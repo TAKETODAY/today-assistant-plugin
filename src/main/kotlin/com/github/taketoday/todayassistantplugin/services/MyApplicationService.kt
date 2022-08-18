@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.taketoday.todayassistantplugin.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.taketoday.todayassistantplugin.MyBundle
 
 class MyApplicationService {
 
