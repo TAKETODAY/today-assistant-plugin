@@ -1,18 +1,31 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.taketoday.todayassistantplugin</id>
-    <name>today-assistant-plugin</name>
-    <vendor>taketoday</vendor>
 
-    <depends>com.intellij.modules.platform</depends>
+  <name>Today Infrastructure Assistant</name>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.taketoday.todayassistantplugin.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.taketoday.todayassistantplugin.services.MyProjectService"/>
-    </extensions>
+  <id>cn.taketoday.assistant</id>
+  <vendor email="taketoday@foxmail.com" url="https://taketoday.cn">Harry Yang</vendor>
 
-    <applicationListeners>
-        <listener class="com.github.taketoday.todayassistantplugin.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.java</depends>
+  <depends>com.intellij.modules.lang</depends>
+  <depends>org.jetbrains.plugins.yaml</depends>
+  <depends>com.intellij.properties</depends>
+
+
+  <!-- Optional dependency on another plugin.
+     If the plugin with the "com.MySecondPlugin" ID is installed, the contents of mysecondplugin.xml
+     (the format of this file conforms to the format of plugin.xml) will be loaded. -->
+  <depends config-file="maven.xml" optional="true">org.jetbrains.idea.maven</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="cn.taketoday.assistant.service.ApplicationService" />
+    <projectService serviceImplementation="cn.taketoday.assistant.service.ProjectService" />
+  </extensions>
+
+  <applicationListeners>
+    <listener class="cn.taketoday.assistant.listener.PluginProjectManagerListener"
+        topic="com.intellij.openapi.project.ProjectManagerListener" />
+  </applicationListeners>
+
 </idea-plugin>
