@@ -1,13 +1,11 @@
+import org.gradle.api.JavaVersion.VERSION_17
 import org.jetbrains.changelog.markdownToHTML
-import org.gradle.api.JavaVersion.VERSION_11
 
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     // Java support
     id("java")
-    // Kotlin support
-//    id("org.jetbrains.kotlin.jvm") version "1.7.10"
     // Gradle IntelliJ Plugin
     id("org.jetbrains.intellij") version "1.8.0"
     // Gradle Changelog Plugin
@@ -19,7 +17,8 @@ plugins {
 
 
 java {
-//    sourceCompatibility = VERSION_11
+    sourceCompatibility = VERSION_17
+    targetCompatibility = VERSION_17
 }
 
 group = properties("pluginGroup")
@@ -32,18 +31,12 @@ repositories {
 }
 
 dependencies {
+    implementation("cn.taketoday", "today-core", "4.0.0-Draft.1")
 
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.1")
     testImplementation("org.mockito", "mockito-core", "2.12.0")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.8.1")
 }
-
-// Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3
-//kotlin {
-//    jvmToolchain {
-//        languageVersion.set(JavaLanguageVersion.of(17))
-//    }
-//}
 
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
