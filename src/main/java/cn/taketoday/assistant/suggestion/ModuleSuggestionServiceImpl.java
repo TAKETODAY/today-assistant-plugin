@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import javax.annotation.Nullable;
+import cn.taketoday.lang.Nullable;
 
 import static com.intellij.openapi.application.ApplicationManager.getApplication;
 
