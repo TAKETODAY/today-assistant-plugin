@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+
+<component name="LanguageInjectionConfiguration">
+
+  <!-- JDBC @formatter:off-->
+
+  <injection language="SQL" injector-id="java">
+    <display-name>Repo Manager (cn.taketoday.jdbc.RepositoryManager)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQuery").definedInClass("cn.taketoday.jdbc.RepositoryManager"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>Jdbc Connection (cn.taketoday.jdbc.JdbcConnection)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQuery").definedInClass("cn.taketoday.jdbc.JdbcConnection"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createQueryWithParams").definedInClass("cn.taketoday.jdbc.JdbcConnection"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.core.JdbcOperations)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("batchUpdate").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("execute").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("query").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForInt").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForList").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForLong").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForMap").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForObject").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForRowSet").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForStream").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("update").definedInClass("cn.taketoday.jdbc.core.JdbcOperations"))]]></place>
+   </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.core.PreparedStatementCreatorFactory)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("PreparedStatementCreatorFactory").withParameters("java.lang.String","int[]").definedInClass("cn.taketoday.jdbc.core.PreparedStatementCreatorFactory"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("PreparedStatementCreatorFactory").withParameters("java.lang.String","java.util.List").definedInClass("cn.taketoday.jdbc.core.PreparedStatementCreatorFactory"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("PreparedStatementCreatorFactory").withParameters("java.lang.String").definedInClass("cn.taketoday.jdbc.core.PreparedStatementCreatorFactory"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("batchUpdate").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("execute").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("query").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForInt").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForList").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForLong").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForMap").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForObject").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForRowSet").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("queryForStream").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("update").definedInClass("cn.taketoday.jdbc.core.namedparam.NamedParameterJdbcOperations"))]]></place>
+  </injection>
+
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.object.SqlCall)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlCall").withParameters("javax.sql.DataSource", "java.lang.String").definedInClass("cn.taketoday.jdbc.object.SqlCall"))]]></place>
+   </injection>
+
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.object.SqlFunction)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlFunction").withParameters("javax.sql.DataSource", "java.lang.String").definedInClass("cn.taketoday.jdbc.object.SqlFunction"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlFunction").withParameters("javax.sql.DataSource", "java.lang.String", "int[]").definedInClass("cn.taketoday.jdbc.object.SqlFunction"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlFunction").withParameters("javax.sql.DataSource", "java.lang.String", "int[]", "java.lang.Class").definedInClass("cn.taketoday.jdbc.object.SqlFunction"))]]></place>
+   </injection>
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.object.SqlFunction)</display-name>
+     <place disabled="true"><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlFunction").withParameters("javax.sql.DataSource", "java.lang.String").definedInClass("cn.taketoday.jdbc.object.SqlFunction"))]]></place>
+     <place disabled="true"><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlFunction").withParameters("javax.sql.DataSource", "java.lang.String", "int[]").definedInClass("cn.taketoday.jdbc.object.SqlFunction"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlFunction").withParameters("javax.sql.DataSource", "java.lang.String", "int[]", "java.lang.Class").definedInClass("cn.taketoday.jdbc.object.SqlFunction"))]]></place>
+   </injection>
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.object.SqlOperation.newPreparedStatementCreator)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("newPreparedStatementCreator").withParameters("java.lang.String", "java.lang.Object[]").definedInClass("cn.taketoday.jdbc.object.SqlOperation"))]]></place>
+   </injection>
+
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.object.SqlQuery)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("execute").withParameters("java.lang.String").definedInClass("cn.taketoday.jdbc.object.SqlQuery"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("execute").withParameters("java.lang.String", "java.util.Map").definedInClass("cn.taketoday.jdbc.object.SqlQuery"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlQuery").withParameters("javax.sql.DataSource", "java.lang.String").definedInClass("cn.taketoday.jdbc.object.SqlQuery"))]]></place>
+   </injection>
+
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.object.SqlUpdate)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlUpdate").withParameters("javax.sql.DataSource", "java.lang.String").definedInClass("cn.taketoday.jdbc.object.SqlUpdate"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlUpdate").withParameters("javax.sql.DataSource", "java.lang.String", "int[]").definedInClass("cn.taketoday.jdbc.object.SqlUpdate"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("SqlUpdate").withParameters("javax.sql.DataSource", "java.lang.String", "int[]", "int").definedInClass("cn.taketoday.jdbc.object.SqlUpdate"))]]></place>
+   </injection>
+
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.support.SQLExceptionTranslator)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("translate").withParameters("java.lang.String","java.lang.String","java.sql.SQLException").definedInClass("cn.taketoday.jdbc.support.SQLExceptionTranslator"))]]></place>
+   </injection>
+
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.support.SQLErrorCodeSQLExceptionTranslator)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("customTranslate").withParameters("java.lang.String","java.lang.String","java.sql.SQLException").definedInClass("cn.taketoday.jdbc.support.SQLErrorCodeSQLExceptionTranslator"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("logTranslation").withParameters("java.lang.String","java.lang.String","java.sql.SQLException","boolean").definedInClass("cn.taketoday.jdbc.support.SQLErrorCodeSQLExceptionTranslator"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("doTranslate").withParameters("java.lang.String","java.lang.String","java.sql.SQLException").definedInClass("cn.taketoday.jdbc.support.SQLErrorCodeSQLExceptionTranslator"))]]></place>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("createCustomException").withParameters("java.lang.String","java.lang.String","java.sql.SQLException","java.lang.Class").definedInClass("cn.taketoday.jdbc.support.SQLErrorCodeSQLExceptionTranslator"))]]></place>
+   </injection>
+
+   <injection language="SQL" injector-id="java">
+     <display-name>JDBC (cn.taketoday.jdbc.support.SQLExceptionSubclassTranslator)</display-name>
+     <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("doTranslate").withParameters("java.lang.String","java.lang.String","java.sql.SQLException").definedInClass("cn.taketoday.jdbc.support.SQLExceptionSubclassTranslator"))]]></place>
+   </injection>
+
+   <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.support.SQLExceptionTranslator)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("translate").withParameters("java.lang.String","java.lang.String","java.sql.SQLException").definedInClass("cn.taketoday.jdbc.support.SQLExceptionTranslator"))]]></place>
+   </injection>
+
+   <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.support.SQLStateSQLExceptionTranslator)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("doTranslate").withParameters("java.lang.String","java.lang.String","java.sql.SQLException").definedInClass("cn.taketoday.jdbc.support.SQLStateSQLExceptionTranslator"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.object.BatchSqlUpdate)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("BatchSqlUpdate").definedInClass("cn.taketoday.jdbc.object.BatchSqlUpdate"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.object.MappingSqlQuery.MappingSqlQuery)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("MappingSqlQuery").withParameters("javax.sql.DataSource", "java.lang.String").definedInClass("cn.taketoday.jdbc.object.MappingSqlQuery"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.object.MappingSqlQueryWithParameters.MappingSqlQueryWithParameters)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("MappingSqlQueryWithParameters").withParameters("javax.sql.DataSource", "java.lang.String").definedInClass("cn.taketoday.jdbc.object.MappingSqlQueryWithParameters"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.object.RdbmsOperation.setSql)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("setSql").withParameters("java.lang.String").definedInClass("cn.taketoday.jdbc.object.RdbmsOperation"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>JDBC (cn.taketoday.jdbc.object.UpdatableSqlQuery.UpdatableSqlQuery)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(1, psiMethod().withName("UpdatableSqlQuery").withParameters("javax.sql.DataSource", "java.lang.String").definedInClass("cn.taketoday.jdbc.object.UpdatableSqlQuery"))]]></place>
+  </injection>
+
+  <injection language="SQL" injector-id="java">
+    <display-name>JDBC Query (cn.taketoday.data.jdbc.repository.query.Query)</display-name>
+    <place><![CDATA[psiMethod().withName("value").withParameters().definedInClass("cn.taketoday.data.jdbc.repository.query.Query")]]></place>
+  </injection>
+
+  <!-- Hibernate -->
+
+  <injection language="HQL" injector-id="java">
+    <display-name>HibernateOperations (cn.taketoday.orm.hibernate5)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("bulkUpdate").definedInClass("cn.taketoday.orm.hibernate5.HibernateOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("find").definedInClass("cn.taketoday.orm.hibernate5.HibernateOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("findByNamedParam").definedInClass("cn.taketoday.orm.hibernate5.HibernateOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("findByValueBean").definedInClass("cn.taketoday.orm.hibernate5.HibernateOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("iterate").definedInClass("cn.taketoday.orm.hibernate5.HibernateOperations"))]]></place>
+  </injection>
+
+  <injection language="JPAQL" injector-id="java">
+    <display-name>JpaOperations (cn.taketoday.orm.jpa)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("find").definedInClass("cn.taketoday.orm.jpa.JpaOperations"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("findByNamedParams").definedInClass("cn.taketoday.orm.jpa.JpaOperations"))]]></place>
+  </injection>
+
+  <!-- Test Sql -->
+  <injection language="SQL" injector-id="java">
+    <display-name>Test Sql (cn.taketoday.test.context.jdbc)</display-name>
+    <place><![CDATA[psiMethod().withName("statements").withParameters().definedInClass("cn.taketoday.test.context.jdbc.Sql")]]></place>
+  </injection>
+
+</component>

@@ -19,10 +19,9 @@
   -->
 
 <idea-plugin>
-
-  <extensions defaultExtensionNs="com.intellij">
-    <postStartupActivity
-        implementation="cn.taketoday.assistant.startup.MavenReIndexingDependencyChangeSubscriber" />
+  <extensions defaultExtensionNs="org.intellij.intelliLang">
+    <injectionConfig config="injections/sql.xml" />
+    <injectionConfig config="injections/http.xml" />
+    <injectionConfig config="injections/el.xml" />
   </extensions>
-
 </idea-plugin>

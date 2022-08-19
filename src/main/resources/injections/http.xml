@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
   ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
@@ -18,11 +19,16 @@
   ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
   -->
 
-<idea-plugin>
+<component name="LanguageInjectionConfiguration">
 
-  <extensions defaultExtensionNs="com.intellij">
-    <postStartupActivity
-        implementation="cn.taketoday.assistant.startup.MavenReIndexingDependencyChangeSubscriber" />
-  </extensions>
+  <!-- HTTP @formatter:off-->
 
-</idea-plugin>
+  <injection language="http-header-reference" injector-id="java">
+    <display-name>HttpHeaders (cn.taketoday.http)</display-name>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName(
+        "set", "add", "addAll", "getFirst", "containsKey", "get", "put", "getFirstDate", "setDate", "setInstant", "setZonedDateTime"
+    ).definedInClass("cn.taketoday.http.HttpHeaders"))]]></place>
+    <place><![CDATA[psiParameter().ofMethod(0, psiMethod().withName("header").definedInClass("cn.taketoday.http.ResponseEntity.HeadersBuilder"))]]></place>
+  </injection>
+
+</component>
