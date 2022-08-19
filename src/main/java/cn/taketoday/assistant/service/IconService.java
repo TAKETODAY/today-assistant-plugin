@@ -20,24 +20,35 @@
 
 package cn.taketoday.assistant.service;
 
-import com.intellij.openapi.components.Service;
-import com.intellij.openapi.project.Project;
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.NotNullLazyValue;
+import com.intellij.ui.LayeredIcon;
+
+import javax.swing.Icon;
+
+import cn.taketoday.assistant.Icons;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/18 21:48
+ * @since 1.0 2022/8/19 15:48
  */
-@Service
-public class ProjectService {
+public class IconService {
 
-  private final Project project;
+  private static final NotNullLazyValue<Icon> ICON = NotNullLazyValue.lazy(() ->
+          new LayeredIcon(Icons.Today, AllIcons.Actions.New));
+  private static final NotNullLazyValue<Icon> GUTTER_ICON = NotNullLazyValue.lazy(() ->
+          new LayeredIcon(Icons.Gutter.Today, AllIcons.Actions.New));
 
-  public ProjectService(Project project) {
-    this.project = project;
+  public static IconService getInstance() {
+    return ApplicationManager.getApplication().getService(IconService.class);
   }
 
-  public Project getProject() {
-    return project;
+  public Icon getFileIcon() {
+    return ICON.getValue();
   }
 
+  public Icon getGutterIcon() {
+    return GUTTER_ICON.getValue();
+  }
 }

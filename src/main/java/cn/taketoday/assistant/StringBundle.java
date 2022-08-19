@@ -18,26 +18,26 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.service;
+package cn.taketoday.assistant;
 
-import com.intellij.openapi.components.Service;
-import com.intellij.openapi.project.Project;
+import com.intellij.DynamicBundle;
 
-/**
- * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/18 21:48
- */
-@Service
-public class ProjectService {
+import java.util.function.Supplier;
 
-  private final Project project;
+public final class StringBundle extends DynamicBundle {
+  private static final String PATH_TO_BUNDLE = "messages.StringBundle";
+  private static final StringBundle ourInstance = new StringBundle();
 
-  public ProjectService(Project project) {
-    this.project = project;
+  public static String message(String key, Object... params) {
+    return ourInstance.getMessage(key, params);
   }
 
-  public Project getProject() {
-    return project;
+  public static Supplier<String> messagePointer(String key, Object... params) {
+    return ourInstance.getLazyMessage(key, params);
+  }
+
+  private StringBundle() {
+    super(PATH_TO_BUNDLE);
   }
 
 }

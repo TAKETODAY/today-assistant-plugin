@@ -39,8 +39,28 @@
   <depends optional="true" config-file="lang-injections.xml">org.intellij.intelliLang</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="cn.taketoday.assistant.service.IconService" />
     <applicationService serviceImplementation="cn.taketoday.assistant.service.ApplicationService" />
     <projectService serviceImplementation="cn.taketoday.assistant.service.ProjectService" />
+
+    <!-- today-strategies.properties -->
+    <fileType name="today-strategies.properties" fieldName="FILE_TYPE"
+        implementationClass="cn.taketoday.assistant.core.TodayStrategiesFileType" />
+    <idIndexer filetype="today-strategies.properties" implementationClass="com.intellij.lang.properties.idCache.PropertiesIdIndexer" />
+    <todoIndexer filetype="today-strategies.properties" implementationClass="com.intellij.lang.properties.idCache.PropertiesTodoIndexer" />
+
+    <properties.alphaUnsortedInspectionSuppressor
+        implementation="cn.taketoday.assistant.core.TodayStrategiesFileInspectionSuppressor" />
+
+    <properties.implicitPropertyUsageProvider
+        implementation="cn.taketoday.assistant.core.StrategiesImplicitPropertyUsageProvider" />
+
+    <psi.referenceContributor language="Properties"
+        implementation="cn.taketoday.assistant.core.StrategiesReferenceContributor" />
+
+    <moduleService serviceImplementation="cn.taketoday.assistant.core.StrategiesManager" />
+    <fileBasedIndex implementation="cn.taketoday.assistant.core.StrategiesFileIndex" />
+
   </extensions>
 
   <applicationListeners>

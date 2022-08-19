@@ -18,26 +18,21 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.service;
+package cn.taketoday.assistant.core;
 
-import com.intellij.openapi.components.Service;
-import com.intellij.openapi.project.Project;
+import com.intellij.lang.properties.codeInspection.unsorted.AlphaUnsortedPropertiesFileInspectionSuppressor;
+import com.intellij.lang.properties.psi.PropertiesFile;
+import com.intellij.openapi.fileTypes.FileTypeRegistry;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/18 21:48
+ * @since 1.0 2022/8/19 18:37
  */
-@Service
-public class ProjectService {
+public class TodayStrategiesFileInspectionSuppressor
+        implements AlphaUnsortedPropertiesFileInspectionSuppressor {
 
-  private final Project project;
-
-  public ProjectService(Project project) {
-    this.project = project;
+  @Override
+  public boolean suppressInspectionFor(PropertiesFile propertiesFile) {
+    return FileTypeRegistry.getInstance().isFileOfType(propertiesFile.getVirtualFile(), TodayStrategiesFileType.FILE_TYPE);
   }
-
-  public Project getProject() {
-    return project;
-  }
-
 }
