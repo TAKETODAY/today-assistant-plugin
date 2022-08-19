@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+
+<component name="LanguageInjectionConfiguration">
+
+  <!-- EL @formatter:off-->
+
+  <injection language="EL" injector-id="java">
+    <display-name>@Cacheable and @CacheEvict</display-name>
+    <place><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("cn.taketoday.cache.annotation.Cacheable")]]></place>
+    <place><![CDATA[psiMethod().withName("unless").withParameters().definedInClass("cn.taketoday.cache.annotation.Cacheable")]]></place>
+    <place><![CDATA[psiMethod().withName("key").withParameters().definedInClass("cn.taketoday.cache.annotation.Cacheable")]]></place>
+
+    <place><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("cn.taketoday.cache.annotation.CacheEvict")]]></place>
+    <place><![CDATA[psiMethod().withName("key").withParameters().definedInClass("cn.taketoday.cache.annotation.CacheEvict")]]></place>
+
+    <place><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("cn.taketoday.cache.annotation.CachePut")]]></place>
+    <place><![CDATA[psiMethod().withName("key").withParameters().definedInClass("cn.taketoday.cache.annotation.CachePut")]]></place>
+    <place><![CDATA[psiMethod().withName("unless").withParameters().definedInClass("cn.taketoday.cache.annotation.CachePut")]]></place>
+  </injection>
+
+  <injection language="EL" injector-id="java">
+    <display-name>@EventListener</display-name>
+    <place><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("cn.taketoday.context.event.EventListener")]]></place>
+    <place><![CDATA[psiMethod().withName("condition").withParameters().definedInClass("cn.taketoday.transaction.event.TransactionalEventListener")]]></place>
+  </injection>
+
+</component>
