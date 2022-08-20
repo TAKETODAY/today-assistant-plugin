@@ -62,6 +62,25 @@
     <moduleService serviceImplementation="cn.taketoday.assistant.core.StrategiesManager" />
     <fileBasedIndex implementation="cn.taketoday.assistant.core.StrategiesFileIndex" />
 
+    <!--@formatter:off-->
+    <problemFileHighlightFilter implementation="cn.taketoday.assistant.code.ProblemFileHighlightFilter"/>
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.code.BeanAnnotator" />
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.code.AutowiredAnnotator" />
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.code.ComponentScanAnnotator" />
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.code.CacheableAnnotator" />
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.code.EventListenerAnnotator" />
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.code.ScheduledTasksLineMarker" />
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.code.PropertiesAnnotator" />
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.core.StrategiesRegistrationAnnotator" />
+
+<!--    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="com.intellij.spring.gutter.SpringTestConfigurationAnnotator" />-->
+<!--    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="com.intellij.spring.gutter.SpringClassFilesetLineMarkerProvider" />-->
+<!--    <codeInsight.lineMarkerProvider language="XML" order="last"  implementationClass="com.intellij.spring.gutter.SpringDomAnnotator" />-->
+    <!--@formatter:on-->
+
+    <semContributor implementation="cn.taketoday.assistant.code.cache.jam.CacheableSemContributor"/>
+
+
   </extensions>
 
   <applicationListeners>

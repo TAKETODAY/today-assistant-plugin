@@ -20,21 +20,29 @@
 
 package cn.taketoday.assistant.util;
 
+import com.intellij.codeInsight.JavaLibraryModificationTracker;
+import com.intellij.facet.ProjectFacetManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PackageScope;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.spring.facet.SpringFacet;
+import com.intellij.util.containers.ConcurrentFactoryMap;
 import com.intellij.util.containers.ContainerUtil;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -47,7 +55,7 @@ public abstract class CommonUtils {
     return findConfigFilesInMetaInf(module.getProject(), moduleScope, filename, psiFileType);
   }
 
-  public static <T extends PsiFile> @NotNull List<T> findConfigFilesInMetaInf(Project project, GlobalSearchScope scope, String filename, Class<T> psiFileType) {
+  public static <T extends PsiFile> List<T> findConfigFilesInMetaInf(Project project, GlobalSearchScope scope, String filename, Class<T> psiFileType) {
     GlobalSearchScope searchScope = getConfigFilesScope(project, scope);
     if (searchScope == null) {
       return Collections.emptyList();
@@ -63,7 +71,8 @@ public abstract class CommonUtils {
     }
   }
 
-  public static @Nullable GlobalSearchScope getConfigFilesScope(Project project, GlobalSearchScope scope) {
+  @Nullable
+  public static GlobalSearchScope getConfigFilesScope(Project project, GlobalSearchScope scope) {
     PsiPackage metaInfPackage = JavaPsiFacade.getInstance(project).findPackage("META-INF");
     if (metaInfPackage == null) {
       return null;
@@ -73,4 +82,34 @@ public abstract class CommonUtils {
       return scope.intersectWith(packageScope);
     }
   }
+
+  public static PsiClass findLibraryClass(@Nullable Module module, String className) {
+    if (module != null && !module.isDisposed()) {
+      Project project = module.getProject();
+      Map<String, PsiClass> cache = CachedValuesManager.getManager(project).getCachedValue(module, () -> {
+        Map<String, PsiClass> map = ConcurrentFactoryMap.createMap((key) -> findLibraryClass(project, key, GlobalSearchScope.moduleRuntimeScope(module, false)));
+        return CachedValueProvider.Result.createSingleDependency(map, JavaLibraryModificationTracker.getInstance(module.getProject()));
+      });
+      return cache.get(className);
+    }
+    else {
+      return null;
+    }
+  }
+
+  @Nullable
+  private static PsiClass findLibraryClass(Project project,
+          String fqn, GlobalSearchScope searchScope) {
+    return DumbService.getInstance(project)
+            .runReadActionInSmartMode(() -> JavaPsiFacade.getInstance(project).findClass(fqn, searchScope));
+  }
+
+  public static boolean hasSpringFacets(Project project) {
+    return ProjectFacetManager.getInstance(project).hasFacets(SpringFacet.FACET_TYPE_ID);
+  }
+
+  public static boolean hasSpringFacet(@Nullable Module module) {
+    return module != null && SpringFacet.getInstance(module) != null;
+  }
+
 }

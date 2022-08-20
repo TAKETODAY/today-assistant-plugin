@@ -27,7 +27,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.PairProcessor;
 
-import org.jetbrains.annotations.Nullable;
+import cn.taketoday.lang.Nullable;
 
 import java.util.List;
 

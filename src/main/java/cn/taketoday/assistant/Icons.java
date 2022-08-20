@@ -29,47 +29,13 @@ import javax.swing.Icon;
  * @since 1.0 2022/8/19 15:49
  */
 public interface Icons {
-  Icon AbstractBean = load("icons/abstractBean.svg");
-  Icon FactoryMethodBean = load("icons/factoryMethodBean.svg");
-  Icon FileSet = load("icons/fileSet.svg");
-  Icon ImplicitBean = load("icons/implicitBean.svg");
-  Icon InfrastructureBean = load("icons/infrastructureBean.svg");
-  Icon Listener = load("icons/listener.svg");
-  Icon PrototypeBean = load("icons/prototypeBean.svg");
-  Icon RequestMapping = load("icons/RequestMapping.svg");
-  Icon ShowAutowiredDependencies = load("icons/showAutowiredDependencies.svg");
-  Icon ShowCacheable = load("icons/showCacheable.svg");
   Icon Today = load("icons/today.svg");
-  Icon Bean = load("icons/Bean.svg");
-  Icon Config = load("icons/Config.svg");
-  Icon JavaBean = load("icons/JavaBean.svg");
-  Icon JavaConfig = load("icons/JavaConfig.svg");
-  Icon Profile = load("icons/Profile.svg");
-  Icon Property = load("icons/Property.svg");
-  Icon ToolWindow = load("icons/ToolWindow.svg");
-  Icon Web = load("icons/Web.svg");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, Icons.class);
   }
 
   interface Gutter {
-    Icon FactoryMethodBean = Icons.load("icons/gutter/factoryMethodBean.svg");
-    Icon InfrastructureBean = Icons.load("icons/gutter/infrastructureBean.svg");
-    Icon Listener = Icons.load("icons/gutter/listener.svg");
-    Icon ParentBeanGutter = Icons.load("icons/gutter/parentBeanGutter.svg");
-    Icon Publisher = Icons.load("icons/gutter/publisher.svg");
-    Icon RequestMapping = Icons.load("icons/gutter/requestMapping.svg");
-    Icon ShowAutowiredCandidates = Icons.load("icons/gutter/showAutowiredCandidates.svg");
-    Icon ShowAutowiredDependencies = Icons.load("icons/gutter/showAutowiredDependencies.svg");
-    Icon ShowCacheable = Icons.load("icons/gutter/showCacheable.svg");
     Icon Today = Icons.load("icons/gutter/today.svg");
-    Icon Bean = Icons.load("icons/gutter/Bean.svg");
-    Icon BeanMethod = Icons.load("icons/gutter/BeanMethod.svg");
-    Icon Config = Icons.load("icons/gutter/Config.svg");
-    Icon JavaBean = Icons.load("icons/gutter/JavaBean.svg");
-    Icon Property = Icons.load("icons/gutter/Property.svg");
-    Icon Scan = Icons.load("icons/gutter/Scan.svg");
-
   }
 }

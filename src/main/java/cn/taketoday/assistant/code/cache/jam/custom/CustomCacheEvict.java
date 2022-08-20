@@ -18,30 +18,24 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant;
+package cn.taketoday.assistant.code.cache.jam.custom;
 
-import com.intellij.DynamicBundle;
+import com.intellij.psi.PsiMember;
+import com.intellij.psi.PsiNamedElement;
+import com.intellij.semantic.SemKey;
+import cn.taketoday.assistant.code.cache.CacheableConstant;
+import cn.taketoday.assistant.code.cache.jam.CustomCacheableElement;
+import cn.taketoday.assistant.code.cache.jam.standard.CacheEvictMarker;
 
-import java.util.function.Supplier;
+public abstract class CustomCacheEvict<T extends PsiMember & PsiNamedElement> extends CustomCacheableElement<T> implements CacheEvictMarker {
+  public static final SemKey<CustomCacheEvict> CUSTOM_CACHE_EVICT_JAM_KEY = CUSTOM_ROOT_JAM_KEY.subKey("SpringJamCustomCacheEvict");
 
-/**
- * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/20 01:19
- */
-public final class StringBundle extends DynamicBundle {
-  private static final String PATH_TO_BUNDLE = "messages.StringBundle";
-  private static final StringBundle ourInstance = new StringBundle();
-
-  public static String message(String key, Object... params) {
-    return ourInstance.getMessage(key, params);
+  public CustomCacheEvict(String annoName, T t) {
+    super(annoName, t);
   }
 
-  public static Supplier<String> messagePointer(String key, Object... params) {
-    return ourInstance.getLazyMessage(key, params);
+  @Override
+  protected String getDefiningAnnotation() {
+    return CacheableConstant.CACHE_EVICT;
   }
-
-  private StringBundle() {
-    super(PATH_TO_BUNDLE);
-  }
-
 }

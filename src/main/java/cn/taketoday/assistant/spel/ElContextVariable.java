@@ -18,30 +18,29 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant;
+package cn.taketoday.assistant.spel;
 
-import com.intellij.DynamicBundle;
+import com.intellij.javaee.el.util.ELImplicitVariable;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiType;
 
-import java.util.function.Supplier;
+import javax.swing.Icon;
+
+import cn.taketoday.assistant.Icons;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/20 01:19
+ * @since 1.0 2022/8/20 17:46
  */
-public final class StringBundle extends DynamicBundle {
-  private static final String PATH_TO_BUNDLE = "messages.StringBundle";
-  private static final StringBundle ourInstance = new StringBundle();
+public class ElContextVariable extends ELImplicitVariable {
 
-  public static String message(String key, Object... params) {
-    return ourInstance.getMessage(key, params);
+  public ElContextVariable(String beanName, PsiType psiType, PsiElement declaration) {
+    super(declaration.getContainingFile(), beanName, psiType, declaration, "NESTED");
   }
 
-  public static Supplier<String> messagePointer(String key, Object... params) {
-    return ourInstance.getLazyMessage(key, params);
-  }
-
-  private StringBundle() {
-    super(PATH_TO_BUNDLE);
+  @Override
+  public Icon getIcon(boolean open) {
+    return Icons.Today;
   }
 
 }

@@ -32,7 +32,7 @@ import com.intellij.util.ProcessingContext;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/19 18:37
+ * @since 1.0 2022/8/20 01:19
  */
 public final class StrategiesClassReferenceProvider extends PsiReferenceProvider {
   public static final String VALUE_DELIMITERS = ",\\ ";

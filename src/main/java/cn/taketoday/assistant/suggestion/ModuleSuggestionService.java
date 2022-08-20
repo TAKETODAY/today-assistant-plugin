@@ -37,7 +37,7 @@ import cn.taketoday.lang.Nullable;
  * @since 1.0 2022/8/19 00:05
  */
 public interface ModuleSuggestionService {
-  static ModuleSuggestionService getInstance(@NotNull Module module) {
+  static ModuleSuggestionService getInstance(Module module) {
     return module.getService(ModuleSuggestionService.class);
   }
 

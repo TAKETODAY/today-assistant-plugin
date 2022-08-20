@@ -18,7 +18,11 @@
   ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
   -->
 
-<idea-plugin>
+<idea-plugin package="cn.taketoday.assistant.facet">
+
+  <extensions defaultExtensionNs="org.jetbrains.idea.maven">
+    <importer implementation="cn.taketoday.assistant.facet.SpringFacetImporter" />
+  </extensions>
 
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity

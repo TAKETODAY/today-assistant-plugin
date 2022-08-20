@@ -21,8 +21,10 @@
 package cn.taketoday.assistant.core;
 
 import com.intellij.lang.properties.IProperty;
+import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.lang.properties.psi.impl.PropertiesFileImpl;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.DelimitedListProcessor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
@@ -42,8 +44,6 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.intellij.util.io.externalizer.StringCollectionExternalizer;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,7 +52,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.taketoday.assistant.util.CommonUtils;
-import cn.taketoday.core.MultiValueMap;
+import cn.taketoday.lang.Nullable;
 import kotlin.collections.CollectionsKt;
 import kotlin.jvm.internal.Intrinsics;
 
@@ -77,29 +77,30 @@ public class StrategiesFileIndex extends FileBasedIndexExtension<String, List<St
   @Override
   public DataIndexer<String, List<String>, FileContent> getIndexer() {
     return inputData -> {
-//      byte[] content = inputData.getContent();
-//        Properties properties = new Properties();
-//
-//        ExceptionUtils.sneakyThrow(() -> properties.load(new ByteArrayInputStream(content)));
+      if (inputData.getPsiFile() instanceof PropertiesFile file) {
+        var result = new HashMap<String, List<String>>();
+//        DefaultMultiValueMap<Object, Object> strategies = MultiValueMap.fromLinkedHashMap();
 
-//        MultiValueMap<String, String> strategies = new DefaultMultiValueMap<>();
-//        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-//          Object key = entry.getKey();
-//          Object value = entry.getValue();
-//          if (key != null && value != null) {
-//            String strategyKey = key.toString();
-//            // split as string list
-//            List<String> strategyValues = StringUtils.splitAsList(value.toString());
-//            for (String strategyValue : strategyValues) {
-//              strategyValue = strategyValue.trim(); // trim whitespace
-//              if (StringUtils.isNotEmpty(strategyValue)) {
-//                strategies.add(strategyKey, strategyValue);
-//              }
-//            }
-//          }
-//        }
-
-      return MultiValueMap.defaults();
+        for (IProperty property : file.getProperties()) {
+          String key = property.getKey();
+          if (key != null) {
+            String value = property.getValue();
+            if (value != null) {
+              var values = new ArrayList<String>();
+              new DelimitedListProcessor(StrategiesClassReferenceProvider.VALUE_DELIMITERS) {
+                @Override
+                protected void processToken(int start, int end, boolean delimitersOnly) {
+                  String substring = value.substring(start, end);
+                  values.add(substring.replace('$', '.'));
+                }
+              }.processText(value);
+              result.put(key, values);
+            }
+          }
+        }
+        return result;
+      }
+      return Collections.emptyMap();
     };
   }
 

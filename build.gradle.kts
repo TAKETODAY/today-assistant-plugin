@@ -53,7 +53,6 @@ repositories {
 dependencies {
     implementation("cn.taketoday", "today-core", "4.0.0-Draft.1")
 
-    testImplementation(fileTree("lib"))
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.1")
     testImplementation("org.mockito", "mockito-core", "2.12.0")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.8.1")

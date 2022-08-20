@@ -18,30 +18,20 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant;
+package cn.taketoday.assistant.code.cache.jam.custom;
 
-import com.intellij.DynamicBundle;
+import com.intellij.jam.reflect.JamClassMeta;
+import com.intellij.jam.reflect.JamMemberArchetype;
+import com.intellij.jam.reflect.JamMemberMeta;
+import com.intellij.psi.PsiClass;
+import com.intellij.semantic.SemKey;
 
-import java.util.function.Supplier;
+public class CustomCachePutForClass extends CustomCachePut<PsiClass> {
+  public static final SemKey<CustomCachePutForClass> JAM_KEY = CUSTOM_CACHE_PUT_JAM_KEY.subKey("SpringJamCustomCachePutForClass");
+  public static final JamClassMeta<CustomCachePutForClass> META = new JamClassMeta<>(null, CustomCachePutForClass.class, JAM_KEY);
+  public static final SemKey<JamMemberMeta<PsiClass, CustomCachePutForClass>> META_KEY = META.getMetaKey().subKey("SpringJamCustomCachePutForClass");
 
-/**
- * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/20 01:19
- */
-public final class StringBundle extends DynamicBundle {
-  private static final String PATH_TO_BUNDLE = "messages.StringBundle";
-  private static final StringBundle ourInstance = new StringBundle();
-
-  public static String message(String key, Object... params) {
-    return ourInstance.getMessage(key, params);
+  public CustomCachePutForClass(String annoName, PsiClass aClass) {
+    super(annoName, aClass);
   }
-
-  public static Supplier<String> messagePointer(String key, Object... params) {
-    return ourInstance.getLazyMessage(key, params);
-  }
-
-  private StringBundle() {
-    super(PATH_TO_BUNDLE);
-  }
-
 }
