@@ -31,7 +31,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 
 import org.jetbrains.uast.UAnnotation;
 import org.jetbrains.uast.UAnnotationKt;
@@ -42,6 +41,7 @@ import org.jetbrains.uast.UastContextKt;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
@@ -64,7 +64,7 @@ public final class CacheNamesInspection extends AbstractInfraLocalInspection {
 
   @Override
   public ProblemDescriptor[] checkMethod(UMethod umethod, InspectionManager manager, boolean isOnTheFly) {
-//    if (CommonUtils.isInInfraEnabledModule(umethod)) {
+    if (CommonUtils.isInInfraEnabledModule(umethod)) {
       PsiMethod method = umethod.getJavaPsi();
       PsiElement sourcePsi = umethod.getSourcePsi();
       if (sourcePsi == null) {
@@ -73,43 +73,46 @@ public final class CacheNamesInspection extends AbstractInfraLocalInspection {
       ProblemsHolder holder = new ProblemsHolder(manager, sourcePsi.getContainingFile(), isOnTheFly);
       checkCacheNames(method.getContainingClass(), holder, getJamCacheableElements(method, CachingGroup.ForMethod.META));
       return holder.getResultsArray();
-//    }
-//    return null;
+    }
+    return null;
   }
 
-  private static List<CacheableElement> getJamCacheableElements(
+  private static Supplier<List<CacheableElement>> getJamCacheableElements(
           PsiElement psiElement, JamMemberMeta<?, ? extends CachingGroup<?>> groupMeta) {
+    return () -> {
+      SemService semService = SemService.getSemService(psiElement.getProject());
+      List<CacheableElement> elements = new ArrayList<>(semService.getSemElements(CacheableElement.CACHEABLE_ROOT_JAM_KEY, psiElement));
 
-    List<CacheableElement> elements = new ArrayList<>(SemService.getSemService(psiElement.getProject()).getSemElements(CacheableElement.CACHEABLE_ROOT_JAM_KEY, psiElement));
+      CachingGroup<?> group = JamService.getJamService(psiElement.getProject())
+              .getJamElement(psiElement, groupMeta);
 
-    CachingGroup<?> group = JamService.getJamService(psiElement.getProject())
-            .getJamElement(psiElement, groupMeta);
-
-    if (group != null) {
-      elements.addAll(group.getCacheables());
-      elements.addAll(group.getCacheEvict());
-      elements.addAll(group.getCachePuts());
-    }
-    return elements;
+      if (group != null) {
+        elements.addAll(group.getCacheables());
+        elements.addAll(group.getCacheEvict());
+        elements.addAll(group.getCachePuts());
+      }
+      return elements;
+    };
   }
 
   private static boolean hasDefaultCacheNamesOrCustomCacheResolver(@Nullable PsiClass aClass) {
     if (aClass != null) {
-      SemService service = SemService.getSemService(aClass.getProject());
-      JamCacheConfig cacheConfig = service.getSemElement(JamCacheConfig.CACHE_CONFIG_JAM_KEY, aClass);
+      JamCacheConfig cacheConfig = JamCacheConfig.from(aClass);
       if (cacheConfig != null) {
-        return !cacheConfig.getCacheNamesElement().isEmpty() || cacheConfig.getCacheResolverElement().getValue() != null;
+        return containsNonEmptyNames(cacheConfig.getCacheNames())
+                || cacheConfig.getCacheResolverElement().getValue() != null;
       }
     }
     return false;
   }
 
-  private static void checkCacheNames(@Nullable PsiClass containingClass, ProblemsHolder holder, List<CacheableElement> elements) {
+  private static void checkCacheNames(@Nullable PsiClass containingClass, ProblemsHolder holder,
+          Supplier<List<CacheableElement>> elements) {
     PsiElement annotation;
     if (hasDefaultCacheNamesOrCustomCacheResolver(containingClass)) {
       return;
     }
-    for (CacheableElement<?> cacheable : elements) {
+    for (CacheableElement<?> cacheable : elements.get()) {
       if (!(cacheable instanceof JamCacheConfig)
               && !containsNonEmptyNames(cacheable.getCacheNames())
               && !hasCustomCacheResolver(cacheable)
@@ -134,11 +137,12 @@ public final class CacheNamesInspection extends AbstractInfraLocalInspection {
   }
 
   private static boolean hasCustomCacheResolver(CacheableElement cacheable) {
-    return (cacheable instanceof JamBaseCacheableElement) && ((JamBaseCacheableElement) cacheable).getCacheResolverElement().getValue() != null;
+    return cacheable instanceof JamBaseCacheableElement cacheableElement && cacheableElement.getCacheResolverElement().getValue() != null;
   }
 
+  @Override
   public ProblemDescriptor[] checkClass(UClass uClass, InspectionManager manager, boolean isOnTheFly) {
-    if (SpringCommonUtils.isInSpringEnabledModule(uClass)) {
+    if (CommonUtils.isInInfraEnabledModule(uClass)) {
       PsiClass aClass = uClass.getJavaPsi();
       PsiElement sourcePsi = uClass.getSourcePsi();
       if (sourcePsi == null) {
@@ -150,4 +154,5 @@ public final class CacheNamesInspection extends AbstractInfraLocalInspection {
     }
     return null;
   }
+
 }
