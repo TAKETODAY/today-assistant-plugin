@@ -257,9 +257,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
     if (psiElement != null && psiElement.isValid()) {
       PsiClass aClass = PsiTreeUtil.getParentOfType(psiElement, PsiClass.class);
       if (aClass != null) {
-
-        SemService service = SemService.getSemService(aClass.getProject());
-        JamCacheConfig cacheConfig = service.getSemElement(JamCacheConfig.CACHE_CONFIG_JAM_KEY, aClass);
+        JamCacheConfig cacheConfig = JamCacheConfig.from(aClass);
         if (cacheConfig != null) {
           return cacheConfig.getCacheNames();
         }
