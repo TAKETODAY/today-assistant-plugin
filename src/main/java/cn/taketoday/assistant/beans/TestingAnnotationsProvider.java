@@ -18,20 +18,28 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.code.cache.jam.custom;
+package cn.taketoday.assistant.beans;
 
-import com.intellij.jam.reflect.JamClassMeta;
-import com.intellij.jam.reflect.JamMemberArchetype;
-import com.intellij.jam.reflect.JamMemberMeta;
+import com.intellij.codeInsight.MetaAnnotationUtil;
+import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
-import com.intellij.semantic.SemKey;
+import com.intellij.spring.model.jam.testContexts.SpringTestingAnnotationsProvider;
 
-public class CustomCacheableForClass extends CustomCacheable<PsiClass> {
-  public static final SemKey<CustomCacheableForClass> JAM_KEY = CUSTOM_CACHEABLE_JAM_KEY.subKey("SpringJamCustomCacheableForClass");
-  public static final JamClassMeta<CustomCacheableForClass> META = new JamClassMeta<>((JamMemberArchetype) null, CustomCacheableForClass.class, JAM_KEY);
-  public static final SemKey<JamMemberMeta<PsiClass, CustomCacheableForClass>> META_KEY = META.getMetaKey().subKey("SpringJamCustomCacheableForClass");
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
-  public CustomCacheableForClass(String annoName, PsiClass aClass) {
-    super(annoName, aClass);
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 15:08
+ */
+public class TestingAnnotationsProvider implements SpringTestingAnnotationsProvider {
+
+  @Override
+  public Collection<PsiClass> getTestingAnnotations(Module module) {
+    LinkedHashSet<PsiClass> ret = new LinkedHashSet<>();
+    ret.addAll(MetaAnnotationUtil.getAnnotationTypesWithChildren(module, "cn.taketoday.test.context.BootstrapWith", true));
+    ret.addAll(MetaAnnotationUtil.getAnnotationTypesWithChildren(module, "cn.taketoday.test.context.ContextConfiguration", true));
+    return ret;
   }
+
 }

@@ -51,9 +51,6 @@ import com.intellij.util.NotNullFunction;
 import com.intellij.util.Processor;
 import com.intellij.util.SmartList;
 
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -67,37 +64,42 @@ import cn.taketoday.lang.Nullable;
  */
 public final class AliasForUtils {
 
-  public static @Nullable TodayAliasFor findAliasFor(@Nullable PsiElement context, @Nullable String toSearchInAnnotation, String aliasedClassName, String attrName) {
+  public static @Nullable AliasForElement findAliasFor(
+          @Nullable PsiElement context, @Nullable String toSearchInAnnotation,
+          String aliasedClassName, String attrName) {
     if (context == null) {
       return null;
     }
     else {
-      CommonProcessors.FindFirstProcessor<TodayAliasFor> findFirstProcessor = new CommonProcessors.FindFirstProcessor();
+      var findFirstProcessor = new CommonProcessors.FindFirstProcessor<AliasForElement>();
       getAliasFor(context.getProject(), context.getResolveScope(), toSearchInAnnotation, aliasedClassName, attrName, findFirstProcessor);
-      return (TodayAliasFor) findFirstProcessor.getFoundValue();
+      return findFirstProcessor.getFoundValue();
     }
   }
 
-  public static Collection<TodayAliasFor> findAliasForAttributes(@Nullable PsiElement context, @Nullable String toSearchInAnnotation, String aliasedClassName, String attrName) {
-
+  public static Collection<AliasForElement> findAliasForAttributes(
+          @Nullable PsiElement context, @Nullable String toSearchInAnnotation,
+          String aliasedClassName, String attrName) {
     if (context == null) {
       return Collections.emptySet();
     }
     else {
-      CommonProcessors.CollectProcessor<TodayAliasFor> collectProcessor = new CommonProcessors.CollectProcessor();
+      var collectProcessor = new CommonProcessors.CollectProcessor<AliasForElement>();
       getAliasFor(context.getProject(), context.getResolveScope(), toSearchInAnnotation, aliasedClassName, attrName, collectProcessor);
       return collectProcessor.getResults();
     }
   }
 
-  public static @Nullable TodayAliasFor findAliasFor(Project project, @Nullable String toSearchInAnnotation, String aliasedClassName, String attrName) {
-    CommonProcessors.FindFirstProcessor<TodayAliasFor> findFirstProcessor = new CommonProcessors.FindFirstProcessor();
+  public static @Nullable AliasForElement findAliasFor(Project project,
+          @Nullable String toSearchInAnnotation, String aliasedClassName, String attrName) {
+    var findFirstProcessor = new CommonProcessors.FindFirstProcessor<AliasForElement>();
     getAliasFor(project, GlobalSearchScope.allScope(project), toSearchInAnnotation, aliasedClassName, attrName, findFirstProcessor);
     return findFirstProcessor.getFoundValue();
   }
 
-  private static boolean getAliasFor(Project project, GlobalSearchScope scope, @Nullable String toSearchInAnnotation, String aliasedClassName, String attrName,
-          Processor<TodayAliasFor> processor) {
+  private static boolean getAliasFor(Project project, GlobalSearchScope scope,
+          @Nullable String toSearchInAnnotation, String aliasedClassName,
+          String attrName, Processor<AliasForElement> processor) {
 
     if (toSearchInAnnotation == null) {
       return true;
@@ -108,15 +110,15 @@ public final class AliasForUtils {
       if (toSearchInClass != null && toSearchInClass.isAnnotationType()) {
         PsiClass annotationClass = javaPsiFacade.findClass(aliasedClassName, scope);
         if (annotationClass != null && annotationClass.isAnnotationType()) {
-          Iterator var9 = getAliasForAttributes(toSearchInClass).iterator();
+          Iterator<AliasForElement> var9 = getAliasForAttributes(toSearchInClass).iterator();
 
-          TodayAliasFor aliasFor;
+          AliasForElement aliasFor;
           do {
             if (!var9.hasNext()) {
               return true;
             }
 
-            aliasFor = (TodayAliasFor) var9.next();
+            aliasFor = var9.next();
           }
           while (!attrName.equals(aliasFor.getAttributeName()) || !annotationClass.equals(aliasFor.getAnnotationClass()) || processor.process(aliasFor));
 
@@ -132,22 +134,24 @@ public final class AliasForUtils {
     }
   }
 
-  private static List<TodayAliasFor> getAliasForAttributes(PsiClass psiClass) {
-
-    List var10000 = (List) CachedValuesManager.getCachedValue(psiClass, () -> {
-      List<TodayAliasFor> aliasForList = JamService.getJamService(psiClass.getProject()).getAnnotatedMembersList(psiClass, TodayAliasFor.SEM_KEY, 2);
-      return Result.create(aliasForList, new Object[] { psiClass });
+  private static List<AliasForElement> getAliasForAttributes(PsiClass psiClass) {
+    return CachedValuesManager.getCachedValue(psiClass, () -> {
+      List<AliasForElement> aliasForList = JamService.getJamService(psiClass.getProject())
+              .getAnnotatedMembersList(psiClass, AliasForElement.SEM_KEY, JamService.CHECK_METHOD);
+      return Result.create(aliasForList, psiClass);
     });
-    return var10000;
   }
 
-  public static @Nullable PsiAnnotation findDefiningMetaAnnotation(@Nullable PsiElement context, String customAnnotationFqn, String baseMetaAnnotationFqn) {
-
+  @Nullable
+  public static PsiAnnotation findDefiningMetaAnnotation(
+          @Nullable PsiElement context, String customAnnotationFqn, String baseMetaAnnotationFqn) {
     return findDefiningMetaAnnotation(context, customAnnotationFqn, baseMetaAnnotationFqn, false);
   }
 
-  public static @Nullable PsiAnnotation findDefiningMetaAnnotation(@Nullable PsiElement context, String customAnnotationFqn, String baseMetaAnnotationFqn, boolean includingTests) {
-
+  @Nullable
+  public static PsiAnnotation findDefiningMetaAnnotation(
+          @Nullable PsiElement context, String customAnnotationFqn,
+          String baseMetaAnnotationFqn, boolean includingTests) {
     if (context == null) {
       return null;
     }
@@ -165,16 +169,17 @@ public final class AliasForUtils {
     }
   }
 
-  public static @Nullable PsiAnnotation findDefiningMetaAnnotation(@Nullable PsiClass customAnnoClass, String baseMetaAnnotationFqn,
-          Collection<? extends PsiClass> allMetaAnnotations) {
+  @Nullable
+  public static PsiAnnotation findDefiningMetaAnnotation(@Nullable PsiClass customAnnoClass,
+          String baseMetaAnnotationFqn, Collection<? extends PsiClass> allMetaAnnotations) {
 
     if (customAnnoClass != null && customAnnoClass.isAnnotationType()) {
-      PsiAnnotation psiAnnotation = AnnotationUtil.findAnnotation(customAnnoClass, true, new String[] { baseMetaAnnotationFqn });
+      PsiAnnotation psiAnnotation = AnnotationUtil.findAnnotation(customAnnoClass, true, baseMetaAnnotationFqn);
       if (psiAnnotation != null) {
         return psiAnnotation;
       }
       else {
-        Iterator var4 = allMetaAnnotations.iterator();
+        Iterator<? extends PsiClass> var4 = allMetaAnnotations.iterator();
 
         PsiClass customMetaAnnoClass;
         String qualifiedName;
@@ -183,7 +188,7 @@ public final class AliasForUtils {
             return null;
           }
 
-          customMetaAnnoClass = (PsiClass) var4.next();
+          customMetaAnnoClass = var4.next();
           qualifiedName = customMetaAnnoClass.getQualifiedName();
         }
         while (qualifiedName == null || !AnnotationUtil.isAnnotated(customAnnoClass, qualifiedName, 1));
@@ -196,76 +201,68 @@ public final class AliasForUtils {
     }
   }
 
-  public static NotNullFunction<Pair<String, Project>, JamAnnotationMeta> getAnnotationMetaProducer(SemKey<JamAnnotationMeta> annoMetaKey, JamMemberMeta<?, ?>... parentMetas) {
+  public static NotNullFunction<Pair<String, Project>, JamAnnotationMeta> getAnnotationMetaProducer(
+          SemKey<JamAnnotationMeta> annoMetaKey, JamMemberMeta<?, ?>... parentMetas) {
 
-    return (anno) -> {
-      return new JamAnnotationMeta((String) anno.first, (JamAnnotationArchetype) null, annoMetaKey) {
-        public @Nullable JamAttributeMeta<?> findAttribute(@Nullable @NonNls String name) {
-          JamAttributeMeta attribute = super.findAttribute(name);
-          if (attribute != null) {
-            return attribute;
-          }
-          else {
-            if (name == null) {
-              name = "value";
-            }
+    return (anno) -> new JamAnnotationMeta(anno.first, null, annoMetaKey) {
 
-            return this.getAliasedAttributeMeta(name);
-          }
+      @Override
+      @Nullable
+      public JamAttributeMeta<?> findAttribute(@Nullable String name) {
+        JamAttributeMeta<?> attribute = super.findAttribute(name);
+        if (attribute != null) {
+          return attribute;
         }
+        else {
+          if (name == null) {
+            name = "value";
+          }
 
-        private @Nullable JamAttributeMeta<?> getAliasedAttributeMeta(String name) {
+          return this.getAliasedAttributeMeta(name);
+        }
+      }
 
-          JamMemberMeta[] var2 = parentMetas;
-          int var3 = var2.length;
+      @Nullable
+      private JamAttributeMeta<?> getAliasedAttributeMeta(String name) {
+        for (JamMemberMeta parentMeta : parentMetas) {
+          List<JamAnnotationMeta> annotations = parentMeta.getAnnotations();
+          for (JamAnnotationMeta annotationMeta : annotations) {
+            List<JamAttributeMeta<?>> parentAnnotationAttributes = getRegisteredAttributes(annotationMeta);
+            for (JamAttributeMeta<?> attributeMeta : parentAnnotationAttributes) {
+              if (attributeMeta instanceof JamStringAttributeMeta meta) {
+                JamConverter<?> converter = meta.getConverter();
+                AliasForElement aliasFor = AliasForUtils.findAliasFor(anno.second, anno.first, annotationMeta.getAnnoName(), meta.getAttributeLink().getAttributeName());
+                if (aliasFor != null) {
+                  String aliasForMethodName = aliasFor.getMethodName();
+                  if (name.equals(aliasForMethodName)) {
+                    if (attributeMeta instanceof JamStringAttributeMeta.Single) {
+                      return JamAttributeMeta.singleString(aliasForMethodName, converter);
+                    }
 
-          for (int var4 = 0; var4 < var3; ++var4) {
-            JamMemberMeta parentMeta = var2[var4];
-            Iterator var6 = parentMeta.getAnnotations().iterator();
-
-            while (var6.hasNext()) {
-              JamAnnotationMeta annotationMeta = (JamAnnotationMeta) var6.next();
-              List parentAnnotationAttributes = this.getRegisteredAttributes(annotationMeta);
-              Iterator var9 = parentAnnotationAttributes.iterator();
-
-              while (var9.hasNext()) {
-                JamAttributeMeta attributeMeta = (JamAttributeMeta) var9.next();
-                if (attributeMeta instanceof JamStringAttributeMeta) {
-                  JamStringAttributeMeta meta = (JamStringAttributeMeta) attributeMeta;
-                  JamConverter converter = meta.getConverter();
-                  TodayAliasFor aliasFor = AliasForUtils.findAliasFor((Project) anno.second, (String) anno.first, annotationMeta.getAnnoName(), meta.getAttributeLink().getAttributeName());
-                  if (aliasFor != null) {
-                    String aliasForMethodName = aliasFor.getMethodName();
-                    if (name.equals(aliasForMethodName)) {
-                      if (attributeMeta instanceof JamStringAttributeMeta.Single) {
-                        return JamAttributeMeta.singleString(aliasForMethodName, converter);
-                      }
-
-                      if (attributeMeta instanceof JamStringAttributeMeta.Collection) {
-                        return JamAttributeMeta.collectionString(aliasForMethodName, converter);
-                      }
+                    if (attributeMeta instanceof JamStringAttributeMeta.Collection) {
+                      return JamAttributeMeta.collectionString(aliasForMethodName, converter);
                     }
                   }
                 }
               }
             }
           }
-
-          return null;
         }
 
-        private List<JamAttributeMeta<?>> getRegisteredAttributes(JamAnnotationMeta annotationMeta) {
+        return null;
+      }
 
-          List attributeMetas = new SmartList();
-          attributeMetas.addAll(annotationMeta.getAttributes());
-          JamAnnotationArchetype archetype = annotationMeta.getArchetype();
-          if (archetype != null) {
-            attributeMetas.addAll(archetype.getAttributes());
-          }
-
-          return attributeMetas;
+      private List<JamAttributeMeta<?>> getRegisteredAttributes(JamAnnotationMeta annotationMeta) {
+        SmartList<JamAttributeMeta<?>> attributeMetas = new SmartList<>();
+        attributeMetas.addAll(annotationMeta.getAttributes());
+        JamAnnotationArchetype archetype = annotationMeta.getArchetype();
+        if (archetype != null) {
+          attributeMetas.addAll(archetype.getAttributes());
         }
-      };
+
+        return attributeMetas;
+      }
     };
   }
+
 }

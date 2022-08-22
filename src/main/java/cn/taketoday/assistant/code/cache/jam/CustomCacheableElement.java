@@ -37,9 +37,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import cn.taketoday.assistant.AliasForUtils;
-import cn.taketoday.assistant.TodayAliasFor;
+import cn.taketoday.assistant.AliasForElement;
 import cn.taketoday.lang.Nullable;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public abstract class CustomCacheableElement<T extends PsiMember & PsiNamedElement> extends CacheableElement<T> {
   public static final SemKey<CustomCacheableElement> CUSTOM_ROOT_JAM_KEY = CACHEABLE_ROOT_JAM_KEY.subKey("SpringJamCustomCacheableElement");
   private final String[] CACHE_NAMES_ATTRIBUTES;
@@ -68,7 +72,7 @@ public abstract class CustomCacheableElement<T extends PsiMember & PsiNamedEleme
   public Set<String> getCacheNames() {
     Set<String> names = new LinkedHashSet<>();
     for (String attrName : this.CACHE_NAMES_ATTRIBUTES) {
-      TodayAliasFor aliasFor = getAliasAttribute(attrName);
+      AliasForElement aliasFor = getAliasAttribute(attrName);
       if (aliasFor != null) {
         var collection = JamAttributeMeta.collectionString(aliasFor.getMethodName());
         for (JamStringAttributeElement<String> stringAttributeElement : collection.getJam(getPsiAnnotationRef())) {
@@ -84,7 +88,7 @@ public abstract class CustomCacheableElement<T extends PsiMember & PsiNamedEleme
     return Collections.emptySet();
   }
 
-  private TodayAliasFor getAliasAttribute(String attrName) {
+  private AliasForElement getAliasAttribute(String attrName) {
     PsiAnnotation annotation = getAnnotation();
     if (annotation == null) {
       return null;

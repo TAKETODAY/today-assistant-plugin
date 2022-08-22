@@ -45,6 +45,10 @@ import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
 import cn.taketoday.lang.Nullable;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public class CachingGroup<T extends PsiMember & PsiNamedElement> extends JamBaseElement<T> {
   public static final SemKey<CachingGroup> CACHING_GROUP_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringJamCachingGroup");
   private static final Collection<JamCachePut> PUT_ATTRIBUTE = JamAttributeMeta.annoCollection("put", JamCachePut.CACHE_PUT_ANNO_META, JamCachePut.class);

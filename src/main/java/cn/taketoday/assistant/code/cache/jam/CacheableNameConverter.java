@@ -48,6 +48,10 @@ import cn.taketoday.lang.Nullable;
 import kotlin.collections.CollectionsKt;
 import kotlin.jvm.internal.Intrinsics;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public final class CacheableNameConverter extends JamConverter<String> {
 
   @Override

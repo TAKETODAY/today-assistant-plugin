@@ -32,7 +32,8 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.spring.dom.SpringDomUtils;
-import com.intellij.spring.model.utils.SpringCommonUtils;
+
+import cn.taketoday.assistant.util.CommonUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -56,7 +57,7 @@ public class ProblemFileHighlightFilter implements Condition<VirtualFile> {
         return false;
       }
       else {
-        return SpringCommonUtils.hasSpringFacet(module) && ReadAction.compute(() -> {
+        return CommonUtils.hasFacet(module) && ReadAction.compute(() -> {
           PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
           return psiFile instanceof XmlFile && SpringDomUtils.isSpringXml((XmlFile) psiFile);
         });

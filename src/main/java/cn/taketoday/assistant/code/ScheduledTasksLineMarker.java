@@ -25,26 +25,22 @@ import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
 import com.intellij.spring.SpringBundle;
-import com.intellij.spring.constants.SpringAnnotationsConstants;
-import com.intellij.util.Function;
 
-import cn.taketoday.lang.Nullable;
 import org.jetbrains.uast.UAnnotation;
-import org.jetbrains.uast.UDeclaration;
 import org.jetbrains.uast.UElement;
 import org.jetbrains.uast.UElementKt;
 import org.jetbrains.uast.UMethod;
 import org.jetbrains.uast.UastUtils;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.lang.Nullable;
 import icons.JavaUltimateIcons;
-import kotlin.jvm.internal.Intrinsics;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -69,15 +65,15 @@ public class ScheduledTasksLineMarker extends LineMarkerProviderDescriptor {
 
   @Override
   @Nullable
-  public LineMarkerInfo getLineMarkerInfo(PsiElement element) {
+  public LineMarkerInfo<PsiElement> getLineMarkerInfo(PsiElement element) {
     return null;
   }
 
   @Override
-  public void collectSlowLineMarkers(List elements, Collection result) {
-    for (Object o : elements) {
-      PsiElement element = (PsiElement) o;
-      LineMarkerInfo markerInfo = computeLineMarkerInfo(element);
+  public void collectSlowLineMarkers(
+          List<? extends PsiElement> elements, Collection<? super LineMarkerInfo<?>> result) {
+    for (PsiElement element : elements) {
+      LineMarkerInfo<PsiElement> markerInfo = computeLineMarkerInfo(element);
       if (markerInfo != null) {
         result.add(markerInfo);
       }
@@ -85,26 +81,14 @@ public class ScheduledTasksLineMarker extends LineMarkerProviderDescriptor {
 
   }
 
-  private final LineMarkerInfo computeLineMarkerInfo(PsiElement element) {
-    UElement var10000 = UastUtils.getUParentForIdentifier(element);
-    if (!(var10000 instanceof UMethod)) {
-      var10000 = null;
-    }
-
-    UDeclaration var6 = (UDeclaration) var10000;
-    if (var6 != null) {
-      UDeclaration parent$iv = var6;
-      var6 = !Intrinsics.areEqual(UElementKt.getSourcePsiElement(parent$iv.getUastAnchor()), element) ? null : parent$iv;
-    }
-    else {
-      var6 = null;
-    }
-
-    if (var6 instanceof UMethod uMethod) {
-      if (isScheduled(uMethod)) {
-        var10000 = uMethod.getUastAnchor();
-        if (var10000 != null) {
-          PsiElement identifyingElement = var10000.getSourcePsi();
+  private LineMarkerInfo<PsiElement> computeLineMarkerInfo(PsiElement element) {
+    UElement identifier = UastUtils.getUParentForIdentifier(element);
+    if (identifier instanceof UMethod uMethod) {
+      if (Objects.equals(UElementKt.getSourcePsiElement(uMethod.getUastAnchor()), element)
+              && isScheduled(uMethod)) {
+        identifier = uMethod.getUastAnchor();
+        if (identifier != null) {
+          PsiElement identifyingElement = identifier.getSourcePsi();
           if (identifyingElement != null) {
             return new LineMarkerInfo<>(identifyingElement,
                     identifyingElement.getTextRange(),
@@ -119,22 +103,12 @@ public class ScheduledTasksLineMarker extends LineMarkerProviderDescriptor {
   }
 
   private boolean isScheduled(UMethod uMethod) {
-    List<UAnnotation> list = uMethod.getUAnnotations();
-    if (list.isEmpty()) {
-      return false;
-    }
-
-    Iterator<UAnnotation> iterator = list.iterator();
-    while (true) {
-      if (!iterator.hasNext()) {
-        return false;
-      }
-
-      UAnnotation anno = iterator.next();
-      if (Intrinsics.areEqual(anno.getQualifiedName(), AnnotationConstant.SCHEDULED)
-              || Intrinsics.areEqual(anno.getQualifiedName(), AnnotationConstant.SCHEDULES)) {
+    for (UAnnotation anno : uMethod.getUAnnotations()) {
+      if (Objects.equals(anno.getQualifiedName(), AnnotationConstant.SCHEDULED)
+              || Objects.equals(anno.getQualifiedName(), AnnotationConstant.SCHEDULES)) {
         return true;
       }
     }
+    return false;
   }
 }

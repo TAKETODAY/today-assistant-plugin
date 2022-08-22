@@ -28,6 +28,10 @@ import cn.taketoday.lang.NonNull;
 import cn.taketoday.lang.Nullable;
 import kotlin.jvm.internal.Intrinsics;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 @Presentation(typeName = SpringCorePresentationConstants.CACHE,
               icon = "com.intellij.spring.SpringApiIcons.ShowCacheable")
 public final class CacheableNameTarget implements PomRenameableTarget<Object> {

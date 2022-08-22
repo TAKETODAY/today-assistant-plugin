@@ -35,17 +35,18 @@ import java.util.Collection;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheConfig;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheEvictForClass;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheEvictForMethod;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCachePutForClass;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCachePutForMethod;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheableForClass;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheableForMethod;
+import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheEvict;
+import cn.taketoday.assistant.code.cache.jam.custom.CustomCachePut;
+import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheable;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheConfig;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheEvict;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 final class CacheableSemContributor extends SemContributor {
   private final PsiClassPattern nonAnnoClass = PsiJavaPatterns.psiClass().nonAnnotationType();
   private final PsiMethodPattern psiMethod = PsiJavaPatterns.psiMethod().constructor(false);
@@ -65,13 +66,13 @@ final class CacheableSemContributor extends SemContributor {
     JamCachePut.ForClass.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(CacheableConstant.CACHE_PUT));
     JamCachePut.ForMethod.META.register(registrar, this.psiMethod.withAnnotation(CacheableConstant.CACHE_PUT));
     Function<Module, Collection<String>> customMetaAnnotations = SpringSemContributorUtil.getCustomMetaAnnotations(CacheableConstant.CACHE_PUT);
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.nonAnnoClass, CustomCachePutForClass.META_KEY, CustomCachePutForClass.JAM_KEY,
-            SpringSemContributorUtil.createFunction(CustomCachePutForClass.JAM_KEY, CustomCachePutForClass.class, customMetaAnnotations, pair -> {
-              return new CustomCachePutForClass(pair.first, pair.second);
+    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.nonAnnoClass, CustomCachePut.ForClass.META_KEY, CustomCachePut.ForClass.JAM_KEY,
+            SpringSemContributorUtil.createFunction(CustomCachePut.ForClass.JAM_KEY, CustomCachePut.ForClass.class, customMetaAnnotations, pair -> {
+              return new CustomCachePut.ForClass(pair.first, pair.second);
             }, null));
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.psiMethod, CustomCachePutForMethod.META_KEY, CustomCachePutForMethod.JAM_KEY,
-            SpringSemContributorUtil.createFunction(CustomCachePutForMethod.JAM_KEY, CustomCachePutForMethod.class, customMetaAnnotations, pair2 -> {
-              return new CustomCachePutForMethod(pair2.first, pair2.second);
+    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.psiMethod, CustomCachePut.ForMethod.META_KEY, CustomCachePut.ForMethod.JAM_KEY,
+            SpringSemContributorUtil.createFunction(CustomCachePut.ForMethod.JAM_KEY, CustomCachePut.ForMethod.class, customMetaAnnotations, pair2 -> {
+              return new CustomCachePut.ForMethod(pair2.first, pair2.second);
             }, null));
   }
 
@@ -79,13 +80,13 @@ final class CacheableSemContributor extends SemContributor {
     JamCacheEvict.ForClass.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(CacheableConstant.CACHE_EVICT));
     JamCacheEvict.ForMethod.META.register(registrar, this.psiMethod.withAnnotation(CacheableConstant.CACHE_EVICT));
     Function<Module, Collection<String>> customMetaAnnotations = SpringSemContributorUtil.getCustomMetaAnnotations(CacheableConstant.CACHE_EVICT);
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.nonAnnoClass, CustomCacheEvictForClass.META_KEY, CustomCacheEvictForClass.JAM_KEY,
-            SpringSemContributorUtil.createFunction(CustomCacheEvictForClass.JAM_KEY, CustomCacheEvictForClass.class, customMetaAnnotations, pair -> {
-              return new CustomCacheEvictForClass(pair.first, pair.second);
+    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.nonAnnoClass, cn.taketoday.assistant.code.cache.jam.custom.CustomCacheEvict.ForClass.META_KEY, cn.taketoday.assistant.code.cache.jam.custom.CustomCacheEvict.ForClass.JAM_KEY,
+            SpringSemContributorUtil.createFunction(cn.taketoday.assistant.code.cache.jam.custom.CustomCacheEvict.ForClass.JAM_KEY, CustomCacheEvict.ForClass.class, customMetaAnnotations, pair -> {
+              return new CustomCacheEvict.ForClass(pair.first, pair.second);
             }, null));
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.psiMethod, CustomCacheEvictForMethod.META_KEY, CustomCacheEvictForMethod.JAM_KEY,
-            SpringSemContributorUtil.createFunction(CustomCacheEvictForMethod.JAM_KEY, CustomCacheEvictForMethod.class, customMetaAnnotations, pair2 -> {
-              return new CustomCacheEvictForMethod(pair2.first, pair2.second);
+    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.psiMethod, CustomCacheEvict.ForMethod.META_KEY, CustomCacheEvict.ForMethod.JAM_KEY,
+            SpringSemContributorUtil.createFunction(CustomCacheEvict.ForMethod.JAM_KEY, CustomCacheEvict.ForMethod.class, customMetaAnnotations, pair2 -> {
+              return new CustomCacheEvict.ForMethod(pair2.first, pair2.second);
             }, null));
   }
 
@@ -93,13 +94,13 @@ final class CacheableSemContributor extends SemContributor {
     JamCacheable.ForClass.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(CacheableConstant.CACHEABLE));
     JamCacheable.ForMethod.META.register(registrar, this.psiMethod.withAnnotation(CacheableConstant.CACHEABLE));
     Function<Module, Collection<String>> customMetaAnnotations = SpringSemContributorUtil.getCustomMetaAnnotations(CacheableConstant.CACHEABLE);
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.nonAnnoClass, CustomCacheableForClass.META_KEY, CustomCacheableForClass.JAM_KEY,
-            SpringSemContributorUtil.createFunction(CustomCacheableForClass.JAM_KEY, CustomCacheableForClass.class, customMetaAnnotations, pair -> {
-              return new CustomCacheableForClass(pair.first, pair.second);
+    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.nonAnnoClass, CustomCacheable.ForClass.META_KEY, CustomCacheable.ForClass.JAM_KEY,
+            SpringSemContributorUtil.createFunction(CustomCacheable.ForClass.JAM_KEY, CustomCacheable.ForClass.class, customMetaAnnotations, pair -> {
+              return new CustomCacheable.ForClass(pair.first, pair.second);
             }, null));
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.psiMethod, CustomCacheableForMethod.META_KEY, CustomCacheableForMethod.JAM_KEY,
-            SpringSemContributorUtil.createFunction(CustomCacheableForMethod.JAM_KEY, CustomCacheableForMethod.class, customMetaAnnotations, pair2 -> {
-              return new CustomCacheableForMethod(pair2.first, pair2.second);
+    SpringSemContributorUtil.registerMetaComponents(semService, registrar, this.psiMethod, CustomCacheable.ForMethod.META_KEY, CustomCacheable.ForMethod.JAM_KEY,
+            SpringSemContributorUtil.createFunction(CustomCacheable.ForMethod.JAM_KEY, CustomCacheable.ForMethod.class, customMetaAnnotations, pair2 -> {
+              return new CustomCacheable.ForMethod(pair2.first, pair2.second);
             }, null));
   }
 

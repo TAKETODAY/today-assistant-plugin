@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.taketoday.assistant.AliasForUtils;
-import cn.taketoday.assistant.TodayAliasFor;
+import cn.taketoday.assistant.AliasForElement;
 import cn.taketoday.assistant.TodayLibraryUtil;
 
 /**
@@ -115,7 +115,7 @@ public final class AliasedAttributeInjectionContext extends SpringElInjectionCon
                   while (!isCustomAnnotation(module, qualifiedName, aliasedAnnoName));
 
                   for (String aliasedAttrName : entry.getValue()) {
-                    TodayAliasFor aliasFor = AliasForUtils.findAliasFor(psiAnnotation, qualifiedName, aliasedAnnoName, aliasedAttrName);
+                    AliasForElement aliasFor = AliasForUtils.findAliasFor(psiAnnotation, qualifiedName, aliasedAnnoName, aliasedAttrName);
                     if (aliasFor != null && attributeName.equals(aliasFor.getMethodName())) {
                       return true;
                     }

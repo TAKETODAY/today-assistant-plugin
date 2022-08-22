@@ -36,6 +36,10 @@ import com.intellij.semantic.SemKey;
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public class JamCacheable<T extends PsiMember & PsiNamedElement> extends JamBaseCacheableElement<T> implements CacheableMarker {
   public static final SemKey<JamCacheable> CACHEABLE_JAM_KEY = CACHEABLE_BASE_JAM_KEY.subKey("SpringJamCacheable");
   public static final JamAnnotationMeta CACHEABLE_ANNO_META = new JamAnnotationMeta(CacheableConstant.CACHEABLE)

@@ -31,7 +31,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.spring.spi.SpringSpiIconService;
 import com.intellij.spring.spi.SpringSpiManager;
 import com.intellij.util.NotNullFunction;
@@ -39,7 +38,6 @@ import com.intellij.util.PairProcessor;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.UClass;
 import org.jetbrains.uast.UElementKt;
 import org.jetbrains.uast.UastContextKt;
@@ -50,9 +48,10 @@ import java.util.List;
 
 import javax.swing.Icon;
 
-import cn.taketoday.assistant.StringBundle;
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.TodayLibraryUtil;
 import cn.taketoday.assistant.service.IconService;
+import cn.taketoday.assistant.util.CommonUtils;
 
 public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarkerProvider {
   private static final NotNullFunction<IProperty, Collection<? extends PsiElement>> PROPERTY_CONVERTER = dom -> {
@@ -69,7 +68,7 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
 
   @Override
   public String getName() {
-    return StringBundle.message("StrategiesRegistrationAnnotator.today.strategies.registration");
+    return InfraBundle.message("StrategiesRegistrationAnnotator.today.strategies.registration");
   }
 
   
@@ -95,7 +94,7 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
       return;
     }
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
-    if (!SpringCommonUtils.isSpringBeanCandidateClass(psiClass) || (module = ModuleUtilCore.findModuleForPsiElement(psiClass)) == null) {
+    if (!CommonUtils.isBeanCandidateClass(psiClass) || (module = ModuleUtilCore.findModuleForPsiElement(psiClass)) == null) {
       return;
     }
     PsiManager psiManager = PsiManager.getInstance(module.getProject());
@@ -117,8 +116,8 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
                 };
                 SpringSpiManager.getInstance(module).processClassesListValues(false, clazzName, processor);
                 return smartList;
-              })).setPopupTitle(StringBundle.message("StrategiesRegistrationAnnotator.choose.registration"))
-              .setTooltipText(StringBundle.message("StrategiesRegistrationAnnotator.tooltip"));
+              })).setPopupTitle(InfraBundle.message("StrategiesRegistrationAnnotator.choose.registration"))
+              .setTooltipText(InfraBundle.message("StrategiesRegistrationAnnotator.tooltip"));
       result.add(builder.createSpringRelatedMergeableLineMarkerInfo(nameIdentifier));
     }
   }

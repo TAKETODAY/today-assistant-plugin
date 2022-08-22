@@ -18,20 +18,32 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.code.cache.jam.custom;
+package cn.taketoday.assistant.code.event.beans;
 
-import com.intellij.jam.reflect.JamMemberArchetype;
-import com.intellij.jam.reflect.JamMemberMeta;
-import com.intellij.jam.reflect.JamMethodMeta;
+import com.intellij.openapi.module.Module;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import com.intellij.semantic.SemKey;
+import com.intellij.psi.PsiType;
 
-public class CustomCachePutForMethod extends CustomCachePut<PsiMethod> {
-  public static final SemKey<CustomCachePutForMethod> JAM_KEY = CUSTOM_CACHE_PUT_JAM_KEY.subKey("SpringJamCustomCachePutForMethod");
-  public static final JamMethodMeta<CustomCachePutForMethod> META = new JamMethodMeta<>((JamMemberArchetype) null, CustomCachePutForMethod.class, JAM_KEY);
-  public static final SemKey<JamMemberMeta<PsiMethod, CustomCachePutForMethod>> META_KEY = META.getMetaKey().subKey("SpringJamCustomCachePutForMethod");
+import org.jetbrains.uast.UExpression;
 
-  public CustomCachePutForMethod(String annoName, PsiMethod psiMethod) {
-    super(annoName, psiMethod);
+import cn.taketoday.lang.Nullable;
+
+public abstract class PublishEventPointDescriptor {
+  @Nullable
+  public abstract PsiType getEventType();
+
+  public abstract PsiElement getIdentifyingElement();
+
+  public static PublishEventPointDescriptor create(UExpression expression) {
+    return new MethodInvocationPublisher(expression);
+  }
+
+  public static PublishEventPointDescriptor create(PsiMethod expression, Module module) {
+    return new EventListenerAnnoPublisher(expression, module);
+  }
+
+  public PsiElement getNavigatableElement() {
+    return getIdentifyingElement();
   }
 }

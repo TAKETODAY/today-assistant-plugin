@@ -39,13 +39,12 @@ import com.intellij.psi.PsiReferenceBase;
 import com.intellij.spring.spi.SpringSpiManager;
 import com.intellij.util.containers.ContainerUtil;
 
-import org.jetbrains.annotations.NotNull;
 import cn.taketoday.lang.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 
-import cn.taketoday.assistant.StringBundle;
+import cn.taketoday.assistant.InfraBundle;
 
 public class StrategiesClassesListJamConverter extends JamConverter<PsiClass> {
   protected final String myConfigKey;
@@ -128,7 +127,7 @@ public class StrategiesClassesListJamConverter extends JamConverter<PsiClass> {
 
     
     public String getUnresolvedMessagePattern() {
-      return StringBundle.message("StrategiesClassesListJamConverter.unresolved.message.pattern", this.myText, this.myConfigKey);
+      return InfraBundle.message("StrategiesClassesListJamConverter.unresolved.message.pattern", this.myText, this.myConfigKey);
     }
   }
 }

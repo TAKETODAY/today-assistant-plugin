@@ -39,10 +39,10 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.SpringBundle;
 import com.intellij.spring.SpringModelVisitorUtils;
-import com.intellij.spring.gutter.SpringAnnotatorBase;
+
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-import com.intellij.spring.java.SpringJavaClassInfo;
+import cn.taketoday.assistant.JavaClassInfo;
 import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.xml.beans.SpringBean;
@@ -66,11 +66,13 @@ import org.jetbrains.uast.UElementKt;
 import org.jetbrains.uast.UMethod;
 import org.jetbrains.uast.UastUtils;
 
+import cn.taketoday.assistant.util.CommonUtils;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:26
  */
-public final class PropertiesAnnotator extends SpringAnnotatorBase {
+public final class PropertiesAnnotator extends AbstractAnnotator {
 
   @Override
   public String getId() {
@@ -93,7 +95,7 @@ public final class PropertiesAnnotator extends SpringAnnotatorBase {
     PsiClass psiClass;
     UMethod[] methods;
     UElement element = UastUtils.getUParentForIdentifier(psiElement);
-    if (!(element instanceof UClass) || (psiClass = UElementKt.getAsJavaPsiElement((uClass = (UClass) element), PsiClass.class)) == null || !SpringCommonUtils.isSpringBeanCandidateClass(psiClass)) {
+    if (!(element instanceof UClass) || (psiClass = UElementKt.getAsJavaPsiElement((uClass = (UClass) element), PsiClass.class)) == null || !CommonUtils.isBeanCandidateClass(psiClass)) {
       return;
     }
     annotateClass(result, uClass);
@@ -116,7 +118,7 @@ public final class PropertiesAnnotator extends SpringAnnotatorBase {
     if (psiClass != null) {
       Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
       if (SpringCommonUtils.isSpringEnabledModule(module)) {
-        SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
+        JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
         if (info.isMappedDomBean() || info.isStereotypeJavaBean()) {
           return;
         }
@@ -135,11 +137,11 @@ public final class PropertiesAnnotator extends SpringAnnotatorBase {
     if (method == null || (psiClass = method.getContainingClass()) == null) {
       return;
     }
-    SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
+    JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
     if (PropertyUtilBase.isSimplePropertySetter(method) && info.isMappedProperty(method)) {
       addPropertiesGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
         String propertyName = PropertyUtilBase.getPropertyNameBySetter(method);
-        return SpringJavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedProperties(propertyName);
+        return JavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedProperties(propertyName);
       }));
     }
   }

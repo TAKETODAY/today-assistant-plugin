@@ -25,9 +25,14 @@ import com.intellij.jam.reflect.JamMemberArchetype;
 import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
+
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.CustomCacheableElement;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public class CustomCacheConfig extends CustomCacheableElement<PsiClass> {
   public static final SemKey<CustomCacheConfig> JAM_KEY = CUSTOM_ROOT_JAM_KEY.subKey("SpringJamCustomCacheable");
   public static final JamClassMeta<CustomCacheConfig> META = new JamClassMeta<>((JamMemberArchetype) null, CustomCacheConfig.class, JAM_KEY);

@@ -50,25 +50,28 @@ import java.util.Objects;
 
 import cn.taketoday.lang.Nullable;
 
-public class TodayAliasFor extends JamBaseElement<PsiMethod> {
-  public static final SemKey<TodayAliasFor> SEM_KEY = SemKey.createKey("TodayAliasFor");
+/**
+ * for cn.taketoday.core.annotation.AliasFor
+ */
+public class AliasForElement extends JamBaseElement<PsiMethod> {
+  public static final SemKey<AliasForElement> SEM_KEY = SemKey.createKey("TodayAliasFor");
   private static final JamClassAttributeMeta.Single ALIAS_FOR_CLASS_ATTR_META = JamAttributeMeta.singleClass("annotation");
   private static final JamStringAttributeMeta.Single<PsiMethod> ALIAS_FOR_ATTR_META = JamAttributeMeta.singleString("attribute", new AliasForAttributePsiMethodJamConverter());
   private static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta("cn.taketoday.core.annotation.AliasFor")
           .addAttribute(ALIAS_FOR_CLASS_ATTR_META)
           .addAttribute(ALIAS_FOR_ATTR_META);
 
-  public static final JamMethodMeta METHOD_META = new JamMethodMeta(null, TodayAliasFor.class, SEM_KEY)
+  public static final JamMethodMeta<AliasForElement> METHOD_META = new JamMethodMeta<>(null, AliasForElement.class, SEM_KEY)
           .addAnnotation(ANNO_META);
 
   private final PsiElementRef<PsiAnnotation> myPsiAnnotation;
 
-  public TodayAliasFor(PsiMethod psiMethod) {
+  public AliasForElement(PsiMethod psiMethod) {
     super(PsiElementRef.real(psiMethod));
     this.myPsiAnnotation = ANNO_META.getAnnotationRef(psiMethod);
   }
 
-  public TodayAliasFor(PsiAnnotation annotation) {
+  public AliasForElement(PsiAnnotation annotation) {
     super(PsiElementRef.real(Objects.requireNonNull(PsiTreeUtil.getParentOfType(annotation, PsiMethod.class, true))));
     this.myPsiAnnotation = PsiElementRef.real(annotation);
   }
@@ -116,7 +119,7 @@ public class TodayAliasFor extends JamBaseElement<PsiMethod> {
 
       PsiMethod psiMethod = getIdentifyingMethod(context);
       if (psiMethod != null) {
-        PsiClass aliasForAnnotationClass = TodayAliasFor.getAliasForAnnotationClass(psiMethod);
+        PsiClass aliasForAnnotationClass = AliasForElement.getAliasForAnnotationClass(psiMethod);
         if (aliasForAnnotationClass != null) {
           return aliasForAnnotationClass.getAllMethods();
         }

@@ -20,13 +20,23 @@
 
 package cn.taketoday.assistant.code.cache.jam.custom;
 
+import com.intellij.jam.reflect.JamClassMeta;
+import com.intellij.jam.reflect.JamMemberMeta;
+import com.intellij.jam.reflect.JamMethodMeta;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMember;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.semantic.SemKey;
+
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.CustomCacheableElement;
 import cn.taketoday.assistant.code.cache.jam.standard.CacheableMarker;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public abstract class CustomCacheable<T extends PsiMember & PsiNamedElement> extends CustomCacheableElement<T> implements CacheableMarker {
   public static final SemKey<CustomCacheable> CUSTOM_CACHEABLE_JAM_KEY = CUSTOM_ROOT_JAM_KEY.subKey("SpringJamCustomCacheable");
 
@@ -38,4 +48,25 @@ public abstract class CustomCacheable<T extends PsiMember & PsiNamedElement> ext
   protected String getDefiningAnnotation() {
     return CacheableConstant.CACHEABLE;
   }
+
+  public static class ForClass extends CustomCacheable<PsiClass> {
+    public static final SemKey<ForClass> JAM_KEY = CUSTOM_CACHEABLE_JAM_KEY.subKey("SpringJamCustomCacheableForClass");
+    public static final JamClassMeta<ForClass> META = new JamClassMeta<>(null, ForClass.class, JAM_KEY);
+    public static final SemKey<JamMemberMeta<PsiClass, ForClass>> META_KEY = META.getMetaKey().subKey("SpringJamCustomCacheableForClass");
+
+    public ForClass(String annoName, PsiClass aClass) {
+      super(annoName, aClass);
+    }
+  }
+
+  public static class ForMethod extends CustomCacheable<PsiMethod> {
+    public static final SemKey<ForMethod> JAM_KEY = CUSTOM_CACHEABLE_JAM_KEY.subKey("SpringJamCustomCacheableForMethod");
+    public static final JamMethodMeta<ForMethod> META = new JamMethodMeta<>(null, ForMethod.class, JAM_KEY);
+    public static final SemKey<JamMemberMeta<PsiMethod, ForMethod>> META_KEY = META.getMetaKey().subKey("SpringJamCustomCacheableForMethod");
+
+    public ForMethod(String annoName, PsiMethod method) {
+      super(annoName, method);
+    }
+  }
+
 }

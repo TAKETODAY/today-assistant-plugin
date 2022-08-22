@@ -34,9 +34,10 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.InheritanceUtil;
 import com.intellij.semantic.SemService;
 import com.intellij.spring.SpringBundle;
-import com.intellij.spring.el.lexer._SpringELLexer;
+
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
+
 import com.intellij.spring.model.highlighting.jam.SpringUastInspectionBase;
 import com.intellij.spring.model.utils.SpringCommonUtils;
 
@@ -52,66 +53,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
-public final class SpringCacheAnnotationsOnInterfaceInspection extends SpringUastInspectionBase {
-  private static void $$$reportNull$$$0(int i) {
-    Object[] objArr = new Object[3];
-    switch (i) {
-      case 0:
-      default:
-        objArr[0] = "uMethod";
-        break;
-      case 1:
-      case 5:
-        objArr[0] = "manager";
-        break;
-      case _SpringELLexer.SELECT:
-      case 3:
-        objArr[0] = "holder";
-        break;
-      case _SpringELLexer.OPEN_BRACE:
-        objArr[0] = "uClass";
-        break;
-      case _SpringELLexer.EL_EXPR:
-        objArr[0] = "clazz";
-        break;
-    }
-    objArr[1] = "com/intellij/spring/model/cacheable/highlighting/SpringCacheAnnotationsOnInterfaceInspection";
-    switch (i) {
-      case 0:
-      case 1:
-      default:
-        objArr[2] = "checkMethod";
-        break;
-      case _SpringELLexer.SELECT:
-      case 3:
-        objArr[2] = "registerProblemIfAnnotationExists";
-        break;
-      case _SpringELLexer.OPEN_BRACE:
-      case 5:
-        objArr[2] = "checkClass";
-        break;
-      case _SpringELLexer.EL_EXPR:
-        objArr[2] = "isImplicitlySubclassed";
-        break;
-    }
-    throw new IllegalArgumentException(String.format("Argument for parameter '%s' of %s.%s must not be null", objArr));
-  }
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
+public final class CacheAnnotationsOnInterfaceInspection extends SpringUastInspectionBase {
 
-  public SpringCacheAnnotationsOnInterfaceInspection() {
+  public CacheAnnotationsOnInterfaceInspection() {
     super(UClass.class, UMethod.class);
   }
 
   public ProblemDescriptor[] checkMethod(UMethod uMethod, InspectionManager manager, boolean isOnTheFly) {
     UClass containingClass;
     PsiElement sourcePsi;
-    if (uMethod == null) {
-      $$$reportNull$$$0(0);
-    }
-    if (manager == null) {
-      $$$reportNull$$$0(1);
-    }
     if (!SpringCommonUtils.isInSpringEnabledModule(uMethod) || (containingClass = UastUtils.getContainingUClass(
             uMethod)) == null || !containingClass.isInterface() || (sourcePsi = containingClass.getSourcePsi()) == null || isImplicitlySubclassed(containingClass.getJavaPsi())) {
       return null;
@@ -138,16 +95,10 @@ public final class SpringCacheAnnotationsOnInterfaceInspection extends SpringUas
   }
 
   private static void registerProblemIfAnnotationExists(ProblemsHolder holder, @Nullable PsiAnnotation annotation) {
-    if (holder == null) {
-      $$$reportNull$$$0(2);
-    }
     registerProblemIfAnnotationExists(holder, UastContextKt.toUElement(annotation, UAnnotation.class));
   }
 
   private static void registerProblemIfAnnotationExists(ProblemsHolder holder, @Nullable UAnnotation uAnnotation) {
-    if (holder == null) {
-      $$$reportNull$$$0(3);
-    }
     PsiElement element = UAnnotationKt.getNamePsiElement(uAnnotation);
     if (element != null) {
       holder.registerProblem(element, SpringBundle.message("cacheable.should.be.defined.on.concrete.method", new Object[0]), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new LocalQuickFix[0]);
@@ -155,13 +106,7 @@ public final class SpringCacheAnnotationsOnInterfaceInspection extends SpringUas
   }
 
   public ProblemDescriptor[] checkClass(UClass uClass, InspectionManager manager, boolean isOnTheFly) {
-    if (uClass == null) {
-      $$$reportNull$$$0(4);
-    }
-    if (manager == null) {
-      $$$reportNull$$$0(5);
-    }
-    if (SpringCommonUtils.isInSpringEnabledModule(uClass) && uClass.isInterface() && !uClass.isAnnotationType()) {
+    if (CommonUtils.isInInfraEnabledModule(uClass) && uClass.isInterface() && !uClass.isAnnotationType()) {
       PsiElement sourcePsi = uClass.getSourcePsi();
       if (sourcePsi == null) {
         return null;
@@ -181,9 +126,6 @@ public final class SpringCacheAnnotationsOnInterfaceInspection extends SpringUas
   }
 
   private static boolean isImplicitlySubclassed(PsiClass clazz) {
-    if (clazz == null) {
-      $$$reportNull$$$0(6);
-    }
     return InheritanceUtil.isInheritor(clazz, "cn.taketoday.data.repository.Repository") || AnnotationUtil.isAnnotated(clazz,
             List.of("cn.taketoday.cloud.netflix.feign.FeignClient", "cn.taketoday.cloud.openfeign.FeignClient"), 0);
   }

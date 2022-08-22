@@ -42,12 +42,12 @@ import com.intellij.spring.contexts.model.LocalAnnotationModel;
 import com.intellij.spring.contexts.model.SpringModel;
 import com.intellij.spring.contexts.model.visitors.CommonSpringModelVisitorContext;
 import com.intellij.spring.contexts.model.visitors.SpringModelVisitors;
-import com.intellij.spring.gutter.SpringAnnotatorBase;
-import com.intellij.spring.gutter.SpringAutowiredAnnotator;
+
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-import com.intellij.spring.impl.SpringAutoConfiguredModels;
-import com.intellij.spring.java.SpringJavaClassInfo;
+
+import cn.taketoday.assistant.JavaClassInfo;
+
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.jam.JamSpringBeanPointer;
@@ -56,7 +56,6 @@ import com.intellij.spring.model.jam.javaConfig.SpringOldJavaConfigurationUtil;
 import com.intellij.spring.model.jam.stereotype.SpringImport;
 import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
 import com.intellij.spring.model.jam.utils.SpringJamUtils;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.xml.DomSpringBeanPointer;
 import com.intellij.util.SmartList;
@@ -72,11 +71,16 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.util.CommonUtils;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:26
  */
-public class BeanAnnotator extends SpringAnnotatorBase {
+public class BeanAnnotator extends AbstractAnnotator {
+  public static final List<String> bootAnnotations = List.of(
+          "cn.taketoday.context.annotation.config.EnableAutoConfiguration"
+  );
 
   @Override
   public String getId() {
@@ -96,24 +100,24 @@ public class BeanAnnotator extends SpringAnnotatorBase {
   @Override
   protected void annotateClass(Collection<? super RelatedItemLineMarkerInfo<?>> result, UClass uClass, PsiElement identifier) {
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
-    if (psiClass == null || !SpringCommonUtils.isSpringBeanCandidateClass(psiClass)) {
+    if (psiClass == null || !CommonUtils.isBeanCandidateClass(psiClass)) {
       return;
     }
-    SpringJavaClassInfo info1 = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
+    JavaClassInfo info1 = JavaClassInfo.getSpringJavaClassInfo(psiClass);
     if (info1.isMappedDomBean()) {
       addSpringBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
-        List<DomSpringBeanPointer> domBeans = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedDomBeans();
+        List<DomSpringBeanPointer> domBeans = JavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedDomBeans();
         domBeans.sort(SpringBeanPointer.DISPLAY_COMPARATOR);
         return domBeans;
       }));
     }
-    else if (!info1.isStereotypeJavaBean() || AnnotationUtil.isAnnotated(psiClass, SpringAutoConfiguredModels.bootAnnotations, 8)) {
+    else if (!info1.isStereotypeJavaBean() || AnnotationUtil.isAnnotated(psiClass, bootAnnotations, 8)) {
 
     }
     else {
-      addSpringJavaBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
-        SmartList smartList = new SmartList();
-        List<JamSpringBeanPointer> mappedBeans = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass).getStereotypeMappedBeans();
+      addJavaBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
+        SmartList<CommonModelElement> smartList = new SmartList<>();
+        List<JamSpringBeanPointer> mappedBeans = JavaClassInfo.getSpringJavaClassInfo(psiClass).getStereotypeMappedBeans();
         for (JamSpringBeanPointer mappedBean : mappedBeans) {
           JamPsiMemberSpringBean<?> bean = mappedBean.getSpringBean();
           if ((bean instanceof SpringJavaBean) || ((bean instanceof SpringStereotypeElement) && !psiClass.isEquivalentTo(bean.getPsiElement()))) {
@@ -127,7 +131,9 @@ public class BeanAnnotator extends SpringAnnotatorBase {
         return smartList;
       }), SpringApiIcons.Gutter.SpringJavaBean);
       PsiClassType classType = JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass);
-      result.add(SpringAutowiredAnnotator.getNavigateToAutowiredCandidatesBuilder(psiClass, classType).createSpringGroupLineMarkerInfo(identifier));
+      result.add(AutowiredAnnotator.getNavigateToAutowiredCandidatesBuilder(psiClass, classType)
+              .createSpringGroupLineMarkerInfo(identifier)
+      );
     }
   }
 
@@ -138,9 +144,8 @@ public class BeanAnnotator extends SpringAnnotatorBase {
     if (method != null) {
       PsiClass psiClass = method.getContainingClass();
       if (psiClass != null) {
-        if (SpringCommonUtils.isSpringBeanCandidateClassInSpringProject(psiClass)) {
-          System.out.println("annotateMethod: " + psiClass);
-          SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
+        if (CommonUtils.isBeanCandidateClassInProject(psiClass)) {
+          JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
           List<SpringBeanPointer<?>> externalBeans = SpringOldJavaConfigurationUtil.findExternalBeans(method);
 
           if (!externalBeans.isEmpty()) {
@@ -151,7 +156,7 @@ public class BeanAnnotator extends SpringAnnotatorBase {
             }));
           }
 
-          Collection<Pair<PsiElement, SpringJavaClassInfo.SpringMethodType>> methodTypes = info.getMethodTypes(method);
+          Collection<Pair<PsiElement, JavaClassInfo.SpringMethodType>> methodTypes = info.getMethodTypes(method);
           if (!methodTypes.isEmpty()) {
             addMethodTypesGutterIcon(result, method, methodTypes);
           }
@@ -163,13 +168,13 @@ public class BeanAnnotator extends SpringAnnotatorBase {
 
   private static void addMethodTypesGutterIcon(
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiMethod psiMethod,
-          Collection<? extends Pair<PsiElement, SpringJavaClassInfo.SpringMethodType>> targets) {
+          Collection<? extends Pair<PsiElement, JavaClassInfo.SpringMethodType>> targets) {
     String tooltipText = SpringBundle.message("spring.bean.methods.tooltip.navigate.declaration");
     Icon icon = SpringApiIcons.Gutter.SpringBeanMethod;
     if (targets.size() == 1) {
-      SpringJavaClassInfo.SpringMethodType methodType = targets.iterator().next().second;
+      JavaClassInfo.SpringMethodType methodType = targets.iterator().next().second;
       tooltipText = SpringBundle.message("spring.bean.method.tooltip.navigate.declaration", methodType.getName());
-      if (methodType == SpringJavaClassInfo.SpringMethodType.FACTORY) {
+      if (methodType == JavaClassInfo.SpringMethodType.FACTORY) {
         icon = SpringApiIcons.Gutter.FactoryMethodBean;
       }
     }

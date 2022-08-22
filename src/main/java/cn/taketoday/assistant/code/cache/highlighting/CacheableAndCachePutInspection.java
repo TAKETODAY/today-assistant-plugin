@@ -29,14 +29,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.semantic.SemService;
 import com.intellij.spring.SpringBundle;
-import com.intellij.spring.el.lexer._SpringELLexer;
+
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.custom.CustomCachePut;
 import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheable;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
+import cn.taketoday.assistant.util.CommonUtils;
+
 import com.intellij.spring.model.highlighting.jam.SpringUastInspectionBase;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.util.SmartList;
 
 import org.jetbrains.uast.UAnnotation;
@@ -46,51 +47,18 @@ import org.jetbrains.uast.UastContextKt;
 
 import java.util.List;
 
-public final class SpringCacheableAndCachePutInspection extends SpringUastInspectionBase {
-  private static void $$$reportNull$$$0(int i) {
-    Object[] objArr = new Object[3];
-    switch (i) {
-      case 0:
-      default:
-        objArr[0] = "umethod";
-        break;
-      case 1:
-        objArr[0] = "manager";
-        break;
-      case _SpringELLexer.SELECT:
-      case 3:
-        objArr[0] = "method";
-        break;
-    }
-    objArr[1] = "com/intellij/spring/model/cacheable/highlighting/SpringCacheableAndCachePutInspection";
-    switch (i) {
-      case 0:
-      case 1:
-      default:
-        objArr[2] = "checkMethod";
-        break;
-      case _SpringELLexer.SELECT:
-        objArr[2] = "getCacheableElements";
-        break;
-      case 3:
-        objArr[2] = "getCachePutElements";
-        break;
-    }
-    throw new IllegalArgumentException(String.format("Argument for parameter '%s' of %s.%s must not be null", objArr));
-  }
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
+public final class CacheableAndCachePutInspection extends SpringUastInspectionBase {
 
-  public SpringCacheableAndCachePutInspection() {
+  public CacheableAndCachePutInspection() {
     super(UMethod.class);
   }
 
   public ProblemDescriptor[] checkMethod(UMethod umethod, InspectionManager manager, boolean isOnTheFly) {
-    if (umethod == null) {
-      $$$reportNull$$$0(0);
-    }
-    if (manager == null) {
-      $$$reportNull$$$0(1);
-    }
-    if (SpringCommonUtils.isInSpringEnabledModule(umethod)) {
+    if (CommonUtils.isInInfraEnabledModule(umethod)) {
       PsiMethod method = umethod.getJavaPsi();
       PsiElement sourcePsi = umethod.getSourcePsi();
       if (sourcePsi == null) {
@@ -122,9 +90,6 @@ public final class SpringCacheableAndCachePutInspection extends SpringUastInspec
   }
 
   private static List<CacheableElement> getCacheableElements(PsiMethod method) {
-    if (method == null) {
-      $$$reportNull$$$0(2);
-    }
     SmartList smartList = new SmartList();
     smartList.addAll(SemService.getSemService(method.getProject()).getSemElements(JamCacheable.CACHEABLE_JAM_KEY, method));
     smartList.addAll(SemService.getSemService(method.getProject()).getSemElements(CustomCacheable.CUSTOM_CACHEABLE_JAM_KEY, method));
@@ -132,9 +97,6 @@ public final class SpringCacheableAndCachePutInspection extends SpringUastInspec
   }
 
   private static List<CacheableElement> getCachePutElements(PsiMethod method) {
-    if (method == null) {
-      $$$reportNull$$$0(3);
-    }
     SmartList smartList = new SmartList();
     smartList.addAll(SemService.getSemService(method.getProject()).getSemElements(JamCachePut.CACHE_PUT_JAM_KEY, method));
     smartList.addAll(SemService.getSemService(method.getProject()).getSemElements(CustomCachePut.CUSTOM_CACHE_PUT_JAM_KEY, method));

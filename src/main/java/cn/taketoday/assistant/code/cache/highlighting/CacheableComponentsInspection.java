@@ -39,7 +39,11 @@ import cn.taketoday.assistant.code.cache.jam.CachingGroup;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 import cn.taketoday.lang.Nullable;
 
-public final class SpringCacheableComponentsInspection extends SpringBeanPointerResolveInspection {
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
+public final class CacheableComponentsInspection extends SpringBeanPointerResolveInspection {
 
   public ProblemDescriptor[] checkMethod(PsiMethod method, InspectionManager manager, boolean isOnTheFly) {
     PsiAnnotation annotation;

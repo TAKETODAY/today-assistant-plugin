@@ -1,0 +1,56 @@
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+
+<idea-plugin>
+
+  <extensions defaultExtensionNs="com.intellij">
+
+    <localInspection language="UAST" shortName="EventListenerInspection"
+        bundle="messages.SpringBundle" key="SpringEventListenerInspection.inspection.display.name"
+        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.code.event.highlighting.EventListenerInspection" />
+
+    <localInspection language="JAVA" shortName="CacheableComponentsInspection"
+        bundle="messages.SpringBundle" key="spring.cacheable.annotations.inspection.display.name"
+        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheableComponentsInspection" />
+
+    <localInspection language="UAST" shortName="CacheNamesInspection"
+        bundle="messages.SpringBundle" key="spring.cacheable.names.inspection.display.name"
+        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheNamesInspection" />
+
+    <localInspection language="UAST" shortName="CacheAnnotationsOnInterfaceInspection"
+        bundle="messages.SpringBundle" key="spring.cacheable.annotations.on.interfaces"
+        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheAnnotationsOnInterfaceInspection" />
+
+    <localInspection language="UAST" shortName="CacheableAndCachePutInspection"
+        bundle="messages.SpringBundle" key="spring.cacheable.and.cache.put.on.the.same.method.display.name"
+        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheableAndCachePutInspection" />
+
+  </extensions>
+</idea-plugin>

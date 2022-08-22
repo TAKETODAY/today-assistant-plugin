@@ -45,11 +45,10 @@ import com.intellij.psi.util.PropertyUtilBase;
 import com.intellij.spring.CommonSpringModel;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.SpringBundle;
-import com.intellij.spring.gutter.SpringAnnotatorBase;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.impl.SpringAutoConfiguredModels;
-import com.intellij.spring.java.SpringJavaClassInfo;
+import cn.taketoday.assistant.JavaClassInfo;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
 import com.intellij.spring.model.utils.SpringAutowireUtil;
@@ -59,7 +58,6 @@ import com.intellij.spring.model.utils.SpringModelSearchers;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.xml.beans.Autowire;
 
-import cn.taketoday.lang.Nullable;
 import org.jetbrains.uast.UAnnotation;
 import org.jetbrains.uast.UElement;
 import org.jetbrains.uast.UElementKt;
@@ -79,11 +77,14 @@ import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.lang.Nullable;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:44
  */
-public class AutowiredAnnotator extends SpringAnnotatorBase {
+public class AutowiredAnnotator extends AbstractAnnotator {
 
   @Override
   public String getId() {
@@ -135,8 +136,8 @@ public class AutowiredAnnotator extends SpringAnnotatorBase {
     if (method != null) {
       PsiClass psiClass = method.getContainingClass();
       if (psiClass != null) {
-        if (SpringCommonUtils.isSpringBeanCandidateClassInSpringProject(psiClass)) {
-          SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
+        if (CommonUtils.isBeanCandidateClassInProject(psiClass)) {
+          JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
           if (PropertyUtilBase.isSimplePropertySetter(method)) {
             if (info.isAutowired()) {
               checkAutowiredMethod(method, result, info, identifier);
@@ -145,7 +146,7 @@ public class AutowiredAnnotator extends SpringAnnotatorBase {
           else if (uMethod.isConstructor()) {
             if (info.isMappedConstructor(method)) {
               addConstructorArgsGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
-                return SpringJavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedConstructorDefinitions(method);
+                return JavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedConstructorDefinitions(method);
               }));
             }
             else if (uMethod.getJavaPsi().getModifierList().hasModifierProperty("public") && info.isStereotypeJavaBean()) {
@@ -186,7 +187,7 @@ public class AutowiredAnnotator extends SpringAnnotatorBase {
     return JamService.getJamService(method.getProject()).getJamElement(ContextJavaBean.BEAN_JAM_KEY, method);
   }
 
-  public static boolean checkAutowiredMethod(PsiMethod method, @Nullable Collection<? super RelatedItemLineMarkerInfo<?>> result, SpringJavaClassInfo info, PsiElement identifier) {
+  public static boolean checkAutowiredMethod(PsiMethod method, @Nullable Collection<? super RelatedItemLineMarkerInfo<?>> result, JavaClassInfo info, PsiElement identifier) {
 
     CommonSpringModel model = SpringAutowireUtil.getProcessingSpringModel(method.getContainingClass());
     if (model != null) {

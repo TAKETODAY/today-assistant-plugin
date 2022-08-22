@@ -18,20 +18,36 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.code.cache.jam.custom;
+package cn.taketoday.assistant.code.event.jam;
 
-import com.intellij.jam.reflect.JamClassMeta;
-import com.intellij.jam.reflect.JamMemberArchetype;
-import com.intellij.jam.reflect.JamMemberMeta;
+import com.intellij.jam.JamElement;
+import com.intellij.jam.JamService;
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMethod;
 import com.intellij.semantic.SemKey;
 
-public class CustomCachePutForClass extends CustomCachePut<PsiClass> {
-  public static final SemKey<CustomCachePutForClass> JAM_KEY = CUSTOM_CACHE_PUT_JAM_KEY.subKey("SpringJamCustomCachePutForClass");
-  public static final JamClassMeta<CustomCachePutForClass> META = new JamClassMeta<>(null, CustomCachePutForClass.class, JAM_KEY);
-  public static final SemKey<JamMemberMeta<PsiClass, CustomCachePutForClass>> META_KEY = META.getMetaKey().subKey("SpringJamCustomCachePutForClass");
+import java.util.List;
 
-  public CustomCachePutForClass(String annoName, PsiClass aClass) {
-    super(annoName, aClass);
-  }
+import cn.taketoday.lang.Nullable;
+
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:11
+ */
+public interface EventListenerElement extends JamElement {
+  String CLASSES_ATTR_NAME = "event";
+  String VALUE_ATTR_NAME = "value";
+  String CONDITION_ATTR_NAME = "condition";
+  SemKey<EventListenerElement> EVENT_LISTENER_ROOT_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("EventListener");
+
+  List<PsiClass> getEventListenerClasses();
+
+  @Nullable
+  PsiMethod getPsiElement();
+
+  @Nullable
+  PsiAnnotation getAnnotation();
+
+  boolean isValid();
 }

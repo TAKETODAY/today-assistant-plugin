@@ -21,7 +21,7 @@
 <idea-plugin package="cn.taketoday.assistant.facet">
 
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
-    <importer implementation="cn.taketoday.assistant.facet.SpringFacetImporter" />
+    <importer implementation="cn.taketoday.assistant.facet.InfraFacetImporter" />
   </extensions>
 
   <extensions defaultExtensionNs="com.intellij">

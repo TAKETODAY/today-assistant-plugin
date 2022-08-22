@@ -28,6 +28,10 @@ import com.intellij.semantic.SemKey;
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public class JamCacheConfig extends JamBaseCacheableElement<PsiClass> {
 
   private static final JamAnnotationMeta CACHE_CONFIG_ANNO_META = new JamAnnotationMeta(CacheableConstant.CACHE_CONFIG)

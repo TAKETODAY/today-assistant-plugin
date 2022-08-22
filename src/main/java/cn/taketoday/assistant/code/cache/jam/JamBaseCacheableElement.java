@@ -28,8 +28,10 @@ import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.semantic.SemKey;
 import com.intellij.spring.model.SpringBeanPointer;
+
 import cn.taketoday.assistant.code.cache.CacheableConstant;
-import com.intellij.spring.model.events.jam.SpringEventListener;
+import cn.taketoday.assistant.code.event.jam.EventListenerElement;
+
 import com.intellij.spring.model.jam.converters.SpringBeanReferenceJamConverter;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -37,11 +39,15 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public abstract class JamBaseCacheableElement<T extends PsiMember & PsiNamedElement> extends CacheableElement<T> {
   public static final String CACHE_NAMES_ATTR_NAME = "cacheNames";
   public static final SemKey<JamBaseCacheableElement> CACHEABLE_BASE_JAM_KEY = CACHEABLE_ROOT_JAM_KEY.subKey("SpringJamBaseCacheableElement");
 
-  private static final JamStringAttributeMeta.Single<String> CONDITION_ATTR_META = JamAttributeMeta.singleString(SpringEventListener.CONDITION_ATTR_NAME);
+  private static final JamStringAttributeMeta.Single<String> CONDITION_ATTR_META = JamAttributeMeta.singleString(EventListenerElement.CONDITION_ATTR_NAME);
 
   protected static final JamStringAttributeMeta.Collection<String> VALUE_ATTR_META = JamAttributeMeta.collectionString("value", new CacheableNameConverter());
   protected static final JamStringAttributeMeta.Collection<String> CACHE_NAMES_ATTR_META =

@@ -29,7 +29,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 
 import javax.swing.Icon;
 
-import cn.taketoday.assistant.StringBundle;
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.service.IconService;
 
 /**
@@ -70,7 +70,7 @@ public class TodayStrategiesFileType extends LanguageFileType implements FileTyp
 
   @Override
   public String getDisplayName() {
-    return StringBundle.message("today.strategies.file.type");
+    return InfraBundle.message("today.strategies.file.type");
   }
 
   @Override

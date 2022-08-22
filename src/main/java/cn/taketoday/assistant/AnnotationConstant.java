@@ -26,8 +26,8 @@ package cn.taketoday.assistant;
  */
 public interface AnnotationConstant {
 
-  String JAVA_SPRING_CONFIGURATION = "cn.taketoday.context.annotation.Configuration";
-  String JAVA_SPRING_BEAN = "cn.taketoday.context.annotation.Bean";
+  String CONFIGURATION = "cn.taketoday.context.annotation.Configuration";
+  String BEAN = "cn.taketoday.context.annotation.Bean";
 
   String CONTEXT_IMPORT = "cn.taketoday.context.annotation.Import";
   String CONTEXT_IMPORT_RESOURCE = "cn.taketoday.context.annotation.ImportResource";

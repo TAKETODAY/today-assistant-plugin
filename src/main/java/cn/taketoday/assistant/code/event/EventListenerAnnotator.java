@@ -18,7 +18,7 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.code;
+package cn.taketoday.assistant.code.event;
 
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
@@ -38,14 +38,8 @@ import com.intellij.semantic.SemService;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.SpringBundle;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-import com.intellij.spring.model.events.beans.PublishEventPointDescriptor;
-import com.intellij.spring.model.events.jam.SpringEventListener;
-import com.intellij.spring.model.events.jam.SpringEventModelUtils;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.util.NotNullFunction;
 import com.intellij.util.containers.ContainerUtil;
-
-import cn.taketoday.lang.Nullable;
 
 import org.jetbrains.uast.UCallExpression;
 import org.jetbrains.uast.UElement;
@@ -64,6 +58,11 @@ import java.util.function.Supplier;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.code.event.beans.PublishEventPointDescriptor;
+import cn.taketoday.assistant.code.event.jam.EventListenerElement;
+import cn.taketoday.assistant.code.event.jam.EventModelUtils;
+import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -73,7 +72,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
   private static final NotNullFunction<PublishEventPointDescriptor, Collection<? extends PsiElement>> PUBLISH_EVENT_CONVERTOR = (descriptor) -> {
     return ContainerUtil.createMaybeSingletonList(descriptor.getNavigatableElement());
   };
-  private static final NotNullFunction<SpringEventListener, Collection<? extends PsiElement>> EVENT_LISTENER_CONVERTOR = (descriptor) -> {
+  private static final NotNullFunction<EventListenerElement, Collection<? extends PsiElement>> EVENT_LISTENER_CONVERTOR = (descriptor) -> {
     return ContainerUtil.createMaybeSingletonList(descriptor.getPsiElement());
   };
 
@@ -98,7 +97,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
     PsiElement psiElement = ContainerUtil.getFirstItem(elements);
     if (psiElement != null
-            && SpringCommonUtils.hasSpringFacets(psiElement.getProject())
+            && CommonUtils.hasFacets(psiElement.getProject())
             && TodayLibraryUtil.hasLibrary(psiElement.getProject())) {
 
       super.collectNavigationMarkers(elements, result, forNavigation);
@@ -128,7 +127,8 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
       }
 
       SemService semService = SemService.getSemService(psiElement.getProject());
-      for (SpringEventListener eventListener : semService.getSemElements(SpringEventListener.EVENT_LISTENER_ROOT_JAM_KEY, psiMethod)) {
+      List<EventListenerElement> semElements = semService.getSemElements(EventListenerElement.EVENT_LISTENER_ROOT_JAM_KEY, psiMethod);
+      for (EventListenerElement eventListener : semElements) {
         PsiAnnotation psiAnnotation = eventListener.getAnnotation();
         if (psiAnnotation != null) {
           annotateEventListenerMethod(() -> findPublishPoints(module, eventListener), uMethod, result);
@@ -137,7 +137,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
           annotateOnApplicationEventMethod(() -> findPublishPoints(module, eventListener), uMethod, result);
         }
 
-        PsiType returnType = SpringEventModelUtils.getEventType(psiMethod.getReturnType(), module);
+        PsiType returnType = EventModelUtils.getEventType(psiMethod.getReturnType(), module);
         if (returnType != null && !PsiType.VOID.equals(returnType)) {
           PsiElement identifier = UElementKt.getSourcePsiElement(uMethod.getUastAnchor());
           if (identifier != null) {
@@ -150,22 +150,22 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
       UCallExpression callExpression = UastContextKt.toUElement(psiElement, UCallExpression.class);
       if (callExpression != null
               && callExpression.getSourcePsi() == psiElement
-              && (SpringEventModelUtils.isPublishEventExpression(callExpression)
-              || SpringEventModelUtils.isMulticastEventExpression(callExpression))) {
+              && (EventModelUtils.isPublishEventExpression(callExpression)
+              || EventModelUtils.isMulticastEventExpression(callExpression))) {
         annotateMethodCallExpression(callExpression, result);
       }
     }
   }
 
   private static Collection<PublishEventPointDescriptor> findPublishPoints(
-          Module module, SpringEventListener eventListener) {
+          Module module, EventListenerElement eventListener) {
     if (!eventListener.isValid()) {
       return Collections.emptyList();
     }
     else {
       var points = new LinkedHashSet<PublishEventPointDescriptor>();
-      for (PsiType handledType : SpringEventModelUtils.getEventListenerHandledType(eventListener)) {
-        points.addAll(SpringEventModelUtils.getPublishPoints(module, handledType));
+      for (PsiType handledType : EventModelUtils.getEventListenerHandledType(eventListener)) {
+        points.addAll(EventModelUtils.getPublishPoints(module, handledType));
       }
       return points;
     }
@@ -193,11 +193,11 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   private static RelatedItemLineMarkerInfo<?> createEventListenerMarker(Supplier<Collection<PublishEventPointDescriptor>> supplier, PsiElement identifier) {
 
-    SpringGutterIconBuilder<PublishEventPointDescriptor> builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Publisher, PUBLISH_EVENT_CONVERTOR, null);
+    var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Publisher, PUBLISH_EVENT_CONVERTOR, null);
     builder.setTargets(NotNullLazyValue.lazy(supplier)).setPopupTitle(SpringBundle.message("spring.event.publisher.choose.title"))
             .setTooltipText(SpringBundle.message("spring.event.publisher.tooltip.text"))
-            .setEmptyPopupText(SpringBundle.message("spring.event.publisher.empty.tooltip.text")).setCellRenderer(
-                    EventListenerAnnotator::getPublishEventRenderer);
+            .setEmptyPopupText(SpringBundle.message("spring.event.publisher.empty.tooltip.text"))
+            .setCellRenderer(EventListenerAnnotator::getPublishEventRenderer);
     return builder.createSpringRelatedMergeableLineMarkerInfo(identifier);
   }
 
@@ -255,12 +255,10 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   }
 
-  private static void annotatePublishPoints(Project project, @Nullable Module module, Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiType publishedType,
-          PsiElement element) {
-    SpringGutterIconBuilder<SpringEventListener> builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Listener, EVENT_LISTENER_CONVERTOR, null);
-    builder.setTargets(NotNullLazyValue.lazy(() -> {
-              return SpringEventModelUtils.getEventListeners(project, module, publishedType);
-            }))
+  private static void annotatePublishPoints(Project project, @Nullable Module module,
+          Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiType publishedType, PsiElement element) {
+    var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Listener, EVENT_LISTENER_CONVERTOR, null);
+    builder.setTargets(NotNullLazyValue.lazy(() -> EventModelUtils.getEventListeners(project, module, publishedType)))
             .setPopupTitle(SpringBundle.message("spring.event.listener.choose.title"))
             .setTooltipText(SpringBundle.message("spring.event.listener.tooltip.text"))
             .setEmptyPopupText(SpringBundle.message("spring.event.listener.empty.tooltip.text"))

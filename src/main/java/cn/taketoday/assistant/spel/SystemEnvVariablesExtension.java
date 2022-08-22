@@ -40,7 +40,7 @@ import java.util.Iterator;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.Icons;
-import cn.taketoday.assistant.StringBundle;
+import cn.taketoday.assistant.InfraBundle;
 
 /**
  * systemProperties, systemEnvironment
@@ -93,7 +93,7 @@ final class SystemEnvVariablesExtension extends SpringElContextsExtension {
 
     @Override
     public String getLocationString() {
-      return StringBundle.message("el.location.name");
+      return InfraBundle.message("el.location.name");
     }
 
     @Override

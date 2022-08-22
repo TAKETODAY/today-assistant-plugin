@@ -71,6 +71,7 @@ import java.util.Set;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -126,7 +127,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
 
     PsiElement psiElement = ContainerUtil.getFirstItem(elements);
     if (psiElement != null
-            && SpringCommonUtils.hasSpringFacets(psiElement.getProject())
+            && CommonUtils.hasFacets(psiElement.getProject())
             && TodayLibraryUtil.hasLibrary(psiElement.getProject())) {
       super.collectNavigationMarkers(elements, result, forNavigation);
     }

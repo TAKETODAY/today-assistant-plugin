@@ -36,14 +36,13 @@ import com.intellij.semantic.SemKey;
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public class JamCachePut<T extends PsiMember & PsiNamedElement> extends JamBaseCacheableElement<T> implements CachePutMarker {
   public static final SemKey<JamCachePut> CACHE_PUT_JAM_KEY = CACHEABLE_BASE_JAM_KEY.subKey("SpringJamCachePut");
   public static final JamAnnotationMeta CACHE_PUT_ANNO_META = new JamAnnotationMeta(CacheableConstant.CACHE_PUT);
-
-  private static void $$$reportNull$$$0(int i) {
-    throw new IllegalArgumentException(
-            String.format("Argument for parameter '%s' of %s.%s must not be null", "annotation", "com/intellij/spring/model/cacheable/jam/standard/SpringJamCachePut", "<init>"));
-  }
 
   static {
     CACHE_PUT_ANNO_META.addAttribute(VALUE_ATTR_META).addAttribute(CACHE_NAMES_ATTR_META).addAttribute(CACHE_MANAGER_ATTR_META).addAttribute(CACHE_RESOLVER_ATTR_META)
@@ -56,9 +55,6 @@ public class JamCachePut<T extends PsiMember & PsiNamedElement> extends JamBaseC
 
   public JamCachePut(PsiAnnotation annotation) {
     super(annotation);
-    if (annotation == null) {
-      $$$reportNull$$$0(0);
-    }
   }
 
   public static class ForMethod extends JamCachePut<PsiMethod> {

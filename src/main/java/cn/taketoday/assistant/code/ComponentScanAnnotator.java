@@ -22,7 +22,6 @@ package cn.taketoday.assistant.code;
 
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.jam.JamService;
-import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.NotNullLazyValue;
@@ -32,7 +31,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.SpringBundle;
-import com.intellij.spring.gutter.SpringAnnotatorBase;
+
 import com.intellij.spring.model.BeanService;
 import com.intellij.spring.model.CommonSpringBean;
 import com.intellij.spring.model.SpringBeanPointer;
@@ -55,7 +54,6 @@ import org.jetbrains.uast.UastUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,7 +66,7 @@ import cn.taketoday.assistant.AnnotationConstant;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:50
  */
-public class ComponentScanAnnotator extends SpringAnnotatorBase {
+public class ComponentScanAnnotator extends AbstractAnnotator {
 
   @Override
   public String getId() {
@@ -158,18 +156,20 @@ public class ComponentScanAnnotator extends SpringAnnotatorBase {
     return parent.getParent() instanceof PsiClass;
   }
 
-  private static void annotateSpringBeansPackagesScan(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement identifier, SpringComponentScan scan) {
+  private static void annotateSpringBeansPackagesScan(
+          Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement identifier,
+          SpringComponentScan scan) {
     PsiAnnotation psiAnnotation = scan.getAnnotation();
     if (psiAnnotation == null) {
       return;
     }
-    annotateSpringBeansPackagesScan(result, identifier, psiAnnotation, new SmartList(scan));
+    annotateSpringBeansPackagesScan(result, identifier, psiAnnotation, new SmartList<>(scan));
   }
 
   private static void annotateSpringBeansPackagesScan(
           Collection<? super RelatedItemLineMarkerInfo<?>> result,
           PsiElement identifier, PsiAnnotation psiAnnotation, List<? extends SpringComponentScan> scans) {
-    addSpringJavaBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
+    addJavaBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
       Module module = ModuleUtilCore.findModuleForPsiElement(psiAnnotation);
       if (module == null) {
         return Collections.emptySet();

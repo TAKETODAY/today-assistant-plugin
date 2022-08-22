@@ -53,9 +53,13 @@ import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheConfig;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheConfig;
 import cn.taketoday.lang.Nullable;
 
-public final class SpringCacheNamesInspection extends SpringUastInspectionBase {
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
+public final class CacheNamesInspection extends SpringUastInspectionBase {
 
-  public SpringCacheNamesInspection() {
+  public CacheNamesInspection() {
     super(UClass.class, UMethod.class);
   }
 

@@ -36,6 +36,10 @@ import java.util.Set;
 
 import cn.taketoday.lang.Nullable;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/21 0:20
+ */
 public abstract class CacheableElement<T extends PsiMember & PsiNamedElement> implements JamElement {
   public static final SemKey<CacheableElement> CACHEABLE_ROOT_JAM_KEY;
   private final JamAnnotationMeta myMeta;

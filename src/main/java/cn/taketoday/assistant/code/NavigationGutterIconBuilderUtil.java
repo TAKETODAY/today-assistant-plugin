@@ -42,14 +42,17 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.Icons;
+
 final class NavigationGutterIconBuilderUtil {
-  static final NotNullFunction<SpringBeanPointer<?>, Collection<? extends PsiElement>> BEAN_POINTER_CONVERTOR = (pointer) -> {
-    return !pointer.isValid() ? Collections.emptySet() : Collections.singleton(pointer.getSpringBean().getIdentifyingPsiElement());
-  };
-  static final NotNullFunction<CommonModelElement, Collection<? extends PsiElement>> COMMON_MODEL_ELEMENT_CONVERTOR = (modelElement) -> {
-    return Collections.singleton(modelElement.getIdentifyingPsiElement());
-  };
-  static final NotNullFunction<SpringBeanPointer<?>, Collection<? extends GotoRelatedItem>> AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER = (pointer) -> {
+  static final NotNullFunction<SpringBeanPointer<?>, Collection<? extends PsiElement>> BEAN_POINTER_CONVERTOR
+          = (pointer) -> !pointer.isValid() ? Collections.emptySet() : Collections.singleton(pointer.getSpringBean().getIdentifyingPsiElement());
+
+  static final NotNullFunction<CommonModelElement, Collection<? extends PsiElement>> COMMON_MODEL_ELEMENT_CONVERTOR
+          = (modelElement) -> Collections.singleton(modelElement.getIdentifyingPsiElement());
+
+  static final NotNullFunction<SpringBeanPointer<?>, Collection<? extends GotoRelatedItem>> AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
+          = (pointer) -> {
     CommonSpringBean bean = pointer.getSpringBean();
     if (bean instanceof DomSpringBean) {
       return Collections.singletonList(new DomGotoRelatedItem((DomSpringBean) bean, SpringBundle.message("autowired.dependencies.goto.related.item.group.name")));
@@ -60,15 +63,16 @@ final class NavigationGutterIconBuilderUtil {
               new GotoRelatedItem(element, SpringBundle.message("autowired.dependencies.goto.related.item.group.name"))) : Collections.emptyList();
     }
   };
+
   static final NotNullFunction<CommonModelElement, Collection<? extends GotoRelatedItem>> COMMON_MODEL_ELEMENT_GOTO_PROVIDER = (modelElement) -> {
     if (modelElement instanceof DomSpringBean) {
       return Collections.singletonList(new DomGotoRelatedItem((DomSpringBean) modelElement));
     }
     else {
       final PsiElement element = modelElement.getIdentifyingPsiElement();
-      return element != null ? Collections.singletonList(new GotoRelatedItem(element, "Spring") {
+      return element != null ? Collections.singletonList(new GotoRelatedItem(element, "Today") {
         public Icon getCustomIcon() {
-          return element instanceof PsiAnnotation ? SpringApiIcons.Spring : null;
+          return element instanceof PsiAnnotation ? Icons.Today : null;
         }
       }) : Collections.emptyList();
     }
