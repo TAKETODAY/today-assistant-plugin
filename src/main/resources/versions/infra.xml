@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+
+<artifacts>
+
+  <artifact version="4.0" name="TODAY Infrastructure">
+
+    <item name="today-core-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-core/4.0.0/today-core-4.0.0.jar">
+      <required-class fqn="cn.taketoday.lang.Version" />
+    </item>
+
+    <item name="today-context-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-context/4.0.0/today-context-4.0.0.jar">
+      <required-class fqn="cn.taketoday.context.ApplicationContext" />
+    </item>
+
+    <item name="today-beans-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-beans/4.0.0/today-beans-4.0.0.jar">
+      <required-class fqn="cn.taketoday.beans.BeanMetadata" />
+    </item>
+
+    <item name="today-aop-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-aop/4.0.0/today-aop-4.0.0.jar">
+      <required-class fqn="cn.taketoday.aop.Advisor" />
+    </item>
+
+    <item name="today-aspects-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-aspects/4.0.0/today-aspects-4.0.0.jar" />
+
+    <item name="today-instrument-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-instrument/4.0.0/today-instrument-4.0.0.jar" />
+
+    <item name="today-jcache-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-jcache/4.0.0/today-jcache-4.0.0.jar" />
+
+    <item name="today-jdbc-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-jdbc/4.0.0/today-jdbc-4.0.0.jar" />
+
+    <item name="today-mybatis-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-mybatis/4.0.0/today-mybatis-4.0.0.jar" />
+
+    <item name="today-orm-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-orm/4.0.0/today-orm-4.0.0.jar" />
+
+    <item name="today-redisson-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-redisson/4.0.0/today-redisson-4.0.0.jar" />
+
+    <item name="today-retry-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-retry/4.0.0/today-retry-4.0.0.jar" />
+
+    <item name="today-tx-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-tx/4.0.0/today-tx-4.0.0.jar" />
+
+    <item name="today-tx-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-tx/4.0.0/today-tx-4.0.0.jar">
+    </item>
+
+    <item name="today-web-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-web/4.0.0/today-web-4.0.0.jar">
+    </item>
+
+    <item name="today-context-indexer-4.0.0.jar"
+        url="https://repo1.maven.org/maven2/cn/taketoday/today-context-indexer/4.0.0/today-context-indexer-4.0.0.jar" />
+
+  </artifact>
+
+</artifacts>

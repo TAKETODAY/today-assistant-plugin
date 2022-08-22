@@ -23,13 +23,9 @@ package cn.taketoday.assistant.facet;
 import com.intellij.facet.FacetType;
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider;
 import com.intellij.openapi.module.Module;
-import com.intellij.spring.facet.SpringFacet;
-import com.intellij.spring.facet.SpringFacetConfiguration;
-import com.intellij.spring.facet.SpringFacetType;
 
 import org.jetbrains.idea.maven.importing.FacetImporter;
 import org.jetbrains.idea.maven.importing.MavenRootModelAdapter;
-import org.jetbrains.idea.maven.model.MavenArtifact;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectChanges;
 import org.jetbrains.idea.maven.project.MavenProjectsProcessorTask;
@@ -42,10 +38,10 @@ import java.util.Map;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 01:19
  */
-public class SpringFacetImporter extends FacetImporter<SpringFacet, SpringFacetConfiguration, SpringFacetType> {
+public class InfraFacetImporter extends FacetImporter<TodayFacet, TodayFacetConfiguration, TodayFacetType> {
 
-  public SpringFacetImporter() {
-    super("dummy", "dummy", FacetType.findInstance(SpringFacetType.class));
+  public InfraFacetImporter() {
+    super("dummy", "dummy", FacetType.findInstance(TodayFacetType.class));
   }
 
   @Override
@@ -54,27 +50,28 @@ public class SpringFacetImporter extends FacetImporter<SpringFacet, SpringFacetC
       return false;
     }
     else {
-      List<MavenArtifact> dependencies = mavenProject.findDependencies("cn.taketoday", "today-context");
-      return !dependencies.isEmpty();
+//       CollectionUtils.isNotEmpty(mavenProject.findDependencies("cn.taketoday", "today-context"));
+      // FIXME match error
+      return mavenProject.getDependencyArtifactIndex().getData().containsKey("cn.taketoday");
     }
   }
 
   @Override
   protected boolean isDisableFacetAutodetection(Module module) {
-    return true;
+    return false;
   }
 
   @Override
-  protected void setupFacet(SpringFacet facet, MavenProject mavenProject) {
+  protected void setupFacet(TodayFacet facet, MavenProject mavenProject) {
     System.out.println("setupFacet: " + "facet: " + facet + " mavenProject: " + mavenProject);
+
   }
 
   @Override
   protected void reimportFacet(IdeModifiableModelsProvider modelsProvider,
-          Module module, MavenRootModelAdapter rootModel, SpringFacet facet,
-          MavenProjectsTree mavenTree, MavenProject mavenProject,
-          MavenProjectChanges changes, Map<MavenProject, String> mavenProjectToModuleName,
-          List<MavenProjectsProcessorTask> postTasks) {
+          Module module, MavenRootModelAdapter rootModel, TodayFacet facet,
+          MavenProjectsTree mavenTree, MavenProject mavenProject, MavenProjectChanges changes,
+          Map<MavenProject, String> mavenProjectToModuleName, List<MavenProjectsProcessorTask> postTasks) {
 
   }
 
