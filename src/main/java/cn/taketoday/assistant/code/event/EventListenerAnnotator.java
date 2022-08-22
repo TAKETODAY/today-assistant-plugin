@@ -36,7 +36,6 @@ import com.intellij.psi.presentation.java.SymbolPresentationUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.semantic.SemService;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringBundle;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.util.NotNullFunction;
 import com.intellij.util.containers.ContainerUtil;
@@ -57,6 +56,7 @@ import java.util.function.Supplier;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.TodayLibraryUtil;
 import cn.taketoday.assistant.code.event.beans.PublishEventPointDescriptor;
 import cn.taketoday.assistant.code.event.jam.EventListenerElement;
@@ -83,7 +83,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   @Override
   public String getName() {
-    return SpringBundle.message("spring.core.event.listener.annotator.name");
+    return InfraBundle.message("spring.core.event.listener.annotator.name");
   }
 
   @Override
@@ -194,9 +194,9 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
   private static RelatedItemLineMarkerInfo<?> createEventListenerMarker(Supplier<Collection<PublishEventPointDescriptor>> supplier, PsiElement identifier) {
 
     var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Publisher, PUBLISH_EVENT_CONVERTOR, null);
-    builder.setTargets(NotNullLazyValue.lazy(supplier)).setPopupTitle(SpringBundle.message("spring.event.publisher.choose.title"))
-            .setTooltipText(SpringBundle.message("spring.event.publisher.tooltip.text"))
-            .setEmptyPopupText(SpringBundle.message("spring.event.publisher.empty.tooltip.text"))
+    builder.setTargets(NotNullLazyValue.lazy(supplier)).setPopupTitle(InfraBundle.message("event.publisher.choose.title"))
+            .setTooltipText(InfraBundle.message("event.publisher.tooltip.text"))
+            .setEmptyPopupText(InfraBundle.message("event.publisher.empty.tooltip.text"))
             .setCellRenderer(EventListenerAnnotator::getPublishEventRenderer);
     return builder.createSpringRelatedMergeableLineMarkerInfo(identifier);
   }
@@ -259,9 +259,9 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiType publishedType, PsiElement element) {
     var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Listener, EVENT_LISTENER_CONVERTOR, null);
     builder.setTargets(NotNullLazyValue.lazy(() -> EventModelUtils.getEventListeners(project, module, publishedType)))
-            .setPopupTitle(SpringBundle.message("spring.event.listener.choose.title"))
-            .setTooltipText(SpringBundle.message("spring.event.listener.tooltip.text"))
-            .setEmptyPopupText(SpringBundle.message("spring.event.listener.empty.tooltip.text"))
+            .setPopupTitle(InfraBundle.message("event.listener.choose.title"))
+            .setTooltipText(InfraBundle.message("event.listener.tooltip.text"))
+            .setEmptyPopupText(InfraBundle.message("event.listener.empty.tooltip.text"))
             .setCellRenderer(EventListenerAnnotator::getEventListenerRenderer);
     result.add(builder.createSpringRelatedMergeableLineMarkerInfo(element));
   }

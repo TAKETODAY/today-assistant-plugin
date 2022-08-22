@@ -41,12 +41,10 @@ import org.jetbrains.uast.UastUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 import cn.taketoday.assistant.code.CacheableAnnotator;
 import cn.taketoday.lang.Nullable;
 import kotlin.collections.CollectionsKt;
-import kotlin.jvm.internal.Intrinsics;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -73,8 +71,6 @@ public final class CacheableNameConverter extends JamConverter<String> {
 
     public CacheableNameReference(JamStringAttributeElement<String> jamStringAttributeElement, PsiLanguageInjectionHost psiElement) {
       super(psiElement);
-      Intrinsics.checkNotNullParameter(jamStringAttributeElement, "context");
-      Intrinsics.checkNotNullParameter(psiElement, "psiElement");
       this.context = jamStringAttributeElement;
     }
 
@@ -83,9 +79,8 @@ public final class CacheableNameConverter extends JamConverter<String> {
       String it;
       Iterable<CacheableElement> findAllCacheable = CacheableAnnotator.findAllCacheable(this.context.getPsiElement());
       HashSet<String> existingCacheableNames = new HashSet<>();
-      for (CacheableElement<?> p1 : findAllCacheable) {
-        Set<String> list$iv = p1.getCacheNames();
-        CollectionsKt.addAll(existingCacheableNames, list$iv);
+      for (CacheableElement<?> element : findAllCacheable) {
+        CollectionsKt.addAll(existingCacheableNames, element.getCacheNames());
       }
       it = getCurrentContextCacheableName(this.context);
       if (it != null) {

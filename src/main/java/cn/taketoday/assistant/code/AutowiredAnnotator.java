@@ -48,6 +48,8 @@ import com.intellij.spring.SpringBundle;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.impl.SpringAutoConfiguredModels;
+
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.JavaClassInfo;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
@@ -93,7 +95,7 @@ public class AutowiredAnnotator extends AbstractAnnotator {
 
   @Override
   public String getName() {
-    return SpringBundle.message("spring.core.autowired.annotator.name");
+    return InfraBundle.message("core.autowired.annotator.name");
   }
 
   @Override

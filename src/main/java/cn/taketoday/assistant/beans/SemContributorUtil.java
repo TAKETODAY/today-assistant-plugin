@@ -63,7 +63,7 @@ import static cn.taketoday.assistant.AnnotationConstant.CONTROLLER;
 import static cn.taketoday.assistant.AnnotationConstant.REPOSITORY;
 import static cn.taketoday.assistant.AnnotationConstant.SERVICE;
 
-public final class SpringSemContributorUtil {
+public final class SemContributorUtil {
   // predefined component annotations
   public static final String[] DEFAULT_COMPONENTS =
           new String[] {
@@ -347,6 +347,8 @@ public final class SpringSemContributorUtil {
       if (!myFilterCustomJamImplementations) {
         return Collections.emptySet();
       }
+
+      // FIXME JamCustomImplementationBean
 
       Set<String> customMetaFQNs = new HashSet<>();
 //      for (JamCustomImplementationBean bean : JamCustomImplementationBean.EP_NAME.getExtensionList()) {

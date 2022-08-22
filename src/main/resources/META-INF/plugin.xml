@@ -39,7 +39,7 @@
   <depends config-file="spring.xml" optional="true">com.intellij.spring</depends>
   <depends config-file="maven.xml" optional="true">org.jetbrains.idea.maven</depends>
   <depends config-file="lang-injections.xml" optional="true">org.intellij.intelliLang</depends>
-  <depends config-file="inspections.xml" optional="true" />
+  <depends config-file="inspections.xml" optional="true">org.intellij.intelliLang</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <facetType implementation="cn.taketoday.assistant.facet.TodayFacetType" />

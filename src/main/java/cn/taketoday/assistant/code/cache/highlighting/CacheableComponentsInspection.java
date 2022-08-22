@@ -24,17 +24,14 @@ import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.jam.JamService;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMember;
-import com.intellij.psi.PsiMethod;
-import com.intellij.semantic.SemService;
-import com.intellij.spring.SpringBundle;
-import com.intellij.spring.model.highlighting.jam.SpringBeanPointerResolveInspection;
 
-import java.util.List;
+import org.jetbrains.uast.UClass;
+import org.jetbrains.uast.UMethod;
 
+import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.assistant.code.cache.jam.CachingGroup;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 import cn.taketoday.lang.Nullable;
@@ -43,37 +40,33 @@ import cn.taketoday.lang.Nullable;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:20
  */
-public final class CacheableComponentsInspection extends SpringBeanPointerResolveInspection {
+public final class CacheableComponentsInspection extends AbstractInfraLocalInspection {
 
-  public ProblemDescriptor[] checkMethod(PsiMethod method, InspectionManager manager, boolean isOnTheFly) {
+  @Override
+  public ProblemDescriptor[] checkMethod(UMethod method, InspectionManager manager, boolean isOnTheFly) {
     PsiAnnotation annotation;
-    if (isPlainJavaFileInSpringModule(method)) {
-      ProblemsHolder holder = new ProblemsHolder(manager, method.getContainingFile(), isOnTheFly);
-      List<JamBaseCacheableElement> elements = SemService.getSemService(method.getProject()).getSemElements(JamBaseCacheableElement.CACHEABLE_BASE_JAM_KEY, method);
-      for (JamBaseCacheableElement cacheable : elements) {
-        if (!method.getModifierList().hasModifierProperty("public") && (annotation = cacheable.getAnnotation()) != null) {
-          holder.registerProblem(annotation, SpringBundle.message("cacheable.annotations.should.be.defined.on.public.methods"), ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
-        }
-        checkBeansResolve(cacheable, holder);
+    ProblemsHolder holder = new ProblemsHolder(manager, method.getContainingFile(), isOnTheFly);
+
+    for (JamBaseCacheableElement cacheable : JamBaseCacheableElement.getElements(method)) {
+      if (!method.getModifierList().hasModifierProperty("public")
+              && (annotation = cacheable.getAnnotation()) != null) {
+        holder.registerProblem(annotation, InfraBundle.message("cacheable.annotations.should.be.defined.on.public.methods"),
+                ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
       }
-      checkCachingGroups(holder, JamService.getJamService(method.getProject())
-              .getJamElement(method, CachingGroup.ForMethod.META));
-      return holder.getResultsArray();
+      checkBeansResolve(cacheable, holder);
     }
-    return null;
+    checkCachingGroups(holder, CachingGroup.forMethod(method));
+    return holder.getResultsArray();
   }
 
-  public ProblemDescriptor[] checkClass(PsiClass aClass, InspectionManager manager, boolean isOnTheFly) {
-    if (isPlainJavaFileInSpringModule(aClass)) {
-      ProblemsHolder holder = new ProblemsHolder(manager, aClass.getContainingFile(), isOnTheFly);
-      List<JamBaseCacheableElement> elements = SemService.getSemService(aClass.getProject()).getSemElements(JamBaseCacheableElement.CACHEABLE_BASE_JAM_KEY, aClass);
-      for (JamBaseCacheableElement cacheable : elements) {
-        checkBeansResolve(cacheable, holder);
-      }
-      checkCachingGroups(holder, JamService.getJamService(aClass.getProject()).getJamElement(aClass, CachingGroup.ForClass.META));
-      return holder.getResultsArray();
+  @Override
+  public ProblemDescriptor[] checkClass(UClass aClass, InspectionManager manager, boolean isOnTheFly) {
+    ProblemsHolder holder = new ProblemsHolder(manager, aClass.getContainingFile(), isOnTheFly);
+    for (JamBaseCacheableElement cacheable : JamBaseCacheableElement.getElements(aClass)) {
+      checkBeansResolve(cacheable, holder);
     }
-    return null;
+    checkCachingGroups(holder, CachingGroup.forClass(aClass));
+    return holder.getResultsArray();
   }
 
   public void checkCachingGroups(ProblemsHolder holder, @Nullable CachingGroup<? extends PsiMember> cachingGroups) {
@@ -91,8 +84,9 @@ public final class CacheableComponentsInspection extends SpringBeanPointerResolv
   }
 
   private static void checkBeansResolve(JamBaseCacheableElement cacheable, ProblemsHolder holder) {
-    checkBeanPointerResolve(holder, cacheable.getCacheManagerElement());
-    checkBeanPointerResolve(holder, cacheable.getCacheResolverElement());
-    checkBeanPointerResolve(holder, cacheable.getKeyGeneratorElement());
+    // FIXME
+//    checkBeanPointerResolve(holder, cacheable.getCacheManagerElement());
+//    checkBeanPointerResolve(holder, cacheable.getCacheResolverElement());
+//    checkBeanPointerResolve(holder, cacheable.getKeyGeneratorElement());
   }
 }

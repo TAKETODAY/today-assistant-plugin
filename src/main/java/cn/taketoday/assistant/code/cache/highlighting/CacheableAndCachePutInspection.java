@@ -21,25 +21,16 @@
 package cn.taketoday.assistant.code.cache.highlighting;
 
 import com.intellij.codeInspection.InspectionManager;
-import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
+import com.intellij.semantic.SemKey;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.SpringBundle;
 
-import cn.taketoday.assistant.code.cache.jam.CacheableElement;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCachePut;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheable;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
-import cn.taketoday.assistant.util.CommonUtils;
-
-import com.intellij.spring.model.highlighting.jam.SpringUastInspectionBase;
-import com.intellij.util.SmartList;
-
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.UAnnotation;
 import org.jetbrains.uast.UAnnotationKt;
 import org.jetbrains.uast.UMethod;
@@ -47,59 +38,56 @@ import org.jetbrains.uast.UastContextKt;
 
 import java.util.List;
 
+import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
+import cn.taketoday.assistant.code.cache.jam.CacheableElement;
+import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
+import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
+import cn.taketoday.assistant.util.CommonUtils;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:20
  */
-public final class CacheableAndCachePutInspection extends SpringUastInspectionBase {
+public final class CacheableAndCachePutInspection extends AbstractInfraLocalInspection {
 
   public CacheableAndCachePutInspection() {
     super(UMethod.class);
   }
 
+  @Override
   public ProblemDescriptor[] checkMethod(UMethod umethod, InspectionManager manager, boolean isOnTheFly) {
     if (CommonUtils.isInInfraEnabledModule(umethod)) {
       PsiMethod method = umethod.getJavaPsi();
       PsiElement sourcePsi = umethod.getSourcePsi();
-      if (sourcePsi == null) {
-        return null;
-      }
-      List<CacheableElement> cacheableElements = getCacheableElements(method);
-      if (cacheableElements.size() > 0) {
-        List<CacheableElement> cachePutElements = getCachePutElements(method);
-        if (cachePutElements.size() > 0) {
-          ProblemsHolder holder = new ProblemsHolder(manager, sourcePsi.getContainingFile(), isOnTheFly);
-          registerProblems(cacheableElements, holder);
-          registerProblems(cachePutElements, holder);
-          return holder.getResultsArray();
+      if (sourcePsi != null) {
+        List<CacheableElement<?>> cacheableElements = getElements(method, JamCacheable.CACHEABLE_JAM_KEY);
+        if (!cacheableElements.isEmpty()) {
+          List<CacheableElement<?>> cachePutElements = getElements(method, JamCachePut.CACHE_PUT_JAM_KEY);
+          if (!cachePutElements.isEmpty()) {
+            ProblemsHolder holder = new ProblemsHolder(manager, sourcePsi.getContainingFile(), isOnTheFly);
+            registerProblems(cacheableElements, holder);
+            registerProblems(cachePutElements, holder);
+            return holder.getResultsArray();
+          }
         }
-        return null;
       }
-      return null;
     }
     return null;
   }
 
-  private static void registerProblems(List<CacheableElement> cacheableElements, ProblemsHolder holder) {
-    for (CacheableElement element : cacheableElements) {
+  private static void registerProblems(List<CacheableElement<?>> cacheableElements, ProblemsHolder holder) {
+    for (CacheableElement<?> element : cacheableElements) {
       PsiElement annotation = UAnnotationKt.getNamePsiElement(UastContextKt.toUElement(element.getAnnotation(), UAnnotation.class));
       if (annotation != null) {
-        holder.registerProblem(annotation, SpringBundle.message("cacheable.and.cache.put.on.the.same.method", new Object[0]), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new LocalQuickFix[0]);
+        holder.registerProblem(annotation, InfraBundle.message("cacheable.and.cache.put.on.the.same.method"), ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
       }
     }
   }
 
-  private static List<CacheableElement> getCacheableElements(PsiMethod method) {
-    SmartList smartList = new SmartList();
-    smartList.addAll(SemService.getSemService(method.getProject()).getSemElements(JamCacheable.CACHEABLE_JAM_KEY, method));
-    smartList.addAll(SemService.getSemService(method.getProject()).getSemElements(CustomCacheable.CUSTOM_CACHEABLE_JAM_KEY, method));
-    return smartList;
+  private static <T extends CacheableElement<?>> List<T> getElements(PsiMethod method, SemKey semKey) {
+    return SemService.getSemService(method.getProject())
+            .getSemElements(semKey, method);
   }
 
-  private static List<CacheableElement> getCachePutElements(PsiMethod method) {
-    SmartList smartList = new SmartList();
-    smartList.addAll(SemService.getSemService(method.getProject()).getSemElements(JamCachePut.CACHE_PUT_JAM_KEY, method));
-    smartList.addAll(SemService.getSemService(method.getProject()).getSemElements(CustomCachePut.CUSTOM_CACHE_PUT_JAM_KEY, method));
-    return smartList;
-  }
 }

@@ -38,21 +38,8 @@ import com.intellij.spring.SpringBundle;
 import com.intellij.spring.SpringManager;
 import com.intellij.spring.contexts.model.SpringModel;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-
-import cn.taketoday.assistant.code.cache.jam.CacheableElement;
-import cn.taketoday.assistant.code.cache.jam.CustomCacheableElement;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheConfig;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheConfig;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheEvict;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
-import cn.taketoday.assistant.code.cache.jam.CachingGroup;
-
-import com.intellij.spring.model.jam.utils.JamAnnotationTypeUtil;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.spring.model.utils.SpringModelSearchers;
 import com.intellij.util.NotNullFunction;
-import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 
 import org.jetbrains.uast.UAnnotationUtils;
@@ -71,6 +58,13 @@ import java.util.Set;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.code.cache.CacheableConstant;
+import cn.taketoday.assistant.code.cache.jam.CacheableElement;
+import cn.taketoday.assistant.code.cache.jam.CachingGroup;
+import cn.taketoday.assistant.code.cache.jam.standard.JamCacheConfig;
+import cn.taketoday.assistant.code.cache.jam.standard.JamCacheEvict;
+import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
+import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -208,7 +202,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
     if (psiAnnotationIdentifier == elementToAnnotate) {
       Set<CacheableElement<?>> cacheableElements = findCacheableWithTheSameName(cacheableElement);
       if (!cacheableElements.isEmpty()) {
-        SpringGutterIconBuilder<CacheableElement<?>> builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.ShowCacheable, CACHEABLE_CONVERTOR, null);
+        var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.ShowCacheable, CACHEABLE_CONVERTOR, null);
         builder.setTargets(cacheableElements)
                 .setCellRenderer(CacheableAnnotator::getCacheableListCellRenderer)
                 .setPopupTitle(SpringBundle.message("spring.cacheable.element.choose.title"))
@@ -220,8 +214,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
   }
 
   private static boolean hasCustomCacheResolver(Module module) {
-
-    PsiClass cacheResolver = SpringCommonUtils.findLibraryClass(module, "cn.taketoday.cache.interceptor.CacheResolver");
+    PsiClass cacheResolver = CommonUtils.findLibraryClass(module, CacheableConstant.CACHE_RESOLVER_CLASS);
     if (cacheResolver == null) {
       return true;
     }
@@ -234,8 +227,9 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
   public static Set<CacheableElement<?>> findCacheableWithTheSameName(
           CacheableElement<?> cacheableElement) {
 
+    var ret = new HashSet<CacheableElement<?>>();
+
     PsiElement psiElement = cacheableElement.getAnnotation();
-    Set<CacheableElement<?>> cacheableElements = new HashSet();
     Set<String> cacheNames = cacheableElement.getCacheNames();
     if (cacheNames.isEmpty()) {
       cacheNames = getDefaultCacheNames(psiElement);
@@ -250,13 +244,13 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
             names = getDefaultCacheNames(element.getAnnotation());
           }
           if (hasSameNames(names, cacheNames)) {
-            cacheableElements.add(element);
+            ret.add(element);
           }
         }
       }
     }
 
-    return cacheableElements;
+    return ret;
   }
 
   private static Set<String> getDefaultCacheNames(@Nullable PsiElement psiElement) {
@@ -269,13 +263,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
         if (cacheConfig != null) {
           return cacheConfig.getCacheNames();
         }
-
-        CustomCacheConfig customCacheConfig = service.getSemElement(CustomCacheConfig.JAM_KEY, aClass);
-        if (customCacheConfig != null) {
-          return customCacheConfig.getCacheNames();
-        }
       }
-
     }
     return Collections.emptySet();
   }
@@ -300,52 +288,16 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
       JamService service = JamService.getJamService(module.getProject());
       GlobalSearchScope scope = psiElement.getResolveScope();
       var result = new LinkedHashSet<CacheableElement>();
-      result.addAll(service.getJamMethodElements(JamCacheable.CACHEABLE_JAM_KEY, "cn.taketoday.cache.annotation.Cacheable", scope));
-      result.addAll(service.getJamMethodElements(JamCachePut.CACHE_PUT_JAM_KEY, "cn.taketoday.cache.annotation.CachePut", scope));
-      result.addAll(service.getJamMethodElements(JamCacheEvict.CACHE_EVICT_JAM_KEY, "cn.taketoday.cache.annotation.CacheEvict", scope));
-      result.addAll(service.getJamClassElements(JamCacheable.CACHEABLE_JAM_KEY, "cn.taketoday.cache.annotation.Cacheable", scope));
-      result.addAll(service.getJamClassElements(JamCachePut.CACHE_PUT_JAM_KEY, "cn.taketoday.cache.annotation.CachePut", scope));
-      result.addAll(service.getJamClassElements(JamCacheEvict.CACHE_EVICT_JAM_KEY, "cn.taketoday.cache.annotation.CacheEvict", scope));
-      result.addAll(service.getJamClassElements(JamCacheConfig.CACHE_CONFIG_JAM_KEY, "cn.taketoday.cache.annotation.CacheConfig", scope));
-      result.addAll(getCustomCacheableElements(scope, module, "cn.taketoday.cache.annotation.Cacheable"));
-      result.addAll(getCustomCacheableElements(scope, module, "cn.taketoday.cache.annotation.CachePut"));
-      result.addAll(getCustomCacheableElements(scope, module, "cn.taketoday.cache.annotation.CacheEvict"));
 
-      var caching = service.getJamClassElements(
-              CachingGroup.ForClass.META, "cn.taketoday.cache.annotation.Caching", scope);
-      for (CachingGroup.ForClass cachingGroups : caching) {
-        addFromCachingGroups(result, cachingGroups);
-      }
-
-      var cachingGroupsForMethods = service.getJamMethodElements(
-              CachingGroup.ForMethod.META, "cn.taketoday.cache.annotation.Caching", scope);
-      for (CachingGroup.ForMethod cachingGroups : cachingGroupsForMethods) {
-        addFromCachingGroups(result, cachingGroups);
-      }
+      JamCachePut.addElements(service, scope, result);
+      JamCacheable.addElements(service, scope, result);
+      JamCacheEvict.addElements(service, scope, result);
+      JamCacheConfig.addElements(service, scope, result);
+      CachingGroup.addElements(service, scope, result);
 
       return result;
     }
   }
 
-  private static void addFromCachingGroups(
-          Set<? super CacheableElement> result, CachingGroup<? extends PsiMember> cachingGroups) {
-    result.addAll(cachingGroups.getCacheables());
-    result.addAll(cachingGroups.getCacheEvict());
-    result.addAll(cachingGroups.getCachePuts());
-  }
-
-  private static List<CustomCacheableElement> getCustomCacheableElements(
-          GlobalSearchScope scope, Module module, String definingAnno) {
-    List<CustomCacheableElement> customCacheables = new SmartList<>();
-    List<String> customAnnotations = ContainerUtil.mapNotNull(JamAnnotationTypeUtil.getInstance(module).getAnnotationTypesWithChildren(definingAnno), PsiClass::getQualifiedName);
-    JamService service = JamService.getJamService(module.getProject());
-
-    for (String customAnno : customAnnotations) {
-      customCacheables.addAll(service.getJamMethodElements(CustomCacheableElement.CUSTOM_ROOT_JAM_KEY, customAnno, scope));
-      customCacheables.addAll(service.getJamClassElements(CustomCacheableElement.CUSTOM_ROOT_JAM_KEY, customAnno, scope));
-    }
-
-    return customCacheables;
-  }
 }
 

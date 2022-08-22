@@ -20,10 +20,8 @@
 
 package cn.taketoday.assistant.code.cache.highlighting;
 
-import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInsight.MetaAnnotationUtil;
 import com.intellij.codeInspection.InspectionManager;
-import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -33,13 +31,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.InheritanceUtil;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.SpringBundle;
-
-import cn.taketoday.assistant.code.cache.CacheableConstant;
-import cn.taketoday.assistant.code.cache.jam.CacheableElement;
-
-import com.intellij.spring.model.highlighting.jam.SpringUastInspectionBase;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 
 import org.jetbrains.uast.UAnnotated;
 import org.jetbrains.uast.UAnnotation;
@@ -53,6 +44,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
+import cn.taketoday.assistant.code.cache.CacheableConstant;
+import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -60,22 +55,30 @@ import cn.taketoday.lang.Nullable;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:20
  */
-public final class CacheAnnotationsOnInterfaceInspection extends SpringUastInspectionBase {
+public final class CacheAnnotationsOnInterfaceInspection extends AbstractInfraLocalInspection {
 
   public CacheAnnotationsOnInterfaceInspection() {
     super(UClass.class, UMethod.class);
   }
 
+  @Override
   public ProblemDescriptor[] checkMethod(UMethod uMethod, InspectionManager manager, boolean isOnTheFly) {
     UClass containingClass;
     PsiElement sourcePsi;
-    if (!SpringCommonUtils.isInSpringEnabledModule(uMethod) || (containingClass = UastUtils.getContainingUClass(
-            uMethod)) == null || !containingClass.isInterface() || (sourcePsi = containingClass.getSourcePsi()) == null || isImplicitlySubclassed(containingClass.getJavaPsi())) {
+
+    if (!CommonUtils.isInInfraEnabledModule(uMethod)
+            || (containingClass = UastUtils.getContainingUClass(uMethod)) == null
+            || !containingClass.isInterface()
+            || (sourcePsi = containingClass.getSourcePsi()) == null
+            || isImplicitlySubclassed(containingClass.getJavaPsi())) {
       return null;
     }
+
     ProblemsHolder holder = new ProblemsHolder(manager, sourcePsi.getContainingFile(), isOnTheFly);
     PsiMethod method = uMethod.getJavaPsi();
-    for (CacheableElement<?> cacheableElement : SemService.getSemService(sourcePsi.getProject()).getSemElements(CacheableElement.CACHEABLE_ROOT_JAM_KEY, method)) {
+    List<CacheableElement> semElements = SemService.getSemService(sourcePsi.getProject())
+            .getSemElements(CacheableElement.CACHEABLE_ROOT_JAM_KEY, method);
+    for (CacheableElement<?> cacheableElement : semElements) {
       registerProblemIfAnnotationExists(holder, cacheableElement.getAnnotation());
     }
     registerProblemIfAnnotationExists(holder, findMetaAnnotation(uMethod, CacheableConstant.CACHING));
@@ -86,10 +89,15 @@ public final class CacheAnnotationsOnInterfaceInspection extends SpringUastInspe
   private static UAnnotation findMetaAnnotation(UAnnotated declaration, String annotationName) {
     for (UAnnotation uAnnotation : declaration.getUAnnotations()) {
       PsiClass annotationClass = uAnnotation.resolve();
-      if (annotationClass == null || (!Objects.equals(annotationClass.getQualifiedName(), annotationName) && !MetaAnnotationUtil.isMetaAnnotated(annotationClass,
-              Collections.singletonList(annotationName)))) {
+      if (annotationClass != null) {
+        if (Objects.equals(annotationClass.getQualifiedName(), annotationName)) {
+          return uAnnotation;
+        }
+
+        if (MetaAnnotationUtil.isMetaAnnotated(annotationClass, Collections.singletonList(annotationName))) {
+          return uAnnotation;
+        }
       }
-      return uAnnotation;
     }
     return null;
   }
@@ -101,10 +109,12 @@ public final class CacheAnnotationsOnInterfaceInspection extends SpringUastInspe
   private static void registerProblemIfAnnotationExists(ProblemsHolder holder, @Nullable UAnnotation uAnnotation) {
     PsiElement element = UAnnotationKt.getNamePsiElement(uAnnotation);
     if (element != null) {
-      holder.registerProblem(element, SpringBundle.message("cacheable.should.be.defined.on.concrete.method", new Object[0]), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, new LocalQuickFix[0]);
+      holder.registerProblem(element, InfraBundle.message("cacheable.should.be.defined.on.concrete.method"),
+              ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
     }
   }
 
+  @Override
   public ProblemDescriptor[] checkClass(UClass uClass, InspectionManager manager, boolean isOnTheFly) {
     if (CommonUtils.isInInfraEnabledModule(uClass) && uClass.isInterface() && !uClass.isAnnotationType()) {
       PsiElement sourcePsi = uClass.getSourcePsi();
@@ -126,7 +136,7 @@ public final class CacheAnnotationsOnInterfaceInspection extends SpringUastInspe
   }
 
   private static boolean isImplicitlySubclassed(PsiClass clazz) {
-    return InheritanceUtil.isInheritor(clazz, "cn.taketoday.data.repository.Repository") || AnnotationUtil.isAnnotated(clazz,
-            List.of("cn.taketoday.cloud.netflix.feign.FeignClient", "cn.taketoday.cloud.openfeign.FeignClient"), 0);
+    return InheritanceUtil.isInheritor(clazz, "cn.taketoday.data.repository.Repository");
   }
+
 }

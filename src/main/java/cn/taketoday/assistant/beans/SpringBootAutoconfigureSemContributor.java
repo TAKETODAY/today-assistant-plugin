@@ -22,10 +22,8 @@ package cn.taketoday.assistant.beans;
 
 import com.intellij.jam.JamElement;
 import com.intellij.jam.reflect.JamClassMeta;
-import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.jam.reflect.JamMethodMeta;
 import com.intellij.openapi.project.Project;
-import com.intellij.patterns.PsiFieldPattern;
 import com.intellij.patterns.PsiJavaPatterns;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemContributor;
@@ -136,19 +134,19 @@ final class SpringBootAutoconfigureSemContributor extends SemContributor {
   private static void registerSpringApplicationConfiguration(SemRegistrar registrar, @NotNull SemService semService) {
 
     SpringApplicationConfiguration.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation("cn.taketoday.boot.test.SpringApplicationConfiguration"));
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), SpringApplicationConfiguration.META_KEY,
+    SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), SpringApplicationConfiguration.META_KEY,
             SpringApplicationConfiguration.SPRING_APP_JAM_KEY,
-            SpringSemContributorUtil.createFunction(SpringApplicationConfiguration.SPRING_APP_JAM_KEY, SpringApplicationConfiguration.class,
-                    SpringSemContributorUtil.getCustomMetaAnnotations("cn.taketoday.boot.test.SpringApplicationConfiguration", true, false), (pair) -> {
+            SemContributorUtil.createFunction(SpringApplicationConfiguration.SPRING_APP_JAM_KEY, SpringApplicationConfiguration.class,
+                    SemContributorUtil.getCustomMetaAnnotations("cn.taketoday.boot.test.SpringApplicationConfiguration", true, false), (pair) -> {
                       return new SpringApplicationConfiguration(pair.first, (PsiClass) pair.second);
                     }, (Consumer) null));
   }
 
   private static void registerBootstrapWithTests(SemRegistrar registrar, @NotNull SemService semService) {
 
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), SpringBootstrapWithTest.META_KEY, SpringBootstrapWithTest.JAM_KEY,
-            SpringSemContributorUtil.createFunction(SpringBootstrapWithTest.JAM_KEY, SpringBootstrapWithTest.class,
-                    SpringSemContributorUtil.getCustomMetaAnnotations("cn.taketoday.test.context.BootstrapWith", true, false), (pair) -> {
+    SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), SpringBootstrapWithTest.META_KEY, SpringBootstrapWithTest.JAM_KEY,
+            SemContributorUtil.createFunction(SpringBootstrapWithTest.JAM_KEY, SpringBootstrapWithTest.class,
+                    SemContributorUtil.getCustomMetaAnnotations("cn.taketoday.test.context.BootstrapWith", true, false), (pair) -> {
                       return new SpringBootstrapWithTest(pair.first, (PsiClass) pair.second);
                     }, (Consumer) null));
   }
@@ -157,35 +155,35 @@ final class SpringBootAutoconfigureSemContributor extends SemContributor {
 
     registrar.registerSemElementProvider(SpringJamMockBean.JAM_KEY, PsiJavaPatterns.psiAnnotation().qName("cn.taketoday.boot.test.mock.mockito.MockBean"), SpringJamMockBean::new);
     SpringJamMockBeans.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation("cn.taketoday.boot.test.mock.mockito.MockBeans"));
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), CustomJamMockBean.META_KEY, CustomJamMockBean.JAM_KEY,
-            SpringSemContributorUtil.createFunction(CustomJamMockBean.JAM_KEY, CustomJamMockBean.class,
-                    SpringSemContributorUtil.getCustomMetaAnnotations("cn.taketoday.boot.test.mock.mockito.MockBean", true, false), (pair) -> {
+    SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), CustomJamMockBean.META_KEY, CustomJamMockBean.JAM_KEY,
+            SemContributorUtil.createFunction(CustomJamMockBean.JAM_KEY, CustomJamMockBean.class,
+                    SemContributorUtil.getCustomMetaAnnotations("cn.taketoday.boot.test.mock.mockito.MockBean", true, false), (pair) -> {
                       return new CustomJamMockBean(pair.first, (PsiClass) pair.second);
                     }, (Consumer) null));
   }
 
   private static void registerEnableAutoConfiguration(SemRegistrar registrar, SemService semService) {
     EnableAutoConfiguration.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation("cn.taketoday.boot.autoconfigure.EnableAutoConfiguration"));
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), EnableAutoConfiguration.META_KEY, EnableAutoConfiguration.JAM_KEY,
-            SpringSemContributorUtil.createFunction(EnableAutoConfiguration.JAM_KEY, EnableAutoConfiguration.class, EnableAutoConfiguration.getAnnotations(), (pair) -> {
+    SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), EnableAutoConfiguration.META_KEY, EnableAutoConfiguration.JAM_KEY,
+            SemContributorUtil.createFunction(EnableAutoConfiguration.JAM_KEY, EnableAutoConfiguration.class, EnableAutoConfiguration.getAnnotations(), (pair) -> {
               return new EnableAutoConfiguration(pair.first, (PsiClass) pair.getSecond());
             }, (Consumer) null));
   }
 
   private static void registerImportAutoConfiguration(SemRegistrar registrar, SemService semService) {
     ImportAutoConfiguration.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation("cn.taketoday.boot.autoconfigure.ImportAutoConfiguration"));
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), ImportAutoConfiguration.META_KEY, ImportAutoConfiguration.JAM_KEY,
-            SpringSemContributorUtil.createFunction(ImportAutoConfiguration.JAM_KEY, ImportAutoConfiguration.class, ImportAutoConfiguration.getAnnotations(), (pair) -> {
+    SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), ImportAutoConfiguration.META_KEY, ImportAutoConfiguration.JAM_KEY,
+            SemContributorUtil.createFunction(ImportAutoConfiguration.JAM_KEY, ImportAutoConfiguration.class, ImportAutoConfiguration.getAnnotations(), (pair) -> {
               return new ImportAutoConfiguration(pair.first, (PsiClass) pair.getSecond());
             }, (Consumer) null));
   }
 
   private static void registerConfigurationPropertiesScan(SemRegistrar registrar, SemService semService) {
     ConfigurationPropertiesScan.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation("cn.taketoday.boot.context.properties.ConfigurationPropertiesScan"));
-    SpringSemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), CustomConfigurationPropertiesScan.META_KEY,
+    SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), CustomConfigurationPropertiesScan.META_KEY,
             CustomConfigurationPropertiesScan.JAM_KEY,
-            SpringSemContributorUtil.createFunction(CustomConfigurationPropertiesScan.JAM_KEY, CustomConfigurationPropertiesScan.class,
-                    SpringSemContributorUtil.getCustomMetaAnnotations("cn.taketoday.boot.context.properties.ConfigurationPropertiesScan"), (pair) -> {
+            SemContributorUtil.createFunction(CustomConfigurationPropertiesScan.JAM_KEY, CustomConfigurationPropertiesScan.class,
+                    SemContributorUtil.getCustomMetaAnnotations("cn.taketoday.boot.context.properties.ConfigurationPropertiesScan"), (pair) -> {
                       return new CustomConfigurationPropertiesScan(pair.first, (PsiClass) pair.second);
                     }, (Consumer) null, SpringAliasForUtils.getAnnotationMetaProducer(CustomConfigurationPropertiesScan.JAM_ANNO_META_KEY, ConfigurationPropertiesScan.META)));
   }

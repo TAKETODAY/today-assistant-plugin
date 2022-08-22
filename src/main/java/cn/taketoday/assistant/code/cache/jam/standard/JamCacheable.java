@@ -20,20 +20,29 @@
 
 package cn.taketoday.assistant.code.cache.jam.standard;
 
+import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.jam.reflect.JamMethodMeta;
+import com.intellij.patterns.PsiJavaPatterns;
+import com.intellij.patterns.PsiMethodPattern;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.semantic.SemKey;
+import com.intellij.semantic.SemRegistrar;
+
+import java.util.Collection;
+import java.util.List;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
+import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 
 /**
@@ -41,7 +50,7 @@ import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
  * @since 1.0 2022/8/21 0:20
  */
 public class JamCacheable<T extends PsiMember & PsiNamedElement> extends JamBaseCacheableElement<T> implements CacheableMarker {
-  public static final SemKey<JamCacheable> CACHEABLE_JAM_KEY = CACHEABLE_BASE_JAM_KEY.subKey("SpringJamCacheable");
+  public static final SemKey<JamCacheable> CACHEABLE_JAM_KEY = CACHEABLE_BASE_JAM_KEY.subKey("Cacheable");
   public static final JamAnnotationMeta CACHEABLE_ANNO_META = new JamAnnotationMeta(CacheableConstant.CACHEABLE)
           .addAttribute(VALUE_ATTR_META)
           .addAttribute(CACHE_NAMES_ATTR_META)
@@ -57,12 +66,22 @@ public class JamCacheable<T extends PsiMember & PsiNamedElement> extends JamBase
     super(annotation);
   }
 
+  public static void register(SemRegistrar registrar, PsiMethodPattern psiMethod) {
+    JamCacheable.ForClass.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(CacheableConstant.CACHEABLE));
+    JamCacheable.ForMethod.META.register(registrar, psiMethod.withAnnotation(CacheableConstant.CACHEABLE));
+  }
+
+  public static void addElements(JamService service, GlobalSearchScope scope, Collection<CacheableElement> result) {
+    result.addAll(service.getJamMethodElements(JamCacheable.CACHEABLE_JAM_KEY, CacheableConstant.CACHEABLE, scope));
+    result.addAll(service.getJamClassElements(CACHEABLE_JAM_KEY, CacheableConstant.CACHEABLE, scope));
+  }
+
   public static class ForMethod extends JamCacheable<PsiMethod> {
-    public static final SemKey<ForMethod> JAM_KEY = CACHEABLE_JAM_KEY.subKey("SpringJamCacheableForMethod");
+    public static final SemKey<ForMethod> JAM_KEY = CACHEABLE_JAM_KEY.subKey("JamCacheable.ForMethod");
     public static final JamMethodMeta<ForMethod> META =
             new JamMethodMeta<>(null, ForMethod.class, JAM_KEY)
                     .addAnnotation(CACHEABLE_ANNO_META);
-    public static final SemKey<JamMemberMeta<PsiMethod, ForMethod>> META_KEY = META.getMetaKey().subKey("SpringJamCacheableForMethod");
+    public static final SemKey<JamMemberMeta<PsiMethod, ForMethod>> META_KEY = META.getMetaKey().subKey("JamCacheableForMethod");
 
     public ForMethod(PsiMethod psiMethod) {
       super(psiMethod);
@@ -70,28 +89,30 @@ public class JamCacheable<T extends PsiMember & PsiNamedElement> extends JamBase
   }
 
   public static class ForClass extends JamCacheable<PsiClass> {
-    public static final SemKey<ForClass> JAM_KEY = CACHEABLE_JAM_KEY.subKey("SpringJamCacheableForClass");
+    public static final SemKey<ForClass> JAM_KEY = CACHEABLE_JAM_KEY.subKey("JamCacheable.ForClass");
     public static final JamClassMeta<ForClass> META =
             new JamClassMeta<>(null, ForClass.class, JAM_KEY)
                     .addAnnotation(CACHEABLE_ANNO_META);
-    public static final SemKey<JamMemberMeta<PsiClass, ForClass>> META_KEY = META.getMetaKey().subKey("SpringJamCacheablePsiClass");
-    private PsiElementRef<PsiAnnotation> myRef;
+    public static final SemKey<JamMemberMeta<PsiClass, ForClass>> META_KEY = META.getMetaKey().subKey("JamCacheablePsiClass");
+    private final PsiElementRef<PsiAnnotation> myRef;
 
     public ForClass(PsiClass aClass) {
       super(aClass);
       this.myRef = null;
+      System.out.println("ForClass aClass," + aClass);
     }
 
     public ForClass(PsiAnnotation annotation) {
       super(PsiTreeUtil.getParentOfType(annotation, PsiClass.class, true));
-      this.myRef = null;
       this.myRef = PsiElementRef.real(annotation);
+      System.out.println("ForClass annotation," + annotation);
     }
 
     @Override
     public PsiElementRef<PsiAnnotation> getPsiAnnotationRef() {
       return this.myRef == null ? super.getPsiAnnotationRef() : this.myRef;
     }
+
   }
 
 }

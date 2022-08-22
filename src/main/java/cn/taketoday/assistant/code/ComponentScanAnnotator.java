@@ -30,8 +30,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringBundle;
-
 import com.intellij.spring.model.BeanService;
 import com.intellij.spring.model.CommonSpringBean;
 import com.intellij.spring.model.SpringBeanPointer;
@@ -61,6 +59,7 @@ import java.util.stream.Collectors;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.InfraBundle;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -75,7 +74,7 @@ public class ComponentScanAnnotator extends AbstractAnnotator {
 
   @Override
   public String getName() {
-    return SpringBundle.message("spring.core.component.scan.annotator.name");
+    return InfraBundle.message("core.component.scan.annotator.name");
   }
 
   @Override

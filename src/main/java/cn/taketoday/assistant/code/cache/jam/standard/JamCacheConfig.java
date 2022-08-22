@@ -20,12 +20,19 @@
 
 package cn.taketoday.assistant.code.cache.jam.standard;
 
+import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamClassMeta;
+import com.intellij.patterns.PsiJavaPatterns;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.semantic.SemKey;
+import com.intellij.semantic.SemRegistrar;
+
+import java.util.Collection;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
+import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 
 /**
@@ -47,4 +54,13 @@ public class JamCacheConfig extends JamBaseCacheableElement<PsiClass> {
   public JamCacheConfig(PsiClass aClass) {
     super(CacheableConstant.CACHE_CONFIG, aClass);
   }
+
+  public static void addElements(JamService service, GlobalSearchScope scope, Collection<CacheableElement> result) {
+    result.addAll(service.getJamClassElements(CACHE_CONFIG_JAM_KEY, CacheableConstant.CACHE_CONFIG, scope));
+  }
+
+  public static void register(SemRegistrar registrar) {
+    META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(CacheableConstant.CACHE_CONFIG));
+  }
+
 }

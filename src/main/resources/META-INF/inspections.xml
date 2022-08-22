@@ -23,32 +23,32 @@
   <extensions defaultExtensionNs="com.intellij">
 
     <localInspection language="UAST" shortName="EventListenerInspection"
-        bundle="messages.SpringBundle" key="SpringEventListenerInspection.inspection.display.name"
-        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        bundle="messages.InfraBundle" key="EventListenerInspection.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
         enabledByDefault="true" level="WARNING"
         implementationClass="cn.taketoday.assistant.code.event.highlighting.EventListenerInspection" />
 
     <localInspection language="JAVA" shortName="CacheableComponentsInspection"
-        bundle="messages.SpringBundle" key="spring.cacheable.annotations.inspection.display.name"
-        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        bundle="messages.InfraBundle" key="cacheable.annotations.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
         enabledByDefault="true" level="ERROR"
         implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheableComponentsInspection" />
 
     <localInspection language="UAST" shortName="CacheNamesInspection"
-        bundle="messages.SpringBundle" key="spring.cacheable.names.inspection.display.name"
-        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        bundle="messages.InfraBundle" key="cacheable.names.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
         enabledByDefault="true" level="WARNING"
         implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheNamesInspection" />
 
     <localInspection language="UAST" shortName="CacheAnnotationsOnInterfaceInspection"
-        bundle="messages.SpringBundle" key="spring.cacheable.annotations.on.interfaces"
-        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        bundle="messages.InfraBundle" key="cacheable.annotations.on.interfaces"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
         enabledByDefault="true" level="WARNING"
         implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheAnnotationsOnInterfaceInspection" />
 
     <localInspection language="UAST" shortName="CacheableAndCachePutInspection"
-        bundle="messages.SpringBundle" key="spring.cacheable.and.cache.put.on.the.same.method.display.name"
-        groupBundle="messages.SpringBundle" groupKey="inspection.group.code" groupPath="Spring,Spring Core"
+        bundle="messages.InfraBundle" key="cacheable.and.cache.put.on.the.same.method.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
         enabledByDefault="true" level="WARNING"
         implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheableAndCachePutInspection" />
 

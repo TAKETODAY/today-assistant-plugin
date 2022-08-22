@@ -28,18 +28,21 @@ import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamAttributeMeta;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.jam.reflect.JamMethodMeta;
+import com.intellij.patterns.PsiJavaPatterns;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.semantic.SemKey;
-
-import cn.taketoday.assistant.code.cache.CacheableConstant;
+import com.intellij.semantic.SemRegistrar;
 
 import java.util.List;
 
+import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheEvict;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
@@ -84,9 +87,51 @@ public class CachingGroup<T extends PsiMember & PsiNamedElement> extends JamBase
     return JamCommonUtil.getElementsIncludingSingle(getPsiElement(), ANNOTATION_META, EVICT_ATTRIBUTE);
   }
 
+  public static void addElements(JamService service, GlobalSearchScope scope, java.util.Collection<CacheableElement> result) {
+    var caching = service.getJamClassElements(
+            CachingGroup.ForClass.META, CacheableConstant.CACHING, scope);
+    for (CachingGroup.ForClass cachingGroups : caching) {
+      addFromCachingGroups(result, cachingGroups);
+    }
+
+    var cachingGroupsForMethods = service.getJamMethodElements(
+            CachingGroup.ForMethod.META, CacheableConstant.CACHING, scope);
+    for (CachingGroup.ForMethod cachingGroups : cachingGroupsForMethods) {
+      addFromCachingGroups(result, cachingGroups);
+    }
+  }
+
+  private static void addFromCachingGroups(
+          java.util.Collection<? super CacheableElement> result, CachingGroup<? extends PsiMember> cachingGroups) {
+    result.addAll(cachingGroups.getCacheables());
+    result.addAll(cachingGroups.getCacheEvict());
+    result.addAll(cachingGroups.getCachePuts());
+  }
+
+  public static void register(SemRegistrar registrar) {
+    ForClass.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(CacheableConstant.CACHING));
+    ForMethod.META.register(registrar, PsiJavaPatterns.psiMethod().withAnnotation(CacheableConstant.CACHING));
+  }
+
+  public static ForMethod forMethod(JamService service, PsiElement element) {
+    return service.getJamElement(element, ForMethod.META);
+  }
+
+  public static ForMethod forMethod(PsiElement element) {
+    return forMethod(JamService.getJamService(element.getProject()), element);
+  }
+
+  public static ForClass forClass(PsiElement element) {
+    return forClass(JamService.getJamService(element.getProject()), element);
+  }
+
+  public static ForClass forClass(JamService service, PsiElement element) {
+    return service.getJamElement(element, ForClass.META);
+  }
+
   public static class ForClass extends CachingGroup<PsiClass> {
     public static final SemKey<ForClass> CACHING_GROUP_FOR_CLASS_JAM_KEY =
-            CACHING_GROUP_JAM_KEY.subKey("SpringCachingGroupsForClass");
+            CACHING_GROUP_JAM_KEY.subKey("CachingGroupsForClass");
     public static final JamClassMeta<ForClass> META =
             new JamClassMeta<>(null, ForClass.class, CACHING_GROUP_FOR_CLASS_JAM_KEY)
                     .addAnnotation(ANNOTATION_META);
@@ -97,7 +142,7 @@ public class CachingGroup<T extends PsiMember & PsiNamedElement> extends JamBase
   }
 
   public static class ForMethod extends CachingGroup<PsiMethod> {
-    public static final SemKey<ForMethod> CACHING_GROUP_FOR_METHOD_JAM_KEY = CACHING_GROUP_JAM_KEY.subKey("SpringCachingGroupsForMethod");
+    public static final SemKey<ForMethod> CACHING_GROUP_FOR_METHOD_JAM_KEY = CACHING_GROUP_JAM_KEY.subKey("CachingGroupsForMethod");
     public static final JamMethodMeta<ForMethod> META = new JamMethodMeta<>(null, ForMethod.class,
             CACHING_GROUP_FOR_METHOD_JAM_KEY).addAnnotation(ANNOTATION_META);
 

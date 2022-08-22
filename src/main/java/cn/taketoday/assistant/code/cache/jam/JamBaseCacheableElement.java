@@ -24,9 +24,12 @@ import com.intellij.jam.JamStringAttributeElement;
 import com.intellij.jam.reflect.JamAttributeMeta;
 import com.intellij.jam.reflect.JamStringAttributeMeta;
 import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMember;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.semantic.SemKey;
+import com.intellij.semantic.SemService;
 import com.intellij.spring.model.SpringBeanPointer;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
@@ -45,19 +48,23 @@ import java.util.Set;
  */
 public abstract class JamBaseCacheableElement<T extends PsiMember & PsiNamedElement> extends CacheableElement<T> {
   public static final String CACHE_NAMES_ATTR_NAME = "cacheNames";
-  public static final SemKey<JamBaseCacheableElement> CACHEABLE_BASE_JAM_KEY = CACHEABLE_ROOT_JAM_KEY.subKey("SpringJamBaseCacheableElement");
+  public static final SemKey<JamBaseCacheableElement> CACHEABLE_BASE_JAM_KEY = CACHEABLE_ROOT_JAM_KEY.subKey("JamBaseCacheableElement");
 
   private static final JamStringAttributeMeta.Single<String> CONDITION_ATTR_META = JamAttributeMeta.singleString(EventListenerElement.CONDITION_ATTR_NAME);
 
-  protected static final JamStringAttributeMeta.Collection<String> VALUE_ATTR_META = JamAttributeMeta.collectionString("value", new CacheableNameConverter());
+  protected static final JamStringAttributeMeta.Collection<String> VALUE_ATTR_META =
+          JamAttributeMeta.collectionString("value", new CacheableNameConverter());
   protected static final JamStringAttributeMeta.Collection<String> CACHE_NAMES_ATTR_META =
           JamAttributeMeta.collectionString(CACHE_NAMES_ATTR_NAME, new CacheableNameConverter());
-  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> KEY_GENERATOR_ATTR_META = JamAttributeMeta.singleString("keyGenerator", new SpringBeanReferenceJamConverter(
-          CacheableConstant.KEY_GENERATOR_CLASS));
-  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> CACHE_MANAGER_ATTR_META = JamAttributeMeta.singleString("cacheManager",
-          new SpringBeanReferenceJamConverter("cn.taketoday.cache.CacheManager"));
-  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> CACHE_RESOLVER_ATTR_META = JamAttributeMeta.singleString("cacheResolver", new SpringBeanReferenceJamConverter(
-          CacheableConstant.CACHE_RESOLVER_CLASS));
+
+  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> KEY_GENERATOR_ATTR_META =
+          JamAttributeMeta.singleString("keyGenerator", new SpringBeanReferenceJamConverter(CacheableConstant.KEY_GENERATOR_CLASS));
+
+  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> CACHE_MANAGER_ATTR_META =
+          JamAttributeMeta.singleString("cacheManager", new SpringBeanReferenceJamConverter(CacheableConstant.CACHE_MANAGER_CLASS));
+
+  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> CACHE_RESOLVER_ATTR_META =
+          JamAttributeMeta.singleString("cacheResolver", new SpringBeanReferenceJamConverter(CacheableConstant.CACHE_RESOLVER_CLASS));
 
   public JamBaseCacheableElement(String annoName, T t) {
     super(t, annoName);
@@ -98,4 +105,10 @@ public abstract class JamBaseCacheableElement<T extends PsiMember & PsiNamedElem
     names.addAll(ContainerUtil.mapNotNull(getCacheNamesElement(), JamStringAttributeElement::getStringValue));
     return names;
   }
+
+  public static List<JamBaseCacheableElement> getElements(PsiElement element) {
+    return SemService.getSemService(element.getProject())
+            .getSemElements(JamBaseCacheableElement.CACHEABLE_BASE_JAM_KEY, element);
+  }
+
 }

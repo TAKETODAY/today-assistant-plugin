@@ -42,12 +42,8 @@ import com.intellij.spring.contexts.model.LocalAnnotationModel;
 import com.intellij.spring.contexts.model.SpringModel;
 import com.intellij.spring.contexts.model.visitors.CommonSpringModelVisitorContext;
 import com.intellij.spring.contexts.model.visitors.SpringModelVisitors;
-
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-
-import cn.taketoday.assistant.JavaClassInfo;
-
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.jam.JamSpringBeanPointer;
@@ -71,6 +67,8 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.JavaClassInfo;
 import cn.taketoday.assistant.util.CommonUtils;
 
 /**
@@ -89,7 +87,7 @@ public class BeanAnnotator extends AbstractAnnotator {
 
   @Override
   public String getName() {
-    return SpringBundle.message("spring.core.bean.annotator.name");
+    return InfraBundle.message("core.bean.annotator.name");
   }
 
   @Override

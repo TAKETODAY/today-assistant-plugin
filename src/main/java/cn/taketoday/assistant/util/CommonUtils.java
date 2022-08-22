@@ -48,7 +48,6 @@ import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.psi.util.ParameterizedCachedValueProvider;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.stereotype.SpringComponent;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.util.containers.ConcurrentFactoryMap;
 import com.intellij.util.containers.ContainerUtil;
@@ -66,6 +65,7 @@ import java.util.Set;
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.TodayLibraryUtil;
 import cn.taketoday.assistant.beans.ConfigurationBean;
+import cn.taketoday.assistant.beans.stereotype.ComponentBean;
 import cn.taketoday.assistant.facet.TodayFacet;
 import cn.taketoday.lang.Nullable;
 
@@ -77,8 +77,8 @@ public abstract class CommonUtils {
   public static final String SPRING_DELIMITERS = ",; ";
 
   public static final CharFilter ourFilter = ch -> SPRING_DELIMITERS.indexOf(ch) >= 0;
-  private static final Key<ParameterizedCachedValue<Boolean, Module>> IS_SPRING_CONFIGURED_KEY = Key.create("IS_SPRING_CONFIGURED_IN_MODULE");
-  private static final ParameterizedCachedValueProvider<Boolean, Module> IS_SPRING_CONFIGURED_PROVIDER
+  private static final Key<ParameterizedCachedValue<Boolean, Module>> IS_INFRA_CONFIGURED_KEY = Key.create("IS_INFRA_CONFIGURED_IN_MODULE");
+  private static final ParameterizedCachedValueProvider<Boolean, Module> IS_INFRA_CONFIGURED_PROVIDER
           = new ParameterizedCachedValueProvider<>() {
     @Override
     public CachedValueProvider.Result<Boolean> compute(Module module) {
@@ -142,17 +142,18 @@ public abstract class CommonUtils {
     }
   }
 
+  @Nullable
   public static PsiClass findLibraryClass(@Nullable Module module, String className) {
-    if (module != null && !module.isDisposed()) {
+    if (module == null || module.isDisposed()) {
+      return null;
+    }
+    else {
       Project project = module.getProject();
       Map<String, PsiClass> cache = CachedValuesManager.getManager(project).getCachedValue(module, () -> {
-        Map<String, PsiClass> map = ConcurrentFactoryMap.createMap((key) -> findLibraryClass(project, key, GlobalSearchScope.moduleRuntimeScope(module, false)));
+        Map<String, PsiClass> map = ConcurrentFactoryMap.createMap(key -> findLibraryClass(project, key, GlobalSearchScope.moduleRuntimeScope(module, false)));
         return CachedValueProvider.Result.createSingleDependency(map, JavaLibraryModificationTracker.getInstance(module.getProject()));
       });
       return cache.get(className);
-    }
-    else {
-      return null;
     }
   }
 
@@ -204,7 +205,7 @@ public abstract class CommonUtils {
     if (!isBeanCandidateClass(psiClass))
       return false;
     return JamService.getJamService(psiClass.getProject())
-            .getJamElement(psiClass, SpringComponent.META) != null;
+            .getJamElement(psiClass, ComponentBean.META) != null;
   }
 
   /**
@@ -274,8 +275,8 @@ public abstract class CommonUtils {
       return false;
     }
 
-    return CachedValuesManager.getManager(module.getProject()).getParameterizedCachedValue(module, IS_SPRING_CONFIGURED_KEY,
-            IS_SPRING_CONFIGURED_PROVIDER, false, module);
+    return CachedValuesManager.getManager(module.getProject()).getParameterizedCachedValue(module, IS_INFRA_CONFIGURED_KEY,
+            IS_INFRA_CONFIGURED_PROVIDER, false, module);
   }
 
   public static boolean isInfraEnabledModule(@Nullable Module module) {

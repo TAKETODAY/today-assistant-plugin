@@ -20,19 +20,26 @@
 
 package cn.taketoday.assistant.code.cache.jam.standard;
 
+import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamClassMeta;
-import com.intellij.jam.reflect.JamMemberArchetype;
 import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.jam.reflect.JamMethodMeta;
+import com.intellij.patterns.PsiJavaPatterns;
+import com.intellij.patterns.PsiMethodPattern;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.semantic.SemKey;
+import com.intellij.semantic.SemRegistrar;
+
+import java.util.Collection;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
+import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 
 /**
@@ -41,7 +48,7 @@ import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
  */
 public class JamCacheEvict<T extends PsiMember & PsiNamedElement> extends JamBaseCacheableElement<T> implements CacheEvictMarker {
   public static final SemKey<JamCacheEvict<?>> CACHE_EVICT_JAM_KEY =
-          CACHEABLE_BASE_JAM_KEY.subKey("SpringJamCacheEvict");
+          CACHEABLE_BASE_JAM_KEY.subKey("CacheEvict");
   public static final JamAnnotationMeta CACHE_EVICT_ANNO_META =
           new JamAnnotationMeta(CacheableConstant.CACHE_EVICT)
                   .addAttribute(VALUE_ATTR_META)
@@ -58,12 +65,22 @@ public class JamCacheEvict<T extends PsiMember & PsiNamedElement> extends JamBas
     super(annotation);
   }
 
+  public static void addElements(JamService service, GlobalSearchScope scope, Collection<CacheableElement> result) {
+    result.addAll(service.getJamMethodElements(CACHE_EVICT_JAM_KEY, CacheableConstant.CACHE_EVICT, scope));
+    result.addAll(service.getJamClassElements(CACHE_EVICT_JAM_KEY, CacheableConstant.CACHE_EVICT, scope));
+  }
+
+  public static void register(SemRegistrar registrar, PsiMethodPattern psiMethod) {
+    ForClass.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(CacheableConstant.CACHE_EVICT));
+    ForMethod.META.register(registrar, psiMethod.withAnnotation(CacheableConstant.CACHE_EVICT));
+  }
+
   public static class ForClass extends JamCacheEvict<PsiClass> {
-    public static final SemKey<ForClass> JAM_KEY = CACHE_EVICT_JAM_KEY.subKey("SpringJamCacheEvictPsiClass");
+    public static final SemKey<ForClass> JAM_KEY = CACHE_EVICT_JAM_KEY.subKey("CacheEvictPsiClass");
     public static final JamClassMeta<ForClass> META =
             new JamClassMeta<>(null, ForClass.class, JAM_KEY).addAnnotation(CACHE_EVICT_ANNO_META);
     public static final SemKey<JamMemberMeta<PsiClass, ForClass>> META_KEY =
-            META.getMetaKey().subKey("SpringJamCacheEvictPsiClass");
+            META.getMetaKey().subKey("CacheEvictPsiClass");
 
     public ForClass(PsiClass aClass) {
       super(aClass);
@@ -71,13 +88,13 @@ public class JamCacheEvict<T extends PsiMember & PsiNamedElement> extends JamBas
   }
 
   public static class ForMethod extends JamCacheEvict<PsiMethod> {
-    public static final SemKey<ForMethod> JAM_KEY = CACHE_EVICT_JAM_KEY.subKey("SpringJamCacheEvictForMethod");
+    public static final SemKey<ForMethod> JAM_KEY = CACHE_EVICT_JAM_KEY.subKey("CacheEvictForMethod");
     public static final JamMethodMeta<ForMethod> META =
             new JamMethodMeta<>(null, ForMethod.class, JAM_KEY)
                     .addAnnotation(CACHE_EVICT_ANNO_META);
 
     public static final SemKey<JamMemberMeta<PsiMethod, ForMethod>>
-            META_KEY = META.getMetaKey().subKey("SpringJamCacheEvictForMethod");
+            META_KEY = META.getMetaKey().subKey("CacheEvictForMethod");
 
     public ForMethod(PsiMethod psiMethod) {
       super(psiMethod);

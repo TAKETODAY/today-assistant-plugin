@@ -20,20 +20,28 @@
 
 package cn.taketoday.assistant.code.cache.jam.standard;
 
+import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.jam.reflect.JamMethodMeta;
+import com.intellij.patterns.PsiJavaPatterns;
+import com.intellij.patterns.PsiMethodPattern;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.semantic.SemKey;
+import com.intellij.semantic.SemRegistrar;
+
+import java.util.Collection;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
+import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 
 /**
@@ -55,6 +63,18 @@ public class JamCachePut<T extends PsiMember & PsiNamedElement> extends JamBaseC
 
   public JamCachePut(PsiAnnotation annotation) {
     super(annotation);
+  }
+
+
+  public static void addElements(JamService service, GlobalSearchScope scope, Collection<CacheableElement> result) {
+    result.addAll(service.getJamMethodElements(JamCachePut.CACHE_PUT_JAM_KEY, CacheableConstant.CACHE_PUT, scope));
+    result.addAll(service.getJamClassElements(JamCachePut.CACHE_PUT_JAM_KEY, CacheableConstant.CACHE_PUT, scope));
+  }
+
+
+  public static void register(SemRegistrar registrar, PsiMethodPattern psiMethod) {
+    ForClass.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(CacheableConstant.CACHE_PUT));
+    ForMethod.META.register(registrar, psiMethod.withAnnotation(CacheableConstant.CACHE_PUT));
   }
 
   public static class ForMethod extends JamCachePut<PsiMethod> {

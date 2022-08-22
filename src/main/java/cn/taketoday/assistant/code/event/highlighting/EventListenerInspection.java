@@ -36,7 +36,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.spring.SpringBundle;
-import com.intellij.spring.model.highlighting.jam.SpringUastInspectionBase;
 
 import org.jetbrains.uast.UAnnotated;
 import org.jetbrains.uast.UAnnotation;
@@ -51,6 +50,7 @@ import java.util.List;
 import java.util.Objects;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.lang.Nullable;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.internal.Intrinsics;
@@ -59,7 +59,7 @@ import kotlin.jvm.internal.Intrinsics;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:11
  */
-public final class EventListenerInspection extends SpringUastInspectionBase {
+public final class EventListenerInspection extends AbstractInfraLocalInspection {
 
   public EventListenerInspection() {
     super(UMethod.class);

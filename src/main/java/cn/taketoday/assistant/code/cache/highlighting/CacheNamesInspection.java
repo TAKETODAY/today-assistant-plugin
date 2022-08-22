@@ -21,7 +21,6 @@
 package cn.taketoday.assistant.code.cache.highlighting;
 
 import com.intellij.codeInspection.InspectionManager;
-import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -32,8 +31,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.SpringBundle;
-import com.intellij.spring.model.highlighting.jam.SpringUastInspectionBase;
 import com.intellij.spring.model.utils.SpringCommonUtils;
 
 import org.jetbrains.uast.UAnnotation;
@@ -46,25 +43,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.CachingGroup;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
-import cn.taketoday.assistant.code.cache.jam.custom.CustomCacheConfig;
 import cn.taketoday.assistant.code.cache.jam.standard.JamCacheConfig;
+import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:20
  */
-public final class CacheNamesInspection extends SpringUastInspectionBase {
+public final class CacheNamesInspection extends AbstractInfraLocalInspection {
 
   public CacheNamesInspection() {
     super(UClass.class, UMethod.class);
   }
 
+  @Override
   public ProblemDescriptor[] checkMethod(UMethod umethod, InspectionManager manager, boolean isOnTheFly) {
-    if (SpringCommonUtils.isInSpringEnabledModule(umethod)) {
+//    if (CommonUtils.isInInfraEnabledModule(umethod)) {
       PsiMethod method = umethod.getJavaPsi();
       PsiElement sourcePsi = umethod.getSourcePsi();
       if (sourcePsi == null) {
@@ -73,14 +73,18 @@ public final class CacheNamesInspection extends SpringUastInspectionBase {
       ProblemsHolder holder = new ProblemsHolder(manager, sourcePsi.getContainingFile(), isOnTheFly);
       checkCacheNames(method.getContainingClass(), holder, getJamCacheableElements(method, CachingGroup.ForMethod.META));
       return holder.getResultsArray();
-    }
-    return null;
+//    }
+//    return null;
   }
 
-  private static List<CacheableElement> getJamCacheableElements(PsiElement psiElement, JamMemberMeta<?, ? extends CachingGroup<?>> groupMeta) {
+  private static List<CacheableElement> getJamCacheableElements(
+          PsiElement psiElement, JamMemberMeta<?, ? extends CachingGroup<?>> groupMeta) {
+
     List<CacheableElement> elements = new ArrayList<>(SemService.getSemService(psiElement.getProject()).getSemElements(CacheableElement.CACHEABLE_ROOT_JAM_KEY, psiElement));
+
     CachingGroup<?> group = JamService.getJamService(psiElement.getProject())
             .getJamElement(psiElement, groupMeta);
+
     if (group != null) {
       elements.addAll(group.getCacheables());
       elements.addAll(group.getCacheEvict());
@@ -96,8 +100,6 @@ public final class CacheNamesInspection extends SpringUastInspectionBase {
       if (cacheConfig != null) {
         return !cacheConfig.getCacheNamesElement().isEmpty() || cacheConfig.getCacheResolverElement().getValue() != null;
       }
-      CustomCacheConfig customCacheConfig = service.getSemElement(CustomCacheConfig.JAM_KEY, aClass);
-      return customCacheConfig != null && !customCacheConfig.getCacheNames().isEmpty();
     }
     return false;
   }
@@ -108,10 +110,13 @@ public final class CacheNamesInspection extends SpringUastInspectionBase {
       return;
     }
     for (CacheableElement<?> cacheable : elements) {
-      if (!(cacheable instanceof JamCacheConfig) && !containsNonEmptyNames(cacheable.getCacheNames()) && !hasCustomCacheResolver(cacheable) && (annotation = UAnnotationKt.getNamePsiElement(
+      if (!(cacheable instanceof JamCacheConfig)
+              && !containsNonEmptyNames(cacheable.getCacheNames())
+              && !hasCustomCacheResolver(cacheable)
+              && (annotation = UAnnotationKt.getNamePsiElement(
               UastContextKt.toUElement(cacheable.getAnnotation(), UAnnotation.class))) != null) {
-        holder.registerProblem(annotation, SpringBundle.message("cacheable.no.cache.could.be.resolved.for.cache.operation", new Object[0]), ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                new LocalQuickFix[0]);
+        holder.registerProblem(annotation, InfraBundle.message("cacheable.no.cache.could.be.resolved.for.cache.operation"),
+                ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
       }
     }
   }
