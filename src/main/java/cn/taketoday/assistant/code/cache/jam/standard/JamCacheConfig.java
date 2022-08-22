@@ -25,15 +25,18 @@ import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.patterns.PsiJavaPatterns;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.semantic.SemKey;
 import com.intellij.semantic.SemRegistrar;
+import com.intellij.semantic.SemService;
 
 import java.util.Collection;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
+import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -46,13 +49,19 @@ public class JamCacheConfig extends JamBaseCacheableElement<PsiClass> {
           .addAttribute(CACHE_MANAGER_ATTR_META)
           .addAttribute(CACHE_RESOLVER_ATTR_META)
           .addAttribute(KEY_GENERATOR_ATTR_META);
-  public static final SemKey<JamCacheConfig> CACHE_CONFIG_JAM_KEY = CACHEABLE_BASE_JAM_KEY.subKey("SpringJamCacheable");
+  public static final SemKey<JamCacheConfig> CACHE_CONFIG_JAM_KEY = CACHEABLE_BASE_JAM_KEY.subKey("Cacheable");
   public static final JamClassMeta<JamCacheConfig> META = new JamClassMeta<>(
           null, JamCacheConfig.class, CACHE_CONFIG_JAM_KEY)
           .addAnnotation(CACHE_CONFIG_ANNO_META);
 
   public JamCacheConfig(PsiClass aClass) {
     super(CacheableConstant.CACHE_CONFIG, aClass);
+  }
+
+  @Nullable
+  public static JamCacheConfig from(PsiElement element) {
+    SemService service = SemService.getSemService(element.getProject());
+    return service.getSemElement(CACHE_CONFIG_JAM_KEY, element);
   }
 
   public static void addElements(JamService service, GlobalSearchScope scope, Collection<CacheableElement> result) {
