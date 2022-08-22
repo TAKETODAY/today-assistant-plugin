@@ -25,11 +25,14 @@ import com.intellij.openapi.util.IconLoader;
 import javax.swing.Icon;
 
 /**
+ * project icons
+ *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/19 15:49
  */
 public interface Icons {
   Icon Today = load("icons/today.svg");
+  Icon WebMvc = load("icons/web-mvc.svg");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, Icons.class);

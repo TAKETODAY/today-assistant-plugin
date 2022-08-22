@@ -28,9 +28,9 @@ import java.util.function.Supplier;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 01:19
  */
-public final class StringBundle extends DynamicBundle {
-  private static final String PATH_TO_BUNDLE = "messages.StringBundle";
-  private static final StringBundle ourInstance = new StringBundle();
+public final class InfraBundle extends DynamicBundle {
+  private static final String PATH_TO_BUNDLE = "messages.InfraBundle";
+  private static final InfraBundle ourInstance = new InfraBundle();
 
   public static String message(String key, Object... params) {
     return ourInstance.getMessage(key, params);
@@ -40,7 +40,7 @@ public final class StringBundle extends DynamicBundle {
     return ourInstance.getLazyMessage(key, params);
   }
 
-  private StringBundle() {
+  private InfraBundle() {
     super(PATH_TO_BUNDLE);
   }
 
