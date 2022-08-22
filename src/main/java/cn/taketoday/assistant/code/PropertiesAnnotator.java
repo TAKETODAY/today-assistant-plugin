@@ -39,10 +39,8 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.SpringBundle;
 import com.intellij.spring.SpringModelVisitorUtils;
-
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-import cn.taketoday.assistant.JavaClassInfo;
 import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.xml.beans.SpringBean;
@@ -52,6 +50,12 @@ import com.intellij.util.xml.DomElement;
 import com.intellij.util.xml.DomUtil;
 import com.intellij.util.xml.GenericAttributeValue;
 
+import org.jetbrains.uast.UClass;
+import org.jetbrains.uast.UElement;
+import org.jetbrains.uast.UElementKt;
+import org.jetbrains.uast.UMethod;
+import org.jetbrains.uast.UastUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,12 +64,8 @@ import java.util.Set;
 
 import javax.swing.Icon;
 
-import org.jetbrains.uast.UClass;
-import org.jetbrains.uast.UElement;
-import org.jetbrains.uast.UElementKt;
-import org.jetbrains.uast.UMethod;
-import org.jetbrains.uast.UastUtils;
-
+import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.JavaClassInfo;
 import cn.taketoday.assistant.util.CommonUtils;
 
 /**
@@ -81,7 +81,7 @@ public final class PropertiesAnnotator extends AbstractAnnotator {
 
   @Override
   public String getName() {
-    return SpringBundle.message("spring.core.properties.annotator.name");
+    return InfraBundle.message("core.properties.annotator.name");
   }
 
   @Override

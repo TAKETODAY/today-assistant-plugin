@@ -47,7 +47,7 @@ import cn.taketoday.lang.Nullable;
  */
 public class JamEventListenerElement implements EventListenerElement {
 
-  public static final SemKey<JamEventListenerElement> SEM_KEY = EVENT_LISTENER_ROOT_JAM_KEY.subKey("SpringEventListener");
+  public static final SemKey<JamEventListenerElement> SEM_KEY = EVENT_LISTENER_ROOT_JAM_KEY.subKey("EventListener");
   public static final JamMethodMeta<JamEventListenerElement> METHOD_META = new JamMethodMeta<>(null, JamEventListenerElement.class, SEM_KEY);
   private static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta(AnnotationConstant.EVENT_LISTENER);
   private static final JamStringAttributeMeta.Single<String> CONDITION_ATTR_META = JamAttributeMeta.singleString(EventListenerElement.CONDITION_ATTR_NAME);

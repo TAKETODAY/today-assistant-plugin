@@ -182,7 +182,7 @@ public class BeanAnnotator extends AbstractAnnotator {
               return (PsiElement) pair.getFirst();
             }))
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
-            .setPopupTitle(SpringBundle.message("spring.bean.class.navigate.choose.class.title"))
+            .setPopupTitle(SpringBundle.message("bean.class.navigate.choose.class.title"))
             .setTooltipText(tooltipText);
 
     PsiIdentifier identifier = psiMethod.getNameIdentifier();
@@ -200,7 +200,7 @@ public class BeanAnnotator extends AbstractAnnotator {
     );
     builder.setTargets(targets)
             .setEmptyPopupText(SpringBundle.message("gutter.navigate.no.matching.beans"))
-            .setPopupTitle(SpringBundle.message("spring.bean.class.navigate.choose.class.title"))
+            .setPopupTitle(SpringBundle.message("bean.class.navigate.choose.class.title"))
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
             .setTooltipText(SpringBundle.message("spring.bean.class.tooltip.navigate.declaration"));
     result.add(builder.createSpringGroupLineMarkerInfo(psiIdentifier));

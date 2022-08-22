@@ -83,7 +83,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   @Override
   public String getName() {
-    return InfraBundle.message("spring.core.event.listener.annotator.name");
+    return InfraBundle.message("core.event.listener.annotator.name");
   }
 
   @Override

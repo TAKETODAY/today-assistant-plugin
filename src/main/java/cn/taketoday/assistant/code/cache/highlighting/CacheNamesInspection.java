@@ -48,7 +48,7 @@ import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.CachingGroup;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheConfig;
+import cn.taketoday.assistant.code.cache.jam.standard.CacheConfig;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -97,7 +97,7 @@ public final class CacheNamesInspection extends AbstractInfraLocalInspection {
 
   private static boolean hasDefaultCacheNamesOrCustomCacheResolver(@Nullable PsiClass aClass) {
     if (aClass != null) {
-      JamCacheConfig cacheConfig = JamCacheConfig.from(aClass);
+      CacheConfig cacheConfig = CacheConfig.from(aClass);
       if (cacheConfig != null) {
         return containsNonEmptyNames(cacheConfig.getCacheNames())
                 || cacheConfig.getCacheResolverElement().getValue() != null;
@@ -113,7 +113,7 @@ public final class CacheNamesInspection extends AbstractInfraLocalInspection {
       return;
     }
     for (CacheableElement<?> cacheable : elements.get()) {
-      if (!(cacheable instanceof JamCacheConfig)
+      if (!(cacheable instanceof CacheConfig)
               && !containsNonEmptyNames(cacheable.getCacheNames())
               && !hasCustomCacheResolver(cacheable)
               && (annotation = UAnnotationKt.getNamePsiElement(

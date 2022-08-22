@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 
 @Presentation(typeName = SpringCorePresentationConstants.SERVICE)
 public class SpringService extends SpringMetaStereotypeComponent {
-    public static final SemKey<JamMemberMeta<PsiClass, SpringService>> META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("SpringServiceMeta", new SemKey[0]);
-    public static final SemKey<SpringService> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("SpringService", new SemKey[0]);
+    public static final SemKey<JamMemberMeta<PsiClass, SpringService>> META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("ServiceMeta", new SemKey[0]);
+    public static final SemKey<SpringService> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("Service", new SemKey[0]);
     public static final JamClassMeta<SpringService> META = new JamClassMeta<>((JamMemberArchetype) null, SpringService.class, JAM_KEY);
     private static final Function<Module, Collection<String>> ANNOTATIONS = module -> {
         return getAnnotations(module, SpringAnnotationsConstants.SERVICE);

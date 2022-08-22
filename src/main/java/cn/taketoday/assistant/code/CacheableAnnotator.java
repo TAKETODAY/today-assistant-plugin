@@ -34,7 +34,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.semantic.SemService;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringBundle;
 import com.intellij.spring.SpringManager;
 import com.intellij.spring.contexts.model.SpringModel;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
@@ -57,14 +56,15 @@ import java.util.Set;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.TodayLibraryUtil;
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.CachingGroup;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheConfig;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheEvict;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
+import cn.taketoday.assistant.code.cache.jam.standard.CacheConfig;
+import cn.taketoday.assistant.code.cache.jam.standard.CacheEvict;
+import cn.taketoday.assistant.code.cache.jam.standard.CachePut;
+import cn.taketoday.assistant.code.cache.jam.standard.Cacheable;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -106,7 +106,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
 
   @Override
   public String getName() {
-    return SpringBundle.message("spring.core.cacheable.annotator.name");
+    return InfraBundle.message("core.cacheable.annotator.name");
   }
 
   @Nullable
@@ -180,15 +180,15 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
           @Nullable CachingGroup<? extends PsiMember> cachingGroups,
           Collection<? super RelatedItemLineMarkerInfo<?>> result) {
     if (cachingGroups != null) {
-      for (JamCacheable<?> cacheable : cachingGroups.getCacheables()) {
+      for (Cacheable<?> cacheable : cachingGroups.getCacheables()) {
         doAnnotateCacheable(identifierToReport, result, cacheable);
       }
 
-      for (JamCachePut<?> put : cachingGroups.getCachePuts()) {
+      for (CachePut<?> put : cachingGroups.getCachePuts()) {
         doAnnotateCacheable(identifierToReport, result, put);
       }
 
-      for (JamCacheEvict<?> evict : cachingGroups.getCacheEvict()) {
+      for (CacheEvict<?> evict : cachingGroups.getCacheEvict()) {
         doAnnotateCacheable(identifierToReport, result, evict);
       }
     }
@@ -205,8 +205,8 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
         var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.ShowCacheable, CACHEABLE_CONVERTOR, null);
         builder.setTargets(cacheableElements)
                 .setCellRenderer(CacheableAnnotator::getCacheableListCellRenderer)
-                .setPopupTitle(SpringBundle.message("spring.cacheable.element.choose.title"))
-                .setTooltipText(SpringBundle.message("spring.cacheable.element.tooltip.text"));
+                .setPopupTitle(InfraBundle.message("cacheable.element.choose.title"))
+                .setTooltipText(InfraBundle.message("cacheable.element.tooltip.text"));
         result.add(builder.createSpringRelatedMergeableLineMarkerInfo(psiAnnotationIdentifier));
       }
     }
@@ -257,7 +257,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
     if (psiElement != null && psiElement.isValid()) {
       PsiClass aClass = PsiTreeUtil.getParentOfType(psiElement, PsiClass.class);
       if (aClass != null) {
-        JamCacheConfig cacheConfig = JamCacheConfig.from(aClass);
+        CacheConfig cacheConfig = CacheConfig.from(aClass);
         if (cacheConfig != null) {
           return cacheConfig.getCacheNames();
         }
@@ -287,10 +287,10 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
       GlobalSearchScope scope = psiElement.getResolveScope();
       var result = new LinkedHashSet<CacheableElement>();
 
-      JamCachePut.addElements(service, scope, result);
-      JamCacheable.addElements(service, scope, result);
-      JamCacheEvict.addElements(service, scope, result);
-      JamCacheConfig.addElements(service, scope, result);
+      CachePut.addElements(service, scope, result);
+      Cacheable.addElements(service, scope, result);
+      CacheEvict.addElements(service, scope, result);
+      CacheConfig.addElements(service, scope, result);
       CachingGroup.addElements(service, scope, result);
 
       return result;

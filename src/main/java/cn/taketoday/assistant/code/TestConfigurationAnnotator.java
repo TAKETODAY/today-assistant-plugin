@@ -55,6 +55,7 @@ import java.util.Set;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.Icons;
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.util.CommonUtils;
 
 /**
@@ -70,7 +71,7 @@ public class TestConfigurationAnnotator extends AbstractAnnotator {
 
   @Override
   public String getName() {
-    return SpringBundle.message("spring.core.test.configuration.annotator.name");
+    return InfraBundle.message("core.test.configuration.annotator.name");
   }
 
   @Override

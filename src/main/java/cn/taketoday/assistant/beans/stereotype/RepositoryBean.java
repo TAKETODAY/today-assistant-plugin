@@ -57,8 +57,8 @@ public class RepositoryBean extends SpringMetaStereotypeComponent {
   }
 
   static {
-    META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("SpringRepositoryMeta");
-    JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("SpringRepository");
+    META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("RepositoryMeta");
+    JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("Repository");
     META = new JamClassMeta<>(null, SpringRepository.class, JAM_KEY);
     addPomTargetProducer(META);
     ANNOTATIONS = (module) -> {

@@ -38,8 +38,8 @@ import cn.taketoday.assistant.AnnotationConstant;
  */
 public class JamComponentScan extends SpringJamComponentScanArchetype {
 
-  private static final SemKey<JamComponentScan> JAM_KEY = COMPONENT_SCAN_JAM_KEY.subKey("SpringJamComponentScan");
-  public static final SemKey<JamComponentScan> REPEATABLE_ANNO_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringJamComponentScan");
+  private static final SemKey<JamComponentScan> JAM_KEY = COMPONENT_SCAN_JAM_KEY.subKey("ComponentScan");
+  public static final SemKey<JamComponentScan> REPEATABLE_ANNO_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("ComponentScan");
 
   public static final JamAnnotationMeta ANNOTATION_META =
           new JamAnnotationMeta(AnnotationConstant.COMPONENT_SCAN, ARCHETYPE, META_KEY);

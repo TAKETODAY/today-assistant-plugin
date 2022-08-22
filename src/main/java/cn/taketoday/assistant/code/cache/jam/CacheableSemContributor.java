@@ -26,10 +26,10 @@ import com.intellij.patterns.PsiMethodPattern;
 import com.intellij.semantic.SemContributor;
 import com.intellij.semantic.SemRegistrar;
 
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheConfig;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheEvict;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
+import cn.taketoday.assistant.code.cache.jam.standard.CacheConfig;
+import cn.taketoday.assistant.code.cache.jam.standard.CacheEvict;
+import cn.taketoday.assistant.code.cache.jam.standard.CachePut;
+import cn.taketoday.assistant.code.cache.jam.standard.Cacheable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -40,11 +40,11 @@ final class CacheableSemContributor extends SemContributor {
   @Override
   public void registerSemProviders(SemRegistrar registrar, Project project) {
     PsiMethodPattern psiMethod = PsiJavaPatterns.psiMethod().constructor(false);
-    JamCacheable.register(registrar, psiMethod);
-    JamCacheEvict.register(registrar, psiMethod);
-    JamCachePut.register(registrar, psiMethod);
+    Cacheable.register(registrar, psiMethod);
+    CacheEvict.register(registrar, psiMethod);
+    CachePut.register(registrar, psiMethod);
 
-    JamCacheConfig.register(registrar);
+    CacheConfig.register(registrar);
     CachingGroup.register(registrar);
   }
 

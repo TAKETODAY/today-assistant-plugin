@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 
 @Presentation(typeName = SpringCorePresentationConstants.CONTROLLER)
 public class SpringController extends SpringMetaStereotypeComponent {
-  public static final SemKey<JamMemberMeta<PsiClass, SpringController>> META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("SpringControllerMeta", new SemKey[0]);
-  public static final SemKey<SpringController> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("SpringController", new SemKey[0]);
+  public static final SemKey<JamMemberMeta<PsiClass, SpringController>> META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("InfraControllerMeta", new SemKey[0]);
+  public static final SemKey<SpringController> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("InfraController", new SemKey[0]);
   public static final JamClassMeta<SpringController> META = new JamClassMeta<>(null, SpringController.class, JAM_KEY);
   private static final Function<Module, Collection<String>> ANNOTATIONS = module -> {
     return getAnnotations(module, SpringAnnotationsConstants.CONTROLLER);

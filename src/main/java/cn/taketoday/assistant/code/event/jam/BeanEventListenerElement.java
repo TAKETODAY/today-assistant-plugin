@@ -39,7 +39,7 @@ import cn.taketoday.lang.Nullable;
  * @since 1.0 2022/8/21 0:11
  */
 public class BeanEventListenerElement implements EventListenerElement {
-  public static final SemKey<BeanEventListenerElement> SEM_KEY = EVENT_LISTENER_ROOT_JAM_KEY.subKey("SpringBeanEventListener");
+  public static final SemKey<BeanEventListenerElement> SEM_KEY = EVENT_LISTENER_ROOT_JAM_KEY.subKey("BeanEventListener");
   public static final JamMethodMeta<BeanEventListenerElement> METHOD_META = new JamMethodMeta<>(null, BeanEventListenerElement.class, SEM_KEY);
   private final PsiAnchor myPsiMethodAnchor;
 

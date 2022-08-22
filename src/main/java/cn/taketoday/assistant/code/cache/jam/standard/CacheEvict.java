@@ -46,8 +46,8 @@ import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:20
  */
-public class JamCacheEvict<T extends PsiMember & PsiNamedElement> extends JamBaseCacheableElement<T> implements CacheEvictMarker {
-  public static final SemKey<JamCacheEvict<?>> CACHE_EVICT_JAM_KEY =
+public class CacheEvict<T extends PsiMember & PsiNamedElement> extends JamBaseCacheableElement<T> implements CacheEvictMarker {
+  public static final SemKey<CacheEvict<?>> CACHE_EVICT_JAM_KEY =
           CACHEABLE_BASE_JAM_KEY.subKey("CacheEvict");
   public static final JamAnnotationMeta CACHE_EVICT_ANNO_META =
           new JamAnnotationMeta(CacheableConstant.CACHE_EVICT)
@@ -57,11 +57,11 @@ public class JamCacheEvict<T extends PsiMember & PsiNamedElement> extends JamBas
                   .addAttribute(CACHE_RESOLVER_ATTR_META)
                   .addAttribute(KEY_GENERATOR_ATTR_META);
 
-  public JamCacheEvict(T t) {
+  public CacheEvict(T t) {
     super(CacheableConstant.CACHE_EVICT, t);
   }
 
-  public JamCacheEvict(PsiAnnotation annotation) {
+  public CacheEvict(PsiAnnotation annotation) {
     super(annotation);
   }
 
@@ -75,7 +75,7 @@ public class JamCacheEvict<T extends PsiMember & PsiNamedElement> extends JamBas
     ForMethod.META.register(registrar, psiMethod.withAnnotation(CacheableConstant.CACHE_EVICT));
   }
 
-  public static class ForClass extends JamCacheEvict<PsiClass> {
+  public static class ForClass extends CacheEvict<PsiClass> {
     public static final SemKey<ForClass> JAM_KEY = CACHE_EVICT_JAM_KEY.subKey("CacheEvictPsiClass");
     public static final JamClassMeta<ForClass> META =
             new JamClassMeta<>(null, ForClass.class, JAM_KEY).addAnnotation(CACHE_EVICT_ANNO_META);
@@ -87,7 +87,7 @@ public class JamCacheEvict<T extends PsiMember & PsiNamedElement> extends JamBas
     }
   }
 
-  public static class ForMethod extends JamCacheEvict<PsiMethod> {
+  public static class ForMethod extends CacheEvict<PsiMethod> {
     public static final SemKey<ForMethod> JAM_KEY = CACHE_EVICT_JAM_KEY.subKey("CacheEvictForMethod");
     public static final JamMethodMeta<ForMethod> META =
             new JamMethodMeta<>(null, ForMethod.class, JAM_KEY)

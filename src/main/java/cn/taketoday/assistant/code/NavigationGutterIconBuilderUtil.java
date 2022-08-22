@@ -43,6 +43,7 @@ import java.util.List;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.Icons;
+import cn.taketoday.assistant.InfraBundle;
 
 final class NavigationGutterIconBuilderUtil {
   static final NotNullFunction<SpringBeanPointer<?>, Collection<? extends PsiElement>> BEAN_POINTER_CONVERTOR
@@ -96,7 +97,7 @@ final class NavigationGutterIconBuilderUtil {
             BEAN_POINTER_CONVERTOR,
             AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
     );
-    builder.setPopupTitle(SpringBundle.message("spring.bean.class.navigate.choose.class.title"))
+    builder.setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
             .setTooltipText(tooltipText)
             .setTargets(sorted);

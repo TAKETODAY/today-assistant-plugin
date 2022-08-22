@@ -25,12 +25,10 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.semantic.SemKey;
 import com.intellij.semantic.SemService;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.UAnnotation;
 import org.jetbrains.uast.UAnnotationKt;
 import org.jetbrains.uast.UMethod;
@@ -41,8 +39,8 @@ import java.util.List;
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
+import cn.taketoday.assistant.code.cache.jam.standard.CachePut;
+import cn.taketoday.assistant.code.cache.jam.standard.Cacheable;
 import cn.taketoday.assistant.util.CommonUtils;
 
 /**
@@ -61,9 +59,9 @@ public final class CacheableAndCachePutInspection extends AbstractInfraLocalInsp
       PsiMethod method = umethod.getJavaPsi();
       PsiElement sourcePsi = umethod.getSourcePsi();
       if (sourcePsi != null) {
-        List<CacheableElement<?>> cacheableElements = getElements(method, JamCacheable.CACHEABLE_JAM_KEY);
+        List<CacheableElement<?>> cacheableElements = getElements(method, Cacheable.CACHEABLE_JAM_KEY);
         if (!cacheableElements.isEmpty()) {
-          List<CacheableElement<?>> cachePutElements = getElements(method, JamCachePut.CACHE_PUT_JAM_KEY);
+          List<CacheableElement<?>> cachePutElements = getElements(method, CachePut.CACHE_PUT_JAM_KEY);
           if (!cachePutElements.isEmpty()) {
             ProblemsHolder holder = new ProblemsHolder(manager, sourcePsi.getContainingFile(), isOnTheFly);
             registerProblems(cacheableElements, holder);

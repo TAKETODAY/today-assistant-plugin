@@ -43,9 +43,9 @@ import com.intellij.semantic.SemRegistrar;
 import java.util.List;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheEvict;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCachePut;
-import cn.taketoday.assistant.code.cache.jam.standard.JamCacheable;
+import cn.taketoday.assistant.code.cache.jam.standard.CacheEvict;
+import cn.taketoday.assistant.code.cache.jam.standard.CachePut;
+import cn.taketoday.assistant.code.cache.jam.standard.Cacheable;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -53,10 +53,10 @@ import cn.taketoday.lang.Nullable;
  * @since 1.0 2022/8/21 0:20
  */
 public class CachingGroup<T extends PsiMember & PsiNamedElement> extends JamBaseElement<T> {
-  public static final SemKey<CachingGroup> CACHING_GROUP_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringJamCachingGroup");
-  private static final Collection<JamCachePut> PUT_ATTRIBUTE = JamAttributeMeta.annoCollection("put", JamCachePut.CACHE_PUT_ANNO_META, JamCachePut.class);
-  private static final Collection<JamCacheEvict> EVICT_ATTRIBUTE = JamAttributeMeta.annoCollection("evict", JamCacheEvict.CACHE_EVICT_ANNO_META, JamCacheEvict.class);
-  private static final Collection<JamCacheable> CACHEABLE_ATTRIBUTE = JamAttributeMeta.annoCollection("cacheable", JamCacheable.CACHEABLE_ANNO_META, JamCacheable.class);
+  public static final SemKey<CachingGroup> CACHING_GROUP_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("CachingGroup");
+  private static final Collection<CachePut> PUT_ATTRIBUTE = JamAttributeMeta.annoCollection("put", CachePut.CACHE_PUT_ANNO_META, CachePut.class);
+  private static final Collection<CacheEvict> EVICT_ATTRIBUTE = JamAttributeMeta.annoCollection("evict", CacheEvict.CACHE_EVICT_ANNO_META, CacheEvict.class);
+  private static final Collection<Cacheable> CACHEABLE_ATTRIBUTE = JamAttributeMeta.annoCollection("cacheable", Cacheable.CACHEABLE_ANNO_META, Cacheable.class);
   protected static final JamAnnotationMeta ANNOTATION_META = new JamAnnotationMeta(CacheableConstant.CACHING)
           .addAttribute(CACHEABLE_ATTRIBUTE)
           .addAttribute(PUT_ATTRIBUTE)
@@ -75,15 +75,15 @@ public class CachingGroup<T extends PsiMember & PsiNamedElement> extends JamBase
     return ANNOTATION_META.getAnnotationRef(getPsiElement());
   }
 
-  public List<JamCacheable> getCacheables() {
+  public List<Cacheable> getCacheables() {
     return JamCommonUtil.getElementsIncludingSingle(getPsiElement(), ANNOTATION_META, CACHEABLE_ATTRIBUTE);
   }
 
-  public List<JamCachePut> getCachePuts() {
+  public List<CachePut> getCachePuts() {
     return JamCommonUtil.getElementsIncludingSingle(getPsiElement(), ANNOTATION_META, PUT_ATTRIBUTE);
   }
 
-  public List<JamCacheEvict> getCacheEvict() {
+  public List<CacheEvict> getCacheEvict() {
     return JamCommonUtil.getElementsIncludingSingle(getPsiElement(), ANNOTATION_META, EVICT_ATTRIBUTE);
   }
 

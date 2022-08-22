@@ -114,7 +114,7 @@ public class AbstractAnnotator extends RelatedItemLineMarkerProvider {
 
     builder.setTargets(targets)
             .setEmptyPopupText(SpringBundle.message("gutter.navigate.no.matching.beans"))
-            .setPopupTitle(SpringBundle.message("spring.bean.class.navigate.choose.class.title"))
+            .setPopupTitle(SpringBundle.message("bean.class.navigate.choose.class.title"))
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
             .setTooltipText(SpringBundle.message("spring.bean.class.tooltip.navigate.declaration"));
     result.add(builder.createSpringGroupLineMarkerInfo(psiIdentifier));

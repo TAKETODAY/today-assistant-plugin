@@ -42,24 +42,24 @@ import cn.taketoday.lang.Nullable;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:20
  */
-public class JamCacheConfig extends JamBaseCacheableElement<PsiClass> {
+public class CacheConfig extends JamBaseCacheableElement<PsiClass> {
 
   private static final JamAnnotationMeta CACHE_CONFIG_ANNO_META = new JamAnnotationMeta(CacheableConstant.CACHE_CONFIG)
           .addAttribute(CACHE_NAMES_ATTR_META)
           .addAttribute(CACHE_MANAGER_ATTR_META)
           .addAttribute(CACHE_RESOLVER_ATTR_META)
           .addAttribute(KEY_GENERATOR_ATTR_META);
-  public static final SemKey<JamCacheConfig> CACHE_CONFIG_JAM_KEY = CACHEABLE_BASE_JAM_KEY.subKey("Cacheable");
-  public static final JamClassMeta<JamCacheConfig> META = new JamClassMeta<>(
-          null, JamCacheConfig.class, CACHE_CONFIG_JAM_KEY)
+  public static final SemKey<CacheConfig> CACHE_CONFIG_JAM_KEY = CACHEABLE_BASE_JAM_KEY.subKey("Cacheable");
+  public static final JamClassMeta<CacheConfig> META = new JamClassMeta<>(
+          null, CacheConfig.class, CACHE_CONFIG_JAM_KEY)
           .addAnnotation(CACHE_CONFIG_ANNO_META);
 
-  public JamCacheConfig(PsiClass aClass) {
+  public CacheConfig(PsiClass aClass) {
     super(CacheableConstant.CACHE_CONFIG, aClass);
   }
 
   @Nullable
-  public static JamCacheConfig from(PsiElement element) {
+  public static CacheConfig from(PsiElement element) {
     SemService service = SemService.getSemService(element.getProject());
     return service.getSemElement(CACHE_CONFIG_JAM_KEY, element);
   }

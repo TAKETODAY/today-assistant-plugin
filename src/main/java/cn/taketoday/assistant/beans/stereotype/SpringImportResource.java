@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class SpringImportResource extends JamCommonModelElement<PsiClass> implements ImportResource {
-  private static final SemKey<SpringImportResource> JAM_KEY = IMPORT_RESOURCE_JAM_KEY.subKey("SpringImportResource", new SemKey[0]);
+  private static final SemKey<SpringImportResource> JAM_KEY = IMPORT_RESOURCE_JAM_KEY.subKey("ImportResource", new SemKey[0]);
   public static final JamClassMeta<SpringImportResource> META = new JamClassMeta<>((JamMemberArchetype) null, SpringImportResource.class, JAM_KEY);
   private static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta(SpringAnnotationsConstants.CONTEXT_IMPORT_RESOURCE);
   private static final JamStringAttributeMeta.Collection<List<XmlFile>> VALUE_ATTR_META = new JamStringAttributeMeta.Collection<>("value", new ApplicationContextReferenceConverter());
