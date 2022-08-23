@@ -208,7 +208,10 @@ public abstract class EventModelUtils {
       return CachedValuesManager.getManager(project).getCachedValue(module, () -> {
         SmartList<EventListenerElement> smartList = new SmartList<>();
         findModuleEventListeners(module, smartList, moduleNetworkScope(module), GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module));
-        return CachedValueProvider.Result.create(smartList, UastModificationTracker.getInstance(module.getProject()), ProjectRootManager.getInstance(module.getProject()));
+        return CachedValueProvider.Result.create(smartList,
+                UastModificationTracker.getInstance(module.getProject()),
+                ProjectRootManager.getInstance(module.getProject())
+        );
       });
     }
     return getProjectEventListeners(project);
@@ -332,8 +335,10 @@ public abstract class EventModelUtils {
   private static boolean isMethodCallExpression(UCallExpression psiElement, String className, String methodName) {
     PsiMethod element;
     PsiClass containingClass;
-    return methodName.equals(psiElement.getMethodName()) && (element = psiElement.resolve()) != null && (containingClass = element.getContainingClass()) != null && InheritanceUtil.isInheritor(
-            containingClass, className);
+    return methodName.equals(psiElement.getMethodName())
+            && (element = psiElement.resolve()) != null
+            && (containingClass = element.getContainingClass()) != null
+            && InheritanceUtil.isInheritor(containingClass, className);
   }
 
   @Nullable

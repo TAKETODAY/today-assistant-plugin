@@ -21,6 +21,7 @@
 package cn.taketoday.assistant.util;
 
 import com.intellij.codeInsight.AnnotationUtil;
+import com.intellij.codeInsight.JavaLibraryModificationTracker;
 import com.intellij.facet.FacetFinder;
 import com.intellij.facet.ProjectFacetManager;
 import com.intellij.jam.JamService;
@@ -30,7 +31,6 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.ModificationTracker;
 import com.intellij.openapi.util.text.CharFilter;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
@@ -154,17 +154,16 @@ public abstract class CommonUtils {
     else {
       Project project = module.getProject();
       Map<String, PsiClass> cache = CachedValuesManager.getManager(project).getCachedValue(module, () -> {
-        Map<String, PsiClass> map = ConcurrentFactoryMap.createMap(key -> findLibraryClass(project, key, GlobalSearchScope.moduleRuntimeScope(module, false)));
-        ModificationTracker service = module.getProject().getService(ModificationTracker.class);
-        return CachedValueProvider.Result.createSingleDependency(map, service);
+        var map = ConcurrentFactoryMap.<String, PsiClass>createMap(key ->
+                findLibraryClass(project, key, GlobalSearchScope.moduleRuntimeScope(module, false)));
+        return CachedValueProvider.Result.createSingleDependency(map, JavaLibraryModificationTracker.getInstance(project));
       });
       return cache.get(className);
     }
   }
 
   @Nullable
-  private static PsiClass findLibraryClass(Project project,
-          String fqn, GlobalSearchScope searchScope) {
+  private static PsiClass findLibraryClass(Project project, String fqn, GlobalSearchScope searchScope) {
     return DumbService.getInstance(project)
             .runReadActionInSmartMode(() -> JavaPsiFacade.getInstance(project).findClass(fqn, searchScope));
   }
