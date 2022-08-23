@@ -31,7 +31,7 @@ import com.intellij.psi.PsiElementRef;
 
 import java.util.List;
 
-import cn.taketoday.assistant.beans.stereotype.JamComponentScan;
+import cn.taketoday.assistant.beans.stereotype.ComponentScan;
 
 public class JamMockBeans extends JamBaseElement<PsiClass> {
   public static final JamAnnotationAttributeMeta.Collection<JamMockBean> MOCK_BEANS_ATTR;
@@ -47,7 +47,7 @@ public class JamMockBeans extends JamBaseElement<PsiClass> {
   }
 
   static {
-    MOCK_BEANS_ATTR = JamAttributeMeta.annoCollection("value", JamComponentScan.ANNOTATION_META, JamMockBean.class);
+    MOCK_BEANS_ATTR = JamAttributeMeta.annoCollection("value", ComponentScan.ANNOTATION_META, JamMockBean.class);
     ANNOTATION_META = (new JamAnnotationMeta("cn.taketoday.framework.boot.test.mock.mockito.MockBeans")).addAttribute(MOCK_BEANS_ATTR);
     META = (new JamClassMeta<>(JamMockBeans.class)).addAnnotation(ANNOTATION_META);
   }

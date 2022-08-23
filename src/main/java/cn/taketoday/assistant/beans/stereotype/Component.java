@@ -12,16 +12,17 @@ import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
 import org.jetbrains.annotations.NotNull;
 
 @Presentation(typeName = SpringCorePresentationConstants.COMPONENT)
-public class ComponentBean extends SpringStereotypeElement {
+public class Component extends SpringStereotypeElement {
 
-  public static final JamClassMeta<ComponentBean> META = new JamClassMeta<>(null, ComponentBean.class,
+  public static final JamClassMeta<Component> META = new JamClassMeta<>(null, Component.class,
           JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("ComponentBean"));
 
   static {
     addPomTargetProducer(META);
   }
 
-  public ComponentBean(@NotNull PsiClass psiClass) {
+  public Component(PsiClass psiClass) {
     super(SpringAnnotationsConstants.COMPONENT, PsiElementRef.real(psiClass));
   }
+
 }

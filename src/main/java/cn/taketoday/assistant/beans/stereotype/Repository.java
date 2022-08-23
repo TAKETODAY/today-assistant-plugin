@@ -22,7 +22,6 @@ package cn.taketoday.assistant.beans.stereotype;
 
 import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamClassMeta;
-import com.intellij.jam.reflect.JamMemberArchetype;
 import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
@@ -32,8 +31,6 @@ import com.intellij.spring.model.jam.stereotype.SpringMetaStereotypeComponent;
 import com.intellij.spring.model.jam.stereotype.SpringRepository;
 import com.intellij.util.Function;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 
 import cn.taketoday.assistant.AnnotationConstant;
@@ -42,17 +39,17 @@ import cn.taketoday.assistant.AnnotationConstant;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 15:58
  */
-public class RepositoryBean extends SpringMetaStereotypeComponent {
+public class Repository extends SpringMetaStereotypeComponent {
   public static final SemKey<JamMemberMeta<PsiClass, SpringRepository>> META_KEY;
   public static final SemKey<SpringRepository> JAM_KEY;
   public static final JamClassMeta<SpringRepository> META;
   private static final Function<Module, Collection<String>> ANNOTATIONS;
 
-  public RepositoryBean(PsiClass psiClass) {
+  public Repository(PsiClass psiClass) {
     this(AnnotationConstant.REPOSITORY, psiClass);
   }
 
-  public RepositoryBean(String anno, PsiClass psiClass) {
+  public Repository(String anno, PsiClass psiClass) {
     super(anno, psiClass);
   }
 

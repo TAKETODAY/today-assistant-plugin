@@ -17,18 +17,16 @@ import com.intellij.psi.PsiElementRef;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.semantic.SemKey;
 import com.intellij.spring.constants.SpringAnnotationsConstants;
-import com.intellij.spring.model.jam.stereotype.ImportResource;
 import com.intellij.spring.model.jam.testContexts.converters.ApplicationContextReferenceConverter;
 import com.intellij.util.Processor;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 
-import java.util.Collection;
 import java.util.List;
 
-public class SpringImportResource extends JamCommonModelElement<PsiClass> implements ImportResource {
-  private static final SemKey<SpringImportResource> JAM_KEY = IMPORT_RESOURCE_JAM_KEY.subKey("ImportResource", new SemKey[0]);
-  public static final JamClassMeta<SpringImportResource> META = new JamClassMeta<>((JamMemberArchetype) null, SpringImportResource.class, JAM_KEY);
+public class ImportResource extends JamCommonModelElement<PsiClass> implements com.intellij.spring.model.jam.stereotype.ImportResource {
+  private static final SemKey<ImportResource> JAM_KEY = IMPORT_RESOURCE_JAM_KEY.subKey("ImportResource", new SemKey[0]);
+  public static final JamClassMeta<ImportResource> META = new JamClassMeta<>((JamMemberArchetype) null, ImportResource.class, JAM_KEY);
   private static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta(SpringAnnotationsConstants.CONTEXT_IMPORT_RESOURCE);
   private static final JamStringAttributeMeta.Collection<List<XmlFile>> VALUE_ATTR_META = new JamStringAttributeMeta.Collection<>("value", new ApplicationContextReferenceConverter());
   private static final JamStringAttributeMeta.Collection<List<XmlFile>> LOCATION_ATTR_META = new JamStringAttributeMeta.Collection<>("locations", new ApplicationContextReferenceConverter());
@@ -39,7 +37,7 @@ public class SpringImportResource extends JamCommonModelElement<PsiClass> implem
     ANNO_META.addAttribute(VALUE_ATTR_META);
   }
 
-  public SpringImportResource(PsiClass psiElement) {
+  public ImportResource(PsiClass psiElement) {
     super(PsiElementRef.real(psiElement));
   }
 

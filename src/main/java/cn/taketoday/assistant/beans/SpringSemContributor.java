@@ -56,7 +56,7 @@ import com.intellij.spring.model.jam.testContexts.propertySources.SpringTestProp
 import com.intellij.spring.model.jam.transaction.SpringTransactionalComponent;
 
 import cn.taketoday.assistant.AnnotationConstant;
-import cn.taketoday.assistant.beans.stereotype.ComponentBean;
+import cn.taketoday.assistant.beans.stereotype.Component;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -68,7 +68,7 @@ final class SpringSemContributor extends SemContributor {
   public void registerSemProviders(SemRegistrar registrar, Project project) {
     PsiClassPattern nonAnnoClass = PsiJavaPatterns.psiClass().nonAnnotationType().withoutModifiers("private");
     PsiClassPattern classPattern = PsiJavaPatterns.psiClass().withoutModifiers("private");
-    ComponentBean.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.COMPONENT));
+    Component.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.COMPONENT));
     SemService semService = SemService.getSemService(project);
     registerConfigurations(registrar, semService);
     registerServices(registrar, nonAnnoClass, semService);

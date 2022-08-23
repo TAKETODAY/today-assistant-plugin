@@ -36,22 +36,22 @@ import cn.taketoday.assistant.AnnotationConstant;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 16:25
  */
-public class JamComponentScan extends SpringJamComponentScanArchetype {
+public class ComponentScan extends SpringJamComponentScanArchetype {
 
-  private static final SemKey<JamComponentScan> JAM_KEY = COMPONENT_SCAN_JAM_KEY.subKey("ComponentScan");
-  public static final SemKey<JamComponentScan> REPEATABLE_ANNO_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("ComponentScan");
+  private static final SemKey<ComponentScan> JAM_KEY = COMPONENT_SCAN_JAM_KEY.subKey("ComponentScan");
+  public static final SemKey<ComponentScan> REPEATABLE_ANNO_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("ComponentScan");
 
   public static final JamAnnotationMeta ANNOTATION_META =
           new JamAnnotationMeta(AnnotationConstant.COMPONENT_SCAN, ARCHETYPE, META_KEY);
 
-  public static final JamClassMeta<JamComponentScan> META =
-          new JamClassMeta<>(null, JamComponentScan.class, JAM_KEY).addAnnotation(ANNOTATION_META);
+  public static final JamClassMeta<ComponentScan> META =
+          new JamClassMeta<>(null, ComponentScan.class, JAM_KEY).addAnnotation(ANNOTATION_META);
 
-  public JamComponentScan(@NotNull PsiClass psiElement) {
+  public ComponentScan(@NotNull PsiClass psiElement) {
     super(psiElement);
   }
 
-  public JamComponentScan(PsiAnnotation annotation) {
+  public ComponentScan(PsiAnnotation annotation) {
     super(annotation);
   }
 

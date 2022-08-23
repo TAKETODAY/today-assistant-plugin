@@ -65,7 +65,7 @@ import java.util.Set;
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.TodayLibraryUtil;
 import cn.taketoday.assistant.beans.ConfigurationBean;
-import cn.taketoday.assistant.beans.stereotype.ComponentBean;
+import cn.taketoday.assistant.beans.stereotype.Component;
 import cn.taketoday.assistant.facet.TodayFacet;
 import cn.taketoday.lang.Nullable;
 
@@ -205,7 +205,7 @@ public abstract class CommonUtils {
     if (!isBeanCandidateClass(psiClass))
       return false;
     return JamService.getJamService(psiClass.getProject())
-            .getJamElement(psiClass, ComponentBean.META) != null;
+            .getJamElement(psiClass, Component.META) != null;
   }
 
   /**
