@@ -18,27 +18,33 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.beans;
+package cn.taketoday.assistant.beans.stereotype;
 
 import com.intellij.jam.JamService;
-import com.intellij.openapi.module.Module;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.spring.model.custom.ComponentScanExtender;
-import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
+import com.intellij.jam.reflect.JamMemberMeta;
+import com.intellij.psi.PsiClass;
+import com.intellij.semantic.SemKey;
+import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 
-import java.util.Collection;
+import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/21 15:01
+ * @since 1.0 2022/8/23 15:26
  */
-public class TodayComponentScanExtender extends ComponentScanExtender {
+public class CustomComponent extends InfraMetaStereotypeComponent {
 
-  @Override
-  public Collection<SpringStereotypeElement> getComponents(GlobalSearchScope scope, Module module) {
-    JamService service = JamService.getJamService(module.getProject());
-    System.out.println("TodayComponentScanExtender, module" + module);
-    return service.getJamClassElements(StereotypeComponent.META, StereotypeComponent.ANNOTATION, scope);
+  public static final SemKey<JamMemberMeta<PsiClass, CustomComponent>> META_KEY =
+          JamService.ALIASING_MEMBER_META_KEY.subKey("CustomComponentMeta");
+
+  public static final SemKey<CustomComponent> JAM_KEY =
+          JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("CustomComponent");
+
+  public CustomComponent(PsiClass psiClassAnchor) {
+    super(null, psiClassAnchor);
   }
 
+  public CustomComponent(@Nullable String anno, PsiClass psiClassAnchor) {
+    super(anno, psiClassAnchor);
+  }
 }

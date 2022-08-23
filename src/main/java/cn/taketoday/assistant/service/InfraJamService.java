@@ -23,6 +23,7 @@ package cn.taketoday.assistant.service;
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.jam.JamService;
 import com.intellij.jam.model.common.CommonModelElement;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
@@ -51,7 +52,6 @@ import com.intellij.spring.contexts.model.graph.LocalModelDependencyType;
 import com.intellij.spring.model.CommonSpringBean;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.SpringJamModel;
 import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
 import com.intellij.spring.model.jam.stereotype.SpringComponentScan;
 import com.intellij.spring.model.jam.stereotype.SpringContextImport;
@@ -62,8 +62,6 @@ import com.intellij.spring.model.jam.stereotype.SpringJamComponentScans;
 import com.intellij.spring.model.jam.stereotype.SpringJamPropertySource;
 import com.intellij.spring.model.jam.stereotype.SpringPropertySource;
 import com.intellij.spring.model.jam.stereotype.SpringPropertySources;
-import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
-import com.intellij.spring.model.jam.utils.SpringJamUtils;
 import com.intellij.spring.model.jam.utils.filters.SpringContextFilter;
 import com.intellij.spring.model.utils.SpringProfileUtils;
 import com.intellij.spring.model.utils.SpringPropertyUtils;
@@ -90,17 +88,23 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.beans.stereotype.SpringJamModel;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 14:00
  */
-public class MySpringJamUtils extends SpringJamUtils {
+public class InfraJamService {
 
   private static final Key<CachedValue<Set<CommonSpringBean>>>
           ANNOTATION_CONFIG_APPLICATION_CONTEXT_CACHE = Key.create("ANNOTATION_CONFIG_APPLICATION_CONTEXT_CACHE");
   private static final List<String> ANNOTATIONS = List.of(
           AnnotationConstant.CONTEXT_IMPORT, AnnotationConstant.CONTEXT_IMPORT_RESOURCE);
+
+  public static InfraJamService getInstance() {
+    return ApplicationManager.getApplication().getService(InfraJamService.class);
+  }
 
   private static Map<SpringBean, Set<CommonSpringBean>> getAnnotationConfigAppContextedBeans(CommonSpringModel model, Module module) {
     Map<SpringBean, Set<CommonSpringBean>> ac = new LinkedHashMap<>();
@@ -130,7 +134,7 @@ public class MySpringJamUtils extends SpringJamUtils {
       return Collections.emptySet();
     }
     Set<CommonSpringBean> stereotypeElements = new LinkedHashSet<>();
-    for (CommonSpringBean stereotypeElement : SpringJamModel.getModel(module).getStereotypeComponents()) {
+    for (CommonSpringBean stereotypeElement : SpringJamModel.from(module).getStereotypeComponents()) {
       PsiElement identifyingPsiElement = stereotypeElement.getIdentifyingPsiElement();
       if (identifyingPsiElement instanceof PsiClass psiClass && isStereotypeAccepted(psiClass, names)) {
         stereotypeElements.add(stereotypeElement);
@@ -163,7 +167,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return false;
   }
 
-  @Override
   public Set<CommonModelElement> findStereotypeConfigurationBeans(
           CommonSpringModel model, List<? extends SpringBeanPointer<?>> beansInModel, @Nullable Module module) {
     if (module == null) {
@@ -218,7 +221,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return cs;
   }
 
-  @Override
   public Set<CommonSpringBean> filterComponentScannedStereotypes(
           Module module, SpringBeansPackagesScan componentScan, List<? extends CommonSpringBean> allComponents) {
     Set<PsiPackage> psiPackages = componentScan.getPsiPackages();
@@ -229,7 +231,6 @@ public class MySpringJamUtils extends SpringJamUtils {
             componentScan.getExcludeContextFilters(), componentScan.getIncludeContextFilters());
   }
 
-  @Override
   public Set<CommonSpringBean> filterComponentScannedStereotypes(
           Module module, List<? extends CommonSpringBean> allComponents, Set<PsiPackage> psiPackages,
           boolean useDefaultFilters, Set<SpringContextFilter.Exclude> excludeContextFilters, Set<SpringContextFilter.Include> includeContextFilters) {
@@ -245,8 +246,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return resultElements;
   }
 
-  @Override
-
   public List<ContextJavaBean> getContextBeans(PsiClass beanClass, @Nullable Set<String> activeProfiles) {
     List<ContextJavaBean> contextJavaBeans = doGetContextBeans(beanClass);
     return SpringProfileUtils.filterBeansInActiveProfiles(contextJavaBeans, activeProfiles);
@@ -256,12 +255,11 @@ public class MySpringJamUtils extends SpringJamUtils {
     return JamService.getJamService(beanClass.getProject()).getAnnotatedMembersList(beanClass, ContextJavaBean.BEAN_JAM_KEY, 10);
   }
 
-  @Override
   @Nullable
-  public SpringStereotypeElement findStereotypeElement(PsiClass psiClass) {
+  public InfraStereotypeElement findStereotypeElement(PsiClass psiClass) {
     JamPsiMemberSpringBean bean = JamService.getJamService(psiClass.getProject()).getJamElement(JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY, psiClass);
-    if (bean instanceof SpringStereotypeElement) {
-      return (SpringStereotypeElement) bean;
+    if (bean instanceof InfraStereotypeElement) {
+      return (InfraStereotypeElement) bean;
     }
     return null;
   }
@@ -283,7 +281,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return false;
   }
 
-  @Override
   public Set<XmlFile> getImportedResources(PsiClass psiClass, Module... contexts) {
     SpringImportResource importResource = SpringImportResource.META.getJamElement(psiClass);
     if (importResource == null) {
@@ -292,7 +289,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return new LinkedHashSet<>(importResource.getImportedResources(contexts));
   }
 
-  @Override
   public boolean processImportedResources(PsiClass psiClass, Processor<Pair<List<XmlFile>, ? extends PsiElement>> processor, Module... contexts) {
     SpringImportResource importResource = SpringImportResource.META.getJamElement(psiClass);
     if (importResource == null) {
@@ -301,7 +297,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return importResource.processImportedResources(processor, contexts);
   }
 
-  @Override
   public Set<PsiClass> getImportedClasses(PsiClass clazz, @Nullable Module module) {
     SpringImport springImport = SemService.getSemService(clazz.getProject()).getSemElement(SpringImport.IMPORT_JAM_KEY, clazz);
     if (springImport == null) {
@@ -310,7 +305,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return new LinkedHashSet<>(springImport.getImportedClasses());
   }
 
-  @Override
   public boolean processImportedClasses(PsiClass clazz, Processor<Pair<PsiClass, ? extends PsiElement>> processor) {
     SpringContextImport springImport = SpringContextImport.META.getJamElement(clazz);
     if (springImport == null) {
@@ -319,7 +313,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return springImport.processImportedClasses(processor);
   }
 
-  @Override
   public List<? extends SpringBeansPackagesScan> getBeansPackagesScan(PsiClass psiClass) {
     SmartList<SpringBeansPackagesScan> smartList = new SmartList<>();
     SemService service = SemService.getSemService(psiClass.getProject());
@@ -337,7 +330,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return smartList;
   }
 
-  @Override
   public Collection<SpringPropertySource> getPropertySources(PsiClass psiClass) {
     SmartList smartList = new SmartList();
     PsiElement[] findAnnotations = AnnotationUtil.findAnnotations(psiClass, Collections.singleton(AnnotationConstant.PROPERTY_SOURCE));
@@ -384,7 +376,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return filtered;
   }
 
-  @Override
   public boolean processCustomAnnotations(PsiClass psiClass, Processor<Pair<PsiClass, LocalModelDependency>> processor) {
     PsiClass annotationClass;
     boolean enableAnnotation;
@@ -409,7 +400,6 @@ public class MySpringJamUtils extends SpringJamUtils {
     return AnnotationUtil.isAnnotated(psiClass, ANNOTATIONS, 0);
   }
 
-  @Override
   public boolean processCustomDependentLocalModels(LocalAnnotationModel localAnnotationModel, PairProcessor<? super LocalModel, ? super LocalModelDependency> processor) {
     for (LocalAnnotationModelDependentModelsProvider provider : LocalAnnotationModelDependentModelsProvider.EP_NAME.getExtensions()) {
       if (!provider.processCustomDependentLocalModels(localAnnotationModel, processor)) {

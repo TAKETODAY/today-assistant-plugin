@@ -18,32 +18,34 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.beans;
+package cn.taketoday.assistant.beans.stereotype.javaee;
 
 import com.intellij.ide.presentation.Presentation;
-import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
+import com.intellij.spring.presentation.SpringCorePresentationConstants;
 
+import org.jetbrains.annotations.NotNull;
+
+import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
 
-@Presentation(typeName = StereotypeComponent.MAPPER_DEFINITION)
-public class StereotypeComponent extends InfraStereotypeElement {
-
-  public static final String MAPPER_DEFINITION = "@Component";
-  public static final JamClassMeta<StereotypeComponent> META = new JamClassMeta<>(null, StereotypeComponent.class,
-          JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("TodayComponent"));
-  public static final String ANNOTATION = "cn.taketoday.stereotype.Component";
-  private static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta(ANNOTATION);
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/23 15:15
+ */
+@Presentation(typeName = SpringCorePresentationConstants.NAMED)
+public class SpringCdiJavaxNamed extends InfraStereotypeElement {
+  public static final JamClassMeta<SpringCdiJavaxNamed> META = new JamClassMeta<>(null, SpringCdiJavaxNamed.class,
+          JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("CdiJavaxNamed"));
 
   static {
     addPomTargetProducer(META);
-    META.addAnnotation(ANNO_META);
   }
 
-  public StereotypeComponent(PsiClass psiClass) {
-    super(ANNOTATION, PsiElementRef.real(psiClass));
+  public SpringCdiJavaxNamed(@NotNull PsiClass psiClass) {
+    super(JavaeeConstant.JAVAX_NAMED, PsiElementRef.real(psiClass));
   }
 }

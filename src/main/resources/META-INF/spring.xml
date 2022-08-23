@@ -24,7 +24,6 @@
 
     <spring.configSearcherScopeModifier order="last"
         implementation="cn.taketoday.assistant.beans.PackagesConfigSearcherScopeModifier" />
-    <spring.componentScanExtender implementation="cn.taketoday.assistant.beans.TodayComponentScanExtender" />
 
     <spring.testingAnnotationsProvider implementation="cn.taketoday.assistant.beans.TestingAnnotationsProvider" />
 

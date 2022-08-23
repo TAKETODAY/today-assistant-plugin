@@ -29,7 +29,6 @@ import com.intellij.spring.contexts.model.LocalAnnotationModel;
 import com.intellij.spring.contexts.model.LocalModel;
 import com.intellij.spring.model.CommonSpringBean;
 import com.intellij.spring.model.custom.CustomLocalComponentsDiscoverer;
-import com.intellij.spring.model.jam.stereotype.CustomSpringComponent;
 import com.intellij.util.SmartList;
 
 import java.util.Collection;
@@ -37,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.beans.stereotype.CustomComponent;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -83,7 +83,7 @@ public class ConfigurationPropertiesDiscoverer extends CustomLocalComponentsDisc
 
   public static CommonSpringBean createConfigurationPropertiesBean(
           ConfigurationProperties configurationProperties, PsiClass configBeanClass) {
-    return new CustomSpringComponent("cn.taketoday.context.properties.ConfigurationProperties", configBeanClass) {
+    return new CustomComponent("cn.taketoday.context.properties.ConfigurationProperties", configBeanClass) {
       public String getBeanName() {
         String prefix = configurationProperties.getValueOrPrefix();
         boolean hasPrefix = StringUtil.isNotEmpty(prefix);

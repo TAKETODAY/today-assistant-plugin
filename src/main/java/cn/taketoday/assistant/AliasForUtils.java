@@ -45,8 +45,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider.Result;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.semantic.SemKey;
-
-import com.intellij.spring.model.jam.utils.JamAnnotationTypeUtil;
 import com.intellij.util.CommonProcessors;
 import com.intellij.util.NotNullFunction;
 import com.intellij.util.Processor;
@@ -57,6 +55,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import cn.taketoday.assistant.util.JamAnnotationTypeUtil;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -164,9 +163,8 @@ public final class AliasForUtils {
       else {
         PsiClass customAnnoClass = JavaPsiFacade.getInstance(module.getProject()).findClass(customAnnotationFqn, context.getResolveScope());
         Collection<PsiClass> allMetaAnnotations =
-                includingTests ? JamAnnotationTypeUtil.getInstance(module)
-                        .getAnnotationTypesWithChildrenIncludingTests(baseMetaAnnotationFqn)
-                               : JamAnnotationTypeUtil.getInstance(module).getAnnotationTypesWithChildren(baseMetaAnnotationFqn);
+                includingTests ? JamAnnotationTypeUtil.getAnnotationTypesWithChildrenIncludingTests(module, baseMetaAnnotationFqn)
+                               : JamAnnotationTypeUtil.getAnnotationTypesWithChildren(module, baseMetaAnnotationFqn);
         return findDefiningMetaAnnotation(customAnnoClass, baseMetaAnnotationFqn, allMetaAnnotations);
       }
     }

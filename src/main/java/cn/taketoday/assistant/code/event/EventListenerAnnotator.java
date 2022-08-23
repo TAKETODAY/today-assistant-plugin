@@ -36,7 +36,6 @@ import com.intellij.psi.presentation.java.SymbolPresentationUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.semantic.SemService;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.util.NotNullFunction;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -61,6 +60,7 @@ import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.code.event.beans.PublishEventPointDescriptor;
 import cn.taketoday.assistant.code.event.jam.EventListenerElement;
 import cn.taketoday.assistant.code.event.jam.EventModelUtils;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -193,12 +193,12 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   private static RelatedItemLineMarkerInfo<?> createEventListenerMarker(Supplier<Collection<PublishEventPointDescriptor>> supplier, PsiElement identifier) {
 
-    var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Publisher, PUBLISH_EVENT_CONVERTOR, null);
+    var builder = GutterIconBuilder.create(SpringApiIcons.Gutter.Publisher, PUBLISH_EVENT_CONVERTOR, null);
     builder.setTargets(NotNullLazyValue.lazy(supplier)).setPopupTitle(InfraBundle.message("event.publisher.choose.title"))
             .setTooltipText(InfraBundle.message("event.publisher.tooltip.text"))
             .setEmptyPopupText(InfraBundle.message("event.publisher.empty.tooltip.text"))
             .setCellRenderer(EventListenerAnnotator::getPublishEventRenderer);
-    return builder.createSpringRelatedMergeableLineMarkerInfo(identifier);
+    return builder.createRelatedMergeableLineMarkerInfo(identifier);
   }
 
   private static DefaultPsiElementCellRenderer getPublishEventRenderer() {
@@ -260,13 +260,13 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   private static void annotatePublishPoints(Project project, @Nullable Module module,
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiType publishedType, PsiElement element) {
-    var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Listener, EVENT_LISTENER_CONVERTOR, null);
+    var builder = GutterIconBuilder.create(SpringApiIcons.Gutter.Listener, EVENT_LISTENER_CONVERTOR, null);
     builder.setTargets(NotNullLazyValue.lazy(() -> EventModelUtils.getEventListeners(project, module, publishedType)))
             .setPopupTitle(InfraBundle.message("event.listener.choose.title"))
             .setTooltipText(InfraBundle.message("event.listener.tooltip.text"))
             .setEmptyPopupText(InfraBundle.message("event.listener.empty.tooltip.text"))
             .setCellRenderer(EventListenerAnnotator::getEventListenerRenderer);
-    result.add(builder.createSpringRelatedMergeableLineMarkerInfo(element));
+    result.add(builder.createRelatedMergeableLineMarkerInfo(element));
   }
 }
 

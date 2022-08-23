@@ -22,19 +22,17 @@ package cn.taketoday.assistant.beans.stereotype;
 
 import com.intellij.ide.presentation.Presentation;
 import com.intellij.jam.reflect.JamClassMeta;
-import com.intellij.openapi.util.Pair;
 import com.intellij.patterns.PsiClassPattern;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.semantic.SemRegistrar;
 import com.intellij.spring.constants.SpringCorePresentationConstants;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
 
 import cn.taketoday.assistant.AnnotationConstant;
 
 @Presentation(typeName = SpringCorePresentationConstants.COMPONENT)
-public class Component extends SpringStereotypeElement {
+public class Component extends InfraStereotypeElement {
 
   public static final JamClassMeta<Component> META = new JamClassMeta<>(null, Component.class,
           JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("ComponentBean"));

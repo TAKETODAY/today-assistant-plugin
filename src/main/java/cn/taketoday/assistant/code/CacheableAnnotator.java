@@ -36,7 +36,6 @@ import com.intellij.semantic.SemService;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.SpringManager;
 import com.intellij.spring.contexts.model.SpringModel;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.model.utils.SpringModelSearchers;
 import com.intellij.util.NotNullFunction;
 import com.intellij.util.containers.ContainerUtil;
@@ -65,6 +64,7 @@ import cn.taketoday.assistant.code.cache.jam.standard.CacheConfig;
 import cn.taketoday.assistant.code.cache.jam.standard.CacheEvict;
 import cn.taketoday.assistant.code.cache.jam.standard.CachePut;
 import cn.taketoday.assistant.code.cache.jam.standard.Cacheable;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -202,12 +202,12 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
     if (psiAnnotationIdentifier == elementToAnnotate) {
       Set<CacheableElement<?>> cacheableElements = findCacheableWithTheSameName(cacheableElement);
       if (!cacheableElements.isEmpty()) {
-        var builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.ShowCacheable, CACHEABLE_CONVERTOR, null);
+        var builder = GutterIconBuilder.create(SpringApiIcons.Gutter.ShowCacheable, CACHEABLE_CONVERTOR, null);
         builder.setTargets(cacheableElements)
                 .setCellRenderer(CacheableAnnotator::getCacheableListCellRenderer)
                 .setPopupTitle(InfraBundle.message("cacheable.element.choose.title"))
                 .setTooltipText(InfraBundle.message("cacheable.element.tooltip.text"));
-        result.add(builder.createSpringRelatedMergeableLineMarkerInfo(psiAnnotationIdentifier));
+        result.add(builder.createRelatedMergeableLineMarkerInfo(psiAnnotationIdentifier));
       }
     }
 

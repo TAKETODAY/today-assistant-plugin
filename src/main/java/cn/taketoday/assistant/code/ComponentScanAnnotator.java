@@ -36,7 +36,7 @@ import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.stereotype.SpringComponentScan;
 import com.intellij.spring.model.jam.stereotype.SpringJamComponentScan;
 import com.intellij.spring.model.jam.stereotype.SpringJamComponentScans;
-import com.intellij.spring.model.jam.utils.SpringJamUtils;
+import cn.taketoday.assistant.service.InfraJamService;
 import com.intellij.spring.model.xml.context.SpringBeansPackagesScan;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
@@ -65,7 +65,7 @@ import cn.taketoday.assistant.InfraBundle;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:50
  */
-public class ComponentScanAnnotator extends AbstractAnnotator {
+public class ComponentScanAnnotator extends AbstractInfraAnnotator {
 
   @Override
   public String getId() {
@@ -132,7 +132,7 @@ public class ComponentScanAnnotator extends AbstractAnnotator {
       PsiClass owner = UElementKt.getAsJavaPsiElement(uDeclaration, PsiClass.class);
       PsiElement identifier = UAnnotationKt.getNamePsiElement(uAnnotation);
       if (identifier != null && owner != null) {
-        List<? extends SpringBeansPackagesScan> allScans = SpringJamUtils.getInstance().getBeansPackagesScan(owner);
+        List<? extends SpringBeansPackagesScan> allScans = InfraJamService.getInstance().getBeansPackagesScan(owner);
         List<SpringComponentScan> scans = allScans.stream().filter(scan -> {
           return (scan instanceof SpringComponentScan) && element.equals(((SpringComponentScan) scan).getAnnotation());
         }).map(scan2 -> {

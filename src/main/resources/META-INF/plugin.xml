@@ -47,9 +47,7 @@
     <framework.type implementation="cn.taketoday.assistant.facet.TodayInfrastructureFrameworkType" />
     <spellchecker.bundledDictionaryProvider implementation="cn.taketoday.assistant.InfraBundledDictionaryProvider" />
 
-    <!-- <applicationService serviceInterface="com.intellij.spring.model.jam.utils.SpringJamUtils"-->
-    <!--   serviceImplementation="cn.taketoday.assistant.service.MySpringJamUtils" />-->
-
+    <applicationService serviceImplementation="cn.taketoday.assistant.service.InfraJamService" />
     <applicationService serviceImplementation="cn.taketoday.assistant.service.IconService" />
     <applicationService serviceImplementation="cn.taketoday.assistant.service.ApplicationService" />
     <projectService serviceImplementation="cn.taketoday.assistant.service.ProjectService" />

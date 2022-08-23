@@ -37,11 +37,7 @@ import com.intellij.psi.impl.compiled.ClsClassImpl;
 import com.intellij.semantic.SemKey;
 import com.intellij.semantic.SemRegistrar;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.constants.SpringJavaeeConstants;
 import com.intellij.spring.model.jam.JamCustomImplementationBean;
-import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
-
-import com.intellij.spring.model.jam.utils.JamAnnotationTypeUtil;
 import com.intellij.util.Consumer;
 import com.intellij.util.Function;
 import com.intellij.util.NotNullFunction;
@@ -56,8 +52,10 @@ import java.util.Set;
 
 import cn.taketoday.assistant.AliasForUtils;
 import cn.taketoday.assistant.AnnotationConstant;
-import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.JavaeeConstant;
+import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.util.JamAnnotationTypeUtil;
 import cn.taketoday.lang.Nullable;
 
 import static cn.taketoday.assistant.AnnotationConstant.CONFIGURATION;
@@ -75,7 +73,7 @@ public final class SemContributorUtil {
                   SERVICE,
                   CONFIGURATION,
                   JavaeeConstant.JAVAX_NAMED,
-                  SpringJavaeeConstants.JAKARTA_NAMED
+                  JavaeeConstant.JAKARTA_NAMED
           };
 
   public static <T extends JamElement, Psi extends PsiMember> void registerMetaComponents(
@@ -258,11 +256,11 @@ public final class SemContributorUtil {
   /**
    * @param <T>
    * @return Consumer.
-   * @see SpringStereotypeElement#addPomTargetProducer(JamMemberMeta)
+   * @see InfraStereotypeElement#addPomTargetProducer(JamMemberMeta)
    */
-  public static <T extends SpringStereotypeElement, Psi extends
+  public static <T extends InfraStereotypeElement, Psi extends
           PsiMember> Consumer<JamMemberMeta<Psi, T>> createStereotypeConsumer() {
-    return SpringStereotypeElement::addPomTargetProducer;
+    return InfraStereotypeElement::addPomTargetProducer;
   }
 
   /**
@@ -306,7 +304,7 @@ public final class SemContributorUtil {
   public static class UserDefinedCustomAnnotationFunction implements Function<Module, Collection<String>>, CustomRootAnnotationsProvider {
     @Override
     public Collection<String> fun(Module module) {
-      return module == null ? Collections.emptySet() : JamAnnotationTypeUtil.getInstance(module).getUserDefinedCustomComponentAnnotations();
+      return module == null ? Collections.emptySet() : JamAnnotationTypeUtil.getUserDefinedCustomComponentAnnotations(module);
     }
 
     @Override
@@ -373,8 +371,8 @@ public final class SemContributorUtil {
         return Collections.emptyList();
 
       return myWithTests ?
-             JamAnnotationTypeUtil.getInstance(module).getAnnotationTypesWithChildrenIncludingTests(anno) :
-             JamAnnotationTypeUtil.getInstance(module).getAnnotationTypesWithChildren(anno);
+             JamAnnotationTypeUtil.getAnnotationTypesWithChildrenIncludingTests(module, anno) :
+             JamAnnotationTypeUtil.getAnnotationTypesWithChildren(module, anno);
     }
 
     @Override

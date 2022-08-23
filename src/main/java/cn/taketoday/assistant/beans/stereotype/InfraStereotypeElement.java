@@ -41,7 +41,6 @@ import com.intellij.semantic.SemService;
 import com.intellij.spring.model.jam.JamPsiClassSpringBean;
 import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
 import com.intellij.spring.model.jam.javaConfig.SpringJavaBean;
-import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,7 +90,7 @@ public class InfraStereotypeElement extends JamPsiClassSpringBean {
     return meta;
   }
 
-  public static <Psi extends PsiModifierListOwner, Jam extends SpringStereotypeElement> void addPomTargetProducer(JamMemberMeta<Psi, Jam> classMeta) {
+  public static <Psi extends PsiModifierListOwner, Jam extends InfraStereotypeElement> void addPomTargetProducer(JamMemberMeta<Psi, Jam> classMeta) {
     classMeta.addPomTargetProducer((stereotypeElement, consumer) -> consumer.consume(stereotypeElement.getPsiTarget()));
   }
 

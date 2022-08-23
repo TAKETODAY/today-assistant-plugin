@@ -39,7 +39,6 @@ import com.intellij.spring.model.CommonSpringBean;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.SpringModelSearchParameters;
 import com.intellij.spring.model.custom.CustomLocalComponentsDiscoverer;
-import com.intellij.spring.model.jam.stereotype.CustomSpringComponent;
 import com.intellij.spring.model.utils.SpringPropertyUtils;
 import com.intellij.spring.model.utils.search.SpringBeanSearchParameters;
 import com.intellij.spring.model.xml.beans.SpringPropertyDefinition;
@@ -49,6 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import cn.taketoday.assistant.beans.stereotype.CustomComponent;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -100,9 +100,9 @@ public class BeansProvider extends CustomLocalComponentsDiscoverer {
     String value;
     PsiClass aClass;
     if (markerInterface != null && (value = markerInterface.getValueAsString()) != null && (aClass = facade.findClass(value, scope)) != null) {
-      mappers.add(new CustomSpringComponent(aClass));
+      mappers.add(new CustomComponent(aClass));
       for (PsiClass psiClass : ClassInheritorsSearch.search(aClass, scope, true).findAll()) {
-        mappers.add(new CustomSpringComponent(psiClass));
+        mappers.add(new CustomComponent(psiClass));
       }
     }
   }
@@ -113,7 +113,7 @@ public class BeansProvider extends CustomLocalComponentsDiscoverer {
     SpringPropertyDefinition annotationClass = getPropertyNameByName(pointer, "annotationClass");
     if (annotationClass != null && (value = annotationClass.getValueAsString()) != null && (aClass = facade.findClass(value, scope)) != null && aClass.isAnnotationType()) {
       for (PsiClass annotatedClass : AnnotatedElementsSearch.searchPsiClasses(aClass, scope).findAll()) {
-        mappers.add(new CustomSpringComponent(annotatedClass));
+        mappers.add(new CustomComponent(annotatedClass));
       }
     }
   }
@@ -149,7 +149,7 @@ public class BeansProvider extends CustomLocalComponentsDiscoverer {
   private static void processBasePackage(GlobalSearchScope scope, PsiPackage aPackage, Collection<CommonSpringBean> myBatisMappers) {
     for (PsiClass aClass : aPackage.getClasses(scope)) {
       if (aClass.isInterface()) {
-        myBatisMappers.add(new CustomSpringComponent(aClass));
+        myBatisMappers.add(new CustomComponent(aClass));
       }
     }
     for (PsiPackage psiPackage : aPackage.getSubPackages(scope)) {

@@ -28,7 +28,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.NotNullLazyValue;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.spring.SpringBundle;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.settings.SpringGeneralSettings;
 import com.intellij.util.SmartList;
@@ -55,8 +54,8 @@ import cn.taketoday.lang.Nullable;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 17:19
  */
-public class AbstractAnnotator extends RelatedItemLineMarkerProvider {
-  private static final Logger LOG = Logger.getInstance(AbstractAnnotator.class);
+public class AbstractInfraAnnotator extends RelatedItemLineMarkerProvider {
+  private static final Logger LOG = Logger.getInstance(AbstractInfraAnnotator.class);
 
   @Override
   protected void collectNavigationMarkers(PsiElement psiElement, Collection<? super RelatedItemLineMarkerInfo<?>> result) {
@@ -114,10 +113,10 @@ public class AbstractAnnotator extends RelatedItemLineMarkerProvider {
     );
 
     builder.setTargets(targets)
-            .setEmptyPopupText(SpringBundle.message("gutter.navigate.no.matching.beans"))
+            .setEmptyPopupText(InfraBundle.message("gutter.navigate.no.matching.beans"))
             .setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
-            .setTooltipText(SpringBundle.message("spring.bean.class.tooltip.navigate.declaration"));
+            .setTooltipText(InfraBundle.message("bean.class.tooltip.navigate.declaration"));
     result.add(builder.createGroupLineMarkerInfo(psiIdentifier));
   }
 

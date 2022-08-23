@@ -45,7 +45,6 @@ import com.intellij.psi.util.PropertyUtilBase;
 import com.intellij.spring.CommonSpringModel;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.impl.SpringAutoConfiguredModels;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
@@ -84,7 +83,7 @@ import cn.taketoday.lang.Nullable;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:44
  */
-public class AutowiredAnnotator extends AbstractAnnotator {
+public class AutowiredAnnotator extends AbstractInfraAnnotator {
 
   @Override
   public String getId() {
@@ -362,7 +361,7 @@ public class AutowiredAnnotator extends AbstractAnnotator {
 
   private static void addConstructorArgsGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier,
           NotNullLazyValue<Collection<? extends SpringBeanPointer<?>>> targets) {
-    SpringGutterIconBuilder<SpringBeanPointer<?>> builder = SpringGutterIconBuilder.createBuilder(
+    GutterIconBuilder<SpringBeanPointer<?>> builder = GutterIconBuilder.create(
             SpringApiIcons.Gutter.SpringBeanMethod,
             NavigationGutterIconBuilderUtil.BEAN_POINTER_CONVERTOR,
             NavigationGutterIconBuilderUtil.AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
@@ -371,7 +370,7 @@ public class AutowiredAnnotator extends AbstractAnnotator {
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
             .setPopupTitle(InfraBundle.message("bean.constructor.navigate.choose.class.title"))
             .setTooltipText(InfraBundle.message("bean.constructor.tooltip.navigate.declaration"));
-    result.add(builder.createSpringRelatedMergeableLineMarkerInfo(psiIdentifier));
+    result.add(builder.createRelatedMergeableLineMarkerInfo(psiIdentifier));
   }
 
   private static Set<Module> getRelatedSpringModules(PsiElement element) {

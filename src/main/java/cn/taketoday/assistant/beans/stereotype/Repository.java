@@ -29,10 +29,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.stereotype.SpringMetaStereotypeComponent;
 import com.intellij.util.Function;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -43,7 +40,7 @@ import cn.taketoday.assistant.AnnotationConstant;
  * @since 1.0 2022/8/21 15:58
  */
 @Presentation(typeName = "@Repository")
-public class Repository extends SpringMetaStereotypeComponent {
+public class Repository extends InfraMetaStereotypeComponent {
   public static final SemKey<JamMemberMeta<PsiClass, Repository>> META_KEY;
   public static final SemKey<Repository> JAM_KEY;
   public static final JamClassMeta<Repository> META;

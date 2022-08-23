@@ -29,7 +29,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.SpringBundle;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.model.CommonSpringBean;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.xml.DomSpringBean;
@@ -44,6 +43,7 @@ import javax.swing.Icon;
 
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
 
 final class NavigationGutterIconBuilderUtil {
 
@@ -93,7 +93,7 @@ final class NavigationGutterIconBuilderUtil {
 
     List<SpringBeanPointer<?>> sorted = new ArrayList<>(collection);
     sorted.sort(SpringBeanPointer.DISPLAY_COMPARATOR);
-    SpringGutterIconBuilder<SpringBeanPointer<?>> builder = SpringGutterIconBuilder.createBuilder(
+    GutterIconBuilder<SpringBeanPointer<?>> builder = GutterIconBuilder.create(
             SpringApiIcons.Gutter.ShowAutowiredDependencies,
             BEAN_POINTER_CONVERTOR,
             AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
@@ -102,6 +102,6 @@ final class NavigationGutterIconBuilderUtil {
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
             .setTooltipText(tooltipText)
             .setTargets(sorted);
-    result.add(builder.createSpringRelatedMergeableLineMarkerInfo(identifier));
+    result.add(builder.createRelatedMergeableLineMarkerInfo(identifier));
   }
 }

@@ -30,7 +30,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
 import com.intellij.spring.constants.SpringCorePresentationConstants;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.stereotype.SpringMetaStereotypeComponent;
 import com.intellij.util.Function;
 
 import java.util.Collection;
@@ -38,7 +37,7 @@ import java.util.Collection;
 import cn.taketoday.assistant.AnnotationConstant;
 
 @Presentation(typeName = SpringCorePresentationConstants.CONTROLLER)
-public class Controller extends SpringMetaStereotypeComponent {
+public class Controller extends InfraMetaStereotypeComponent {
   public static final SemKey<JamMemberMeta<PsiClass, Controller>> META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("InfraControllerMeta");
   public static final SemKey<Controller> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("InfraController");
   public static final JamClassMeta<Controller> META = new JamClassMeta<>(null, Controller.class, JAM_KEY);

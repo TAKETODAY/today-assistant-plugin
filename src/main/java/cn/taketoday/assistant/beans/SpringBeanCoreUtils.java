@@ -52,7 +52,6 @@ import com.intellij.spring.model.BeanService;
 import com.intellij.spring.model.CommonSpringBean;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.SpringModelSearchParameters;
-import com.intellij.spring.model.utils.CommonUtils;
 import com.intellij.spring.model.utils.SpringModelSearchers;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.utils.SpringPropertyUtils;
@@ -86,6 +85,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import cn.taketoday.assistant.InfraConstant;
+import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -381,7 +381,7 @@ public final class SpringBeanCoreUtils {
 
   public static List<SpringBeanPointer<?>> getBeansByType(PsiType type, CommonSpringModel model) {
     PsiClass psiClass = PsiTypesUtil.getPsiClass(type);
-    if (CommonUtils.isSpringBeanCandidateClass(psiClass)) {
+    if (CommonUtils.isBeanCandidateClass(psiClass)) {
       return SpringModelSearchers.findBeans(model, SpringModelSearchParameters.byClass(psiClass).withInheritors().effectiveBeanTypes());
     }
     return Collections.emptyList();

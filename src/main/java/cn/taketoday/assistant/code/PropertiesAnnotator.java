@@ -37,11 +37,8 @@ import com.intellij.psi.util.PropertyUtilBase;
 import com.intellij.psi.xml.XmlElement;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringBundle;
 import com.intellij.spring.SpringModelVisitorUtils;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-import com.intellij.spring.model.utils.CommonUtils;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.xml.beans.SpringBean;
 import com.intellij.spring.model.xml.beans.SpringProperty;
@@ -66,13 +63,14 @@ import javax.swing.Icon;
 
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.JavaClassInfo;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.util.CommonUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:26
  */
-public final class PropertiesAnnotator extends AbstractAnnotator {
+public final class PropertiesAnnotator extends AbstractInfraAnnotator {
 
   @Override
   public String getId() {
@@ -93,7 +91,6 @@ public final class PropertiesAnnotator extends AbstractAnnotator {
   protected void collectNavigationMarkers(PsiElement psiElement, Collection<? super RelatedItemLineMarkerInfo<?>> result) {
     UClass uClass;
     PsiClass psiClass;
-    UMethod[] methods;
     UElement element = UastUtils.getUParentForIdentifier(psiElement);
     if (!(element instanceof UClass) || (psiClass = UElementKt.getAsJavaPsiElement((uClass = (UClass) element), PsiClass.class)) == null || !CommonUtils.isBeanCandidateClass(psiClass)) {
       return;
@@ -105,11 +102,16 @@ public final class PropertiesAnnotator extends AbstractAnnotator {
   }
 
   private static void addPropertiesGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier, NotNullLazyValue<Collection<? extends DomElement>> targets) {
-    SpringGutterIconBuilder<DomElement> builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.SpringProperty, NavigationGutterIconBuilder.DEFAULT_DOM_CONVERTOR,
-            NavigationGutterIconBuilder.DOM_GOTO_RELATED_ITEM_PROVIDER);
-    builder.setTargets(targets).setCellRenderer(SpringBeansPsiElementCellRenderer::new).setPopupTitle(SpringBundle.message("spring.bean.property.navigate.choose.class.title"))
-            .setTooltipText(SpringBundle.message("spring.bean.property.tooltip.navigate.declaration"));
-    result.add(builder.createSpringRelatedMergeableLineMarkerInfo(psiIdentifier));
+    var builder = GutterIconBuilder.create(
+            SpringApiIcons.Gutter.SpringProperty,
+            NavigationGutterIconBuilder.DEFAULT_DOM_CONVERTOR,
+            NavigationGutterIconBuilder.DOM_GOTO_RELATED_ITEM_PROVIDER
+    );
+    builder.setTargets(targets)
+            .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
+            .setPopupTitle(InfraBundle.message("bean.property.navigate.choose.class.title"))
+            .setTooltipText(InfraBundle.message("bean.property.tooltip.navigate.declaration"));
+    result.add(builder.createRelatedMergeableLineMarkerInfo(psiIdentifier));
   }
 
   @Override

@@ -36,7 +36,6 @@ import com.intellij.psi.PsiModifier;
 import com.intellij.semantic.SemKey;
 import com.intellij.spring.constants.SpringCorePresentationConstants;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.stereotype.SpringMetaStereotypeComponent;
 import com.intellij.spring.model.jam.stereotype.SpringPropertySource;
 import com.intellij.spring.model.jam.utils.SpringJamUtils;
 import com.intellij.util.Function;
@@ -52,7 +51,7 @@ import cn.taketoday.lang.Nullable;
  * @since 1.0 2022/8/21 15:53
  */
 @Presentation(typeName = SpringCorePresentationConstants.CONFIGURATION)
-public class Configuration extends SpringMetaStereotypeComponent {
+public class Configuration extends InfraMetaStereotypeComponent {
 
   private static final String PROXY_BEAN_METHODS_ATTR_NAME = "proxyBeanMethods";
 
@@ -63,8 +62,7 @@ public class Configuration extends SpringMetaStereotypeComponent {
    * @see CommonUtils#isConfiguration(PsiClass)
    * @see CommonUtils#isConfigurationOrMeta(PsiClass)
    */
-  public static final SemKey<Configuration> JAM_KEY =
-          JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("ConfigurationBean");
+  public static final SemKey<Configuration> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("ConfigurationBean");
 
   public static final JamClassMeta<Configuration> META =
           new JamClassMeta<>(null, Configuration.class, JAM_KEY);
@@ -112,8 +110,9 @@ public class Configuration extends SpringMetaStereotypeComponent {
   @Override
   @Nullable
   public String getBeanName() {
-    if (!isValid())
+    if (!isValid()) {
       return null;
+    }
     return StringUtil.decapitalize(StringUtil.notNullize(getConfigurationName(getPsiElement())));
   }
 

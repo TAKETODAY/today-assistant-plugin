@@ -78,10 +78,8 @@ import com.intellij.spring.model.SpringObjectFactoryEffectiveTypeProvider;
 import com.intellij.spring.model.highlighting.xml.SpringConstructorArgResolveUtil;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.jam.JamSpringBeanPointer;
-import com.intellij.spring.model.jam.SpringJamModel;
 import com.intellij.spring.model.jam.contexts.CustomContextJavaBean;
 import com.intellij.spring.model.jam.qualifiers.SpringJamQualifier;
-import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
 import com.intellij.spring.model.jam.testContexts.SpringTestContextUtil;
 import com.intellij.spring.model.utils.ExplicitRedefinitionAwareBeansCollector;
 import com.intellij.spring.model.utils.SpringBeanUtils;
@@ -123,8 +121,10 @@ import java.util.stream.Collectors;
 import cn.taketoday.assistant.AliasForUtils;
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.InfraConstant;
-import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.JavaeeConstant;
+import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.beans.stereotype.SpringJamModel;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.assistant.util.JamAnnotationTypeUtil;
 import cn.taketoday.lang.Nullable;
@@ -762,7 +762,7 @@ public final class AutowireUtil {
         AnnotatedMembersSearch.search(annoClass, scope).forEach(processor);
       }
     }
-    for (SpringStereotypeElement stereotypeElement : SpringJamModel.getModel(module).getStereotypeComponents()) {
+    for (InfraStereotypeElement stereotypeElement : SpringJamModel.from(module).getStereotypeComponents()) {
       PsiClass psiClass = stereotypeElement.getPsiElement();
       PsiMethod[] constructors = psiClass.getConstructors();
       if (constructors.length == 1 && !membersCandidate.contains(constructors[0])) {

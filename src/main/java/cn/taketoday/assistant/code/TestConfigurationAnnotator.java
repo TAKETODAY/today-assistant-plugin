@@ -33,7 +33,6 @@ import com.intellij.spring.CommonSpringModel;
 import com.intellij.spring.SpringApiIcons;
 import com.intellij.spring.SpringBundle;
 import com.intellij.spring.contexts.model.LocalModel;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.model.jam.testContexts.ContextConfiguration;
 import com.intellij.spring.model.jam.testContexts.SpringContextConfiguration;
 import com.intellij.spring.model.jam.testContexts.SpringContextHierarchy;
@@ -56,13 +55,14 @@ import javax.swing.Icon;
 
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.util.CommonUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 17:24
  */
-public class TestConfigurationAnnotator extends AbstractAnnotator {
+public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
 
   @Override
   public String getId() {
@@ -135,12 +135,12 @@ public class TestConfigurationAnnotator extends AbstractAnnotator {
           }
         }
 
-        SpringGutterIconBuilder<PsiElement> builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.Spring);
+        GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(SpringApiIcons.Gutter.Spring);
         builder.setTargets(toNavigate).setPopupTitle(SpringBundle.message("spring.app.context.to.navigate"))
                 .setTooltipText(SpringBundle.message("spring.app.context.navigate.tooltip"));
         PsiElement identifier = UAnnotationKt.getNamePsiElement(UastContextKt.toUElement(annotation, UAnnotation.class));
         if (identifier != null) {
-          result.add(builder.createSpringRelatedMergeableLineMarkerInfo(identifier));
+          result.add(builder.createRelatedMergeableLineMarkerInfo(identifier));
         }
       }
 

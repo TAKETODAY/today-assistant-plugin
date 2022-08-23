@@ -37,21 +37,17 @@ import com.intellij.psi.util.InheritanceUtil;
 import com.intellij.semantic.SemService;
 import com.intellij.spring.CommonSpringModel;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringBundle;
 import com.intellij.spring.contexts.model.LocalAnnotationModel;
 import com.intellij.spring.contexts.model.SpringModel;
 import com.intellij.spring.contexts.model.visitors.CommonSpringModelVisitorContext;
 import com.intellij.spring.contexts.model.visitors.SpringModelVisitors;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.jam.JamSpringBeanPointer;
 import com.intellij.spring.model.jam.javaConfig.SpringJavaBean;
 import com.intellij.spring.model.jam.javaConfig.SpringOldJavaConfigurationUtil;
 import com.intellij.spring.model.jam.stereotype.SpringImport;
-import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
-import com.intellij.spring.model.jam.utils.SpringJamUtils;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.xml.DomSpringBeanPointer;
 import com.intellij.util.SmartList;
@@ -69,13 +65,16 @@ import javax.swing.Icon;
 
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.JavaClassInfo;
+import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
+import cn.taketoday.assistant.service.InfraJamService;
 import cn.taketoday.assistant.util.CommonUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:26
  */
-public class BeanAnnotator extends AbstractAnnotator {
+public class BeanAnnotator extends AbstractInfraAnnotator {
   public static final List<String> bootAnnotations = List.of(
           "cn.taketoday.context.annotation.config.EnableAutoConfiguration"
   );
@@ -118,13 +117,13 @@ public class BeanAnnotator extends AbstractAnnotator {
         List<JamSpringBeanPointer> mappedBeans = JavaClassInfo.getSpringJavaClassInfo(psiClass).getStereotypeMappedBeans();
         for (JamSpringBeanPointer mappedBean : mappedBeans) {
           JamPsiMemberSpringBean<?> bean = mappedBean.getSpringBean();
-          if ((bean instanceof SpringJavaBean) || ((bean instanceof SpringStereotypeElement) && !psiClass.isEquivalentTo(bean.getPsiElement()))) {
+          if ((bean instanceof SpringJavaBean) || ((bean instanceof InfraStereotypeElement) && !psiClass.isEquivalentTo(bean.getPsiElement()))) {
             smartList.add(bean);
           }
         }
         CommonSpringModel model = SpringModelUtils.getInstance().getPsiClassSpringModel(psiClass);
         Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
-        ContainerUtil.addAllNotNull(smartList, SpringJamUtils.getInstance().findStereotypeConfigurationBeans(model, mappedBeans, module));
+        ContainerUtil.addAllNotNull(smartList, InfraJamService.getInstance().findStereotypeConfigurationBeans(model, mappedBeans, module));
         ContainerUtil.addAllNotNull(smartList, getImportConfigurations(model, psiClass));
         return smartList;
       }), SpringApiIcons.Gutter.SpringJavaBean);
@@ -167,22 +166,22 @@ public class BeanAnnotator extends AbstractAnnotator {
   private static void addMethodTypesGutterIcon(
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiMethod psiMethod,
           Collection<? extends Pair<PsiElement, JavaClassInfo.SpringMethodType>> targets) {
-    String tooltipText = SpringBundle.message("spring.bean.methods.tooltip.navigate.declaration");
+    String tooltipText = InfraBundle.message("bean.methods.tooltip.navigate.declaration");
     Icon icon = SpringApiIcons.Gutter.SpringBeanMethod;
     if (targets.size() == 1) {
       JavaClassInfo.SpringMethodType methodType = targets.iterator().next().second;
-      tooltipText = SpringBundle.message("spring.bean.method.tooltip.navigate.declaration", methodType.getName());
+      tooltipText = InfraBundle.message("bean.method.tooltip.navigate.declaration", methodType.getName());
       if (methodType == JavaClassInfo.SpringMethodType.FACTORY) {
         icon = SpringApiIcons.Gutter.FactoryMethodBean;
       }
     }
 
-    SpringGutterIconBuilder<PsiElement> builder = SpringGutterIconBuilder.createBuilder(icon);
+    GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(icon);
     builder.setTargets(ContainerUtil.mapNotNull(targets, (pair) -> {
               return (PsiElement) pair.getFirst();
             }))
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
-            .setPopupTitle(SpringBundle.message("bean.class.navigate.choose.class.title"))
+            .setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
             .setTooltipText(tooltipText);
 
     PsiIdentifier identifier = psiMethod.getNameIdentifier();
@@ -193,17 +192,17 @@ public class BeanAnnotator extends AbstractAnnotator {
   }
 
   private static void addSpringBeanGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier, NotNullLazyValue<Collection<? extends SpringBeanPointer<?>>> targets) {
-    var builder = SpringGutterIconBuilder.createBuilder(
+    var builder = GutterIconBuilder.create(
             SpringApiIcons.Gutter.SpringBean,
             NavigationGutterIconBuilderUtil.BEAN_POINTER_CONVERTOR,
             NavigationGutterIconBuilderUtil.AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
     );
     builder.setTargets(targets)
-            .setEmptyPopupText(SpringBundle.message("gutter.navigate.no.matching.beans"))
-            .setPopupTitle(SpringBundle.message("bean.class.navigate.choose.class.title"))
+            .setEmptyPopupText(InfraBundle.message("gutter.navigate.no.matching.beans"))
+            .setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
-            .setTooltipText(SpringBundle.message("spring.bean.class.tooltip.navigate.declaration"));
-    result.add(builder.createSpringGroupLineMarkerInfo(psiIdentifier));
+            .setTooltipText(InfraBundle.message("bean.class.tooltip.navigate.declaration"));
+    result.add(builder.createGroupLineMarkerInfo(psiIdentifier));
   }
 
   private static List<CommonModelElement> getImportConfigurations(CommonSpringModel model, PsiClass psiClass) {
