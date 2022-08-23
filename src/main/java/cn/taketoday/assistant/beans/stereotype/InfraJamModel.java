@@ -28,7 +28,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.spring.SpringModificationTrackersManager;
-import com.intellij.spring.model.custom.ComponentScanExtender;
 import com.intellij.util.SmartList;
 
 import java.util.ArrayList;
@@ -48,23 +47,23 @@ import cn.taketoday.assistant.util.JamAnnotationTypeUtil;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/23 15:01
  */
-public class SpringJamModel {
+public class InfraJamModel {
   private final Module myModule;
   private final JamService myJamService;
 
-  public SpringJamModel(Module module) {
+  public InfraJamModel(Module module) {
     this.myModule = module;
     this.myJamService = JamService.getJamService(myModule.getProject());
   }
 
   public List<InfraStereotypeElement> getStereotypeComponents() {
-    Project project = this.myModule.getProject();
+    Project project = myModule.getProject();
     if (DumbService.isDumb(project)) {
       return Collections.emptyList();
     }
     else {
       return CachedValuesManager.getManager(project).getCachedValue(myModule, () -> {
-        List<InfraStereotypeElement> components = this.getStereotypeComponents(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(this.myModule));
+        List<InfraStereotypeElement> components = getStereotypeComponents(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(this.myModule));
         return CachedValueProvider.Result.create(components, SpringModificationTrackersManager.getInstance(project).getOuterModelsDependencies());
       });
     }
@@ -87,7 +86,7 @@ public class SpringJamModel {
   }
 
   private List<CustomComponent> getCustomStereotypeComponents(GlobalSearchScope scope) {
-    SmartList smartList = new SmartList();
+    SmartList<CustomComponent> smartList = new SmartList<>();
     for (String anno : JamAnnotationTypeUtil.getUserDefinedCustomComponentAnnotations(myModule)) {
       smartList.addAll(myJamService.getJamClassElements(CustomComponent.JAM_KEY, anno, scope));
     }
@@ -95,9 +94,9 @@ public class SpringJamModel {
   }
 
   private List<InfraStereotypeElement> getStereotypeComponentExtensions(GlobalSearchScope scope) {
-    SmartList smartList = new SmartList();
-    for (ComponentScanExtender extender : ComponentScanExtender.EP_NAME.getExtensionList()) {
-      smartList.addAll(extender.getComponents(scope, this.myModule));
+    SmartList<InfraStereotypeElement> smartList = new SmartList<>();
+    for (ComponentScanImporter importer : ComponentScanImporter.EP_NAME.getExtensionList()) {
+      smartList.addAll(importer.getComponents(scope, this.myModule));
     }
     return smartList;
   }
@@ -115,25 +114,25 @@ public class SpringJamModel {
   }
 
   public List<Controller> getControllers(GlobalSearchScope scope) {
-    SmartList smartList = new SmartList();
+    SmartList<Controller> smartList = new SmartList<>();
     Collection<String> controllerAnnotations = Controller.getControllerAnnotations().fun(this.myModule);
     for (String anno : controllerAnnotations) {
-      smartList.addAll(this.myJamService.getJamClassElements(Controller.META, anno, scope));
+      smartList.addAll(myJamService.getJamClassElements(Controller.META, anno, scope));
     }
     return smartList;
   }
 
   private List<Repository> getRepositories(GlobalSearchScope scope) {
-    SmartList smartList = new SmartList();
+    SmartList<Repository> smartList = new SmartList<>();
     Collection<String> repositoryAnnotations = Repository.getRepositoryAnnotations().fun(this.myModule);
     for (String anno : repositoryAnnotations) {
-      smartList.addAll(this.myJamService.getJamClassElements(Repository.META, anno, scope));
+      smartList.addAll(myJamService.getJamClassElements(Repository.META, anno, scope));
     }
     return smartList;
   }
 
   private List<Service> getServices(GlobalSearchScope scope) {
-    SmartList smartList = new SmartList();
+    SmartList<Service> smartList = new SmartList<>();
     Collection<String> serviceAnnotations = Service.getServiceAnnotations().fun(this.myModule);
     for (String anno : serviceAnnotations) {
       smartList.addAll(this.myJamService.getJamClassElements(Service.META, anno, scope));
@@ -153,7 +152,7 @@ public class SpringJamModel {
     if (DumbService.isDumb(this.myModule.getProject())) {
       return Collections.emptyList();
     }
-    SmartList smartList = new SmartList();
+    SmartList<Configuration> smartList = new SmartList<>();
     Collection<String> configurationAnnotations = Configuration.getAnnotations().fun(this.myModule);
     for (String anno : configurationAnnotations) {
       smartList.addAll(this.myJamService.getJamClassElements(Configuration.META, anno, scope));
@@ -161,8 +160,8 @@ public class SpringJamModel {
     return smartList;
   }
 
-  public static SpringJamModel from(Module module) {
-    return module.getService(SpringJamModel.class);
+  public static InfraJamModel from(Module module) {
+    return module.getService(InfraJamModel.class);
   }
 
 }

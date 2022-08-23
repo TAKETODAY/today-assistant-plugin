@@ -63,7 +63,7 @@ public class ImportResource extends JamCommonModelElement<PsiClass> implements c
 
   @Override
   public List<XmlFile> getImportedResources(Module... contexts) {
-    SmartList smartList = new SmartList();
+    SmartList<XmlFile> smartList = new SmartList<>();
     Processor<Pair<List<XmlFile>, ? extends PsiElement>> collect = pair -> {
       smartList.addAll(pair.first);
       return true;
@@ -81,7 +81,7 @@ public class ImportResource extends JamCommonModelElement<PsiClass> implements c
   }
 
   protected List<JamStringAttributeElement<List<XmlFile>>> getValueAttrElements() {
-    return (List<JamStringAttributeElement<List<XmlFile>>>) ANNO_META.getAttribute(getPsiElement(), VALUE_ATTR_META);
+    return ANNO_META.getAttribute(getPsiElement(), VALUE_ATTR_META);
   }
 
   protected List<JamStringAttributeElement<List<XmlFile>>> getLocationsAttrElements() {
@@ -92,8 +92,8 @@ public class ImportResource extends JamCommonModelElement<PsiClass> implements c
     return ContainerUtil.concat(getValueAttrElements(), getLocationsAttrElements());
   }
 
-  protected boolean addFiles(Processor<Pair<List<XmlFile>, ? extends PsiElement>> processor, List<JamStringAttributeElement<List<XmlFile>>> valueAttributeElements,
-          PsiElement annotationElement, Module[] contexts) {
+  protected boolean addFiles(Processor<Pair<List<XmlFile>, ? extends PsiElement>> processor,
+          List<JamStringAttributeElement<List<XmlFile>>> valueAttributeElements, PsiElement annotationElement, Module[] contexts) {
     boolean useAnnotationAsElement = valueAttributeElements.size() == 1;
     for (JamStringAttributeElement<List<XmlFile>> element : valueAttributeElements) {
       List<XmlFile> value = element.getValue();

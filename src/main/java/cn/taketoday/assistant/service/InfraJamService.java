@@ -89,7 +89,7 @@ import java.util.Set;
 
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
-import cn.taketoday.assistant.beans.stereotype.SpringJamModel;
+import cn.taketoday.assistant.beans.stereotype.InfraJamModel;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -134,7 +134,7 @@ public class InfraJamService {
       return Collections.emptySet();
     }
     Set<CommonSpringBean> stereotypeElements = new LinkedHashSet<>();
-    for (CommonSpringBean stereotypeElement : SpringJamModel.from(module).getStereotypeComponents()) {
+    for (CommonSpringBean stereotypeElement : InfraJamModel.from(module).getStereotypeComponents()) {
       PsiElement identifyingPsiElement = stereotypeElement.getIdentifyingPsiElement();
       if (identifyingPsiElement instanceof PsiClass psiClass && isStereotypeAccepted(psiClass, names)) {
         stereotypeElements.add(stereotypeElement);

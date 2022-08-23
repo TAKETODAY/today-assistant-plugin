@@ -31,7 +31,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.spring.CommonSpringModel;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringBundle;
 import com.intellij.spring.contexts.model.LocalModel;
 import com.intellij.spring.model.jam.testContexts.ContextConfiguration;
 import com.intellij.spring.model.jam.testContexts.SpringContextConfiguration;
@@ -115,10 +114,11 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
     if (psiClass != null) {
       PsiAnnotation annotation = contextConfiguration.getAnnotation();
       if (annotation != null) {
-        Set<XmlFile> xmlContexts = new LinkedHashSet();
-        Set<PsiClass> javaContexts = new LinkedHashSet();
+        var xmlContexts = new LinkedHashSet<XmlFile>();
+        var toNavigate = new LinkedHashSet<PsiElement>();
+        var javaContexts = new LinkedHashSet<PsiClass>();
+
         SpringTestContextUtil.getInstance().discoverConfigFiles(contextConfiguration, xmlContexts, javaContexts, psiClass);
-        Set<PsiElement> toNavigate = new LinkedHashSet();
         toNavigate.addAll(xmlContexts);
         toNavigate.addAll(javaContexts);
         Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
@@ -127,7 +127,7 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
 
           for (SpringTestingImplicitContextsProvider provider : SpringTestingImplicitContextsProvider.EP_NAME.getExtensionList()) {
             for (CommonSpringModel model : provider.getModels(module, contextConfiguration, annotationActiveProfiles)) {
-              if (model instanceof LocalModel localModel) {
+              if (model instanceof LocalModel<?> localModel) {
                 toNavigate.add(localModel.getConfig());
               }
             }
@@ -135,8 +135,8 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
         }
 
         GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(SpringApiIcons.Gutter.Spring);
-        builder.setTargets(toNavigate).setPopupTitle(SpringBundle.message("spring.app.context.to.navigate"))
-                .setTooltipText(SpringBundle.message("spring.app.context.navigate.tooltip"));
+        builder.setTargets(toNavigate).setPopupTitle(InfraBundle.message("app.context.to.navigate"))
+                .setTooltipText(InfraBundle.message("app.context.navigate.tooltip"));
         PsiElement identifier = UAnnotationKt.getNamePsiElement(UastContextKt.toUElement(annotation, UAnnotation.class));
         if (identifier != null) {
           result.add(builder.createRelatedMergeableLineMarkerInfo(identifier));

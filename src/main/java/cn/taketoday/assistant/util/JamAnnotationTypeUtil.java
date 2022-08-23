@@ -51,6 +51,10 @@ import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.SemContributorUtil;
 
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/23 14:46
+ */
 public abstract class JamAnnotationTypeUtil {
 
   public static List<PsiClass> getQualifierAnnotationTypesWithChildren(Module module) {

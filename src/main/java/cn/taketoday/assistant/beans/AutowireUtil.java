@@ -124,7 +124,7 @@ import cn.taketoday.assistant.InfraConstant;
 import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
-import cn.taketoday.assistant.beans.stereotype.SpringJamModel;
+import cn.taketoday.assistant.beans.stereotype.InfraJamModel;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.assistant.util.JamAnnotationTypeUtil;
 import cn.taketoday.lang.Nullable;
@@ -762,7 +762,7 @@ public final class AutowireUtil {
         AnnotatedMembersSearch.search(annoClass, scope).forEach(processor);
       }
     }
-    for (InfraStereotypeElement stereotypeElement : SpringJamModel.from(module).getStereotypeComponents()) {
+    for (InfraStereotypeElement stereotypeElement : InfraJamModel.from(module).getStereotypeComponents()) {
       PsiClass psiClass = stereotypeElement.getPsiElement();
       PsiMethod[] constructors = psiClass.getConstructors();
       if (constructors.length == 1 && !membersCandidate.contains(constructors[0])) {

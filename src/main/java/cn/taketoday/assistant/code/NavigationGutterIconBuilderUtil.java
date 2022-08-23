@@ -27,7 +27,6 @@ import com.intellij.navigation.GotoRelatedItem;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringBundle;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.model.CommonSpringBean;
 import com.intellij.spring.model.SpringBeanPointer;
@@ -57,12 +56,13 @@ final class NavigationGutterIconBuilderUtil {
           = (pointer) -> {
     CommonSpringBean bean = pointer.getSpringBean();
     if (bean instanceof DomSpringBean) {
-      return Collections.singletonList(new DomGotoRelatedItem((DomSpringBean) bean, SpringBundle.message("autowired.dependencies.goto.related.item.group.name")));
+      return Collections.singletonList(new DomGotoRelatedItem((DomSpringBean) bean,
+              InfraBundle.message("autowired.dependencies.goto.related.item.group.name")));
     }
     else {
       PsiElement element = bean.getIdentifyingPsiElement();
       return element != null ? Collections.singletonList(
-              new GotoRelatedItem(element, SpringBundle.message("autowired.dependencies.goto.related.item.group.name"))) : Collections.emptyList();
+              new GotoRelatedItem(element, InfraBundle.message("autowired.dependencies.goto.related.item.group.name"))) : Collections.emptyList();
     }
   };
 
@@ -84,7 +84,7 @@ final class NavigationGutterIconBuilderUtil {
           Collection<? extends SpringBeanPointer<?>> collection,
           Collection<? super RelatedItemLineMarkerInfo<?>> holder, PsiElement identifier) {
 
-    addAutowiredBeansGutterIcon(collection, holder, identifier, SpringBundle.message("navigate.to.autowired.dependencies"));
+    addAutowiredBeansGutterIcon(collection, holder, identifier, InfraBundle.message("navigate.to.autowired.dependencies"));
   }
 
   static void addAutowiredBeansGutterIcon(

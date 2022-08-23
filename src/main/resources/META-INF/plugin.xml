@@ -41,6 +41,12 @@
   <depends config-file="lang-injections.xml" optional="true">org.intellij.intelliLang</depends>
   <depends config-file="inspections.xml" optional="true">org.intellij.intelliLang</depends>
 
+  <extensionPoints>
+    <extensionPoint name="componentScanImporter" dynamic="true"
+        interface="cn.taketoday.assistant.beans.stereotype.ComponentScanImporter" />
+
+  </extensionPoints>
+
   <extensions defaultExtensionNs="com.intellij">
     <facetType implementation="cn.taketoday.assistant.facet.TodayFacetType" />
     <library.type implementation="cn.taketoday.assistant.facet.InfraLibraryType" />
