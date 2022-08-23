@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraLibraryUtil;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -49,7 +49,7 @@ public class ConfigurationPropertiesDiscoverer extends CustomLocalComponentsDisc
     System.out.println("getCustomComponents");
     Module module = localModel.getModule();
     if (module != null && !module.isDisposed() && localModel instanceof LocalAnnotationModel) {
-      if (!TodayLibraryUtil.hasLibrary(module)) {
+      if (!InfraLibraryUtil.hasLibrary(module)) {
         return Collections.emptyList();
       }
       else {

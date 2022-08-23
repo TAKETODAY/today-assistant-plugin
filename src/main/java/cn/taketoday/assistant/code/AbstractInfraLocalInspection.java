@@ -29,7 +29,7 @@ import com.intellij.psi.PsiElementVisitor;
 
 import org.jetbrains.uast.UElement;
 
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraLibraryUtil;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -55,7 +55,7 @@ public abstract class AbstractInfraLocalInspection extends AbstractBaseUastLocal
   }
 
   public boolean isEnabledForModule(Module moduleForFile) {
-    return TodayLibraryUtil.hasLibrary(moduleForFile);
+    return InfraLibraryUtil.hasLibrary(moduleForFile);
   }
 
 }

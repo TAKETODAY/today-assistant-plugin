@@ -57,7 +57,7 @@ import java.util.Set;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.InfraBundle;
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.CachingGroup;
@@ -122,7 +122,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
     PsiElement psiElement = ContainerUtil.getFirstItem(elements);
     if (psiElement != null
             && CommonUtils.hasFacets(psiElement.getProject())
-            && TodayLibraryUtil.hasLibrary(psiElement.getProject())) {
+            && InfraLibraryUtil.hasLibrary(psiElement.getProject())) {
       super.collectNavigationMarkers(elements, result, forNavigation);
     }
   }

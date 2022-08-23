@@ -25,15 +25,17 @@ import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.constants.SpringAnnotationsConstants;
 import com.intellij.spring.constants.SpringCorePresentationConstants;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.jam.stereotype.SpringMetaStereotypeComponent;
 import com.intellij.util.Function;
 
 import java.util.Collection;
+
+import cn.taketoday.assistant.AnnotationConstant;
 
 @Presentation(typeName = SpringCorePresentationConstants.CONTROLLER)
 public class Controller extends SpringMetaStereotypeComponent {
@@ -42,11 +44,15 @@ public class Controller extends SpringMetaStereotypeComponent {
   public static final JamClassMeta<Controller> META = new JamClassMeta<>(null, Controller.class, JAM_KEY);
 
   private static final Function<Module, Collection<String>> ANNOTATIONS = module -> {
-    return getAnnotations(module, SpringAnnotationsConstants.CONTROLLER);
+    return getAnnotations(module, AnnotationConstant.CONTROLLER);
   };
 
   public Controller(PsiClass psiClass) {
-    this(SpringAnnotationsConstants.CONTROLLER, psiClass);
+    this(AnnotationConstant.CONTROLLER, psiClass);
+  }
+
+  public Controller(Pair<String, PsiClass> pair) {
+    super(pair.getFirst(), pair.getSecond());
   }
 
   public Controller(String anno, PsiClass psiClass) {

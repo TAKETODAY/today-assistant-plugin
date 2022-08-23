@@ -25,15 +25,17 @@ import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.constants.SpringAnnotationsConstants;
 import com.intellij.spring.constants.SpringCorePresentationConstants;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.jam.stereotype.SpringMetaStereotypeComponent;
 import com.intellij.util.Function;
 
 import java.util.Collection;
+
+import cn.taketoday.assistant.AnnotationConstant;
 
 @Presentation(typeName = SpringCorePresentationConstants.SERVICE)
 public class Service extends SpringMetaStereotypeComponent {
@@ -42,11 +44,15 @@ public class Service extends SpringMetaStereotypeComponent {
   public static final JamClassMeta<Service> META = new JamClassMeta<>(null, Service.class, JAM_KEY);
 
   private static final Function<Module, Collection<String>> ANNOTATIONS = module -> {
-    return getAnnotations(module, SpringAnnotationsConstants.SERVICE);
+    return getAnnotations(module, AnnotationConstant.SERVICE);
   };
 
   public Service(PsiClass psiClass) {
-    this(SpringAnnotationsConstants.SERVICE, psiClass);
+    this(AnnotationConstant.SERVICE, psiClass);
+  }
+
+  public Service(Pair<String, PsiClass> pair) {
+    super(pair.getFirst(), pair.getSecond());
   }
 
   public Service(String anno, PsiClass psiClass) {

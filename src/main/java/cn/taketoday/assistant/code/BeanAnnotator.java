@@ -130,7 +130,7 @@ public class BeanAnnotator extends AbstractAnnotator {
       }), SpringApiIcons.Gutter.SpringJavaBean);
       PsiClassType classType = JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass);
       result.add(AutowiredAnnotator.getNavigateToAutowiredCandidatesBuilder(psiClass, classType)
-              .createSpringGroupLineMarkerInfo(identifier)
+              .createGroupLineMarkerInfo(identifier)
       );
     }
   }

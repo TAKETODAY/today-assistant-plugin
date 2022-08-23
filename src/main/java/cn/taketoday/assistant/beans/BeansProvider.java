@@ -40,7 +40,6 @@ import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.SpringModelSearchParameters;
 import com.intellij.spring.model.custom.CustomLocalComponentsDiscoverer;
 import com.intellij.spring.model.jam.stereotype.CustomSpringComponent;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.spring.model.utils.SpringPropertyUtils;
 import com.intellij.spring.model.utils.search.SpringBeanSearchParameters;
 import com.intellij.spring.model.xml.beans.SpringPropertyDefinition;
@@ -50,6 +49,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
 public class BeansProvider extends CustomLocalComponentsDiscoverer {
@@ -71,7 +71,7 @@ public class BeansProvider extends CustomLocalComponentsDiscoverer {
 
   public void collectMappers(LocalXmlModel springModel, Module module, Collection<CommonSpringBean> myBatisMappers, String className) {
     VirtualFile configFile;
-    PsiClass mapperFactoryBeanClass = SpringCommonUtils.findLibraryClass(module, className);
+    PsiClass mapperFactoryBeanClass = CommonUtils.findLibraryClass(module, className);
     if (mapperFactoryBeanClass == null || (configFile = springModel.getConfig().getVirtualFile()) == null) {
       return;
     }

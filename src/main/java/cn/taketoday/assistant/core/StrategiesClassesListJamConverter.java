@@ -36,7 +36,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceBase;
-import com.intellij.spring.spi.SpringSpiManager;
 import com.intellij.util.containers.ContainerUtil;
 
 import cn.taketoday.lang.Nullable;
@@ -122,7 +121,7 @@ public class StrategiesClassesListJamConverter extends JamConverter<PsiClass> {
       }
       VirtualFile containingFile = literal.getContainingFile().getOriginalFile().getVirtualFile();
       boolean isInTest = containingFile != null && ModuleRootManager.getInstance(module).getFileIndex().isInTestSourceContent(containingFile);
-      return SpringSpiManager.getInstance(module).getClassesListValue(isInTest, configKey);
+      return StrategiesManager.from(module).getClassesListValue(isInTest, configKey);
     }
 
     

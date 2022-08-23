@@ -44,18 +44,12 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PropertyUtilBase;
 import com.intellij.spring.CommonSpringModel;
 import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringBundle;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.impl.SpringAutoConfiguredModels;
-
-import cn.taketoday.assistant.InfraBundle;
-import cn.taketoday.assistant.JavaClassInfo;
 import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
-import com.intellij.spring.model.utils.SpringAutowireUtil;
 import com.intellij.spring.model.utils.SpringBeanFactoryUtils;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.spring.model.utils.SpringModelSearchers;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.xml.beans.Autowire;
@@ -79,6 +73,10 @@ import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.JavaClassInfo;
+import cn.taketoday.assistant.beans.AutowireUtil;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -177,7 +175,7 @@ public class AutowiredAnnotator extends AbstractAnnotator {
       if (bean != null) {
         UAnnotation annotationFromBean = UastContextKt.toUElement(bean.getPsiAnnotation(), UAnnotation.class);
         if (Objects.equals(annotationFromBean, uAnnotation)) {
-          result.add(getNavigateToAutowiredCandidatesBuilder(method, method.getReturnType()).createSpringRelatedMergeableLineMarkerInfo(psiElement));
+          result.add(getNavigateToAutowiredCandidatesBuilder(method, method.getReturnType()).createRelatedMergeableLineMarkerInfo(psiElement));
         }
       }
     }
@@ -191,7 +189,7 @@ public class AutowiredAnnotator extends AbstractAnnotator {
 
   public static boolean checkAutowiredMethod(PsiMethod method, @Nullable Collection<? super RelatedItemLineMarkerInfo<?>> result, JavaClassInfo info, PsiElement identifier) {
 
-    CommonSpringModel model = SpringAutowireUtil.getProcessingSpringModel(method.getContainingClass());
+    CommonSpringModel model = AutowireUtil.getProcessingSpringModel(method.getContainingClass());
     if (model != null) {
       for (Autowire autowire : info.getAutowires()) {
         if (autowire == Autowire.BY_TYPE) {
@@ -217,7 +215,7 @@ public class AutowiredAnnotator extends AbstractAnnotator {
     if (collection != null && !collection.isEmpty()) {
       if (result != null) {
         NavigationGutterIconBuilderUtil.addAutowiredBeansGutterIcon(collection, result, identifier,
-                SpringBundle.message("navigate.to.by.name.autowired.dependencies"));
+                InfraBundle.message("navigate.to.by.name.autowired.dependencies"));
       }
 
       return true;
@@ -252,8 +250,8 @@ public class AutowiredAnnotator extends AbstractAnnotator {
     if (identifier != null) {
       PsiField field = UElementKt.getAsJavaPsiElement(ufield, PsiField.class);
       if (field != null) {
-        if (SpringAutowireUtil.isAutowiredByAnnotation(field)) {
-          CommonSpringModel processor = SpringAutowireUtil.getProcessingSpringModel(field.getContainingClass());
+        if (AutowireUtil.isAutowiredByAnnotation(field)) {
+          CommonSpringModel processor = AutowireUtil.getProcessingSpringModel(field.getContainingClass());
           if (processor != null) {
             processVariable(field, result, processor, identifier, field.getType());
           }
@@ -265,10 +263,10 @@ public class AutowiredAnnotator extends AbstractAnnotator {
 
   private static void processAnnotatedMethod(UMethod uMethod, PsiElement identifier, Collection<? super RelatedItemLineMarkerInfo<?>> result) {
     PsiMethod method = uMethod.getJavaPsi();
-    if (SpringAutowireUtil.isInjectionPoint(method)) {
-      CommonSpringModel model = SpringAutowireUtil.getProcessingSpringModel(method.getContainingClass());
+    if (AutowireUtil.isInjectionPoint(method)) {
+      CommonSpringModel model = AutowireUtil.getProcessingSpringModel(method.getContainingClass());
       if (model != null) {
-        if (SpringAutowireUtil.getResourceAnnotation(method) != null && PropertyUtilBase.isSimplePropertySetter(method)) {
+        if (AutowireUtil.getResourceAnnotation(method) != null && PropertyUtilBase.isSimplePropertySetter(method)) {
           UParameter uParameter = uMethod.getUastParameters().get(0);
           if (identifier == UElementKt.getSourcePsiElement(uParameter.getUastAnchor())) {
             processVariable(method, result, model, identifier, uParameter.getType());
@@ -292,7 +290,7 @@ public class AutowiredAnnotator extends AbstractAnnotator {
           PsiModifierListOwner variable, @Nullable Collection<? super RelatedItemLineMarkerInfo<?>> result,
           CommonSpringModel model, PsiElement identifier, PsiType type) {
 
-    Collection<SpringBeanPointer<?>> list = SpringAutowireUtil.getAutowiredBeansFor(variable, getAutowiredType(type), model);
+    Collection<SpringBeanPointer<?>> list = AutowireUtil.getAutowiredBeansFor(variable, getAutowiredType(type), model);
     if (!list.isEmpty()) {
       if (result != null) {
         NavigationGutterIconBuilderUtil.addAutowiredBeansGutterIcon(list, result, identifier);
@@ -306,8 +304,8 @@ public class AutowiredAnnotator extends AbstractAnnotator {
   }
 
   private static PsiType getAutowiredType(PsiType type) {
-    if (SpringAutowireUtil.isJavaUtilOptional(type)) {
-      PsiType optionalType = SpringAutowireUtil.getOptionalType(type);
+    if (AutowireUtil.isJavaUtilOptional(type)) {
+      PsiType optionalType = AutowireUtil.getOptionalType(type);
       if (optionalType != null) {
         return optionalType;
       }
@@ -315,24 +313,24 @@ public class AutowiredAnnotator extends AbstractAnnotator {
     return type;
   }
 
-  public static SpringGutterIconBuilder<PsiElement> getNavigateToAutowiredCandidatesBuilder(PsiMember psiMember, PsiType type) {
+  public static GutterIconBuilder<PsiElement> getNavigateToAutowiredCandidatesBuilder(PsiMember psiMember, PsiType type) {
 
-    SpringGutterIconBuilder<PsiElement> builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.ShowAutowiredCandidates);
-    builder.setPopupTitle(SpringBundle.message("gutter.choose.autowired.candidates.title"))
-            .setEmptyPopupText(SpringBundle.message("gutter.navigate.no.matching.autowired.candidates"))
-            .setTooltipText(SpringBundle.message("gutter.navigate.to.autowired.candidates.title")).setTargets(NotNullLazyValue.lazy(() -> {
+    var builder = GutterIconBuilder.create(SpringApiIcons.Gutter.ShowAutowiredCandidates);
+    builder.setPopupTitle(InfraBundle.message("gutter.choose.autowired.candidates.title"))
+            .setEmptyPopupText(InfraBundle.message("gutter.navigate.no.matching.autowired.candidates"))
+            .setTooltipText(InfraBundle.message("gutter.navigate.to.autowired.candidates.title")).setTargets(NotNullLazyValue.lazy(() -> {
               if (!psiMember.isValid()) {
                 return Collections.emptySet();
               }
               else {
                 Module moduleForPsiElement = ModuleUtilCore.findModuleForPsiElement(psiMember);
                 if (moduleForPsiElement != null) {
-                  return SpringAutowireUtil.getAutowiredMembers(type, moduleForPsiElement, psiMember);
+                  return AutowireUtil.getAutowiredMembers(type, moduleForPsiElement, psiMember);
                 }
                 else {
                   Set<PsiModifierListOwner> members = new LinkedHashSet<>();
                   for (Module module : getRelatedSpringModules(psiMember)) {
-                    members.addAll(SpringAutowireUtil.getAutowiredMembers(type, module, psiMember));
+                    members.addAll(AutowireUtil.getAutowiredMembers(type, module, psiMember));
                   }
                   return members;
                 }
@@ -351,11 +349,11 @@ public class AutowiredAnnotator extends AbstractAnnotator {
           PsiClassType psiClassType = JavaPsiFacade.getInstance(method.getProject()).getElementFactory().createType(containingClass);
           Set<PsiElement> callsForBean = SpringBeanFactoryUtils.findBeanFactoryCallsForBean(moduleForPsiElement, psiClassType, method.getName(), SpringBeanFactoryUtils.getParamTypes(method));
           if (!callsForBean.isEmpty()) {
-            SpringGutterIconBuilder<PsiElement> builder = SpringGutterIconBuilder.createBuilder(SpringApiIcons.Gutter.ShowAutowiredCandidates);
-            builder.setPopupTitle(SpringBundle.message("gutter.choose.bean.factory.calls.title"))
-                    .setEmptyPopupText(SpringBundle.message("gutter.navigate.no.bean.factory.calls"))
-                    .setTooltipText(SpringBundle.message("gutter.navigate.to.bean.factory.calls.title")).setTargets(callsForBean);
-            result.add(builder.createSpringRelatedMergeableLineMarkerInfo(identifier));
+            GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(SpringApiIcons.Gutter.ShowAutowiredCandidates);
+            builder.setPopupTitle(InfraBundle.message("gutter.choose.bean.factory.calls.title"))
+                    .setEmptyPopupText(InfraBundle.message("gutter.navigate.no.bean.factory.calls"))
+                    .setTooltipText(InfraBundle.message("gutter.navigate.to.bean.factory.calls.title")).setTargets(callsForBean);
+            result.add(builder.createRelatedMergeableLineMarkerInfo(identifier));
           }
         }
       }
@@ -371,8 +369,8 @@ public class AutowiredAnnotator extends AbstractAnnotator {
     );
     builder.setTargets(targets)
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
-            .setPopupTitle(SpringBundle.message("spring.bean.constructor.navigate.choose.class.title"))
-            .setTooltipText(SpringBundle.message("spring.bean.constructor.tooltip.navigate.declaration"));
+            .setPopupTitle(InfraBundle.message("bean.constructor.navigate.choose.class.title"))
+            .setTooltipText(InfraBundle.message("bean.constructor.tooltip.navigate.declaration"));
     result.add(builder.createSpringRelatedMergeableLineMarkerInfo(psiIdentifier));
   }
 
@@ -394,7 +392,7 @@ public class AutowiredAnnotator extends AbstractAnnotator {
         else {
           boolean allowAutoConfig = SpringAutoConfiguredModels.isAllowAutoConfiguration(element.getProject());
           return fileIndex.getOrderEntriesForFile(virtualFile).stream().map(OrderEntry::getOwnerModule).filter((module) -> {
-            return SpringCommonUtils.hasSpringFacet(module) || allowAutoConfig && SpringModelUtils.getInstance().hasAutoConfiguredModels(module);
+            return CommonUtils.hasFacet(module) || allowAutoConfig && SpringModelUtils.getInstance().hasAutoConfiguredModels(module);
           }).collect(Collectors.toSet());
         }
       }

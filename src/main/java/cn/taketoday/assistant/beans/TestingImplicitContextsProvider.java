@@ -131,8 +131,8 @@ public class TestingImplicitContextsProvider extends SpringTestingImplicitContex
 
   private static List<CommonSpringBean> getImplicitBeans(JavaPsiFacade facade, GlobalSearchScope searchScope) {
     List<CommonSpringBean> beans = new SmartList<>();
-    ContainerUtil.addIfNotNull(beans, SpringImplicitBean.create("Testing Beans", facade.findClass("org.springframework.boot.test.web.client.TestRestTemplate", searchScope), "testRestTemplate"));
-    ContainerUtil.addIfNotNull(beans, SpringImplicitBean.create("Testing Beans", facade.findClass("org.springframework.test.web.reactive.server.WebTestClient", searchScope), "webTestClient"));
+    ContainerUtil.addIfNotNull(beans, SpringImplicitBean.create("Testing Beans", facade.findClass("cn.taketoday.boot.test.web.client.TestRestTemplate", searchScope), "testRestTemplate"));
+    ContainerUtil.addIfNotNull(beans, SpringImplicitBean.create("Testing Beans", facade.findClass("cn.taketoday.test.web.reactive.server.WebTestClient", searchScope), "webTestClient"));
 
     return beans;
   }

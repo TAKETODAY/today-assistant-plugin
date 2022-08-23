@@ -62,11 +62,12 @@ import com.intellij.spring.boot.model.testing.jam.custom.SpringApplicationConfig
 import com.intellij.spring.boot.model.testing.jam.mock.CustomJamMockBean;
 import com.intellij.spring.boot.model.testing.jam.mock.SpringJamMockBean;
 import com.intellij.spring.boot.model.testing.jam.mock.SpringJamMockBeans;
-import com.intellij.spring.model.aliasFor.SpringAliasForUtils;
 
 import com.intellij.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
+
+import cn.taketoday.assistant.AliasForUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -185,7 +186,7 @@ final class SpringBootAutoconfigureSemContributor extends SemContributor {
             SemContributorUtil.createFunction(CustomConfigurationPropertiesScan.JAM_KEY, CustomConfigurationPropertiesScan.class,
                     SemContributorUtil.getCustomMetaAnnotations("cn.taketoday.boot.context.properties.ConfigurationPropertiesScan"), (pair) -> {
                       return new CustomConfigurationPropertiesScan(pair.first, (PsiClass) pair.second);
-                    }, (Consumer) null, SpringAliasForUtils.getAnnotationMetaProducer(CustomConfigurationPropertiesScan.JAM_ANNO_META_KEY, ConfigurationPropertiesScan.META)));
+                    }, (Consumer) null, AliasForUtils.getAnnotationMetaProducer(CustomConfigurationPropertiesScan.JAM_ANNO_META_KEY, ConfigurationPropertiesScan.META)));
   }
 
   private static <T extends JamElement> void registerConditionalOn(SemRegistrar registrar, String annotationFQN, JamClassMeta<T> classMeta, JamMethodMeta<T> methodMeta) {

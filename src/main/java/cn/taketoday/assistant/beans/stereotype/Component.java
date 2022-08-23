@@ -22,14 +22,16 @@ package cn.taketoday.assistant.beans.stereotype;
 
 import com.intellij.ide.presentation.Presentation;
 import com.intellij.jam.reflect.JamClassMeta;
+import com.intellij.openapi.util.Pair;
+import com.intellij.patterns.PsiClassPattern;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
-import com.intellij.spring.constants.SpringAnnotationsConstants;
+import com.intellij.semantic.SemRegistrar;
 import com.intellij.spring.constants.SpringCorePresentationConstants;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
 
-import org.jetbrains.annotations.NotNull;
+import cn.taketoday.assistant.AnnotationConstant;
 
 @Presentation(typeName = SpringCorePresentationConstants.COMPONENT)
 public class Component extends SpringStereotypeElement {
@@ -42,7 +44,11 @@ public class Component extends SpringStereotypeElement {
   }
 
   public Component(PsiClass psiClass) {
-    super(SpringAnnotationsConstants.COMPONENT, PsiElementRef.real(psiClass));
+    super(AnnotationConstant.COMPONENT, PsiElementRef.real(psiClass));
+  }
+
+  public static void register(SemRegistrar registrar, PsiClassPattern prototype) {
+    META.register(registrar, prototype.withAnnotation(AnnotationConstant.COMPONENT));
   }
 
 }

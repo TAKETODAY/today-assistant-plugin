@@ -41,7 +41,7 @@ import com.intellij.spring.SpringBundle;
 import com.intellij.spring.SpringModelVisitorUtils;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
 import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-import com.intellij.spring.model.utils.SpringCommonUtils;
+import com.intellij.spring.model.utils.CommonUtils;
 import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.spring.model.xml.beans.SpringBean;
 import com.intellij.spring.model.xml.beans.SpringProperty;
@@ -117,7 +117,7 @@ public final class PropertiesAnnotator extends AbstractAnnotator {
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
     if (psiClass != null) {
       Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
-      if (SpringCommonUtils.isSpringEnabledModule(module)) {
+      if (CommonUtils.isInfraEnabledModule(module)) {
         JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
         if (info.isMappedDomBean() || info.isStereotypeJavaBean()) {
           return;

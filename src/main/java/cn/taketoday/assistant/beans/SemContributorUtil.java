@@ -40,6 +40,7 @@ import com.intellij.semantic.SemService;
 import com.intellij.spring.constants.SpringJavaeeConstants;
 import com.intellij.spring.model.jam.JamCustomImplementationBean;
 import com.intellij.spring.model.jam.stereotype.SpringStereotypeElement;
+
 import com.intellij.spring.model.jam.utils.JamAnnotationTypeUtil;
 import com.intellij.util.Consumer;
 import com.intellij.util.Function;
@@ -55,7 +56,8 @@ import java.util.Set;
 
 import cn.taketoday.assistant.AliasForUtils;
 import cn.taketoday.assistant.AnnotationConstant;
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.JavaeeConstant;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.lang.Nullable;
 
 import static cn.taketoday.assistant.AnnotationConstant.CONFIGURATION;
@@ -72,7 +74,7 @@ public final class SemContributorUtil {
                   REPOSITORY,
                   SERVICE,
                   CONFIGURATION,
-                  SpringJavaeeConstants.JAVAX_NAMED,
+                  JavaeeConstant.JAVAX_NAMED,
                   SpringJavaeeConstants.JAKARTA_NAMED
           };
 
@@ -139,11 +141,11 @@ public final class SemContributorUtil {
         return null;
       if (psiMember instanceof PsiClass && ((PsiClass) psiMember).isAnnotationType())
         return null;
-      if (!TodayLibraryUtil.hasLibrary(project))
+      if (!InfraLibraryUtil.hasLibrary(project))
         return null;
 
       Module module = ModuleUtilCore.findModuleForPsiElement(psiMember);
-      if (module != null && !TodayLibraryUtil.hasLibrary(module))
+      if (module != null && !InfraLibraryUtil.hasLibrary(module))
         return null;
       for (String anno : annotationsGetter.fun(module)) {
         if (AnnotationUtil.isAnnotated(psiMember, anno, AnnotationUtil.CHECK_HIERARCHY)) {
@@ -207,11 +209,11 @@ public final class SemContributorUtil {
         return null;
       if (psiMember instanceof PsiClass && ((PsiClass) psiMember).isAnnotationType())
         return null;
-      if (!TodayLibraryUtil.hasLibrary(project))
+      if (!InfraLibraryUtil.hasLibrary(project))
         return null;
 
       Module module = ModuleUtilCore.findModuleForPsiElement(psiMember);
-      if (module != null && !TodayLibraryUtil.hasLibrary(module))
+      if (module != null && !InfraLibraryUtil.hasLibrary(module))
         return null;
 
       Collection<JamMemberMeta<Psi, T>> metas = new HashSet<>();
@@ -367,7 +369,7 @@ public final class SemContributorUtil {
     }
 
     private Collection<PsiClass> getAnnotationTypes(Module module, String anno) {
-      if (!TodayLibraryUtil.hasLibrary(module))
+      if (!InfraLibraryUtil.hasLibrary(module))
         return Collections.emptyList();
 
       return myWithTests ?

@@ -35,7 +35,6 @@ import com.intellij.lang.jvm.actions.MemberRequestsKt;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiModifierListOwner;
-import com.intellij.spring.SpringBundle;
 
 import org.jetbrains.uast.UAnnotated;
 import org.jetbrains.uast.UAnnotation;
@@ -50,6 +49,7 @@ import java.util.List;
 import java.util.Objects;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.lang.Nullable;
 import kotlin.jvm.functions.Function0;
@@ -79,7 +79,7 @@ public final class EventListenerInspection extends AbstractInfraLocalInspection 
     if (method.getUastParameters().size() > 1) {
       PsiElement psiElement = getListenerElement(method);
       if (psiElement != null) {
-        String message = SpringBundle.message("event.listener.method.parameters.count");
+        String message = InfraBundle.message("event.listener.method.parameters.count");
         LocalQuickFix[] wrapToQuickFixes = IntentionWrapper.wrapToQuickFixes(
                 new IntentionAction[0], psiElement.getContainingFile());
         holder.registerProblem(psiElement, message,
@@ -87,7 +87,7 @@ public final class EventListenerInspection extends AbstractInfraLocalInspection 
       }
     }
     if (method.getVisibility() != UastVisibility.PUBLIC) {
-      String message = SpringBundle.message("event.listener.method.visibility.public");
+      String message = InfraBundle.message("event.listener.method.visibility.public");
 
       PsiElement namePsiElement = getListenerElement(method);
       if (namePsiElement != null) {
@@ -106,7 +106,7 @@ public final class EventListenerInspection extends AbstractInfraLocalInspection 
         List<IntentionAction> actions = JvmElementActionFactories.createModifierActions(method, MemberRequestsKt.modifierRequest(JvmModifier.STATIC, false));
         Object[] array3 = actions.toArray(new IntentionAction[0]);
         LocalQuickFix[] wrapToQuickFixes3 = IntentionWrapper.wrapToQuickFixes((IntentionAction[]) array3, element.getContainingFile());
-        String message = SpringBundle.message("event.listener.method.visibility.nonstatic");
+        String message = InfraBundle.message("event.listener.method.visibility.nonstatic");
         holder.registerProblem(element, message, problemHighlightType3, Arrays.copyOf(wrapToQuickFixes3, wrapToQuickFixes3.length));
       }
     }

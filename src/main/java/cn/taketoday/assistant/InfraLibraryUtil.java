@@ -38,7 +38,7 @@ import cn.taketoday.lang.Nullable;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 00:25
  */
-public class TodayLibraryUtil {
+public class InfraLibraryUtil {
 
   public static boolean hasLibrary(Project project) {
     return JavaLibraryUtils.hasLibraryClass(project, TodayVersion.ANY.getDetectionClassFqn());

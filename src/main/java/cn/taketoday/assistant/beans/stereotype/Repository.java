@@ -20,16 +20,19 @@
 
 package cn.taketoday.assistant.beans.stereotype;
 
+import com.intellij.ide.presentation.Presentation;
 import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.jam.reflect.JamMemberMeta;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.jam.stereotype.SpringMetaStereotypeComponent;
-import com.intellij.spring.model.jam.stereotype.SpringRepository;
 import com.intellij.util.Function;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -39,10 +42,11 @@ import cn.taketoday.assistant.AnnotationConstant;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 15:58
  */
+@Presentation(typeName = "@Repository")
 public class Repository extends SpringMetaStereotypeComponent {
-  public static final SemKey<JamMemberMeta<PsiClass, SpringRepository>> META_KEY;
-  public static final SemKey<SpringRepository> JAM_KEY;
-  public static final JamClassMeta<SpringRepository> META;
+  public static final SemKey<JamMemberMeta<PsiClass, Repository>> META_KEY;
+  public static final SemKey<Repository> JAM_KEY;
+  public static final JamClassMeta<Repository> META;
   private static final Function<Module, Collection<String>> ANNOTATIONS;
 
   public Repository(PsiClass psiClass) {
@@ -53,13 +57,22 @@ public class Repository extends SpringMetaStereotypeComponent {
     super(anno, psiClass);
   }
 
+  public Repository(Pair<String, PsiClass> pair) {
+    super(pair.getFirst(), pair.getSecond());
+  }
+
   static {
     META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("RepositoryMeta");
     JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("Repository");
-    META = new JamClassMeta<>(null, SpringRepository.class, JAM_KEY);
+    META = new JamClassMeta<>(null, Repository.class, JAM_KEY);
     addPomTargetProducer(META);
     ANNOTATIONS = (module) -> {
       return getAnnotations(module, AnnotationConstant.REPOSITORY);
     };
   }
+
+  public static Function<Module, Collection<String>> getRepositoryAnnotations() {
+    return ANNOTATIONS;
+  }
+
 }

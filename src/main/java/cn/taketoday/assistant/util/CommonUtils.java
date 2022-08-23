@@ -47,8 +47,11 @@ import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.psi.util.ParameterizedCachedValueProvider;
 import com.intellij.psi.util.PsiUtil;
+import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.model.utils.SpringModelUtils;
+import com.intellij.spring.model.xml.DomSpringBeanPointer;
+import com.intellij.spring.model.xml.beans.CollectionElements;
 import com.intellij.util.containers.ConcurrentFactoryMap;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -56,16 +59,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.UElement;
 import org.jetbrains.uast.UElementKt;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import cn.taketoday.assistant.AnnotationConstant;
-import cn.taketoday.assistant.TodayLibraryUtil;
-import cn.taketoday.assistant.beans.ConfigurationBean;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.beans.stereotype.Component;
+import cn.taketoday.assistant.beans.stereotype.Configuration;
 import cn.taketoday.assistant.facet.TodayFacet;
 import cn.taketoday.lang.Nullable;
 
@@ -192,7 +197,7 @@ public abstract class CommonUtils {
     if (!isBeanCandidateClass(psiClass))
       return false;
     return JamService.getJamService(psiClass.getProject())
-            .getJamElement(ConfigurationBean.JAM_KEY, psiClass) != null;
+            .getJamElement(Configuration.JAM_KEY, psiClass) != null;
   }
 
   /**
@@ -253,7 +258,7 @@ public abstract class CommonUtils {
       return false;
     }
 
-    if (!TodayLibraryUtil.hasLibrary(psiClass.getProject())) {
+    if (!InfraLibraryUtil.hasLibrary(psiClass.getProject())) {
       return false;
     }
 
@@ -288,6 +293,20 @@ public abstract class CommonUtils {
     if (psi == null)
       return false;
     return isInfraEnabledModule(ModuleUtilCore.findModuleForPsiElement(psi));
+  }
+
+  public static Set<SpringBeanPointer<?>> filterInnerClassBeans(Collection<SpringBeanPointer<?>> pointers) {
+    return pointers.stream()
+            .filter(pointer -> !isDefinedAsCollectionElement(pointer))
+            .collect(Collectors.toSet());
+  }
+
+  public static boolean isDefinedAsCollectionElement(@Nullable SpringBeanPointer<?> pointer) {
+    if (pointer instanceof DomSpringBeanPointer) {
+      // bean is defined in collection and can't be autowired
+      return (((DomSpringBeanPointer) pointer).getSpringBean()).getParent() instanceof CollectionElements;
+    }
+    return false;
   }
 
 }

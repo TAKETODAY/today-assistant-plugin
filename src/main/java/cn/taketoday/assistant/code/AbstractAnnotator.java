@@ -30,7 +30,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.spring.SpringBundle;
 import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
 import com.intellij.spring.settings.SpringGeneralSettings;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
@@ -46,7 +45,9 @@ import java.util.List;
 
 import javax.swing.Icon;
 
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -94,7 +95,7 @@ public class AbstractAnnotator extends RelatedItemLineMarkerProvider {
     PsiElement psiElement = ContainerUtil.getFirstItem(elements);
     if (psiElement != null
             && hasFacetsOrAutoConfigurationMode(psiElement)
-            && TodayLibraryUtil.hasLibrary(psiElement.getProject())) {
+            && InfraLibraryUtil.hasLibrary(psiElement.getProject())) {
       super.collectNavigationMarkers(elements, result, forNavigation);
     }
   }
@@ -106,7 +107,7 @@ public class AbstractAnnotator extends RelatedItemLineMarkerProvider {
 
   protected static void addJavaBeanGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier,
           NotNullLazyValue<Collection<? extends CommonModelElement>> targets, Icon icon) {
-    var builder = SpringGutterIconBuilder.createBuilder(
+    var builder = GutterIconBuilder.create(
             icon,
             NavigationGutterIconBuilderUtil.COMMON_MODEL_ELEMENT_CONVERTOR,
             NavigationGutterIconBuilderUtil.COMMON_MODEL_ELEMENT_GOTO_PROVIDER
@@ -114,10 +115,10 @@ public class AbstractAnnotator extends RelatedItemLineMarkerProvider {
 
     builder.setTargets(targets)
             .setEmptyPopupText(SpringBundle.message("gutter.navigate.no.matching.beans"))
-            .setPopupTitle(SpringBundle.message("bean.class.navigate.choose.class.title"))
+            .setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
             .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
             .setTooltipText(SpringBundle.message("spring.bean.class.tooltip.navigate.declaration"));
-    result.add(builder.createSpringGroupLineMarkerInfo(psiIdentifier));
+    result.add(builder.createGroupLineMarkerInfo(psiIdentifier));
   }
 
   @Nullable

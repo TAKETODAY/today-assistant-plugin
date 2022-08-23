@@ -53,9 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cn.taketoday.assistant.TodayLibraryUtil;
-import cn.taketoday.assistant.spel.ElContextVariable;
-import cn.taketoday.assistant.spel.AliasedAttributeInjectionContext;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.lang.Nullable;
 import kotlin.Pair;
 
@@ -140,7 +138,7 @@ final class CacheableContextVariables extends SpringElContextsExtension {
       else {
         PsiAnnotation annotation = annotationEntry.getFirst();
         Module module = ModuleUtilCore.findModuleForPsiElement(annotation);
-        if (!TodayLibraryUtil.hasLibrary(module)) {
+        if (!InfraLibraryUtil.hasLibrary(module)) {
           return null;
         }
         else {

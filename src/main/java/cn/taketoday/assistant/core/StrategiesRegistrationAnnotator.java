@@ -30,9 +30,6 @@ import com.intellij.openapi.util.NotNullLazyValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
-import com.intellij.spring.gutter.groups.SpringGutterIconBuilder;
-import com.intellij.spring.spi.SpringSpiIconService;
-import com.intellij.spring.spi.SpringSpiManager;
 import com.intellij.util.NotNullFunction;
 import com.intellij.util.PairProcessor;
 import com.intellij.util.SmartList;
@@ -49,7 +46,8 @@ import java.util.List;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.InfraBundle;
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.service.IconService;
 import cn.taketoday.assistant.util.CommonUtils;
 
@@ -71,14 +69,13 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
     return InfraBundle.message("StrategiesRegistrationAnnotator.today.strategies.registration");
   }
 
-  
   public Icon getIcon() {
     return IconService.getInstance().getFileIcon();
   }
 
   public void collectNavigationMarkers(List<? extends PsiElement> elements, Collection<? super RelatedItemLineMarkerInfo<?>> result, boolean forNavigation) {
     PsiElement psiElement = ContainerUtil.getFirstItem(elements);
-    if (psiElement == null || !TodayLibraryUtil.hasLibrary(psiElement.getProject())) {
+    if (psiElement == null || !InfraLibraryUtil.hasLibrary(psiElement.getProject())) {
       return;
     }
     super.collectNavigationMarkers(elements, result, forNavigation);
@@ -88,7 +85,7 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
     UClass uClass;
     PsiElement nameIdentifier;
     Module module;
-    if (!TodayLibraryUtil.hasLibrary(element.getProject())
+    if (!InfraLibraryUtil.hasLibrary(element.getProject())
             || (uClass = UastContextKt.toUElement(element, UClass.class)) == null
             || (nameIdentifier = UElementKt.getSourcePsiElement(uClass.getUastAnchor())) == null) {
       return;
@@ -98,13 +95,11 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
       return;
     }
     PsiManager psiManager = PsiManager.getInstance(module.getProject());
-    PairProcessor<IProperty, PsiClass> findFirstProcessor = (property, aClass) -> {
-      return !psiManager.areElementsEquivalent(psiClass, aClass);
-    };
+    PairProcessor<IProperty, PsiClass> findFirstProcessor = (property, aClass) -> !psiManager.areElementsEquivalent(psiClass, aClass);
     String clazzName = uClass.getQualifiedName();
-    boolean foundEntry = SpringSpiManager.getInstance(module).processClassesListValues(false, clazzName, findFirstProcessor);
+    boolean foundEntry = StrategiesManager.from(module).processClassesListValues(false, clazzName, findFirstProcessor);
     if (!foundEntry) {
-      SpringGutterIconBuilder<IProperty> builder = SpringGutterIconBuilder.createBuilder(SpringSpiIconService.getInstance().getGutterIcon(), PROPERTY_CONVERTER, PROPERTY_RELATED_CONVERTER);
+      var builder = GutterIconBuilder.create(IconService.getInstance().getGutterIcon(), PROPERTY_CONVERTER, PROPERTY_RELATED_CONVERTER);
       builder.setTargets((IProperty) NotNullLazyValue.lazy(() -> {
                 SmartList<IProperty> smartList = new SmartList<>();
                 PairProcessor<IProperty, PsiClass> processor = (property2, aClass2) -> {
@@ -114,11 +109,11 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
                   }
                   return true;
                 };
-                SpringSpiManager.getInstance(module).processClassesListValues(false, clazzName, processor);
+                StrategiesManager.from(module).processClassesListValues(false, clazzName, processor);
                 return smartList;
               })).setPopupTitle(InfraBundle.message("StrategiesRegistrationAnnotator.choose.registration"))
               .setTooltipText(InfraBundle.message("StrategiesRegistrationAnnotator.tooltip"));
-      result.add(builder.createSpringRelatedMergeableLineMarkerInfo(nameIdentifier));
+      result.add(builder.createRelatedMergeableLineMarkerInfo(nameIdentifier));
     }
   }
 }

@@ -18,39 +18,20 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.code.event.jam;
+package cn.taketoday.assistant.context;
 
 import com.intellij.jam.JamElement;
 import com.intellij.jam.JamService;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMember;
-import com.intellij.psi.PsiMethod;
 import com.intellij.semantic.SemKey;
-
-import java.util.List;
-
-import cn.taketoday.lang.Nullable;
+import com.intellij.spring.model.SpringConditional;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/8/21 0:11
+ * @since 1.0 2022/8/23 12:15
  */
-public interface EventListenerElement extends JamElement {
-  String CLASSES_ATTR_NAME = "event";
-  String VALUE_ATTR_NAME = "value";
-  String CONDITION_ATTR_NAME = "condition";
-  SemKey<EventListenerElement> EVENT_LISTENER_ROOT_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("EventListener");
+public interface InfraConditional extends JamElement {
 
-  List<PsiClass> getEventListenerClasses();
-
-  @Nullable
-  PsiMethod getPsiElement();
-
-  @Nullable
-  PsiAnnotation getAnnotation();
-
-  boolean isValid();
-
+  SemKey<SpringConditional> CONDITIONAL_JAM_ELEMENT_KEY =
+          JamService.JAM_ELEMENT_KEY.subKey("ConditionalJamElement");
 }
+

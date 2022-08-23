@@ -31,6 +31,7 @@ import com.intellij.semantic.SemKey;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import cn.taketoday.lang.Nullable;
 
@@ -77,4 +78,14 @@ public class BeanEventListenerElement implements EventListenerElement {
   public boolean isValid() {
     return this.myPsiMethodAnchor.retrieve() != null;
   }
+
+  static Optional<BeanEventListenerElement> of(PsiMethod element) {
+    return Optional.ofNullable(BeanEventListenerElement.METHOD_META.getJamElement(element));
+  }
+
+  @Nullable
+  static BeanEventListenerElement from(PsiMethod element) {
+    return BeanEventListenerElement.METHOD_META.getJamElement(element);
+  }
+
 }

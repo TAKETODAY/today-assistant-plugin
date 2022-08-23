@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.Set;
 
 import cn.taketoday.assistant.AliasForUtils;
-import cn.taketoday.assistant.AliasForElement;
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraAliasFor;
+import cn.taketoday.assistant.InfraLibraryUtil;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -90,7 +90,7 @@ public final class AliasedAttributeInjectionContext extends SpringElInjectionCon
           }
           else {
             Module module = ModuleUtilCore.findModuleForPsiElement(psiAnnotation);
-            if (!TodayLibraryUtil.hasLibrary(module)) {
+            if (!InfraLibraryUtil.hasLibrary(module)) {
               return false;
             }
             else {
@@ -115,7 +115,7 @@ public final class AliasedAttributeInjectionContext extends SpringElInjectionCon
                   while (!isCustomAnnotation(module, qualifiedName, aliasedAnnoName));
 
                   for (String aliasedAttrName : entry.getValue()) {
-                    AliasForElement aliasFor = AliasForUtils.findAliasFor(psiAnnotation, qualifiedName, aliasedAnnoName, aliasedAttrName);
+                    InfraAliasFor aliasFor = AliasForUtils.findAliasFor(psiAnnotation, qualifiedName, aliasedAnnoName, aliasedAttrName);
                     if (aliasFor != null && attributeName.equals(aliasFor.getMethodName())) {
                       return true;
                     }

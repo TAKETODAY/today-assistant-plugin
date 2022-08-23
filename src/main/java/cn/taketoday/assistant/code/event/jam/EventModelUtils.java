@@ -27,7 +27,6 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiArrayType;
 import com.intellij.psi.PsiClass;
@@ -46,8 +45,6 @@ import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.InheritanceUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.spring.boot.reactor.ReactorConstants;
-import com.intellij.spring.model.jam.utils.JamAnnotationTypeUtil;
-import com.intellij.spring.model.utils.SpringCommonUtils;
 import com.intellij.uast.UastModificationTracker;
 import com.intellij.util.Query;
 import com.intellij.util.SmartList;
@@ -70,10 +67,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import cn.taketoday.assistant.AnnotationConstant;
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.code.event.beans.PublishEventPointDescriptor;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
+
+import static cn.taketoday.assistant.InfraConstant.APPLICATION_EVENT;
+import static cn.taketoday.assistant.InfraConstant.APPLICATION_EVENT_MULTICASTER;
+import static cn.taketoday.assistant.InfraConstant.APPLICATION_EVENT_PUBLISHER;
+import static cn.taketoday.assistant.InfraConstant.APPLICATION_EVENT_SHORT_NAME;
+import static cn.taketoday.assistant.InfraConstant.APPLICATION_LISTENER;
+import static cn.taketoday.assistant.InfraConstant.ASYNC_EVENT_WRAPPER_CLASSES;
+import static cn.taketoday.assistant.InfraConstant.EVENT_WRAPPER_CLASSES;
+import static cn.taketoday.assistant.InfraConstant.ON_APPLICATION_EVENT_METHOD;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -82,28 +88,6 @@ import cn.taketoday.lang.Nullable;
 public abstract class EventModelUtils {
   private static final String PUBLISH_EVENT_METHOD = "publishEvent";
   private static final String MULTICAST_EVENT_METHOD = "multicastEvent";
-  static final String APPLICATION_EVENT_PUBLISHER = "cn.taketoday.context.ApplicationEventPublisher";
-  static final String APPLICATION_EVENT_MULTICASTER = "cn.taketoday.context.event.ApplicationEventMulticaster";
-  static final String APPLICATION_LISTENER = "cn.taketoday.context.ApplicationListener";
-  static final String ON_APPLICATION_EVENT_METHOD = "onApplicationEvent";
-  static final String APPLICATION_EVENT = "cn.taketoday.context.ApplicationEvent";
-  static final String APPLICATION_EVENT_SHORT_NAME = "ApplicationEvent";
-
-  static final List<String> EVENT_WRAPPER_CLASSES = List.of(
-          CommonClassNames.JAVA_UTIL_COLLECTION,
-          CommonClassNames.JAVA_UTIL_LIST,
-          CommonClassNames.JAVA_UTIL_SET
-  );
-
-  static final String UTIL_CONCURRENT_LISTENABLE_FUTURE = "cn.taketoday.util.concurrent.ListenableFuture";
-  static final String JAVA_UTIL_CONCURRENT_COMPLETABLE_FUTURE = CommonClassNames.JAVA_UTIL_CONCURRENT_COMPLETABLE_FUTURE;
-
-  static final List<String> ASYNC_EVENT_WRAPPER_CLASSES = List.of(
-          CommonClassNames.JAVA_UTIL_CONCURRENT_COMPLETION_STAGE,
-          JAVA_UTIL_CONCURRENT_COMPLETABLE_FUTURE,
-          UTIL_CONCURRENT_LISTENABLE_FUTURE,
-          "cn.taketoday.util.concurrent.ListenableFutureTask"
-  );
 
   public static Collection<PublishEventPointDescriptor> getPublishPoints(Module module, PsiType handledType) {
     PsiClass eventClass;
@@ -142,7 +126,7 @@ public abstract class EventModelUtils {
     Set<Module> dependencies = new HashSet<>();
     ModuleUtilCore.getDependencies(module, dependencies);
     for (Module networkModule : dependencies) {
-      if (!visited.contains(networkModule) && TodayLibraryUtil.hasLibrary(networkModule)) {
+      if (!visited.contains(networkModule) && InfraLibraryUtil.hasLibrary(networkModule)) {
         visited.add(networkModule);
         smartList.add(networkModule);
       }
@@ -234,8 +218,8 @@ public abstract class EventModelUtils {
     return CachedValuesManager.getManager(project).getCachedValue(project, () -> {
       SmartList<EventListenerElement> smartList = new SmartList<>();
       for (Module m : ModuleManager.getInstance(project).getModules()) {
-        if (TodayLibraryUtil.hasLibrary(m)
-                && SpringCommonUtils.hasSpringFacet(m) && !m.getName().endsWith(".test")) {
+        if (InfraLibraryUtil.hasLibrary(m)
+                && CommonUtils.hasFacet(m) && !m.getName().endsWith(".test")) {
           findModuleEventListeners(m, smartList, GlobalSearchScope.moduleScope(m), GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(m));
         }
       }
@@ -246,16 +230,11 @@ public abstract class EventModelUtils {
   private static void findModuleEventListeners(Module module, List<EventListenerElement> result, GlobalSearchScope scope, GlobalSearchScope apiScope) {
     JamService jamService = JamService.getJamService(module.getProject());
     result.addAll(jamService.getJamMethodElements(JamEventListenerElement.SEM_KEY, AnnotationConstant.EVENT_LISTENER, scope));
-    JamAnnotationTypeUtil annotationTypeUtil = JamAnnotationTypeUtil.getInstance(module);
-    List<String> customAnnotations = ContainerUtil.mapNotNull(annotationTypeUtil.getAnnotationTypesWithChildren(AnnotationConstant.EVENT_LISTENER), PsiClass::getQualifiedName);
-    for (String annotation : customAnnotations) {
-      result.addAll(jamService.getJamMethodElements(CustomEventListenerElement.JAM_KEY, annotation, scope));
-    }
+
     collectEventListenerBeans(module, scope, apiScope, result);
   }
 
   private static void collectEventListenerBeans(Module module, GlobalSearchScope scope, GlobalSearchScope apiScope, List<EventListenerElement> result) {
-    BeanEventListenerElement beanEventListener;
     JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(module.getProject());
     for (PsiClass listenerInterface : javaPsiFacade.findClasses(APPLICATION_LISTENER, apiScope)) {
       PsiClass applicationEventClass = javaPsiFacade.findClass(APPLICATION_EVENT, apiScope);
@@ -264,8 +243,11 @@ public abstract class EventModelUtils {
         if (CommonUtils.isBeanCandidateClass(entry)) {
           PsiMethod[] onEventMethods = entry.findMethodsByName(ON_APPLICATION_EVENT_METHOD, false);
           for (PsiMethod method : onEventMethods) {
-            if (isValidReceiverMethod(method, applicationEventClass) && (beanEventListener = BeanEventListenerElement.METHOD_META.getJamElement(method)) != null) {
-              result.add(beanEventListener);
+            if (isValidReceiverMethod(method, applicationEventClass)) {
+              BeanEventListenerElement beanEventListener = BeanEventListenerElement.from(method);
+              if (beanEventListener != null) {
+                result.add(beanEventListener);
+              }
             }
           }
         }

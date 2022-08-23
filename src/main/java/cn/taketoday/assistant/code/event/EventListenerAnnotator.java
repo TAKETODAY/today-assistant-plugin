@@ -57,7 +57,7 @@ import java.util.function.Supplier;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.InfraBundle;
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.code.event.beans.PublishEventPointDescriptor;
 import cn.taketoday.assistant.code.event.jam.EventListenerElement;
 import cn.taketoday.assistant.code.event.jam.EventModelUtils;
@@ -98,7 +98,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
     PsiElement psiElement = ContainerUtil.getFirstItem(elements);
     if (psiElement != null
             && CommonUtils.hasFacets(psiElement.getProject())
-            && TodayLibraryUtil.hasLibrary(psiElement.getProject())) {
+            && InfraLibraryUtil.hasLibrary(psiElement.getProject())) {
 
       super.collectNavigationMarkers(elements, result, forNavigation);
     }
@@ -203,10 +203,12 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   private static DefaultPsiElementCellRenderer getPublishEventRenderer() {
     return new DefaultPsiElementCellRenderer() {
+      @Override
       protected Icon getIcon(PsiElement element) {
         return UastContextKt.toUElement(element, UCallExpression.class) != null ? SpringApiIcons.Gutter.Publisher : super.getIcon(element);
       }
 
+      @Override
       public String getContainerText(PsiElement element, String name) {
         if (UastContextKt.toUElement(element, UCallExpression.class) != null) {
           UMethod uMethod = UastContextKt.getUastParentOfType(element, UMethod.class);
@@ -214,8 +216,8 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
             PsiMethod methodJavaPsi = uMethod.getJavaPsi();
             PsiClass containingClass = methodJavaPsi.getContainingClass();
             if (containingClass != null) {
-              String var10000 = SymbolPresentationUtil.getSymbolPresentableText(containingClass);
-              return var10000 + "." + SymbolPresentationUtil.getSymbolPresentableText(methodJavaPsi);
+              String presentableText = SymbolPresentationUtil.getSymbolPresentableText(containingClass);
+              return presentableText + "." + SymbolPresentationUtil.getSymbolPresentableText(methodJavaPsi);
             }
           }
         }
@@ -227,6 +229,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   private static DefaultPsiElementCellRenderer getEventListenerRenderer() {
     return new DefaultPsiElementCellRenderer() {
+      @Override
       protected Icon getIcon(PsiElement element) {
         UMethod uMethod = UastContextKt.toUElement(element, UMethod.class);
         return uMethod != null && uMethod.getSourcePsi() != null ? super.getIcon(uMethod.getSourcePsi()) : super.getIcon(element);

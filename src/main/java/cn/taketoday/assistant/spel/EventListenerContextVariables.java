@@ -47,7 +47,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import cn.taketoday.assistant.TodayLibraryUtil;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.util.CommonUtils;
 import cn.taketoday.lang.Nullable;
 import kotlin.Pair;
@@ -72,7 +72,7 @@ final class EventListenerContextVariables extends SpringElContextsExtension {
       else {
         PsiAnnotation annotation = annotationEntry.getFirst();
         Module module = ModuleUtilCore.findModuleForPsiElement(annotation);
-        if (!TodayLibraryUtil.hasLibrary(module)) {
+        if (!InfraLibraryUtil.hasLibrary(module)) {
           return Collections.emptyList();
         }
         else {

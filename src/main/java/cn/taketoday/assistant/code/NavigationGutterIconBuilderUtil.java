@@ -46,6 +46,7 @@ import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
 
 final class NavigationGutterIconBuilderUtil {
+
   static final NotNullFunction<SpringBeanPointer<?>, Collection<? extends PsiElement>> BEAN_POINTER_CONVERTOR
           = (pointer) -> !pointer.isValid() ? Collections.emptySet() : Collections.singleton(pointer.getSpringBean().getIdentifyingPsiElement());
 

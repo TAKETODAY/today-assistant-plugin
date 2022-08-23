@@ -45,6 +45,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider.Result;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.semantic.SemKey;
+
 import com.intellij.spring.model.jam.utils.JamAnnotationTypeUtil;
 import com.intellij.util.CommonProcessors;
 import com.intellij.util.NotNullFunction;
@@ -64,42 +65,42 @@ import cn.taketoday.lang.Nullable;
  */
 public final class AliasForUtils {
 
-  public static @Nullable AliasForElement findAliasFor(
+  public static @Nullable InfraAliasFor findAliasFor(
           @Nullable PsiElement context, @Nullable String toSearchInAnnotation,
           String aliasedClassName, String attrName) {
     if (context == null) {
       return null;
     }
     else {
-      var findFirstProcessor = new CommonProcessors.FindFirstProcessor<AliasForElement>();
+      var findFirstProcessor = new CommonProcessors.FindFirstProcessor<InfraAliasFor>();
       getAliasFor(context.getProject(), context.getResolveScope(), toSearchInAnnotation, aliasedClassName, attrName, findFirstProcessor);
       return findFirstProcessor.getFoundValue();
     }
   }
 
-  public static Collection<AliasForElement> findAliasForAttributes(
+  public static Collection<InfraAliasFor> findAliasForAttributes(
           @Nullable PsiElement context, @Nullable String toSearchInAnnotation,
           String aliasedClassName, String attrName) {
     if (context == null) {
       return Collections.emptySet();
     }
     else {
-      var collectProcessor = new CommonProcessors.CollectProcessor<AliasForElement>();
+      var collectProcessor = new CommonProcessors.CollectProcessor<InfraAliasFor>();
       getAliasFor(context.getProject(), context.getResolveScope(), toSearchInAnnotation, aliasedClassName, attrName, collectProcessor);
       return collectProcessor.getResults();
     }
   }
 
-  public static @Nullable AliasForElement findAliasFor(Project project,
+  public static @Nullable InfraAliasFor findAliasFor(Project project,
           @Nullable String toSearchInAnnotation, String aliasedClassName, String attrName) {
-    var findFirstProcessor = new CommonProcessors.FindFirstProcessor<AliasForElement>();
+    var findFirstProcessor = new CommonProcessors.FindFirstProcessor<InfraAliasFor>();
     getAliasFor(project, GlobalSearchScope.allScope(project), toSearchInAnnotation, aliasedClassName, attrName, findFirstProcessor);
     return findFirstProcessor.getFoundValue();
   }
 
   private static boolean getAliasFor(Project project, GlobalSearchScope scope,
           @Nullable String toSearchInAnnotation, String aliasedClassName,
-          String attrName, Processor<AliasForElement> processor) {
+          String attrName, Processor<InfraAliasFor> processor) {
 
     if (toSearchInAnnotation == null) {
       return true;
@@ -110,9 +111,9 @@ public final class AliasForUtils {
       if (toSearchInClass != null && toSearchInClass.isAnnotationType()) {
         PsiClass annotationClass = javaPsiFacade.findClass(aliasedClassName, scope);
         if (annotationClass != null && annotationClass.isAnnotationType()) {
-          Iterator<AliasForElement> var9 = getAliasForAttributes(toSearchInClass).iterator();
+          Iterator<InfraAliasFor> var9 = getAliasForAttributes(toSearchInClass).iterator();
 
-          AliasForElement aliasFor;
+          InfraAliasFor aliasFor;
           do {
             if (!var9.hasNext()) {
               return true;
@@ -134,10 +135,10 @@ public final class AliasForUtils {
     }
   }
 
-  private static List<AliasForElement> getAliasForAttributes(PsiClass psiClass) {
+  private static List<InfraAliasFor> getAliasForAttributes(PsiClass psiClass) {
     return CachedValuesManager.getCachedValue(psiClass, () -> {
-      List<AliasForElement> aliasForList = JamService.getJamService(psiClass.getProject())
-              .getAnnotatedMembersList(psiClass, AliasForElement.SEM_KEY, JamService.CHECK_METHOD);
+      List<InfraAliasFor> aliasForList = JamService.getJamService(psiClass.getProject())
+              .getAnnotatedMembersList(psiClass, InfraAliasFor.SEM_KEY, JamService.CHECK_METHOD);
       return Result.create(aliasForList, psiClass);
     });
   }
@@ -162,8 +163,10 @@ public final class AliasForUtils {
       }
       else {
         PsiClass customAnnoClass = JavaPsiFacade.getInstance(module.getProject()).findClass(customAnnotationFqn, context.getResolveScope());
-        Collection<PsiClass> allMetaAnnotations = includingTests ? JamAnnotationTypeUtil.getInstance(module)
-                .getAnnotationTypesWithChildrenIncludingTests(baseMetaAnnotationFqn) : JamAnnotationTypeUtil.getInstance(module).getAnnotationTypesWithChildren(baseMetaAnnotationFqn);
+        Collection<PsiClass> allMetaAnnotations =
+                includingTests ? JamAnnotationTypeUtil.getInstance(module)
+                        .getAnnotationTypesWithChildrenIncludingTests(baseMetaAnnotationFqn)
+                               : JamAnnotationTypeUtil.getInstance(module).getAnnotationTypesWithChildren(baseMetaAnnotationFqn);
         return findDefiningMetaAnnotation(customAnnoClass, baseMetaAnnotationFqn, allMetaAnnotations);
       }
     }
@@ -231,7 +234,7 @@ public final class AliasForUtils {
             for (JamAttributeMeta<?> attributeMeta : parentAnnotationAttributes) {
               if (attributeMeta instanceof JamStringAttributeMeta meta) {
                 JamConverter<?> converter = meta.getConverter();
-                AliasForElement aliasFor = AliasForUtils.findAliasFor(anno.second, anno.first, annotationMeta.getAnnoName(), meta.getAttributeLink().getAttributeName());
+                InfraAliasFor aliasFor = AliasForUtils.findAliasFor(anno.second, anno.first, annotationMeta.getAnnoName(), meta.getAttributeLink().getAttributeName());
                 if (aliasFor != null) {
                   String aliasForMethodName = aliasFor.getMethodName();
                   if (name.equals(aliasForMethodName)) {
