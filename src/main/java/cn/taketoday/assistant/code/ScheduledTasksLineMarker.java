@@ -24,7 +24,6 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
-import com.intellij.spring.SpringBundle;
 
 import org.jetbrains.uast.UAnnotation;
 import org.jetbrains.uast.UElement;
@@ -39,6 +38,7 @@ import java.util.Objects;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.lang.Nullable;
 import icons.JavaUltimateIcons;
 
@@ -55,7 +55,7 @@ public class ScheduledTasksLineMarker extends LineMarkerProviderDescriptor {
 
   @Override
   public String getName() {
-    return SpringBundle.message("spring.scheduled.tasks");
+    return InfraBundle.message("scheduled.tasks");
   }
 
   @Override
@@ -78,7 +78,6 @@ public class ScheduledTasksLineMarker extends LineMarkerProviderDescriptor {
         result.add(markerInfo);
       }
     }
-
   }
 
   private LineMarkerInfo<PsiElement> computeLineMarkerInfo(PsiElement element) {
@@ -93,8 +92,8 @@ public class ScheduledTasksLineMarker extends LineMarkerProviderDescriptor {
             return new LineMarkerInfo<>(identifyingElement,
                     identifyingElement.getTextRange(),
                     JavaUltimateIcons.Cdi.Gutter.ScheduledEvent,
-                    o -> SpringBundle.message("spring.scheduled.method"), null,
-                    GutterIconRenderer.Alignment.LEFT, SpringBundle.messagePointer("spring.scheduled.method"));
+                    o -> InfraBundle.message("scheduled.method"), null,
+                    GutterIconRenderer.Alignment.LEFT, InfraBundle.messagePointer("scheduled.method"));
           }
         }
       }
