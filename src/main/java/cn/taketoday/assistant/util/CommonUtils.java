@@ -21,7 +21,6 @@
 package cn.taketoday.assistant.util;
 
 import com.intellij.codeInsight.AnnotationUtil;
-import com.intellij.codeInsight.JavaLibraryModificationTracker;
 import com.intellij.facet.FacetFinder;
 import com.intellij.facet.ProjectFacetManager;
 import com.intellij.jam.JamService;
@@ -31,6 +30,7 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.ModificationTracker;
 import com.intellij.openapi.util.text.CharFilter;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
@@ -55,7 +55,6 @@ import com.intellij.spring.model.xml.beans.CollectionElements;
 import com.intellij.util.containers.ConcurrentFactoryMap;
 import com.intellij.util.containers.ContainerUtil;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.UElement;
 import org.jetbrains.uast.UElementKt;
 
@@ -156,7 +155,8 @@ public abstract class CommonUtils {
       Project project = module.getProject();
       Map<String, PsiClass> cache = CachedValuesManager.getManager(project).getCachedValue(module, () -> {
         Map<String, PsiClass> map = ConcurrentFactoryMap.createMap(key -> findLibraryClass(project, key, GlobalSearchScope.moduleRuntimeScope(module, false)));
-        return CachedValueProvider.Result.createSingleDependency(map, JavaLibraryModificationTracker.getInstance(module.getProject()));
+        ModificationTracker service = module.getProject().getService(ModificationTracker.class);
+        return CachedValueProvider.Result.createSingleDependency(map, service);
       });
       return cache.get(className);
     }
@@ -182,7 +182,7 @@ public abstract class CommonUtils {
    *
    * @see #isConfigurationOrMeta(PsiClass)
    */
-  public static boolean isConfiguration(@NotNull PsiClass psiClass) {
+  public static boolean isConfiguration(PsiClass psiClass) {
     return isBeanCandidateClass(psiClass)
             && AnnotationUtil.isAnnotated(psiClass, AnnotationConstant.CONFIGURATION, 0);
   }
@@ -193,7 +193,7 @@ public abstract class CommonUtils {
    * @param psiClass Class to check.
    * @return {@code true} if class annotated.
    */
-  public static boolean isConfigurationOrMeta(@NotNull PsiClass psiClass) {
+  public static boolean isConfigurationOrMeta(PsiClass psiClass) {
     if (!isBeanCandidateClass(psiClass))
       return false;
     return JamService.getJamService(psiClass.getProject())
@@ -206,7 +206,7 @@ public abstract class CommonUtils {
    * <p>NOTE: it doesn't consider {@value AnnotationConstant#SERVICE}, {@value AnnotationConstant#REPOSITORY} and so on</p>
    * @see #isStereotypeComponentOrMeta(PsiClass)
    */
-  public static boolean isComponentOrMeta(@NotNull PsiClass psiClass) {
+  public static boolean isComponentOrMeta(PsiClass psiClass) {
     if (!isBeanCandidateClass(psiClass))
       return false;
     return JamService.getJamService(psiClass.getProject())
@@ -219,7 +219,7 @@ public abstract class CommonUtils {
    * @param psiClass Class to check.
    * @return {@code true} if class annotated.
    */
-  public static boolean isStereotypeComponentOrMeta(@NotNull PsiClass psiClass) {
+  public static boolean isStereotypeComponentOrMeta(PsiClass psiClass) {
     if (!isBeanCandidateClass(psiClass))
       return false;
     return JamService.getJamService(psiClass.getProject())

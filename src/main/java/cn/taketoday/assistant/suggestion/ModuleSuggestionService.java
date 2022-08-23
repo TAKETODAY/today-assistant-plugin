@@ -25,8 +25,6 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiElement;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.Set;
 

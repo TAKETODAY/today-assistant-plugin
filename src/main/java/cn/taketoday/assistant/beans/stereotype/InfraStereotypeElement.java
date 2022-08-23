@@ -42,7 +42,6 @@ import com.intellij.spring.model.jam.JamPsiClassSpringBean;
 import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
 import com.intellij.spring.model.jam.javaConfig.SpringJavaBean;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -80,8 +79,7 @@ public class InfraStereotypeElement extends JamPsiClassSpringBean {
       myMeta = getMeta(anno);
   }
 
-  @NotNull
-  private static synchronized JamAnnotationMeta getMeta(@NotNull String anno) {
+  private static synchronized JamAnnotationMeta getMeta(String anno) {
     JamAnnotationMeta meta = annotationMetaMap.get(anno);
     if (meta == null) {
       meta = new JamAnnotationMeta(anno);
@@ -141,7 +139,7 @@ public class InfraStereotypeElement extends JamPsiClassSpringBean {
   }
 
   @Override
-  @NotNull
+
   public PsiElement getIdentifyingPsiElement() {
     return PomService.convertToPsi(getPsiManager().getProject(), getPsiTarget());
   }

@@ -36,7 +36,6 @@ import com.intellij.spring.model.SpringBeanPointer;
 import com.intellij.spring.model.jam.stereotype.SpringComponentScan;
 import com.intellij.spring.model.jam.stereotype.SpringJamComponentScan;
 import com.intellij.spring.model.jam.stereotype.SpringJamComponentScans;
-import cn.taketoday.assistant.service.InfraJamService;
 import com.intellij.spring.model.xml.context.SpringBeansPackagesScan;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
@@ -60,6 +59,7 @@ import javax.swing.Icon;
 
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.service.InfraJamService;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

@@ -24,8 +24,6 @@ import com.intellij.jam.JamElement;
 import com.intellij.jam.JamService;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.semantic.SemKey;
 

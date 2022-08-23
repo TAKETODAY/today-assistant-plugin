@@ -27,8 +27,6 @@ import com.intellij.psi.PsiElementRef;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.spring.presentation.SpringCorePresentationConstants;
 
-import org.jetbrains.annotations.NotNull;
-
 import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
 
@@ -37,15 +35,15 @@ import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
  * @since 1.0 2022/8/23 15:15
  */
 @Presentation(typeName = SpringCorePresentationConstants.NAMED)
-public class SpringCdiJakartaNamed extends InfraStereotypeElement {
-  public static final JamClassMeta<SpringCdiJakartaNamed> META = new JamClassMeta<>(null, SpringCdiJakartaNamed.class,
+public class CdiJakartaNamed extends InfraStereotypeElement {
+  public static final JamClassMeta<CdiJakartaNamed> META = new JamClassMeta<>(null, CdiJakartaNamed.class,
           JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("CdiJakartaNamed"));
 
   static {
     addPomTargetProducer(META);
   }
 
-  public SpringCdiJakartaNamed(@NotNull PsiClass psiClass) {
+  public CdiJakartaNamed(PsiClass psiClass) {
     super(JavaeeConstant.JAKARTA_NAMED, PsiElementRef.real(psiClass));
   }
 

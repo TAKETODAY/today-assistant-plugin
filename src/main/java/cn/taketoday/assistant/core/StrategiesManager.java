@@ -27,11 +27,10 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.PairProcessor;
 
-import cn.taketoday.lang.Nullable;
-
 import java.util.List;
 
 import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

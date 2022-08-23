@@ -40,7 +40,6 @@ import com.intellij.spring.model.jam.testContexts.SpringTestContextUtil;
 import com.intellij.spring.model.jam.testContexts.SpringTestingImplicitContextsProvider;
 import com.intellij.util.containers.ContainerUtil;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.UAnnotation;
 import org.jetbrains.uast.UAnnotationKt;
 import org.jetbrains.uast.UClass;
@@ -80,7 +79,7 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
   }
 
   @Override
-  protected void annotateClass(Collection<? super RelatedItemLineMarkerInfo<?>> result, @NotNull UClass uClass, @NotNull PsiElement identifier) {
+  protected void annotateClass(Collection<? super RelatedItemLineMarkerInfo<?>> result, UClass uClass, PsiElement identifier) {
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
     if (psiClass != null) {
       if (CommonUtils.isBeanCandidateClass(psiClass)) {
@@ -110,7 +109,7 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
     }
   }
 
-  private void annotateContextConfiguration(@NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result, @NotNull ContextConfiguration contextConfiguration, @NotNull UClass uClass) {
+  private void annotateContextConfiguration(Collection<? super RelatedItemLineMarkerInfo<?>> result, ContextConfiguration contextConfiguration, UClass uClass) {
 
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
     if (psiClass != null) {

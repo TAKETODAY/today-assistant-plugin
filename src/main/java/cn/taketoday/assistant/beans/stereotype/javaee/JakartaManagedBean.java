@@ -20,32 +20,28 @@
 
 package cn.taketoday.assistant.beans.stereotype.javaee;
 
-import com.intellij.ide.presentation.Presentation;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.presentation.SpringCorePresentationConstants;
 
-import org.jetbrains.annotations.NotNull;
-
-import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/23 15:15
  */
-@Presentation(typeName = SpringCorePresentationConstants.NAMED)
-public class SpringCdiJavaxNamed extends InfraStereotypeElement {
-  public static final JamClassMeta<SpringCdiJavaxNamed> META = new JamClassMeta<>(null, SpringCdiJavaxNamed.class,
-          JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("CdiJavaxNamed"));
+public class JakartaManagedBean extends InfraStereotypeElement {
+  public static final JamClassMeta<JakartaManagedBean> META;
+
+  public JakartaManagedBean(PsiClass psiClass) {
+    super("jakarta.annotation.ManagedBean", PsiElementRef.real(psiClass));
+  }
 
   static {
+    META = new JamClassMeta<>(null, JakartaManagedBean.class,
+            JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("JakartaManagedBean"));
     addPomTargetProducer(META);
   }
-
-  public SpringCdiJavaxNamed(@NotNull PsiClass psiClass) {
-    super(JavaeeConstant.JAVAX_NAMED, PsiElementRef.real(psiClass));
-  }
 }
+

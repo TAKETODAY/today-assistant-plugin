@@ -38,7 +38,6 @@ import com.intellij.spring.model.jam.lookup.SpringLookupInjection;
 import com.intellij.spring.model.jam.profile.CustomContextProfile;
 import com.intellij.spring.model.jam.profile.SpringJamProfile;
 import com.intellij.spring.model.jam.stereotype.SpringContextImport;
-import com.intellij.spring.model.jam.stereotype.SpringImportResource;
 import com.intellij.spring.model.jam.stereotype.SpringJamComponentScan;
 import com.intellij.spring.model.jam.stereotype.SpringJamComponentScans;
 import com.intellij.spring.model.jam.stereotype.SpringJamPropertySource;

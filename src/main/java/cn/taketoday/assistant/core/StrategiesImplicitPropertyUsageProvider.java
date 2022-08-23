@@ -20,9 +20,9 @@
 
 package cn.taketoday.assistant.core;
 
-import com.intellij.openapi.fileTypes.FileTypeRegistry;
 import com.intellij.lang.properties.codeInspection.unused.ImplicitPropertyUsageProvider;
 import com.intellij.lang.properties.psi.Property;
+import com.intellij.openapi.fileTypes.FileTypeRegistry;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

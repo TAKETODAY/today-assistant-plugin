@@ -28,8 +28,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
 import com.intellij.spring.model.jam.stereotype.SpringJamComponentScanArchetype;
 
-import org.jetbrains.annotations.NotNull;
-
 import cn.taketoday.assistant.AnnotationConstant;
 
 /**
@@ -47,7 +45,7 @@ public class ComponentScan extends SpringJamComponentScanArchetype {
   public static final JamClassMeta<ComponentScan> META =
           new JamClassMeta<>(null, ComponentScan.class, JAM_KEY).addAnnotation(ANNOTATION_META);
 
-  public ComponentScan(@NotNull PsiClass psiElement) {
+  public ComponentScan(PsiClass psiElement) {
     super(psiElement);
   }
 
@@ -56,7 +54,7 @@ public class ComponentScan extends SpringJamComponentScanArchetype {
   }
 
   @Override
-  @NotNull
+
   protected JamAnnotationMeta getAnnotationMeta() {
     return ANNOTATION_META;
   }

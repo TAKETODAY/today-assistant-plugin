@@ -62,10 +62,7 @@ import com.intellij.spring.boot.model.testing.jam.custom.SpringApplicationConfig
 import com.intellij.spring.boot.model.testing.jam.mock.CustomJamMockBean;
 import com.intellij.spring.boot.model.testing.jam.mock.SpringJamMockBean;
 import com.intellij.spring.boot.model.testing.jam.mock.SpringJamMockBeans;
-
 import com.intellij.util.Consumer;
-
-import org.jetbrains.annotations.NotNull;
 
 import cn.taketoday.assistant.AliasForUtils;
 
@@ -76,7 +73,7 @@ import cn.taketoday.assistant.AliasForUtils;
 
 final class SpringBootAutoconfigureSemContributor extends SemContributor {
 
-  public void registerSemProviders(@NotNull SemRegistrar registrar, @NotNull Project project) {
+  public void registerSemProviders(SemRegistrar registrar, Project project) {
 
     SpringBootApplication.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation("cn.taketoday.boot.autoconfigure.SpringBootApplication"));
     SemService semService = SemService.getSemService(project);
@@ -125,14 +122,14 @@ final class SpringBootAutoconfigureSemContributor extends SemContributor {
             ConditionalOnManagementPort.METHOD_META);
   }
 
-  private static void registerTesting(SemRegistrar registrar, @NotNull SemService semService) {
+  private static void registerTesting(SemRegistrar registrar, SemService semService) {
 
     registerSpringApplicationConfiguration(registrar, semService);
     registerBootstrapWithTests(registrar, semService);
     registerMockBeans(registrar, semService);
   }
 
-  private static void registerSpringApplicationConfiguration(SemRegistrar registrar, @NotNull SemService semService) {
+  private static void registerSpringApplicationConfiguration(SemRegistrar registrar, SemService semService) {
 
     SpringApplicationConfiguration.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation("cn.taketoday.boot.test.SpringApplicationConfiguration"));
     SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), SpringApplicationConfiguration.META_KEY,
@@ -143,7 +140,7 @@ final class SpringBootAutoconfigureSemContributor extends SemContributor {
                     }, (Consumer) null));
   }
 
-  private static void registerBootstrapWithTests(SemRegistrar registrar, @NotNull SemService semService) {
+  private static void registerBootstrapWithTests(SemRegistrar registrar, SemService semService) {
 
     SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass(), SpringBootstrapWithTest.META_KEY, SpringBootstrapWithTest.JAM_KEY,
             SemContributorUtil.createFunction(SpringBootstrapWithTest.JAM_KEY, SpringBootstrapWithTest.class,
@@ -152,7 +149,7 @@ final class SpringBootAutoconfigureSemContributor extends SemContributor {
                     }, (Consumer) null));
   }
 
-  private static void registerMockBeans(SemRegistrar registrar, @NotNull SemService semService) {
+  private static void registerMockBeans(SemRegistrar registrar, SemService semService) {
 
     registrar.registerSemElementProvider(SpringJamMockBean.JAM_KEY, PsiJavaPatterns.psiAnnotation().qName("cn.taketoday.boot.test.mock.mockito.MockBean"), SpringJamMockBean::new);
     SpringJamMockBeans.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation("cn.taketoday.boot.test.mock.mockito.MockBeans"));

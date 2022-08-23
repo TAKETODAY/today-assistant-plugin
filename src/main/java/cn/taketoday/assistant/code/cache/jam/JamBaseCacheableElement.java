@@ -26,21 +26,19 @@ import com.intellij.jam.reflect.JamStringAttributeMeta;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMember;
-import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.semantic.SemKey;
 import com.intellij.semantic.SemService;
 import com.intellij.spring.model.SpringBeanPointer;
-
-import cn.taketoday.assistant.code.cache.CacheableConstant;
-import cn.taketoday.assistant.code.event.jam.EventListenerElement;
-
 import com.intellij.spring.model.jam.converters.SpringBeanReferenceJamConverter;
 import com.intellij.util.containers.ContainerUtil;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import cn.taketoday.assistant.code.cache.CacheableConstant;
+import cn.taketoday.assistant.code.event.jam.EventListenerElement;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

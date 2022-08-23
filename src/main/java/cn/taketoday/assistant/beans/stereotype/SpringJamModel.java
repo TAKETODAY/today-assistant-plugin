@@ -38,10 +38,10 @@ import java.util.List;
 
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.JavaeeConstant;
-import cn.taketoday.assistant.beans.stereotype.javaee.SpringCdiJakartaNamed;
-import cn.taketoday.assistant.beans.stereotype.javaee.SpringCdiJavaxNamed;
-import cn.taketoday.assistant.beans.stereotype.javaee.SpringJakartaManagedBean;
-import cn.taketoday.assistant.beans.stereotype.javaee.SpringJavaxManagedBean;
+import cn.taketoday.assistant.beans.stereotype.javaee.CdiJakartaNamed;
+import cn.taketoday.assistant.beans.stereotype.javaee.CdiJavaxNamed;
+import cn.taketoday.assistant.beans.stereotype.javaee.JakartaManagedBean;
+import cn.taketoday.assistant.beans.stereotype.javaee.JavaxManagedBean;
 import cn.taketoday.assistant.util.JamAnnotationTypeUtil;
 
 /**
@@ -106,12 +106,12 @@ public class SpringJamModel {
     return this.myJamService.getJamClassElements(Component.META, AnnotationConstant.COMPONENT, scope);
   }
 
-  private List<SpringCdiJavaxNamed> getCdiJavaxNamed(GlobalSearchScope scope) {
-    return this.myJamService.getJamClassElements(SpringCdiJavaxNamed.META, JavaeeConstant.JAVAX_NAMED, scope);
+  private List<CdiJavaxNamed> getCdiJavaxNamed(GlobalSearchScope scope) {
+    return this.myJamService.getJamClassElements(CdiJavaxNamed.META, JavaeeConstant.JAVAX_NAMED, scope);
   }
 
-  private List<SpringCdiJakartaNamed> getCdiJakartaNamed(GlobalSearchScope scope) {
-    return this.myJamService.getJamClassElements(SpringCdiJakartaNamed.META, JavaeeConstant.JAKARTA_NAMED, scope);
+  private List<CdiJakartaNamed> getCdiJakartaNamed(GlobalSearchScope scope) {
+    return this.myJamService.getJamClassElements(CdiJakartaNamed.META, JavaeeConstant.JAKARTA_NAMED, scope);
   }
 
   public List<Controller> getControllers(GlobalSearchScope scope) {
@@ -141,12 +141,12 @@ public class SpringJamModel {
     return smartList;
   }
 
-  private List<SpringJavaxManagedBean> getJavaxManagedBeans(GlobalSearchScope scope) {
-    return this.myJamService.getJamClassElements(SpringJavaxManagedBean.META, JavaeeConstant.JAVAX_MANAGED_BEAN, scope);
+  private List<JavaxManagedBean> getJavaxManagedBeans(GlobalSearchScope scope) {
+    return this.myJamService.getJamClassElements(JavaxManagedBean.META, JavaeeConstant.JAVAX_MANAGED_BEAN, scope);
   }
 
-  private List<SpringJakartaManagedBean> getJakartaManagedBeans(GlobalSearchScope scope) {
-    return this.myJamService.getJamClassElements(SpringJakartaManagedBean.META, JavaeeConstant.JAKARTA_MANAGED_BEAN, scope);
+  private List<JakartaManagedBean> getJakartaManagedBeans(GlobalSearchScope scope) {
+    return this.myJamService.getJamClassElements(JakartaManagedBean.META, JavaeeConstant.JAKARTA_MANAGED_BEAN, scope);
   }
 
   public List<Configuration> getConfigurations(GlobalSearchScope scope) {
