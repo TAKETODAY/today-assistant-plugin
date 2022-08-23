@@ -89,7 +89,7 @@
     <!--@formatter:on-->
 
     <semContributor implementation="cn.taketoday.assistant.code.cache.jam.CacheableSemContributor" />
-    <semContributor implementation="cn.taketoday.assistant.beans.SpringSemContributor" />
+    <semContributor implementation="cn.taketoday.assistant.beans.InfraSemContributor" />
 
     <dependencySupport coordinate="cn.taketoday:today-core" kind="java" displayName="Today Infrastructure" />
 
