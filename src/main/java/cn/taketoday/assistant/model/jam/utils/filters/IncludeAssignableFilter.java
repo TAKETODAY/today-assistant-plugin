@@ -38,7 +38,7 @@ public class IncludeAssignableFilter extends InfraContextFilter.IncludeClasses {
 
   @Override
   public Set<InfraStereotypeElement> includeStereotypes(Module module, Set<PsiPackage> packages) {
-    final Set<InfraStereotypeElement> components = new LinkedHashSet<>();
+    Set<InfraStereotypeElement> components = new LinkedHashSet<>();
     for (PsiClass assignableClass : getClasses()) {
       InfraContextIncludeAssignableFilter
               .addCustomComponents(packages, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module), components, assignableClass);

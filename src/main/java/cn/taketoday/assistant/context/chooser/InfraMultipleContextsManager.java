@@ -169,7 +169,7 @@ public class InfraMultipleContextsManager {
   }
 
   public static InfraContextDescriptor createDescriptor(InfraFileSet fileSet, Module module) {
-    final String qualifiedName = fileSet.getQualifiedName();
+    String qualifiedName = fileSet.getQualifiedName();
     return new InfraContextDescriptor(module, fileSet.getId(), fileSet.getName()) {
 
       @Override

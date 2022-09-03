@@ -31,7 +31,7 @@ import cn.taketoday.lang.Nullable;
 public abstract class ConstructorArgNameConverter extends ResolvingConverter<PsiParameter> {
 
   @Override
-  public String toString(final @Nullable PsiParameter beanProperty, final ConvertContext context) {
+  public String toString(@Nullable final PsiParameter beanProperty, ConvertContext context) {
     return null;
   }
 }

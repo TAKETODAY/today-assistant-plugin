@@ -1215,7 +1215,7 @@ public final class AutowireUtil {
   }
 
   private static boolean isJavaLangString(@Nullable PsiType type) {
-    return (type instanceof PsiClassType) && type.getCanonicalText().equals("java.lang.String");
+    return (type instanceof PsiClassType) && "java.lang.String".equals(type.getCanonicalText());
   }
 
   private static boolean isJavaUtilProperties(PsiType psiType) {

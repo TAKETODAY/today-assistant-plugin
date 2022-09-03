@@ -163,8 +163,8 @@ public abstract class InfraJamComponentScan extends AbstractComponentScan {
   public Set<InfraContextFilter.Exclude> getExcludeContextFilters() {
     Set<InfraContextFilter.Exclude> excludes = new LinkedHashSet<>();
     for (ComponentScanFilter filter : EXCLUDE_FILTERS_ATTR_META.getJam(myAnnotation)) {
-      final FilterType value = filter.getFilterType();
-      final Set<PsiClass> classes = filter.getFilteredClasses();
+      FilterType value = filter.getFilterType();
+      Set<PsiClass> classes = filter.getFilteredClasses();
       if (value == FilterType.ASSIGNABLE_TYPE) {
         excludes.add(new ExcludeAssignableFilter(classes));
       }
@@ -180,8 +180,8 @@ public abstract class InfraJamComponentScan extends AbstractComponentScan {
   public Set<InfraContextFilter.Include> getIncludeContextFilters() {
     Set<InfraContextFilter.Include> includes = new LinkedHashSet<>();
     for (ComponentScanFilter filter : INCLUDE_FILTERS_ATTR_META.getJam(myAnnotation)) {
-      final FilterType value = filter.getFilterType();
-      final Set<PsiClass> classes = filter.getFilteredClasses();
+      FilterType value = filter.getFilterType();
+      Set<PsiClass> classes = filter.getFilteredClasses();
       if (value == FilterType.ASSIGNABLE_TYPE) {
         includes.add(new IncludeAssignableFilter(classes));
       }

@@ -30,8 +30,8 @@ import cn.taketoday.assistant.model.utils.PsiTypeUtil;
 public class PropsValueConverter extends PropertyValueConverter {
   @Override
 
-  public List<PsiType> getValueTypes(final GenericDomValue domValue) {
-    final PsiType type = PsiTypeUtil.getInstance(domValue.getManager().getProject()).findType(String.class);
+  public List<PsiType> getValueTypes(GenericDomValue domValue) {
+    PsiType type = PsiTypeUtil.getInstance(domValue.getManager().getProject()).findType(String.class);
     return type == null ? Collections.emptyList() : Collections.singletonList(type);
   }
 }

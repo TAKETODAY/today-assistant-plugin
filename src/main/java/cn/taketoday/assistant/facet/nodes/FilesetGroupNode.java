@@ -49,14 +49,14 @@ public abstract class FilesetGroupNode extends SimpleNode {
     for (VirtualFilePointer file : this.myChildren) {
       nodes.add(createNode(file));
     }
-    if (getFilesetNode().getConfigurationTabSettings().isSortAlpha()) {
+    if (myFilesetNode.getConfigurationTabSettings().isSortAlpha()) {
       nodes.sort(FileSetNode.FILENAME_COMPARATOR);
     }
     return nodes.toArray(new SimpleNode[0]);
   }
 
   protected cn.taketoday.assistant.facet.nodes.ConfigFileNode createNode(VirtualFilePointer virtualFilePointer) {
-    return new ConfigFileNode(getFilesetNode().getConfigurationTabSettings(), getFilesetNode().getFileSet(), virtualFilePointer, this);
+    return new ConfigFileNode(myFilesetNode.getConfigurationTabSettings(), myFilesetNode.getFileSet(), virtualFilePointer, this);
   }
 
   protected FileSetNode getFilesetNode() {

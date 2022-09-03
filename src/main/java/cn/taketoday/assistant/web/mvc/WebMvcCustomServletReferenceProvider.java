@@ -38,7 +38,7 @@ public class WebMvcCustomServletReferenceProvider extends CustomServletReference
   protected PsiReference[] createReferences(PsiElement element, int offset, String text, @Nullable ServletMappingInfo info, boolean soft) {
     TextRange nameRange;
     Module module = ModuleUtilCore.findModuleForPsiElement(element);
-    if (module == null || !InfraLibraryUtil.hasWebMvcLibrary(module)) {
+    if (!InfraLibraryUtil.hasWebMvcLibrary(module)) {
       return PsiReference.EMPTY_ARRAY;
     }
     if (WebMvcService.getServletModels(module).isEmpty()) {

@@ -65,7 +65,6 @@ public class ContextImport extends CommonModelElement.PsiBase implements CommonM
   private final PsiElementRef<PsiAnnotation> myPsiAnnotation;
 
   public ContextImport(PsiClass psiClass) {
-    super();
     this.myPsiElement = psiClass;
     this.myPsiAnnotation = ANNO_META.getAnnotationRef(psiClass);
   }

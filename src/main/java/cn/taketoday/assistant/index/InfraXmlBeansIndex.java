@@ -137,7 +137,7 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
       }
 
       public boolean isEqual(Pair<InfraBeanIndexType, String> val1, Pair<InfraBeanIndexType, String> val2) {
-        if (!val1.first.equals(val2.first)) {
+        if (val1.first != val2.first) {
           return false;
         }
         if (val1.first.key() != null) {
@@ -232,7 +232,7 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
     return ContainerUtil.process(smartList, processor);
   }
 
-  public static boolean processAliases(BeanSearchParameters.BeanName params, final Processor<? super Alias> processor) {
+  public static boolean processAliases(BeanSearchParameters.BeanName params, Processor<? super Alias> processor) {
     Pair<InfraBeanIndexType, String> key = Pair.create(InfraBeanIndexType.ALIAS, params.getBeanName());
     MultiMap<VirtualFile, TIntArrayList> results = getResults(key, params);
     if (results.isEmpty()) {
@@ -248,7 +248,7 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
     return processDomElements(params.getProject(), results, domElementProcessor);
   }
 
-  public static boolean processCustomBeans(BeanSearchParameters params, final Processor<? super CustomBeanWrapper> processor) {
+  public static boolean processCustomBeans(BeanSearchParameters params, Processor<? super CustomBeanWrapper> processor) {
     Pair<InfraBeanIndexType, String> key = InfraBeanIndexType.CUSTOM_BEAN_WRAPPER.key();
     MultiMap<VirtualFile, TIntArrayList> results = getResults(key, params);
     if (results.isEmpty()) {
@@ -264,7 +264,7 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
   }
 
   private static boolean processBeanPointer(Pair<InfraBeanIndexType, String> key, BeanSearchParameters params,
-          final Processor<? super BeanPointer<?>> processor) {
+          Processor<? super BeanPointer<?>> processor) {
     MultiMap<VirtualFile, TIntArrayList> results = getResults(key, params);
     if (results.isEmpty()) {
       return true;
@@ -319,7 +319,7 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
     return true;
   }
 
-  public static abstract class DomElementProcessor {
+  public abstract static class DomElementProcessor {
     protected abstract boolean processDomElement(DomElement domElement);
 
     private DomElementProcessor() {

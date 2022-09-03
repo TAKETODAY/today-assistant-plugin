@@ -197,7 +197,7 @@ public class ConfigurationPropertyRelatedItemLineMarkerProvider extends RelatedI
             super.run(indicator);
             search.forEach((reference) -> {
               ProgressManager.checkCanceled();
-              PsiElement navigationElement = ConfigurationPropertyRelatedItemLineMarkerProvider.getNavigationElement(reference);
+              PsiElement navigationElement = getNavigationElement(reference);
               if (ReadAction.compute(() -> !this.updateComponent(navigationElement))) {
                 indicator.cancel();
               }

@@ -39,7 +39,7 @@ import cn.taketoday.lang.Nullable;
 public class InfraXmlStructureViewBuilderProvider implements XmlStructureViewBuilderProvider {
 
   @Nullable
-  public StructureViewBuilder createStructureViewBuilder(final XmlFile file) {
+  public StructureViewBuilder createStructureViewBuilder(XmlFile file) {
     if (InfraDomUtils.isInfraXml(file)) {
       return new TreeBasedStructureViewBuilder() {
 
@@ -48,7 +48,7 @@ public class InfraXmlStructureViewBuilderProvider implements XmlStructureViewBui
         }
 
         public StructureView createStructureView(FileEditor fileEditor, Project project) {
-          final StructureViewModel model = createStructureViewModel(fileEditor instanceof TextEditor ? ((TextEditor) fileEditor).getEditor() : null);
+          StructureViewModel model = createStructureViewModel(fileEditor instanceof TextEditor ? ((TextEditor) fileEditor).getEditor() : null);
           StructureViewComponent structureViewComponent = new StructureViewComponent(fileEditor, model, project, false);
           Disposer.register(structureViewComponent, model::dispose);
           return structureViewComponent;

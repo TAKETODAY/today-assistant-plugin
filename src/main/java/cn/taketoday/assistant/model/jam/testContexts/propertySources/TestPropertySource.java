@@ -133,7 +133,7 @@ public class TestPropertySource extends JamBaseElement<PsiClass> implements Prop
   protected void addPropertiesFiles(Set<PropertiesFile> propertiesFiles,
           List<JamStringAttributeElement<Set<PropertiesFile>>> attributeValues) {
     for (JamStringAttributeElement<Set<PropertiesFile>> attributeElement : attributeValues) {
-      final Set<PropertiesFile> value = attributeElement.getValue();
+      Set<PropertiesFile> value = attributeElement.getValue();
       if (value != null)
         propertiesFiles.addAll(value);
     }
@@ -141,14 +141,14 @@ public class TestPropertySource extends JamBaseElement<PsiClass> implements Prop
 
   @Nullable
   private PropertiesFile getDefaultPropertiesFile() {
-    final String propertiesFileName = getDefaultPropertiesFileName();
-    final PsiDirectory containingDirectory = getPsiElement().getContainingFile().getContainingDirectory();
+    String propertiesFileName = getDefaultPropertiesFileName();
+    PsiDirectory containingDirectory = getPsiElement().getContainingFile().getContainingDirectory();
     if (containingDirectory != null) {
       PsiFile file = containingDirectory.findFile(propertiesFileName);
       if (file instanceof PropertiesFile)
         return (PropertiesFile) file;
 
-      final PsiPackage psiPackage = JavaDirectoryService.getInstance().getPackage(containingDirectory);
+      PsiPackage psiPackage = JavaDirectoryService.getInstance().getPackage(containingDirectory);
       if (psiPackage != null) {
         for (PsiDirectory psiDirectory : psiPackage.getDirectories()) {
           file = psiDirectory.findFile(propertiesFileName);

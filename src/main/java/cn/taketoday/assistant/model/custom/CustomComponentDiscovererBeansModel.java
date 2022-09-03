@@ -40,7 +40,8 @@ public abstract class CustomComponentDiscovererBeansModel extends CacheableCommo
   }
 
   @Override
-  public @Nullable Module getModule() {
+  @Nullable
+  public Module getModule() {
     return myModule;
   }
 

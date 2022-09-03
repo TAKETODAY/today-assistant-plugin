@@ -230,8 +230,8 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
   }
 
   public static boolean isStringOrStringArray(PsiType type) {
-    if (!(type instanceof PsiClassType) || !type.getCanonicalText().equals("java.lang.String")) {
-      return (type instanceof PsiArrayType) && ((PsiArrayType) type).getComponentType().getCanonicalText().equals("java.lang.String");
+    if (!(type instanceof PsiClassType) || !"java.lang.String".equals(type.getCanonicalText())) {
+      return (type instanceof PsiArrayType) && "java.lang.String".equals(((PsiArrayType) type).getComponentType().getCanonicalText());
     }
     return true;
   }

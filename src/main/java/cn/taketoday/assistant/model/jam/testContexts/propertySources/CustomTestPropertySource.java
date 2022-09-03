@@ -67,11 +67,11 @@ public class CustomTestPropertySource implements PropertySource {
             @Nullable
             @Override
             protected TestPropertySource compute() {
-              final PsiAnnotation definingMetaAnnotation = AliasForUtils
+              PsiAnnotation definingMetaAnnotation = AliasForUtils
                       .findDefiningMetaAnnotation(getPsiElement(), myAnnotationChildLink.getAnnotationQualifiedName(),
                               TestPropertySource.ANNO_META.getAnnoName());
               if (definingMetaAnnotation != null) {
-                final PsiClass annotationType = PsiTreeUtil.getParentOfType(definingMetaAnnotation, PsiClass.class, true);
+                PsiClass annotationType = PsiTreeUtil.getParentOfType(definingMetaAnnotation, PsiClass.class, true);
                 if (annotationType != null) {
                   return TestPropertySource.META.getJamElement(annotationType);
                 }
@@ -143,7 +143,7 @@ public class CustomTestPropertySource implements PropertySource {
       }
     }
 
-    final TestPropertySource testPropertySource = getDefiningTestPropertySource();
+    TestPropertySource testPropertySource = getDefiningTestPropertySource();
     if (testPropertySource != null) {
       return testPropertySource.getPropertiesFiles();
     }

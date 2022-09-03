@@ -96,7 +96,7 @@ final class InfraConfigurationCheckStartupActivity implements StartupActivity {
       else {
         project.getMessageBus().connect().subscribe(ProfileChangeAdapter.TOPIC, new ProfileChangeAdapter() {
           public void profilesInitialized() {
-            InfraConfigurationCheckStartupActivity.queueTask(project);
+            queueTask(project);
           }
         });
       }

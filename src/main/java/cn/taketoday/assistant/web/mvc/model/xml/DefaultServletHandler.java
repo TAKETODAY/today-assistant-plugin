@@ -31,7 +31,7 @@ import cn.taketoday.assistant.web.mvc.InfraMvcConstant;
 @BeanType(DefaultServletHandler.CLASS_NAME)
 @Namespace(InfraMvcConstant.MVC_NAMESPACE_KEY)
 public interface DefaultServletHandler extends DomInfraBean {
-  public static final String CLASS_NAME = "cn.taketoday.web.servlet.resource.DefaultServletHttpRequestHandler";
+  String CLASS_NAME = "cn.taketoday.web.servlet.resource.DefaultServletHttpRequestHandler";
 
   @Required(false)
   GenericAttributeValue<String> getDefaultServletName();

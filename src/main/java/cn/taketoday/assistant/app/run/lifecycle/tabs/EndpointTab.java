@@ -79,7 +79,7 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
 
   private TooltipChangeListener myTooltipChangeListener;
 
-  private volatile boolean myActuatorsEnabled = false;
+  private volatile boolean myActuatorsEnabled;
 
   protected EndpointTab(Endpoint<T> endpoint, InfraApplicationRunConfigurationBase runConfiguration,
           ProcessHandler processHandler) {
@@ -127,7 +127,7 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
     myRootPanel = new JPanel(myRootPanelLayout);
 
     myMessagePanel = new JBLoadingPanel(new GridBagLayout(), this);
-    final String name = StringUtil.shortenTextWithEllipsis(myRunConfiguration.getName(), 30, 3);
+    String name = StringUtil.shortenTextWithEllipsis(myRunConfiguration.getName(), 30, 3);
     myMessagePanel.setLoadingText(InfraAppBundle.message("infra.application.endpoints.application.is.starting", name));
     myMessagePanel.startLoading();
 
@@ -225,7 +225,7 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
   }
 
   public void checkAvailability() {
-    myActuatorsEnabled = InfraLibraryUtil.hasActuators(getRunConfiguration().getModule());
+    myActuatorsEnabled = InfraLibraryUtil.hasActuators(myRunConfiguration.getModule());
     if (!myActuatorsEnabled) {
       showMessage(InfraAppBundle.message("infra.application.endpoints.error.actuator.starter.disabled"));
     }
@@ -305,10 +305,10 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
 
   private void updateComponent() {
     InfraApplicationInfo info = InfraApplicationLifecycleManager.from(getProject())
-            .getInfraApplicationInfo(getProcessHandler());
+            .getInfraApplicationInfo(myProcessHandler);
     LiveProperty<T> liveProperty = info != null ? getLiveProperty(info) : null;
-    final T value = liveProperty != null ? liveProperty.getValue() : null;
-    final long timeStamp = liveProperty != null ? liveProperty.getTimeStamp() : -1L;
+    T value = liveProperty != null ? liveProperty.getValue() : null;
+    long timeStamp = liveProperty != null ? liveProperty.getTimeStamp() : -1L;
     AppUIUtil.invokeLaterIfProjectAlive(getProject(), () -> {
       setTimeStampTooltip(timeStamp);
       doUpdateComponent(value);
@@ -328,7 +328,7 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
 
     protected EndpointToggleAction(@Nullable @NlsActions.ActionText String text,
             @Nullable @NlsActions.ActionDescription String description,
-            @Nullable final Icon icon) {
+            @Nullable Icon icon) {
       super(text, description, icon);
     }
 

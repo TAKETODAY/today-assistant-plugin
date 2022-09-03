@@ -28,5 +28,5 @@ import cn.taketoday.assistant.model.xml.DomInfraBean;
 @BeanType("cn.taketoday.transaction.jta.JtaTransactionManager")
 @BeanName(JtaTransactionManager.DEFAULT_NAME)
 public interface JtaTransactionManager extends DomInfraBean, InfraTxElement, InfrastructureBean {
-  public static final String DEFAULT_NAME = "transactionManager";
+  String DEFAULT_NAME = "transactionManager";
 }

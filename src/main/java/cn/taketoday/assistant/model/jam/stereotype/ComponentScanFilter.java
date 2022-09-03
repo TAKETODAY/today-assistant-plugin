@@ -80,7 +80,7 @@ public class ComponentScanFilter extends CommonModelElement.PsiBase implements J
 
   private void addClasses(Set<PsiClass> result, JamClassAttributeMeta.Collection meta) {
     for (JamClassAttributeElement element : meta.getJam(myAnnotation)) {
-      final PsiClass psiClass = element.getValue();
+      PsiClass psiClass = element.getValue();
       if (psiClass != null) {
         result.add(psiClass);
       }
@@ -88,7 +88,7 @@ public class ComponentScanFilter extends CommonModelElement.PsiBase implements J
   }
 
   public FilterType getFilterType() {
-    final FilterType filterType = FILTER_TYPE_ATTR_META.getJam(myAnnotation).getValue();
+    FilterType filterType = FILTER_TYPE_ATTR_META.getJam(myAnnotation).getValue();
     if (filterType != null) {
       return filterType;
     }

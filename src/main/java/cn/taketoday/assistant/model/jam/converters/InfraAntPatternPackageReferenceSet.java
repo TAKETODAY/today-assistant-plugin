@@ -58,17 +58,17 @@ public class InfraAntPatternPackageReferenceSet extends PackageReferenceSet {
         return PsiElementResolveResult.createResults(packages);
       }
 
-      private Collection<PsiPackage> resolvePackages(@Nullable final PsiPackage context) {
+      private Collection<PsiPackage> resolvePackages(@Nullable PsiPackage context) {
         if (context == null)
           return Collections.emptySet();
 
-        final String packageName = getValue();
+        String packageName = getValue();
 
         CommonProcessors.CollectProcessor<PsiPackage> processor = getProcessor(packageName);
 
         PsiPackageReference parentContextReference = myIndex > 0 ? getReferenceSet().getReference(myIndex - 1) : null;
 
-        if (packageName.equals("*")) {
+        if ("*".equals(packageName)) {
           for (PsiPackage aPackage : context.getSubPackages(getResolveScope())) {
             if (!processor.process(aPackage))
               break;
@@ -76,18 +76,18 @@ public class InfraAntPatternPackageReferenceSet extends PackageReferenceSet {
           return processor.getResults();
         }
 
-        if (parentContextReference != null && parentContextReference.getValue().equals(("**"))) {
+        if (parentContextReference != null && "**".equals(parentContextReference.getValue())) {
           return getSubPackages(context, processor, true);
         }
 
-        if (packageName.equals("**")) {
+        if ("**".equals(packageName)) {
           if (isLastReference()) {
             return getSubPackages(context, processor, false);
           }
           return Collections.singleton(context);
         }
         else if (packageName.contains("*") || packageName.contains("?")) {
-          for (final PsiPackage subPackage : context.getSubPackages(getResolveScope())) {
+          for (PsiPackage subPackage : context.getSubPackages(getResolveScope())) {
             processor.process(subPackage);
           }
           return processor.getResults();
@@ -101,7 +101,7 @@ public class InfraAntPatternPackageReferenceSet extends PackageReferenceSet {
       }
 
       private CommonProcessors.CollectProcessor<PsiPackage> getProcessor(String packageName) {
-        final Pattern pattern = PatternUtil.fromMask(packageName);
+        Pattern pattern = PatternUtil.fromMask(packageName);
         return new CommonProcessors.CollectProcessor<>(new LinkedHashSet<>()) {
           @Override
           protected boolean accept(PsiPackage psiPackage) {
@@ -116,9 +116,9 @@ public class InfraAntPatternPackageReferenceSet extends PackageReferenceSet {
         return processor.getResults();
       }
 
-      private void processSubPackages(final PsiPackage psiPackage,
-              final CommonProcessors.CollectProcessor<PsiPackage> processor, boolean deep) {
-        for (final PsiPackage subPackage : psiPackage.getSubPackages(getResolveScope())) {
+      private void processSubPackages(PsiPackage psiPackage,
+              CommonProcessors.CollectProcessor<PsiPackage> processor, boolean deep) {
+        for (PsiPackage subPackage : psiPackage.getSubPackages(getResolveScope())) {
           processor.process(subPackage);
           if (deep)
             processSubPackages(subPackage, processor, true);

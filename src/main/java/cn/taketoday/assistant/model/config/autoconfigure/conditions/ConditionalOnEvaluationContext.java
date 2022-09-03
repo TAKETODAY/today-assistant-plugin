@@ -60,7 +60,7 @@ public interface ConditionalOnEvaluationContext extends UserDataHolderEx {
   default boolean processConfigurationValues(Processor<? super List<ConfigurationValueResult>> processor,
           boolean checkRelaxedNames,
           String configKey) {
-    final MetaConfigKey key =
+    MetaConfigKey key =
             InfraApplicationMetaConfigKeyManager.getInstance().findCanonicalApplicationMetaConfigKey(getModule(), configKey);
     if (key == null)
       return true;

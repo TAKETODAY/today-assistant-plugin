@@ -54,7 +54,7 @@ public final class InfraExchangeUrlPathSpecification extends FrameworkUrlPathSpe
   private static final UrlPksParser parser = new UrlPksParser(
           new Function2<>() {
             @Override
-            public final SplitEscaper invoke(CharSequence input, String pattern) {
+            public SplitEscaper invoke(CharSequence input, String pattern) {
               return new PlaceholderSplitEscaper(PATH_PLACEHOLDER_BRACES, input, pattern);
             }
           },

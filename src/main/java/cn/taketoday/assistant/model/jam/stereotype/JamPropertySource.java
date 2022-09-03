@@ -96,10 +96,10 @@ public class JamPropertySource extends JamBaseElement<PsiClass> implements Prope
   public Set<PropertiesFile> getPropertiesFiles() {
     Set<PropertiesFile> propertiesFiles = new LinkedHashSet<>();
 
-    final List<JamStringAttributeElement<Set<PropertiesFile>>> attributeValues = VALUE_ATTR_META.getJam(myPsiAnnotation);
+    List<JamStringAttributeElement<Set<PropertiesFile>>> attributeValues = VALUE_ATTR_META.getJam(myPsiAnnotation);
 
     for (JamStringAttributeElement<Set<PropertiesFile>> attributeElement : attributeValues) {
-      final Set<PropertiesFile> value = attributeElement.getValue();
+      Set<PropertiesFile> value = attributeElement.getValue();
       if (value != null)
         propertiesFiles.addAll(value);
     }

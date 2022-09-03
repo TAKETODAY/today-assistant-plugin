@@ -41,7 +41,7 @@ public class IncludeAnnotationsFilter extends InfraContextFilter.IncludeClasses 
     Set<InfraStereotypeElement> includes = new LinkedHashSet<>();
     GlobalSearchScope searchScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
     for (PsiClass psiClass : getClasses()) {
-      final String qualifiedName = psiClass.getQualifiedName();
+      String qualifiedName = psiClass.getQualifiedName();
       if (qualifiedName != null) {
         includes.addAll(InfraContextIncludeAnnotationFilter.getAnnotatedStereotypes(psiClass, searchScope, packages));
       }

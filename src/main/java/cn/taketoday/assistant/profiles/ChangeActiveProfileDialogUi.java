@@ -86,7 +86,7 @@ public final class ChangeActiveProfileDialogUi {
                     return Unit.INSTANCE;
                   });
                   DefaultImpls.row(label, (JLabel) null, false, row1 -> {
-                    row1.invoke(getContextRadioButton(), new CCFlags[0], null, null);
+                    row1.invoke(contextRadioButton, new CCFlags[0], null, null);
                     return Unit.INSTANCE;
                   });
                   return Unit.INSTANCE;

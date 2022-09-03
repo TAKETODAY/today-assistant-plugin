@@ -25,5 +25,5 @@ import cn.taketoday.assistant.model.xml.DomInfraBean;
 
 @BeanType(LocalSlsb.CLASS_NAME)
 public interface LocalSlsb extends DomInfraBean, InfraEjb {
-  public static final String CLASS_NAME = "cn.taketoday.ejb.access.LocalStatelessSessionProxyFactoryBean";
+  String CLASS_NAME = "cn.taketoday.ejb.access.LocalStatelessSessionProxyFactoryBean";
 }

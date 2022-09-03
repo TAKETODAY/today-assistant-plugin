@@ -35,7 +35,7 @@ import cn.taketoday.assistant.web.mvc.InfraMvcConstant;
 @BeanType(Resources.CLASS_NAME)
 @Namespace(InfraMvcConstant.MVC_NAMESPACE_KEY)
 public interface Resources extends DomInfraBean {
-  public static final String CLASS_NAME = "cn.taketoday.web.servlet.resource.ResourceHttpRequestHandler";
+  String CLASS_NAME = "cn.taketoday.web.servlet.resource.ResourceHttpRequestHandler";
 
   @Required
   GenericAttributeValue<String> getMapping();

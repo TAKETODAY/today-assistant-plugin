@@ -28,7 +28,7 @@ import cn.taketoday.assistant.model.xml.DomInfraBean;
 
 @BeanType(RemoteSlsb.CLASS_NAME)
 public interface RemoteSlsb extends DomInfraBean, InfraEjb {
-  public static final String CLASS_NAME = "cn.taketoday.ejb.access.SimpleRemoteStatelessSessionProxyFactoryBean";
+  String CLASS_NAME = "cn.taketoday.ejb.access.SimpleRemoteStatelessSessionProxyFactoryBean";
 
   GenericAttributeValue<PsiClass> getHomeInterface();
 

@@ -62,7 +62,7 @@ public class InfraTestContextUtilImpl extends InfraTestContextUtil {
     }
     CommonProcessors.FindProcessor<PsiClass> findFirstProcessor = new CommonProcessors.FindProcessor<>() {
       public boolean accept(PsiClass psiClass2) {
-        return InfraTestContextUtilImpl.isSpringTestContextConfiguration(psiClass2);
+        return isSpringTestContextConfiguration(psiClass2);
       }
     };
     InheritanceUtil.processSupers(psiClass, true, findFirstProcessor);

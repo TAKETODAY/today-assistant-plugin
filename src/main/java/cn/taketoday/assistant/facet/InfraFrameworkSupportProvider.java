@@ -153,7 +153,7 @@ public class InfraFrameworkSupportProvider extends FacetBasedFrameworkSupportPro
 
     public JComponent getComponent() {
       JPanel allPanel = new JPanel(new BorderLayout());
-      JBCheckBox createEmptySpringXml = new JBCheckBox(InfraBundle.message("framework.support.provider.create.empty.config", InfraFrameworkSupportProvider.CONFIG_XML));
+      JBCheckBox createEmptySpringXml = new JBCheckBox(InfraBundle.message("framework.support.provider.create.empty.config", CONFIG_XML));
       createEmptySpringXml.addChangeListener(e -> {
         InfraFrameworkSupportProvider.this.myCreateEmptySpringXml = createEmptySpringXml.isSelected();
       });

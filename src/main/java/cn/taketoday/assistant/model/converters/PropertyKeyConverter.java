@@ -29,7 +29,7 @@ public class PropertyKeyConverter extends WrappingConverter {
 
   @Override
   @Nullable
-  public Converter getConverter(final GenericDomValue domValue) {
+  public Converter getConverter(GenericDomValue domValue) {
 
     return CustomConverterRegistry.getRegistry().getCustomConverter(getClass(), domValue);
   }

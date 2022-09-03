@@ -63,7 +63,7 @@ public final class DefaultInfraBeanQualifier implements InfraQualifier {
 
   @Override
   public PsiElement getIdentifyingPsiElement() {
-    final PsiElement psiElement = myBean.getIdentifyingPsiElement();
+    PsiElement psiElement = myBean.getIdentifyingPsiElement();
     assert psiElement != null : myBean;
     return psiElement;
   }

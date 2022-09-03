@@ -86,7 +86,7 @@ public class InfraTestingDirtiesContext implements JamElement {
   }
 
   public ClassMode getClassMode() {
-    final ClassMode classMode = getClassModeElement().getValue();
+    ClassMode classMode = getClassModeElement().getValue();
     if (classMode != null) {
       return classMode;
     }
@@ -94,7 +94,7 @@ public class InfraTestingDirtiesContext implements JamElement {
   }
 
   public MethodMode getMethodMode() {
-    final MethodMode methodMode = getMethodModeElement().getValue();
+    MethodMode methodMode = getMethodModeElement().getValue();
     if (methodMode != null) {
       return methodMode;
     }
@@ -102,7 +102,7 @@ public class InfraTestingDirtiesContext implements JamElement {
   }
 
   public HierarchyMode getHierarchyMode() {
-    final HierarchyMode methodMode = getHierarchyModeElement().getValue();
+    HierarchyMode methodMode = getHierarchyModeElement().getValue();
     if (methodMode != null) {
       return methodMode;
     }
@@ -121,11 +121,13 @@ public class InfraTestingDirtiesContext implements JamElement {
     return HIERARCHY_MODE_ATTR_META.getJam(myPsiAnnotation);
   }
 
-  public @Nullable PsiMember getPsiElement() {
+  @Nullable
+  public PsiMember getPsiElement() {
     return myPsiMemberAnchor != null ? (PsiMember) myPsiMemberAnchor.retrieveOrThrow() : null;
   }
 
-  public @Nullable PsiAnnotation getAnnotation() {
+  @Nullable
+  public PsiAnnotation getAnnotation() {
     return myPsiAnnotation.getPsiElement();
   }
 

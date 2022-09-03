@@ -49,21 +49,20 @@ import cn.taketoday.lang.Nullable;
 public abstract class FrameworkIntegrationAction extends AnAction implements FrameworkSupportProvider {
 
   protected FrameworkIntegrationAction() {
-    super();
 
     // TODO we cannot use getTemplatePresentation() and set icon/text once
     // TODO due to BasicDelegateFrameworkIntegrationAction, so reserve space for icon
-    final Presentation template = getTemplatePresentation();
+    Presentation template = getTemplatePresentation();
     template.setIcon(EmptyIcon.ICON_16);
   }
 
   @Override
   public void actionPerformed(AnActionEvent e) {
-    final DataContext dataContext = e.getDataContext();
+    DataContext dataContext = e.getDataContext();
 
-    final Module module = getModule(dataContext);
-    final Editor editor = getEditor(dataContext);
-    final XmlFile xmlFile = getXmlFile(dataContext);
+    Module module = getModule(dataContext);
+    Editor editor = getEditor(dataContext);
+    XmlFile xmlFile = getXmlFile(dataContext);
 
     if (module != null && editor != null && xmlFile != null) {
       generateSpringBeans(module, editor, xmlFile);
@@ -71,15 +70,15 @@ public abstract class FrameworkIntegrationAction extends AnAction implements Fra
   }
 
   @Override
-  public void update(final AnActionEvent event) {
+  public void update(AnActionEvent event) {
     Presentation presentation = event.getPresentation();
     DataContext dataContext = event.getDataContext();
 
     XmlFile file = getXmlFile(dataContext);
 
-    final boolean isSpringBeanFile = file != null && InfraDomUtils.isInfraXml(file);
+    boolean isSpringBeanFile = file != null && InfraDomUtils.isInfraXml(file);
 
-    final boolean enabled = isSpringBeanFile && accept(file);
+    boolean enabled = isSpringBeanFile && accept(file);
 
     presentation.setEnabledAndVisible(enabled);
     presentation.setText(getDescription());
@@ -87,35 +86,35 @@ public abstract class FrameworkIntegrationAction extends AnAction implements Fra
   }
 
   @Nullable
-  protected static XmlFile getXmlFile(final DataContext dataContext) {
+  protected static XmlFile getXmlFile(DataContext dataContext) {
     return getXmlFile(getProject(dataContext), getEditor(dataContext));
   }
 
   @Nullable
-  protected static XmlFile getXmlFile(final Project project, final Editor editor) {
+  protected static XmlFile getXmlFile(Project project, Editor editor) {
     if (project == null || editor == null)
       return null;
 
-    final PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+    PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
     return psiFile instanceof XmlFile ? (XmlFile) psiFile : null;
   }
 
   @Nullable
-  protected static Editor getEditor(final DataContext dataContext) {
+  protected static Editor getEditor(DataContext dataContext) {
     return CommonDataKeys.EDITOR.getData(dataContext);
   }
 
   @Nullable
-  protected static Project getProject(final DataContext dataContext) {
+  protected static Project getProject(DataContext dataContext) {
     return CommonDataKeys.PROJECT.getData(dataContext);
   }
 
   @Nullable
-  protected static Module getModule(final DataContext dataContext) {
+  protected static Module getModule(DataContext dataContext) {
     return PlatformCoreDataKeys.MODULE.getData(dataContext);
   }
 
-  protected boolean accept(final XmlFile file) {
+  protected boolean accept(XmlFile file) {
     return acceptBeansByClassNames(file, getBeansClassNames());
   }
 
@@ -127,17 +126,17 @@ public abstract class FrameworkIntegrationAction extends AnAction implements Fra
     if (classNames.length == 0)
       return true;
 
-    final Module module = ModuleUtilCore.findModuleForPsiElement(file);
+    Module module = ModuleUtilCore.findModuleForPsiElement(file);
     if (module == null)
       return false;
 
-    final JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(module.getProject());
-    final GlobalSearchScope searchScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
+    JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(module.getProject());
+    GlobalSearchScope searchScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
 
-    final CommonInfraModel model = InfraManager.from(file.getProject()).getInfraModelByFile(file);
+    CommonInfraModel model = InfraManager.from(file.getProject()).getInfraModelByFile(file);
     if (model != null) {
       for (String className : classNames) {
-        final PsiClass psiClass = javaPsiFacade.findClass(className, searchScope);
+        PsiClass psiClass = javaPsiFacade.findClass(className, searchScope);
         if (psiClass == null)
           continue;
 
@@ -148,7 +147,7 @@ public abstract class FrameworkIntegrationAction extends AnAction implements Fra
     return true;
   }
 
-  protected abstract void generateSpringBeans(final Module module, final Editor editor, final XmlFile xmlFile);
+  protected abstract void generateSpringBeans(Module module, Editor editor, XmlFile xmlFile);
 
   @Nullable
   protected Icon getIcon() {

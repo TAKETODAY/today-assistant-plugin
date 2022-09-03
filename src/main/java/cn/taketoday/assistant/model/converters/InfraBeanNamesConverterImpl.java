@@ -52,7 +52,7 @@ public class InfraBeanNamesConverterImpl extends InfraBeanNamesConverter {
     return InfraUtils.tokenize(s);
   }
 
-  public PsiReference[] createReferences(final GenericDomValue<List<String>> genericDomValue, final PsiElement element, final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<List<String>> genericDomValue, PsiElement element, ConvertContext context) {
     List<String> strings = genericDomValue.getValue();
     if (strings != null) {
       List<PsiReference> references = new ArrayList<>(strings.size());

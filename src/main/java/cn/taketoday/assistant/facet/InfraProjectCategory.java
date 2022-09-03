@@ -63,7 +63,7 @@ public class InfraProjectCategory extends ModuleTypeCategory.Java {
     return new JavaModuleBuilder() {
 
       public String getBuilderId() {
-        return InfraProjectCategory.LEGACY_MODULE_BUILDER_ID;
+        return LEGACY_MODULE_BUILDER_ID;
       }
 
       public boolean isAvailable() {

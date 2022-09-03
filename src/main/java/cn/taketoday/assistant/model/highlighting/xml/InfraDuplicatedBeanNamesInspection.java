@@ -147,11 +147,11 @@ public final class InfraDuplicatedBeanNamesInspection extends InfraBeanInspectio
     }
   }
 
-  private static LocalQuickFix[] getFixes(final String name, final PsiElementPointer bean, InfraModel model, InfraProfile profile) {
+  private static LocalQuickFix[] getFixes(String name, PsiElementPointer bean, InfraModel model, InfraProfile profile) {
     if (bean == null) {
       return LocalQuickFix.EMPTY_ARRAY;
     }
-    final Collection<BeanPointer<?>> pointers = InfraModelSearchers.findBeans(model, name).stream().filter(pointer -> {
+    Collection<BeanPointer<?>> pointers = InfraModelSearchers.findBeans(model, name).stream().filter(pointer -> {
       return !pointer.equals(bean) && isPointerInTheSameProfiles(profile, pointer.getPsiElement());
     }).collect(Collectors.toSet());
     if (pointers.isEmpty()) {
@@ -219,12 +219,12 @@ public final class InfraDuplicatedBeanNamesInspection extends InfraBeanInspectio
       this.myName = name;
     }
 
-    public FakePsiElement fun(final PsiElementPointer pointer) {
-      final PsiElement psiElement = pointer.getPsiElement();
+    public FakePsiElement fun(PsiElementPointer pointer) {
+      PsiElement psiElement = pointer.getPsiElement();
       if (psiElement == null) {
         return null;
       }
-      final PsiFile containingFile = psiElement.getContainingFile();
+      PsiFile containingFile = psiElement.getContainingFile();
       if (!psiElement.equals(this.myBean.getPsiElement())) {
         return new FakePsiElement() {
 

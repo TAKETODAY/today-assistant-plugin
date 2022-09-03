@@ -89,14 +89,14 @@ public abstract class MethodInvokingFactoryBean extends InfraBeanGenerateProvide
   protected abstract String getClassName();
 
   private static Expression getTargetMethodExpression(InfraBean infraBean) {
-    final InfraBean copy = infraBean.createStableCopy();
+    InfraBean copy = infraBean.createStableCopy();
     return new Expression() {
       public Result calculateResult(ExpressionContext context) {
         return new TextResult("");
       }
 
       public LookupElement[] calculateLookupItems(ExpressionContext context) {
-        PsiClass psiClass = MethodInvokingFactoryBean.getTargetObjectPsiClass(copy);
+        PsiClass psiClass = getTargetObjectPsiClass(copy);
         if (psiClass == null) {
           return LookupElement.EMPTY_ARRAY;
         }
@@ -115,7 +115,8 @@ public abstract class MethodInvokingFactoryBean extends InfraBeanGenerateProvide
     };
   }
 
-  private static @Nullable PsiClass getTargetObjectPsiClass(InfraBean infraBean) {
+  @Nullable
+  private static PsiClass getTargetObjectPsiClass(InfraBean infraBean) {
     InfraPropertyDefinition property = InfraPropertyUtils.findPropertyByName(infraBean, "targetObject");
     if (property == null) {
       return null;

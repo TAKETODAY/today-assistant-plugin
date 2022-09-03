@@ -112,8 +112,8 @@ public final class InfraMultipleContextsPanel extends InfraEditorNotificationPan
     return modules;
   }
 
-  private HyperlinkLabel addChangeContextLabel(final InfraContextDescriptor currentContext) {
-    final HyperlinkLabel label = new HyperlinkLabel(currentContext.getName(), this.getBackground());
+  private HyperlinkLabel addChangeContextLabel(InfraContextDescriptor currentContext) {
+    HyperlinkLabel label = new HyperlinkLabel(currentContext.getName(), this.getBackground());
     label.setIcon(Icons.FileSet);
     label.addHyperlinkListener(new HyperlinkAdapter() {
       public void hyperlinkActivated(HyperlinkEvent e) {

@@ -56,7 +56,7 @@ public class InfraContextSchemaInjector implements MultiHostInjector {
             GenericAttributeValue value = DomManager.getDomManager(host.getProject()).getDomElement(xmlAttribute);
             if (value != null) {
               Filter filter = value.getParentOfType(Filter.class, true);
-              if (filter != null && Type.REGEX.equals(filter.getType().getValue())) {
+              if (filter != null && Type.REGEX == filter.getType().getValue()) {
                 injectRegexpLanguage(registrar, (PsiLanguageInjectionHost) host);
               }
             }

@@ -54,7 +54,7 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
     return new PsiReference[] { createReference(psiClass, element, stringValue) };
   }
 
-  private static PsiReference createReference(final PsiClass psiClass, final PsiElement element, final String stringValue) {
+  private static PsiReference createReference(PsiClass psiClass, PsiElement element, String stringValue) {
     return new PsiReferenceBase<>(element, true) {
 
       public PsiElement resolve() {
@@ -66,7 +66,7 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
       }
 
       public Object[] getVariants() {
-        return EnumValueConverter.getFields(psiClass);
+        return getFields(psiClass);
       }
     };
   }

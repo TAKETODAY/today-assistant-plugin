@@ -190,7 +190,7 @@ public class InfraProfilesFactory {
     return smartList;
   }
 
-  private static List<TextRange> getProfileRanges(@cn.taketoday.lang.Nullable final String value, String delimiters) {
+  private static List<TextRange> getProfileRanges(@cn.taketoday.lang.Nullable String value, String delimiters) {
     if (StringUtil.isEmptyOrSpaces(value)) {
       return Collections.emptyList();
     }

@@ -54,7 +54,7 @@ public class ModuleSuggestionServiceImpl implements ModuleSuggestionService {
    * Within the trie, all keys are stored in sanitised format to enable us find keys without worrying about hyphens, underscores, e.t.c in the keys themselves
    */
   private Future<?> indexExecution;
-  private boolean indexAvailable = false;
+  private boolean indexAvailable;
 
   ModuleSuggestionServiceImpl(Module module) {
     this.module = module;

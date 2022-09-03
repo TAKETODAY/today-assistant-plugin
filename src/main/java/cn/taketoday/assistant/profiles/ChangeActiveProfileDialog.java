@@ -73,7 +73,7 @@ class ChangeActiveProfileDialog extends DialogWrapper {
     this.myModule = module;
     this.myFileSet = fileSet;
     this.myCompletionProvider = new InfraProfileCompletionProvider(includeTests);
-    final TextFieldWithAutoCompletion<String> profilesField = new TextFieldWithAutoCompletion<>(this.myProject, this.myCompletionProvider, true, "aaaaa");
+    TextFieldWithAutoCompletion<String> profilesField = new TextFieldWithAutoCompletion<>(this.myProject, this.myCompletionProvider, true, "aaaaa");
     profilesField.addDocumentListener(new DocumentListener() {
 
       public void documentChanged(DocumentEvent event) {

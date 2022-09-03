@@ -63,10 +63,9 @@ public final class InfraMvcControllersEndpointsProvider extends WebMvcServerProv
   }
 
   public Iterable<BeanPointer<?>> getEndpointGroups(Project project, EndpointsFilter filter) {
-    if (!(filter instanceof ModuleEndpointsFilter)) {
+    if (!(filter instanceof ModuleEndpointsFilter moduleFilter)) {
       return ContainerUtil.emptyList();
     }
-    ModuleEndpointsFilter moduleFilter = (ModuleEndpointsFilter) filter;
     Module module = moduleFilter.getModule();
     if (!InfraLibraryUtil.hasWebMvcLibrary(module) && !WebMvcLibraryUtil.hasWebfluxLibrary(module)) {
       return ContainerUtil.emptyList();

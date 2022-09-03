@@ -41,7 +41,7 @@ public final class CustomBeanParser {
       public void publish(LogRecord record) {
         Throwable throwable = record.getThrown();
         if (throwable != null) {
-          CustomBeanParser.printException(throwable);
+          printException(throwable);
         }
       }
 

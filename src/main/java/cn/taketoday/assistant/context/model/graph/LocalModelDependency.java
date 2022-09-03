@@ -57,7 +57,7 @@ public final class LocalModelDependency {
     return new LocalModelDependency(text != null ? text : "", type, identifyingElement);
   }
 
-  public static LocalModelDependency create(String label, LocalModelDependencyType type, final DomElement identifyingElement) {
+  public static LocalModelDependency create(String label, LocalModelDependencyType type, DomElement identifyingElement) {
     return new LocalModelDependency(label, type, new FakePsiElement() {
 
       private XmlElement getXmlElement() {

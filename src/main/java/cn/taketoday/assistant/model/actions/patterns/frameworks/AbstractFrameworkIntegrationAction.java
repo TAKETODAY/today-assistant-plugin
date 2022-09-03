@@ -36,7 +36,7 @@ import cn.taketoday.lang.Nullable;
 public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegrationAction {
 
   @Override
-  protected void generateSpringBeans(final Module module, final Editor editor, final XmlFile xmlFile) {
+  protected void generateSpringBeans(Module module, Editor editor, XmlFile xmlFile) {
     FrameworkSupportTemplatesRunner.getInstance().generateSpringBeans(this, module, editor, xmlFile);
   }
 
@@ -47,22 +47,22 @@ public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegr
   }
 
   @Override
-  public void addFacet(final Module module) {
+  public void addFacet(Module module) {
     if (module == null)
       return;
 
-    final String facetId = getFacetId();
+    String facetId = getFacetId();
     if (!StringUtil.isEmptyOrSpaces(facetId)) {
 
-      final FacetManager facetManager = FacetManager.getInstance(module);
-      final FacetType<?, ?> type = FacetTypeRegistry.getInstance().findFacetType(facetId);
+      FacetManager facetManager = FacetManager.getInstance(module);
+      FacetType<?, ?> type = FacetTypeRegistry.getInstance().findFacetType(facetId);
 
       if (type != null) {
 
         if (facetManager.getFacetByType(type.getId()) == null) {
-          final ModifiableFacetModel model = facetManager.createModifiableModel();
+          ModifiableFacetModel model = facetManager.createModifiableModel();
 
-          final Facet facet = facetManager.addFacet(type, type.getDefaultFacetName(), null);
+          Facet facet = facetManager.addFacet(type, type.getDefaultFacetName(), null);
 
           model.addFacet(facet);
           model.commit();

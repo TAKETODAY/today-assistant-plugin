@@ -33,7 +33,7 @@ import cn.taketoday.assistant.model.xml.beans.Alias;
 
 public class AliasNameConverterImpl extends AliasNameConverter {
 
-  public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue, PsiElement element, ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<String> genericDomValue, PsiElement element, ConvertContext context) {
     if (PlaceholderUtils.getInstance().isRawTextPlaceholder(genericDomValue)) {
       return PlaceholderUtils.getInstance().createPlaceholderPropertiesReferences(genericDomValue);
     }

@@ -140,8 +140,7 @@ public abstract class InfraModelVisitor {
           return false;
       }
       if (bean instanceof InfraMap) {
-        if (!visitMap(visitor, (InfraMap) bean))
-          return false;
+        return visitMap(visitor, (InfraMap) bean);
       }
     }
     return true;
@@ -155,14 +154,14 @@ public abstract class InfraModelVisitor {
             visitElementsHolder(visitor, elementsHolder);
   }
 
-  private static boolean visitElementsHolder(final InfraModelVisitor visitor, final InfraElementsHolder elementsHolder) {
+  private static boolean visitElementsHolder(InfraModelVisitor visitor, InfraElementsHolder elementsHolder) {
     if (!visitor.visitChildrenBeans(elementsHolder))
       return false;
 
-    final InfraRef ref = elementsHolder.getRef();
+    InfraRef ref = elementsHolder.getRef();
     if (DomUtil.hasXml(ref) && !visitor.visitRef(ref))
       return false;
-    final Idref idref = elementsHolder.getIdref();
+    Idref idref = elementsHolder.getIdref();
     if (DomUtil.hasXml(idref) && !visitor.visitIdref(idref))
       return false;
     if (!visitCollection(visitor, elementsHolder.getList()))
@@ -171,12 +170,10 @@ public abstract class InfraModelVisitor {
       return false;
     if (!visitCollection(visitor, elementsHolder.getArray()))
       return false;
-    if (!visitMap(visitor, elementsHolder.getMap()))
-      return false;
-    return true;
+    return visitMap(visitor, elementsHolder.getMap());
   }
 
-  private static boolean visitCollection(final InfraModelVisitor visitor,
+  private static boolean visitCollection(InfraModelVisitor visitor,
           ListOrSet collection) {
     if (!visitor.visitChildrenBeans(collection))
       return false;
@@ -216,7 +213,7 @@ public abstract class InfraModelVisitor {
         return false;
       if (!visitValueHolder(visitor, entry))
         return false;
-      final InfraKey key = entry.getKey();
+      InfraKey key = entry.getKey();
       if (DomUtil.hasXml(key) && !visitElementsHolder(visitor, key))
         return false;
     }

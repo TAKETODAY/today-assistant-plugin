@@ -29,15 +29,15 @@ public final class RestOperation {
 
   private final String type;
 
-  public final String component1() {
+  public String component1() {
     return this.method;
   }
 
-  public final String component2() {
+  public String component2() {
     return this.type;
   }
 
-  public final RestOperation copy(String method, String type) {
+  public RestOperation copy(String method, String type) {
     Intrinsics.checkNotNullParameter(method, "method");
     Intrinsics.checkNotNullParameter(type, "type");
     return new RestOperation(method, type);
@@ -66,20 +66,19 @@ public final class RestOperation {
 
   public boolean equals(@Nullable Object obj) {
     if (this != obj) {
-      if (!(obj instanceof RestOperation)) {
+      if (!(obj instanceof RestOperation restOperation)) {
         return false;
       }
-      RestOperation restOperation = (RestOperation) obj;
       return Intrinsics.areEqual(this.method, restOperation.method) && Intrinsics.areEqual(this.type, restOperation.type);
     }
     return true;
   }
 
-  public final String getMethod() {
+  public String getMethod() {
     return this.method;
   }
 
-  public final String getType() {
+  public String getType() {
     return this.type;
   }
 

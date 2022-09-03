@@ -140,7 +140,8 @@ public class InfraSchemaProvider extends XmlSchemaProvider {
     }
   }
 
-  private static @Nullable String getNamespace(VirtualFile virtualFile, Project project) {
+  @Nullable
+  private static String getNamespace(VirtualFile virtualFile, Project project) {
     PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
     if (psiFile instanceof XmlFile) {
       XmlDocument document = ((XmlFile) psiFile).getDocument();

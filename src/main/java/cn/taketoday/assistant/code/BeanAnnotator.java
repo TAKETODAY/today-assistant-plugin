@@ -93,7 +93,7 @@ public class BeanAnnotator extends AbstractInfraAnnotator {
   @Override
   protected void annotateClass(Collection<? super RelatedItemLineMarkerInfo<?>> result, UClass uClass, PsiElement identifier) {
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
-    if (psiClass == null || !InfraUtils.isBeanCandidateClass(psiClass)) {
+    if (!InfraUtils.isBeanCandidateClass(psiClass)) {
       return;
     }
     JavaClassInfo info1 = JavaClassInfo.from(psiClass);

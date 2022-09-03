@@ -29,9 +29,9 @@ import com.intellij.semantic.SemKey;
 import java.util.List;
 
 public interface ImportResource extends JamElement {
-  public static final String LOCATIONS_ATTR_NAME = "locations";
-  public static final String VALUE_ATTR_NAME = "value";
-  public static final SemKey<ImportResource> IMPORT_RESOURCE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("ImportResource");
+  String LOCATIONS_ATTR_NAME = "locations";
+  String VALUE_ATTR_NAME = "value";
+  SemKey<ImportResource> IMPORT_RESOURCE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("ImportResource");
 
   List<XmlFile> getImportedResources(Module... moduleArr);
 }

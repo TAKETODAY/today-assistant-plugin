@@ -86,7 +86,8 @@ public class InfraContextConfiguration implements ContextConfiguration {
     META.addAnnotation(ANNO_META);
   }
 
-  private final @Nullable PsiAnchor myPsiClassAnchor;
+  @Nullable
+  private final PsiAnchor myPsiClassAnchor;
   private final PsiElementRef<PsiAnnotation> myPsiAnnotation;
 
   @SuppressWarnings("unused")
@@ -153,7 +154,7 @@ public class InfraContextConfiguration implements ContextConfiguration {
           }
         }
         else {
-          final String value = stringAttributeElement.getStringValue();
+          String value = stringAttributeElement.getStringValue();
           if (value != null) {
             locations.addAll(ApplicationContextReferenceConverter.getApplicationContexts(value, context));
           }
@@ -173,11 +174,11 @@ public class InfraContextConfiguration implements ContextConfiguration {
   }
 
   public Set<String> getActiveProfiles() {
-    final PsiClass psiClass = getPsiElement();
+    PsiClass psiClass = getPsiElement();
     if (psiClass == null)
       return Collections.emptySet();
 
-    final InfraActiveProfile profiles = getActiveProfiles(psiClass);
+    InfraActiveProfile profiles = getActiveProfiles(psiClass);
     return profiles != null ? profiles.getActiveProfiles() : Collections.emptySet();
   }
 

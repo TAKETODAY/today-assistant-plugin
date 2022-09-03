@@ -131,7 +131,7 @@ public final class ContextConfigurationInspection extends AbstractInfraLocalInsp
     else if (InfraTestContextUtilImpl.isGenericXmlContextLoader(contextConfiguration)) {
       XmlFile xmlFile = InfraTestContextUtilImpl.getDefaultLocation(contextConfiguration);
       if (xmlFile == null) {
-        final PsiElement annotation = contextConfiguration.getAnnotation();
+        PsiElement annotation = contextConfiguration.getAnnotation();
         Intrinsics.checkNotNull(annotation);
         Intrinsics.checkNotNullExpressionValue(annotation, "contextConfiguration.annotation!!");
         PsiFile containingFile = annotation.getContainingFile();
@@ -166,7 +166,7 @@ public final class ContextConfigurationInspection extends AbstractInfraLocalInsp
       processConfigurationsHierarchy(contextConfiguration, processor);
       if (!processor.isFound() && !hasInnerConfigurations(contextConfiguration)) {
         PsiElement psiElement = contextConfiguration.getAnnotation();
-        final PsiClass aClass = contextConfiguration.getPsiElement();
+        PsiClass aClass = contextConfiguration.getPsiElement();
         if (aClass == null) {
           return;
         }

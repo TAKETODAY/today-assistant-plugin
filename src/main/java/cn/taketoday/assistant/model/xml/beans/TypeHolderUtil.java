@@ -44,11 +44,11 @@ public final class TypeHolderUtil {
 
   @Nullable
   public static PsiType getRequiredType(TypeHolder typeHolder) {
-    final List<PsiType> psiTypes = getRequiredTypes(typeHolder);
+    List<PsiType> psiTypes = getRequiredTypes(typeHolder);
     return ContainerUtil.getFirstItem(psiTypes);
   }
 
-  public static List<PsiType> getRequiredTypes(final TypeHolder typeHolder) {
+  public static List<PsiType> getRequiredTypes(TypeHolder typeHolder) {
     if (!DomUtil.hasXml(typeHolder) ||
             !typeHolder.isValid()) {
       return Collections.emptyList();
@@ -63,7 +63,7 @@ public final class TypeHolderUtil {
 
   @Nullable
   public static PsiClassType getRequiredClassType(TypeHolder typeHolder) {
-    final PsiType injectionType = getRequiredType(typeHolder);
+    PsiType injectionType = getRequiredType(typeHolder);
     if (injectionType instanceof PsiClassType) {
       return (PsiClassType) injectionType;
     }

@@ -69,7 +69,7 @@ public class XmlInfraModelImpl extends XmlInfraModel {
     return this.myConfigFiles;
   }
 
-  private boolean hasImportedConfigs(final XmlFile file) {
+  private boolean hasImportedConfigs(XmlFile file) {
     CommonProcessors.FindProcessor<CommonInfraModel> findProcessor = new CommonProcessors.FindProcessor<>() {
       public boolean accept(CommonInfraModel model) {
         return (model instanceof cn.taketoday.assistant.context.model.LocalXmlModel) && ((LocalXmlModel) model).getConfig().equals(file);

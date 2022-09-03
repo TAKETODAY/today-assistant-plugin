@@ -48,10 +48,10 @@ public class InfraContextIncludeAnnotationFilter extends InfraContextFilter.Incl
 
   @Override
   public Set<InfraStereotypeElement> includeStereotypes(Module module, Set<PsiPackage> packages) {
-    final String annotation = getExpression();
+    String annotation = getExpression();
     if (!StringUtil.isEmptyOrSpaces(annotation)) {
       GlobalSearchScope searchScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
-      final PsiClass annotationClass = JavaPsiFacade.getInstance(module.getProject()).findClass(annotation, searchScope);
+      PsiClass annotationClass = JavaPsiFacade.getInstance(module.getProject()).findClass(annotation, searchScope);
 
       return getAnnotatedStereotypes(annotationClass, searchScope, packages);
     }
@@ -64,8 +64,8 @@ public class InfraContextIncludeAnnotationFilter extends InfraContextFilter.Incl
     if (annotationClass == null || !annotationClass.isAnnotationType())
       return Collections.emptySet();
 
-    final Set<InfraStereotypeElement> components = new LinkedHashSet<>();
-    final Set<PsiClass> annotatedClasses = getAnnotatedClasses(annotationClass, packages, searchScope);
+    Set<InfraStereotypeElement> components = new LinkedHashSet<>();
+    Set<PsiClass> annotatedClasses = getAnnotatedClasses(annotationClass, packages, searchScope);
     for (PsiClass annotatedClass : annotatedClasses) {
       JamPsiMemberInfraBean bean = JamService.getJamService(annotatedClass.getProject())
               .getJamElement(JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY, annotatedClass);
@@ -83,11 +83,11 @@ public class InfraContextIncludeAnnotationFilter extends InfraContextFilter.Incl
   private static Set<PsiClass> getAnnotatedClasses(PsiClass annotationClass,
           Set<PsiPackage> packages,
           GlobalSearchScope searchScope) {
-    final Set<PsiClass> annotatedClasses = new LinkedHashSet<>();
+    Set<PsiClass> annotatedClasses = new LinkedHashSet<>();
     Processor<PsiClass> processor = new CommonProcessors.CollectProcessor<>(annotatedClasses);
 
     for (PsiPackage psiPackage : packages) {
-      final GlobalSearchScope scope = searchScope.intersectWith(PackageScope.packageScope(psiPackage, true));
+      GlobalSearchScope scope = searchScope.intersectWith(PackageScope.packageScope(psiPackage, true));
       AnnotatedElementsSearch.searchPsiClasses(annotationClass, scope).forEach(processor);
     }
     return annotatedClasses;

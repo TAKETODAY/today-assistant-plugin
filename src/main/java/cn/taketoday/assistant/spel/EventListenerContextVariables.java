@@ -101,7 +101,8 @@ final class EventListenerContextVariables extends SpringElContextsExtension {
     }
   }
 
-  private static @Nullable PsiVariable getEventExpressionRootObject(PsiMethod method) {
+  @Nullable
+  private static PsiVariable getEventExpressionRootObject(PsiMethod method) {
     PsiClass rootObjectClass = InfraUtils.findLibraryClass(ModuleUtilCore.findModuleForPsiElement(method), "cn.taketoday.context.event.EventExpressionRootObject");
     if (rootObjectClass == null) {
       return null;
@@ -122,7 +123,7 @@ final class EventListenerContextVariables extends SpringElContextsExtension {
         PsiMethod[] psiMethods = super.getMethods();
 
         for (PsiMethod method : psiMethods) {
-          if (method.getName().equals("getEvent")) {
+          if ("getEvent".equals(method.getName())) {
             methods.add(new LightMethod(this.getManager(), method, rootObjectClass) {
               @Override
               public PsiType getReturnType() {

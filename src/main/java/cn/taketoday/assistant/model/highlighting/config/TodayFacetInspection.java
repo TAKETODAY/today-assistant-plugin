@@ -39,7 +39,7 @@ import cn.taketoday.assistant.model.xml.beans.Beans;
 import cn.taketoday.assistant.util.InfraUtils;
 
 public final class TodayFacetInspection extends InfraBeanInspectionBase {
-  public boolean checkTestFiles = false;
+  public boolean checkTestFiles;
 
   @Override
   public void checkFileElement(DomFileElement<Beans> domFileElement, DomElementAnnotationHolder holder) {

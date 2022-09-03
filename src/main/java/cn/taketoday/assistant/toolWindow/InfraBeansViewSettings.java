@@ -140,7 +140,7 @@ public class InfraBeansViewSettings implements PersistentStateComponent<InfraBea
     FULL,
     UPDATE_LIST,
     UPDATE_DETAILS,
-    FORCE_UPDATE_RIGHT_COMPONENT;
+    FORCE_UPDATE_RIGHT_COMPONENT
 
   }
 

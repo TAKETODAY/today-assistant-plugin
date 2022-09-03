@@ -298,7 +298,7 @@ public class FileSetEditor extends DialogWrapper {
 
   private void performAddFiles(cn.taketoday.assistant.facet.editor.AddFileType addFileType) {
     Project project = this.myModule.getProject();
-    final Condition<VirtualFile> fileVisibleCondition = addFileType.getFileVisibleCondition(project);
+    Condition<VirtualFile> fileVisibleCondition = addFileType.getFileVisibleCondition(project);
     FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, true, false, true, true) {
       public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
         if (!super.isFileVisible(file, showHiddenFiles)) {

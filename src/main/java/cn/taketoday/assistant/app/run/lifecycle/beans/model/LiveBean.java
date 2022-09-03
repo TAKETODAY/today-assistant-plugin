@@ -35,7 +35,7 @@ import cn.taketoday.lang.Nullable;
 
 public interface LiveBean {
 
-  public interface LiveResourcePointer extends PsiElementPointer {
+  interface LiveResourcePointer extends PsiElementPointer {
   }
 
   String getId();

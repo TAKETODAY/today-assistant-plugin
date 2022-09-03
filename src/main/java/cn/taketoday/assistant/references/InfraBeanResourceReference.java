@@ -42,18 +42,18 @@ import static cn.taketoday.assistant.util.InfraUtils.isDefinedAsCollectionElemen
  */
 public class InfraBeanResourceReference extends InfraBeanReference {
 
-  public InfraBeanResourceReference(final PsiElement element,
+  public InfraBeanResourceReference(PsiElement element,
           TextRange range,
-          @Nullable final PsiClass requiredClass,
+          @Nullable PsiClass requiredClass,
           boolean isFactoryBeanRef) {
     super(element, range, requiredClass, isFactoryBeanRef);
   }
 
   @Override
   public PsiElement resolve() {
-    final String beanName = getValue();
+    String beanName = getValue();
 
-    final CommonInfraModel springModel = getInfraModel();
+    CommonInfraModel springModel = getInfraModel();
 
     BeanPointer<?> pointer = InfraModelSearchers.findBean(springModel, beanName);
     return pointer == null || !pointer.isValid() || isDefinedAsCollectionElement(pointer) ?

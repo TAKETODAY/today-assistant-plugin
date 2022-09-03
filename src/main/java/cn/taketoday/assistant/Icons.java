@@ -47,7 +47,7 @@ public interface Icons {
   }
 
   private static Icon load(String path, int cacheKey, int flags) {
-    return IconManager.getInstance().loadRasterizedIcon(path, cn.taketoday.assistant.Icons.class.getClassLoader(), cacheKey, flags);
+    return IconManager.getInstance().loadRasterizedIcon(path, Icons.class.getClassLoader(), cacheKey, flags);
   }
 
   /** 16x16 */
@@ -58,7 +58,7 @@ public interface Icons {
   Icon FileSet = load("icons/fileSet.svg", 1104081322, 0);
 
   interface Gutter {
-    Icon Today = Icons.load("icons/gutter/today.svg");
+    Icon Today = load("icons/gutter/today.svg");
 
     /** 12x12 */
     Icon FactoryMethodBean = load("icons/gutter/factoryMethodBean.svg", 1828459504, 0);

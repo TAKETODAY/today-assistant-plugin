@@ -46,7 +46,7 @@ public abstract class InfraImplicitBeansProviderBase extends CustomModuleCompone
       return null;
     }
 
-    final JavaPsiFacade facade = JavaPsiFacade.getInstance(module.getProject());
+    JavaPsiFacade facade = JavaPsiFacade.getInstance(module.getProject());
     return facade.findClass(className,
             GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, includeTests()));
   }
@@ -80,7 +80,7 @@ public abstract class InfraImplicitBeansProviderBase extends CustomModuleCompone
           String className,
           String beanName,
           boolean isLibraryClass) {
-    final PsiClass psiClass = isLibraryClass ? InfraUtils.findLibraryClass(module, className) :
+    PsiClass psiClass = isLibraryClass ? InfraUtils.findLibraryClass(module, className) :
                               findClassInDependenciesAndLibraries(module, className);
     if (psiClass != null) {
       implicitBeans.add(new InfraImplicitBean(getProviderName(), psiClass, beanName));

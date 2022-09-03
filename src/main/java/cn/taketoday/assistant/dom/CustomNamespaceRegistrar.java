@@ -42,12 +42,12 @@ public final class CustomNamespaceRegistrar {
     return new CustomNamespaceRegistrar(registrar, namespaceKey);
   }
 
-  public CustomNamespaceRegistrar add(final String xmlTagName, final Class<? extends DomElement> domElementClass) {
+  public CustomNamespaceRegistrar add(String xmlTagName, Class<? extends DomElement> domElementClass) {
     registrar.registerCollectionChildrenExtension(new XmlName(xmlTagName, namespaceKey), domElementClass);
     return this;
   }
 
-  public CustomNamespaceRegistrar addFixed(final String xmlTagName, final Class<? extends DomElement> domElementClass) {
+  public CustomNamespaceRegistrar addFixed(String xmlTagName, Class<? extends DomElement> domElementClass) {
     registrar.registerFixedNumberChildExtension(new XmlName(xmlTagName, namespaceKey), domElementClass);
     return this;
   }

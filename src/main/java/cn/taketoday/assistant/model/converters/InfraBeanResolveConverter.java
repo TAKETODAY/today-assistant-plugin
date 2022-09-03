@@ -66,7 +66,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
   }
 
   @Nullable
-  protected CommonInfraModel getSpringModel(final ConvertContext context) {
+  protected CommonInfraModel getSpringModel(ConvertContext context) {
     return InfraManager.from(context.getFile().getProject()).getInfraModelByFile(context.getFile());
   }
 
@@ -83,7 +83,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
 
   @Override
   @Nullable
-  public BeanPointer<?> fromString(final @Nullable String s, final ConvertContext context) {
+  public BeanPointer<?> fromString(@Nullable final String s, ConvertContext context) {
     if (s == null)
       return null;
 
@@ -95,7 +95,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
   }
 
   @Override
-  public String toString(final @Nullable BeanPointer<?> beanPointer, ConvertContext context) {
+  public String toString(@Nullable final BeanPointer<?> beanPointer, ConvertContext context) {
     return beanPointer == null ? null : beanPointer.getName();
   }
 
@@ -113,7 +113,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
   }
 
   @Override
-  public String getErrorMessage(final String s, final ConvertContext context) {
+  public String getErrorMessage(String s, ConvertContext context) {
     return InfraBundle.message("model.bean.error.message", s);
   }
 
@@ -127,8 +127,8 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
   }
 
   @Override
-  public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
-    final GenericDomValue element = (GenericDomValue) context.getInvocationElement();
+  public LocalQuickFix[] getQuickFixes(ConvertContext context) {
+    GenericDomValue element = (GenericDomValue) context.getInvocationElement();
     return InfraBeanResolveQuickFixManager.of().getQuickFixes(context,
             element.getParentOfType(Beans.class, false),
             null,
@@ -136,7 +136,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
   }
 
   @Override
-  public Collection<BeanPointer<?>> getVariants(final ConvertContext context) {
+  public Collection<BeanPointer<?>> getVariants(ConvertContext context) {
     if (isPlaceholder(context)) {
       return Collections.emptySet();
     }
@@ -145,7 +145,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
   }
 
   protected static boolean isPlaceholder(ConvertContext context) {
-    final DomElement element = context.getInvocationElement();
+    DomElement element = context.getInvocationElement();
     return element instanceof GenericDomValue
             && PlaceholderUtils.getInstance().isRawTextPlaceholder((GenericDomValue) element);
   }
@@ -158,12 +158,12 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
     if (model == null)
       return Collections.emptyList();
 
-    final List<BeanPointer<?>> variants = new ArrayList<>();
-    final CommonInfraBean currentBean = InfraConverterUtil.getCurrentBeanCustomAware(context);
+    List<BeanPointer<?>> variants = new ArrayList<>();
+    CommonInfraBean currentBean = InfraConverterUtil.getCurrentBeanCustomAware(context);
 
     // remove java.lang.Object (e.g. "fallback type" via TypeHolder.getRequiredTypes)
     if (!requiredClasses.isEmpty()) {
-      final PsiClassType object = PsiType.getJavaLangObject(context.getPsiManager(), GlobalSearchScope.allScope(context.getProject()));
+      PsiClassType object = PsiType.getJavaLangObject(context.getPsiManager(), GlobalSearchScope.allScope(context.getProject()));
       if (requiredClasses.contains(object)) {
         requiredClasses = new ArrayList<>(requiredClasses); // guard against immutable
         requiredClasses.remove(object);
@@ -181,7 +181,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
           CommonInfraBean currentBean) {
     if (parentBeans) {
       if (model instanceof XmlInfraModel) {
-        final Collection<BeanPointer<?>> allBeans = new ArrayList<>();
+        Collection<BeanPointer<?>> allBeans = new ArrayList<>();
         for (InfraModel infraModel : ((XmlInfraModel) model).getDependencies()) {
           if (requiredClasses.isEmpty()) {
             allBeans.addAll(infraModel.getAllCommonBeans());
@@ -201,7 +201,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
   }
 
   protected static List<PsiClassType> getValueClasses(ConvertContext context) {
-    final TypeHolder valueHolder = context.getInvocationElement().getParentOfType(TypeHolder.class, false);
+    TypeHolder valueHolder = context.getInvocationElement().getParentOfType(TypeHolder.class, false);
     if (valueHolder == null) {
       return Collections.emptyList(); // invalid XML
     }

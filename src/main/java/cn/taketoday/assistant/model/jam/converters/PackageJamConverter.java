@@ -57,7 +57,7 @@ public class PackageJamConverter extends JamConverter<Collection<PsiPackage>> {
           @Nullable PsiElement context) {
     if (context == null)
       return null;
-    final PsiExpression psiExpression =
+    PsiExpression psiExpression =
             JavaPsiFacade.getElementFactory(context.getProject()).createExpressionFromText("\"" + s + "\"", context);
     if (psiExpression instanceof PsiLanguageInjectionHost) {
       return createReferenceSet((PsiLanguageInjectionHost) psiExpression, s).resolvePackage();
@@ -68,7 +68,7 @@ public class PackageJamConverter extends JamConverter<Collection<PsiPackage>> {
   @Override
   public PsiReference[] createReferences(JamStringAttributeElement<Collection<PsiPackage>> context,
           PsiLanguageInjectionHost injectionHost) {
-    final String value = context.getStringValue();
+    String value = context.getStringValue();
     if (value == null) {
       return PsiReference.EMPTY_ARRAY;
     }

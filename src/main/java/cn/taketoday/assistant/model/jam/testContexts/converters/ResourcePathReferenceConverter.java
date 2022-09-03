@@ -52,7 +52,7 @@ public abstract class ResourcePathReferenceConverter<T> extends JamSimpleReferen
 
   public List<T> getFiles(PsiReference[] references) {
     for (PsiReference reference : references) {
-      final FileReference fileReference = FileReference.findFileReference(reference);
+      FileReference fileReference = FileReference.findFileReference(reference);
       if (fileReference == null)
         continue;
 
@@ -82,7 +82,7 @@ public abstract class ResourcePathReferenceConverter<T> extends JamSimpleReferen
   }
 
   private static PsiReference[] getReferences(PsiElement psiLiteral, String s, Module... modules) {
-    final InfraResourcesBuilder resourcesBuilder =
+    InfraResourcesBuilder resourcesBuilder =
             InfraResourcesBuilder.create(psiLiteral, s).fromRoot(s.startsWith("/")).soft(false).modules(modules);
     return ResourcesUtil.of().getReferences(resourcesBuilder);
   }
@@ -92,7 +92,7 @@ public abstract class ResourcePathReferenceConverter<T> extends JamSimpleReferen
       return PsiReference.EMPTY_ARRAY;
     }
     try {
-      final PsiExpression psiExpression =
+      PsiExpression psiExpression =
               JavaPsiFacade.getElementFactory(element.getProject()).createExpressionFromText("\"" + s + "\"", element);
       if (psiExpression instanceof PsiLiteral) {
         return getReferences(psiExpression, s, modules);

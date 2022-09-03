@@ -36,13 +36,13 @@ public class ListOrSetValueConverter extends PropertyValueConverter {
 
   @Override
 
-  public List<PsiType> getValueTypes(final GenericDomValue element) {
+  public List<PsiType> getValueTypes(GenericDomValue element) {
     if (element instanceof InfraValue) {
-      final List<PsiType> psiTypes = TypeHolderUtil.getRequiredTypes(((InfraValue) element));
+      List<PsiType> psiTypes = TypeHolderUtil.getRequiredTypes(((InfraValue) element));
       if (!psiTypes.isEmpty())
         return psiTypes;
     }
-    final ListOrSet parent = (ListOrSet) element.getParent();
+    ListOrSet parent = (ListOrSet) element.getParent();
     assert parent != null;
     return parent.getRequiredTypes();
   }

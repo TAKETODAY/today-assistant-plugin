@@ -193,7 +193,7 @@ public class InfraLibraryUtil {
         return true;
       }
       else {
-        return StringUtil.compareVersionNumbers(this.myVersion, reference.getVersion()) >= 0;
+        return StringUtil.compareVersionNumbers(this.myVersion, reference.myVersion) >= 0;
       }
     }
 

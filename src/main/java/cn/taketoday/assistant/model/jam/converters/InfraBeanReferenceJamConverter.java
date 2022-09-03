@@ -65,35 +65,35 @@ public class InfraBeanReferenceJamConverter extends JamSimpleReferenceConverter<
       return null;
     }
 
-    final CommonInfraModel model = getSpringModel(context.getPsiElement());
+    CommonInfraModel model = getSpringModel(context.getPsiElement());
     return InfraModelSearchers.findBean(model, s);
   }
 
   @Override
   public Collection<BeanPointer<?>> getVariants(JamStringAttributeElement<BeanPointer<?>> context) {
-    final PsiAnnotationMemberValue psiElement = context.getPsiElement();
+    PsiAnnotationMemberValue psiElement = context.getPsiElement();
     if (psiElement == null)
       return Collections.emptyList();
 
     if (myBaseClass == null) {
-      final CommonInfraModel model = getSpringModel(psiElement);
+      CommonInfraModel model = getSpringModel(psiElement);
       return model.getAllCommonBeans();
     }
 
-    final PsiClass psiClass = JavaPsiFacade.getInstance(psiElement.getProject())
+    PsiClass psiClass = JavaPsiFacade.getInstance(psiElement.getProject())
             .findClass(myBaseClass, psiElement.getResolveScope());
     if (psiClass == null)
       return Collections.emptyList();
 
-    final CommonInfraModel model = getSpringModel(psiElement);
-    final ModelSearchParameters.BeanClass searchParameters =
+    CommonInfraModel model = getSpringModel(psiElement);
+    ModelSearchParameters.BeanClass searchParameters =
             ModelSearchParameters.byClass(psiClass).withInheritors().effectiveBeanTypes();
     return InfraModelSearchers.findBeans(model, searchParameters);
   }
 
   @Override
   protected LookupElement createLookupElementFor(BeanPointer<?> target) {
-    final LookupElement variant = InfraConverterUtil.createCompletionVariant(target);
+    LookupElement variant = InfraConverterUtil.createCompletionVariant(target);
     return variant != null ? variant : super.createLookupElementFor(target);
   }
 

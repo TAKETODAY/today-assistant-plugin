@@ -45,14 +45,14 @@ import cn.taketoday.assistant.model.xml.beans.TypeHolderUtil;
 public abstract class PropertyValueConverter extends WrappingConverter {
 
   @Override
-  public Converter getConverter(final GenericDomValue domElement) {
-    final List<Converter> converters = getConverters(domElement);
+  public Converter getConverter(GenericDomValue domElement) {
+    List<Converter> converters = getConverters(domElement);
     return converters.isEmpty() ? null : converters.get(0);
   }
 
   @Override
 
-  public List<Converter> getConverters(final GenericDomValue element) {
+  public List<Converter> getConverters(GenericDomValue element) {
     XmlElement xmlElement = element.getXmlElement();
     if (xmlElement instanceof XmlAttribute) {
       PsiLanguageInjectionHost host = (PsiLanguageInjectionHost) ((XmlAttribute) xmlElement).getValueElement();
@@ -60,17 +60,17 @@ public abstract class PropertyValueConverter extends WrappingConverter {
         return Collections.emptyList();
       }
     }
-    final GenericDomValueConvertersRegistry registry = InfraValueConvertersRegistry.of();
+    GenericDomValueConvertersRegistry registry = InfraValueConvertersRegistry.of();
 
-    final List<PsiType> types = getValueTypes(element);
+    List<PsiType> types = getValueTypes(element);
     if (types.isEmpty()) {
-      final Converter converter = registry.getConverter(element, null);
+      Converter converter = registry.getConverter(element, null);
       return ContainerUtil.createMaybeSingletonList(converter);
     }
 
-    final List<Converter> converters = new SmartList<>();
+    List<Converter> converters = new SmartList<>();
     for (PsiType type : types) {
-      final Converter converter = registry.getConverter(element, type instanceof PsiEllipsisType ? ((PsiEllipsisType) type).getComponentType() : type);
+      Converter converter = registry.getConverter(element, type instanceof PsiEllipsisType ? ((PsiEllipsisType) type).getComponentType() : type);
       if (converter != null) {
         converters.add(converter);
       }
@@ -81,15 +81,15 @@ public abstract class PropertyValueConverter extends WrappingConverter {
     return converters;
   }
 
-  public List<PsiType> getValueTypes(final GenericDomValue element) {
+  public List<PsiType> getValueTypes(GenericDomValue element) {
     if (element instanceof TypeHolder) {
-      final List<PsiType> psiTypes = TypeHolderUtil.getRequiredTypes(((TypeHolder) element));
+      List<PsiType> psiTypes = TypeHolderUtil.getRequiredTypes(((TypeHolder) element));
       if (!psiTypes.isEmpty()) {
         return psiTypes;
       }
     }
 
-    final DomElement parent = element.getParent();
+    DomElement parent = element.getParent();
     return parent instanceof TypeHolder ? TypeHolderUtil.getRequiredTypes(((TypeHolder) parent)) : Collections.emptyList();
   }
 }

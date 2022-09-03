@@ -61,13 +61,13 @@ public interface InfraConstant extends InfraUtilElement, DomInfraBean {
     @Nullable
     @Override
     public String getBeanType(InfraConstant constant) {
-      final PsiClass psiClass = getStaticFieldType(constant);
+      PsiClass psiClass = getStaticFieldType(constant);
       return psiClass != null ? StringUtil.notNullize(psiClass.getQualifiedName()) : "";
     }
 
     @Nullable
     private static PsiClass getStaticFieldType(InfraConstant constant) {
-      final String staticField = constant.getStaticField().getRawText();
+      String staticField = constant.getStaticField().getRawText();
       if (StringUtil.isEmptyOrSpaces(staticField) || PlaceholderUtils.getInstance().isDefaultPlaceholder(staticField))
         return null;
       int lastPoint = staticField.indexOf('$');

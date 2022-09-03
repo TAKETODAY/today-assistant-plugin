@@ -114,7 +114,7 @@ public class InfraAliasFor extends JamBaseElement<PsiMethod> {
 
       PsiMethod psiMethod = getIdentifyingMethod(context);
       if (psiMethod != null) {
-        PsiClass aliasForAnnotationClass = InfraAliasFor.getAliasForAnnotationClass(psiMethod);
+        PsiClass aliasForAnnotationClass = getAliasForAnnotationClass(psiMethod);
         if (aliasForAnnotationClass != null) {
           return aliasForAnnotationClass.getAllMethods();
         }

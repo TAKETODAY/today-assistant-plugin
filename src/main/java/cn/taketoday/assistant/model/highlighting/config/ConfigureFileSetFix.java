@@ -86,8 +86,8 @@ class ConfigureFileSetFix implements LocalQuickFix {
   public void applyFix(Project project, ProblemDescriptor descriptor) {
 
     SideEffectGuard.checkSideEffectAllowed(SideEffectGuard.EffectType.PROJECT_MODEL);
-    final Ref<Boolean> fileSetsInMultipleModules = Ref.create(Boolean.FALSE);
-    final Set<InfraFileSet> sets = new LinkedHashSet<>();
+    Ref<Boolean> fileSetsInMultipleModules = Ref.create(Boolean.FALSE);
+    Set<InfraFileSet> sets = new LinkedHashSet<>();
     ModuleUtilCore.visitMeAndDependentModules(this.myModule, (module) -> {
       InfraFacet facet = InfraFacet.from(module);
       if (facet != null) {
@@ -145,7 +145,8 @@ class ConfigureFileSetFix implements LocalQuickFix {
         return isFakeNewSet(fileSet) ? LayeredIcon.create(fileSet.getIcon(), AllIcons.Actions.New) : fileSet.getIcon();
       }
 
-      public @Nullable ListSeparator getSeparatorAbove(InfraFileSet fileSet) {
+      @Nullable
+      public ListSeparator getSeparatorAbove(InfraFileSet fileSet) {
         return this.isFakeNewSet(fileSet) ? new ListSeparator() : null;
       }
 

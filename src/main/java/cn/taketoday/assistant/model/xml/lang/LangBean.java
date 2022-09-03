@@ -39,7 +39,7 @@ import cn.taketoday.lang.Nullable;
 @BeanType(provider = LangBean.LangBeanBeanTypeProvider.class)
 public interface LangBean extends DomInfraBean, SimpleScript {
 
-  public static class LangBeanBeanTypeProvider implements BeanTypeProvider<LangBean> {
+  class LangBeanBeanTypeProvider implements BeanTypeProvider<LangBean> {
 
     @Override
     public String[] getBeanTypeCandidates() {

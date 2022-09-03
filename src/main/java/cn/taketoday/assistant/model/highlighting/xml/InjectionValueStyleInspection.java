@@ -62,11 +62,11 @@ public class InjectionValueStyleInspection extends InfraBeanInspectionBase {
   private static final String REF = "ref";
 
   @Override
-  protected InfraModelVisitor createVisitor(final DomElementAnnotationHolder holder, Beans beans, @Nullable CommonInfraModel model) {
+  protected InfraModelVisitor createVisitor(DomElementAnnotationHolder holder, Beans beans, @Nullable CommonInfraModel model) {
     return new InfraModelVisitor() {
       @Override
       protected boolean visitValueHolder(InfraValueHolder valueHolder) {
-        InjectionValueStyleInspection.checkValueHolder(holder, valueHolder);
+        checkValueHolder(holder, valueHolder);
         return true;
       }
     };
@@ -124,7 +124,7 @@ public class InjectionValueStyleInspection extends InfraBeanInspectionBase {
 
     public String getName() {
       Object[] objArr = new Object[1];
-      objArr[0] = this.myValueHolder instanceof InfraKey ? InjectionValueStyleInspection.KEY : "value";
+      objArr[0] = this.myValueHolder instanceof InfraKey ? KEY : "value";
       String message = InfraBundle.message("model.inspection.injection.value.style.value.fix", objArr);
       return message;
     }
@@ -170,13 +170,13 @@ public class InjectionValueStyleInspection extends InfraBeanInspectionBase {
     public String getName() {
       String attr;
       if (this.myValueHolder instanceof InfraKey) {
-        attr = InjectionValueStyleInspection.KEY_REF;
+        attr = KEY_REF;
       }
       else if (this.myValueHolder instanceof InfraEntry) {
-        attr = InjectionValueStyleInspection.VALUE_REF;
+        attr = VALUE_REF;
       }
       else {
-        attr = InjectionValueStyleInspection.REF;
+        attr = REF;
       }
       String message = InfraBundle.message("model.inspection.injection.value.style.ref.fix", attr);
       return message;

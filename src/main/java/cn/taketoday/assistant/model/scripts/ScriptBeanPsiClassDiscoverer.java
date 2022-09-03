@@ -27,7 +27,7 @@ import com.intellij.psi.PsiType;
 import cn.taketoday.lang.Nullable;
 
 public interface ScriptBeanPsiClassDiscoverer {
-  public static final ExtensionPointName<ScriptBeanPsiClassDiscoverer> EP_NAME = ExtensionPointName.create("cn.taketoday.assistant.scriptBeanPsiClassDiscoverer");
+  ExtensionPointName<ScriptBeanPsiClassDiscoverer> EP_NAME = ExtensionPointName.create("cn.taketoday.assistant.scriptBeanPsiClassDiscoverer");
 
   @Nullable
   PsiType getInferredScriptReturnType(@Nullable PsiFile psiFile);

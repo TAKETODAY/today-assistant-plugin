@@ -58,7 +58,7 @@ public abstract class JamPsiMemberInfraBean<T extends PsiMember> extends JamComm
 
   @Override
   @Nullable
-  public PsiType getBeanType(final boolean considerFactories) {
+  public PsiType getBeanType(boolean considerFactories) {
     return getBeanType();
   }
 
@@ -85,7 +85,7 @@ public abstract class JamPsiMemberInfraBean<T extends PsiMember> extends JamComm
   }
 
   public Collection<InfraQualifier> getQualifiers() {
-    final Module module = getModule();
+    Module module = getModule();
     if (module == null) {
       return Collections.emptySet();
     }

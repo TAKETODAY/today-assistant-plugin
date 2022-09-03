@@ -179,7 +179,7 @@ public final class WebUrlPathReferenceContributor extends PsiReferenceContributo
               new UastUrlPathReferenceProvider(new Function2<UExpression, PsiElement, PsiReference[]>() {
 
                 @Override
-                public final PsiReference[] invoke(UExpression uElement, PsiElement host) {
+                public PsiReference[] invoke(UExpression uElement, PsiElement host) {
                   PsiReference[] buildAbsoluteOrRelativeReferences;
                   Intrinsics.checkNotNullParameter(uElement, "uElement");
                   Intrinsics.checkNotNullParameter(host, "host");
@@ -195,7 +195,7 @@ public final class WebUrlPathReferenceContributor extends PsiReferenceContributo
     UrlPathReferenceInjector injector = UastReferenceInjectorUtils.uastUrlPathReferenceInjectorForScheme(UrlConstants.HTTP_SCHEMES, null)
             .withDefaultRootContextProviderFactory(new Function1<UExpression, UrlPathContext>() {
               @Override
-              public final UrlPathContext invoke(UExpression it) {
+              public UrlPathContext invoke(UExpression it) {
                 return UrlPathContext.Companion.supportingSchemes(UrlConstants.HTTP_SCHEMES, method);
               }
             });
@@ -207,7 +207,7 @@ public final class WebUrlPathReferenceContributor extends PsiReferenceContributo
                     (UrlConstants.HTTP_SCHEMES, InfraMvcUrlPathSpecification.INSTANCE.getParser())
             .withDefaultRootContextProviderFactory(new Function1<UExpression, UrlPathContext>() {
               @Override
-              public final UrlPathContext invoke(UExpression it) {
+              public UrlPathContext invoke(UExpression it) {
                 return UrlPathContext.Companion.supportingSchemes(UrlConstants.HTTP_SCHEMES, method);
               }
             });

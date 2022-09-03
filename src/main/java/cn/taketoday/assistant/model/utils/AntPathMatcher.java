@@ -53,7 +53,7 @@ public final class AntPathMatcher {
     // Match all elements up to the first **
     while (patIdxStart <= patIdxEnd && strIdxStart <= strIdxEnd) {
       String patDir = patDirs[patIdxStart];
-      if (patDir.equals("**")) {
+      if ("**".equals(patDir)) {
         break;
       }
       if (!matchStrings(patDir, strDirs[strIdxStart])) {
@@ -65,12 +65,12 @@ public final class AntPathMatcher {
 
     if (strIdxStart > strIdxEnd) {
       // String is exhausted, only match if rest of pattern is * or **'s
-      if (patIdxStart == patIdxEnd && patDirs[patIdxStart].equals("*") &&
+      if (patIdxStart == patIdxEnd && "*".equals(patDirs[patIdxStart]) &&
               str.endsWith(pathSeparator)) {
         return true;
       }
       for (int i = patIdxStart; i <= patIdxEnd; i++) {
-        if (!patDirs[i].equals("**")) {
+        if (!"**".equals(patDirs[i])) {
           return false;
         }
       }
@@ -86,7 +86,7 @@ public final class AntPathMatcher {
     // up to last '**'
     while (patIdxStart <= patIdxEnd && strIdxStart <= strIdxEnd) {
       String patDir = patDirs[patIdxEnd];
-      if (patDir.equals("**")) {
+      if ("**".equals(patDir)) {
         break;
       }
       if (!matchStrings(patDir, strDirs[strIdxEnd])) {
@@ -98,7 +98,7 @@ public final class AntPathMatcher {
     if (strIdxStart > strIdxEnd) {
       // String is exhausted
       for (int i = patIdxStart; i <= patIdxEnd; i++) {
-        if (!patDirs[i].equals("**")) {
+        if (!"**".equals(patDirs[i])) {
           return false;
         }
       }
@@ -108,7 +108,7 @@ public final class AntPathMatcher {
     while (patIdxStart != patIdxEnd && strIdxStart <= strIdxEnd) {
       int patIdxTmp = -1;
       for (int i = patIdxStart + 1; i <= patIdxEnd; i++) {
-        if (patDirs[i].equals("**")) {
+        if ("**".equals(patDirs[i])) {
           patIdxTmp = i;
           break;
         }
@@ -146,7 +146,7 @@ public final class AntPathMatcher {
     }
 
     for (int i = patIdxStart; i <= patIdxEnd; i++) {
-      if (!patDirs[i].equals("**")) {
+      if (!"**".equals(patDirs[i])) {
         return false;
       }
     }

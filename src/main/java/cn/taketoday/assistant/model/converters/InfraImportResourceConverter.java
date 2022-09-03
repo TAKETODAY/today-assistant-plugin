@@ -47,7 +47,7 @@ public abstract class InfraImportResourceConverter extends Converter<Set<PsiFile
   };
 
   public static List<XmlFile> getFiles(PsiReference[] references) {
-    final Collection<XmlFile> items = ResourcesUtil.of().getResourceItems(references, InfraDomUtils.XML_CONDITION);
+    Collection<XmlFile> items = ResourcesUtil.of().getResourceItems(references, InfraDomUtils.XML_CONDITION);
     return new ArrayList<>(items);
   }
 }

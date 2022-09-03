@@ -66,11 +66,11 @@ public class InfraCustomActiveProfiles implements InfraActiveProfile {
               if (element == null)
                 return null;
 
-              final PsiAnnotation definingMetaAnnotation =
+              PsiAnnotation definingMetaAnnotation =
                       AliasForUtils.findDefiningMetaAnnotation(element, myAnnotationChildLink.getAnnotationQualifiedName(),
                               AnnotationConstant.ACTIVE_PROFILES);
               if (definingMetaAnnotation != null) {
-                final PsiClass annotationType = PsiTreeUtil.getParentOfType(definingMetaAnnotation, PsiClass.class, true);
+                PsiClass annotationType = PsiTreeUtil.getParentOfType(definingMetaAnnotation, PsiClass.class, true);
                 if (annotationType != null) {
                   return InfraJamActiveProfiles.META.getJamElement(annotationType);
                 }

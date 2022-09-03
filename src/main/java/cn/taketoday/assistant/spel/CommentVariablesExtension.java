@@ -89,7 +89,7 @@ final class CommentVariablesExtension extends SpringElContextsExtension {
   public static void processVariableDeclarations(String text, ElVarsProcessor processor) {
     for (int elVarIndex = text.indexOf(EL_VAR); elVarIndex >= 0; elVarIndex = text.indexOf(EL_VAR, elVarIndex + 1)) {
       int start = text.indexOf('(', elVarIndex) + 1;
-      int end = text.indexOf(")", elVarIndex);
+      int end = text.indexOf(')', elVarIndex);
       if (start >= end) {
         break;
       }

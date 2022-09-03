@@ -80,12 +80,12 @@ public class BeanEventListenerElement implements EventListenerElement {
   }
 
   static Optional<BeanEventListenerElement> of(PsiMethod element) {
-    return Optional.ofNullable(BeanEventListenerElement.METHOD_META.getJamElement(element));
+    return Optional.ofNullable(METHOD_META.getJamElement(element));
   }
 
   @Nullable
   static BeanEventListenerElement from(PsiMethod element) {
-    return BeanEventListenerElement.METHOD_META.getJamElement(element);
+    return METHOD_META.getJamElement(element);
   }
 
 }

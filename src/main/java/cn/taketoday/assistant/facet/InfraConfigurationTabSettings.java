@@ -30,7 +30,7 @@ import cn.taketoday.lang.Nullable;
 
 @State(name = "InfraConfigurationTabSettings", storages = { @Storage("$WORKSPACE_FILE$") })
 public class InfraConfigurationTabSettings implements PersistentStateComponent<InfraConfigurationTabSettings> {
-  private boolean sortAlpha = false;
+  private boolean sortAlpha;
 
   public static InfraConfigurationTabSettings getInstance(Project project) {
     return project.getService(InfraConfigurationTabSettings.class);

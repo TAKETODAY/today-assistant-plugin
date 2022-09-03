@@ -34,7 +34,7 @@ import static com.intellij.codeInsight.daemon.impl.quickfix.CreateMethodFixKt.cr
 public abstract class InfraBeanMethodConverter extends PsiMethodConverter {
 
   @Override
-  protected MethodAccepter getMethodAccepter(final ConvertContext context, final boolean forCompletion) {
+  protected MethodAccepter getMethodAccepter(ConvertContext context, boolean forCompletion) {
     return new MethodAccepter() {
 
       @Override
@@ -42,10 +42,10 @@ public abstract class InfraBeanMethodConverter extends PsiMethodConverter {
         if (method.isConstructor())
           return false;
 
-        final PsiClass containingClass = method.getContainingClass();
+        PsiClass containingClass = method.getContainingClass();
         if (containingClass == null)
           return false;
-        final String containing = containingClass.getQualifiedName();
+        String containing = containingClass.getQualifiedName();
         if (CommonClassNames.JAVA_LANG_OBJECT.equals(containing))
           return false;
 
@@ -54,24 +54,24 @@ public abstract class InfraBeanMethodConverter extends PsiMethodConverter {
     };
   }
 
-  protected boolean checkModifiers(final PsiMethod method) {
+  protected boolean checkModifiers(PsiMethod method) {
     return method.hasModifierProperty(PsiModifier.PUBLIC) && !method.hasModifierProperty(PsiModifier.ABSTRACT);
   }
 
-  protected boolean checkParameterList(final PsiMethod method) {
+  protected boolean checkParameterList(PsiMethod method) {
     return method.getParameterList().getParametersCount() == 0;
   }
 
-  protected boolean checkReturnType(final ConvertContext context, final PsiMethod method, final boolean forCompletion) {
+  protected boolean checkReturnType(ConvertContext context, PsiMethod method, boolean forCompletion) {
     return true;
   }
 
   @Override
-  public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
-    final GenericDomValue element = (GenericDomValue) context.getInvocationElement();
+  public LocalQuickFix[] getQuickFixes(ConvertContext context) {
+    GenericDomValue element = (GenericDomValue) context.getInvocationElement();
 
-    final String elementName = element.getStringValue();
-    final PsiClass beanClass = getPsiClass(context);
+    String elementName = element.getStringValue();
+    PsiClass beanClass = getPsiClass(context);
     if (elementName != null && elementName.length() > 0 && beanClass != null) {
       return createVoidMethodFixes(beanClass, elementName, JvmModifier.PRIVATE);
     }

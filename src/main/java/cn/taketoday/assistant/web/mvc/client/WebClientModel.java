@@ -117,14 +117,14 @@ public abstract class WebClientModel {
     VirtualFile virtualFile = containingFile.getVirtualFile();
     CachedValuesManager cachedValuesManager = CachedValuesManager.getManager(project);
     if (ProjectScope.getLibrariesScope(project).contains(virtualFile)) {
-      return cachedValuesManager.getCachedValue(psiElement, new CachedValueProvider<List<WebClientUrl>>() {
+      return CachedValuesManager.getCachedValue(psiElement, new CachedValueProvider<List<WebClientUrl>>() {
         @Nullable
         public CachedValueProvider.Result<List<WebClientUrl>> compute() {
           return Result.createSingleDependency(findEndpoints(psiElement), ProjectRootManager.getInstance(project));
         }
       });
     }
-    return cachedValuesManager.getCachedValue(psiElement, new CachedValueProvider<>() {
+    return CachedValuesManager.getCachedValue(psiElement, new CachedValueProvider<>() {
       @Nullable
       public CachedValueProvider.Result<List<WebClientUrl>> compute() {
         return Result.createSingleDependency(findEndpoints(psiElement), UastModificationTracker.Companion.getInstance(project));

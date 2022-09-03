@@ -41,7 +41,7 @@ public interface RedirectViewController extends ViewControllerBase {
 
   GenericAttributeValue<Boolean> getKeepQueryParams();
 
-  public static class RedirectOnlyHttpStatusCodeConverter extends HttpStatusCodeConverter {
+  class RedirectOnlyHttpStatusCodeConverter extends HttpStatusCodeConverter {
     public RedirectOnlyHttpStatusCodeConverter() {
       super(HttpStatusCode.Series.REDIRECTION.allStatusCodes(), false);
     }

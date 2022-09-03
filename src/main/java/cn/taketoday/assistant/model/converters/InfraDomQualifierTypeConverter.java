@@ -32,7 +32,7 @@ import cn.taketoday.assistant.AnnotationConstant;
 public class InfraDomQualifierTypeConverter extends PsiClassConverter {
 
   @Override
-  public PsiClass fromString(final String s, final ConvertContext context) {
+  public PsiClass fromString(String s, ConvertContext context) {
     if (s == null) {
       return DomJavaUtil.findClass(AnnotationConstant.QUALIFIER,
               context.getFile(), context.getModule(), null);

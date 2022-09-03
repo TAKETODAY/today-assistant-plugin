@@ -73,10 +73,10 @@ public final class InfraXmlAutowiringInspection extends InfraBeanInspectionBase 
 
   private static void checkAutowiring(InfraBean infraBean, CommonInfraModel model, DomElementAnnotationHolder holder) {
     Autowire autowire = infraBean.getBeanAutowire();
-    if (autowire.equals(Autowire.BY_TYPE)) {
+    if (autowire == Autowire.BY_TYPE) {
       checkByTypeAutowire(infraBean, model, holder);
     }
-    else if (autowire.equals(Autowire.CONSTRUCTOR)) {
+    else if (autowire == Autowire.CONSTRUCTOR) {
       checkByConstructorAutowire(infraBean, holder);
     }
   }

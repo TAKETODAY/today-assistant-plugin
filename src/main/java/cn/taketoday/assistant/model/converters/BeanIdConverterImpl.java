@@ -131,7 +131,7 @@ public class BeanIdConverterImpl extends BeanIdConverter {
 
     public Object[] getVariants() {
       DomInfraBean infraBean = getDomSpringBean();
-      List<String> names = BeanIdConverterImpl.suggestUnusedBeanNames(infraBean);
+      List<String> names = suggestUnusedBeanNames(infraBean);
       ContainerUtil.addAll(names, BeanCoreUtils.suggestBeanNames(infraBean));
       return ArrayUtilRt.toStringArray(names);
     }

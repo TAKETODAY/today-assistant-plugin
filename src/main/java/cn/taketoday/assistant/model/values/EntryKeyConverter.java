@@ -38,15 +38,15 @@ public class EntryKeyConverter extends PropertyValueConverter {
 
   @Override
 
-  public List<PsiType> getValueTypes(final GenericDomValue domValue) {
+  public List<PsiType> getValueTypes(GenericDomValue domValue) {
     InfraEntry entry = (InfraEntry) domValue.getParent();
     assert entry != null;
-    final PsiClass psiClass = entry.getRequiredKeyClass();
+    PsiClass psiClass = entry.getRequiredKeyClass();
     if (psiClass == null) {
       return Collections.emptyList();
     }
 
-    final PsiClassType psiClassType = PsiTypesUtil.getClassType(psiClass);
+    PsiClassType psiClassType = PsiTypesUtil.getClassType(psiClass);
     return Collections.singletonList(psiClassType);
   }
 }

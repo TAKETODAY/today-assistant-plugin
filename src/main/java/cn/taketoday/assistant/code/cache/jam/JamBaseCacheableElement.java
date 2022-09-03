@@ -106,7 +106,7 @@ public abstract class JamBaseCacheableElement<T extends PsiMember & PsiNamedElem
 
   public static List<JamBaseCacheableElement> getElements(PsiElement element) {
     return SemService.getSemService(element.getProject())
-            .getSemElements(JamBaseCacheableElement.CACHEABLE_BASE_JAM_KEY, element);
+            .getSemElements(CACHEABLE_BASE_JAM_KEY, element);
   }
 
 }

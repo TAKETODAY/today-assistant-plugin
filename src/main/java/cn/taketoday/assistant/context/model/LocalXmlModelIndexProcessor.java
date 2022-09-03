@@ -84,7 +84,7 @@ public final class LocalXmlModelIndexProcessor {
   private final InfraExecutorsQueryCachingProcessor<ModelSearchParameters.BeanName, BeanSearchParameters.BeanName> myBeanNameProcessor = new InfraExecutorsQueryCachingProcessor<>() {
     @Override
     public ExecutorsQuery<BeanPointer<?>, BeanSearchParameters.BeanName> createQuery(ModelSearchParameters.BeanName params) {
-      return new ExecutorsQuery<>(LocalXmlModelIndexProcessor.this.getByNameSearchParameters(params), LocalXmlModelIndexProcessor.ourByNameExecutors);
+      return new ExecutorsQuery<>(LocalXmlModelIndexProcessor.this.getByNameSearchParameters(params), ourByNameExecutors);
     }
   };
   private final ByClassCacheProcessor myBeansProcessor = new ByClassCacheProcessor(XmlBeanClassQueryExecutor.INSTANCE);
@@ -287,8 +287,7 @@ public final class LocalXmlModelIndexProcessor {
     }
     Set<PsiType> beanTypes = new HashSet<>();
     Object mo448getSpringBean = currentParent.getBean();
-    if (mo448getSpringBean instanceof InfraBean) {
-      InfraBean bean = (InfraBean) mo448getSpringBean;
+    if (mo448getSpringBean instanceof InfraBean bean) {
       if (hasClassAttribute(bean)) {
         beanTypes.addAll(getSimpleBeanTypes(bean));
       }

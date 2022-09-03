@@ -41,7 +41,7 @@ public class CustomConverterRegistry {
     return ourInstance;
   }
 
-  private final static CustomConverterRegistry ourInstance = new CustomConverterRegistry();
+  private static final CustomConverterRegistry ourInstance = new CustomConverterRegistry();
 
   @Nullable
   public Converter<?> getCustomConverter(Class aClass, GenericDomValue context) {

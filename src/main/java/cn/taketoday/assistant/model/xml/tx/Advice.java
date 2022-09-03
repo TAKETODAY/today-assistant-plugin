@@ -33,7 +33,7 @@ import cn.taketoday.assistant.model.xml.beans.Identified;
 
 @BeanType(Advice.CLASS_NAME)
 public interface Advice extends InfraTxElement, Identified, DomInfraBean {
-  public static final String CLASS_NAME = "cn.taketoday.transaction.interceptor.TransactionInterceptor";
+  String CLASS_NAME = "cn.taketoday.transaction.interceptor.TransactionInterceptor";
 
   @Convert(InfraBeanResolveConverter.class)
   @RequiredBeanType({ AnnotationConstant.PLATFORM_TRANSACTION_MANAGER })

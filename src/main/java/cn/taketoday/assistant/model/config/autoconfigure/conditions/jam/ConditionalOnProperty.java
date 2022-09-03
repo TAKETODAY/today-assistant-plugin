@@ -116,7 +116,7 @@ public class ConditionalOnProperty extends JamBaseElement<PsiModifierListOwner> 
   }
 
   private String getPrefix() {
-    String prefix = (String) (ANNOTATION_META.getAttribute(getPsiElement(), PREFIX_META)).getValue();
+    String prefix = (ANNOTATION_META.getAttribute(getPsiElement(), PREFIX_META)).getValue();
     if (StringUtil.isEmpty(prefix)) {
       return "";
     }

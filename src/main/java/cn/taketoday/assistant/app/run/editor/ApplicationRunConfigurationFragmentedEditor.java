@@ -378,14 +378,14 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             ExecutionBundle.message("group.java.options"), create,
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<ShortenCommandLineModeCombo>>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration t, LabeledComponent<ShortenCommandLineModeCombo> labeledComponent) {
+              public void accept(InfraApplicationRunConfiguration t, LabeledComponent<ShortenCommandLineModeCombo> labeledComponent) {
                 ShortenCommandLineModeCombo component = labeledComponent.getComponent();
                 component.setItem(t.getShortenCommandLine());
               }
             },
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<ShortenCommandLineModeCombo>>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration t, LabeledComponent<ShortenCommandLineModeCombo> labeledComponent) {
+              public void accept(InfraApplicationRunConfiguration t, LabeledComponent<ShortenCommandLineModeCombo> labeledComponent) {
                 ShortenCommandLine shortenCommandLine;
                 if (labeledComponent.isVisible()) {
                   ShortenCommandLineModeCombo component = labeledComponent.getComponent();
@@ -399,8 +399,8 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             },
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
-              public final boolean test(InfraApplicationRunConfiguration it) {
-                return (it.getShortenCommandLine() == null || it.getShortenCommandLine() == ShortenCommandLine.NONE) ? false : true;
+              public boolean test(InfraApplicationRunConfiguration it) {
+                return it.getShortenCommandLine() != null && it.getShortenCommandLine() != ShortenCommandLine.NONE;
               }
             });
     fragment.setActionHint(ExecutionBundle.message("select.a.method.to.shorten.the.command.if.it.exceeds.the.os.limit"));
@@ -444,7 +444,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             });
     parameters.setEditorGetter(new Function<RawCommandLineEditor, JComponent>() {
       @Override
-      public final JComponent apply(RawCommandLineEditor editor) {
+      public JComponent apply(RawCommandLineEditor editor) {
         return editor.getEditorField();
       }
     });
@@ -467,14 +467,14 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     SettingsEditorFragment workingDirectorySettings = new SettingsEditorFragment("workingDirectory", ExecutionBundle.message("run.configuration.working.directory.name"),
             ExecutionBundle.message("group.operating.system"), create,
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithBrowseButton>>() {
-              public final void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithBrowseButton> labeledComponent) {
+              public void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithBrowseButton> labeledComponent) {
                 labeledComponent.getComponent().setText(settings.getWorkingDirectory());
               }
             }
             ,
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithBrowseButton>>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithBrowseButton> labeledComponent) {
+              public void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithBrowseButton> labeledComponent) {
                 Intrinsics.checkNotNullExpressionValue(settings, "settings");
                 Intrinsics.checkNotNullExpressionValue(labeledComponent, "component");
                 TextFieldWithBrowseButton component = labeledComponent.getComponent();
@@ -484,7 +484,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             },
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
-              public final boolean test(InfraApplicationRunConfiguration it) {
+              public boolean test(InfraApplicationRunConfiguration it) {
                 Intrinsics.checkNotNullExpressionValue(it, "it");
                 String workingDirectory = it.getWorkingDirectory();
                 return !(workingDirectory == null || workingDirectory.length() == 0);
@@ -531,7 +531,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
       }
     }, new Predicate<InfraApplicationRunConfiguration>() {
       @Override
-      public final boolean test(InfraApplicationRunConfiguration it) {
+      public boolean test(InfraApplicationRunConfiguration it) {
         var envs = it.getEnvs();
         return !envs.isEmpty();
       }
@@ -567,7 +567,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             message("infra.run.config.fragment.framework.group"), create,
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithAutoCompletion<String>>>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithAutoCompletion<String>> labeledComponent) {
+              public void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithAutoCompletion<String>> labeledComponent) {
                 Intrinsics.checkNotNullExpressionValue(labeledComponent, "c");
                 Intrinsics.checkNotNullExpressionValue(settings, "settings");
                 labeledComponent.getComponent().setText(settings.getActiveProfiles());
@@ -575,7 +575,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             },
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithAutoCompletion<String>>>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithAutoCompletion<String>> labeledComponent) {
+              public void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithAutoCompletion<String>> labeledComponent) {
                 Intrinsics.checkNotNullExpressionValue(labeledComponent, "c");
                 if (!labeledComponent.isVisible()) {
                   Intrinsics.checkNotNullExpressionValue(settings, "settings");
@@ -606,13 +606,13 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             message("infra.run.config.fragment.framework.group"),
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
-              public final boolean test(InfraApplicationRunConfiguration it) {
+              public boolean test(InfraApplicationRunConfiguration it) {
                 return it.isDebugMode();
               }
             },
             new BiConsumer<InfraApplicationRunConfiguration, Boolean>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
+              public void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
                 configuration.setDebugMode(value.booleanValue());
               }
             });
@@ -623,14 +623,14 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             message("infra.run.config.fragment.framework.group"),
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
-              public final boolean test(InfraApplicationRunConfiguration it) {
+              public boolean test(InfraApplicationRunConfiguration it) {
                 Intrinsics.checkNotNullExpressionValue(it, "it");
                 return it.isHideBanner();
               }
             },
             new BiConsumer<InfraApplicationRunConfiguration, Boolean>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
+              public void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
                 configuration.setHideBanner(value.booleanValue());
               }
             });
@@ -643,13 +643,13 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             message("infra.run.config.fragment.framework.group"),
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
-              public final boolean test(InfraApplicationRunConfiguration it) {
+              public boolean test(InfraApplicationRunConfiguration it) {
                 return !it.isEnableLaunchOptimization();
               }
             },
             new BiConsumer<InfraApplicationRunConfiguration, Boolean>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
+              public void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
                 configuration.setEnableLaunchOptimization(!value.booleanValue());
               }
             });
@@ -675,13 +675,13 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             message("infra.run.config.fragment.framework.group"),
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
-              public final boolean test(InfraApplicationRunConfiguration it) {
+              public boolean test(InfraApplicationRunConfiguration it) {
                 return !it.isEnableJmxAgent();
               }
             },
             new BiConsumer<InfraApplicationRunConfiguration, Boolean>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
+              public void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
                 Intrinsics.checkNotNullExpressionValue(configuration, "configuration");
                 configuration.setEnableJmxAgent(!value);
               }
@@ -721,14 +721,14 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     ArrayList fragments = new ArrayList();
     Function nameProvider = new Function<InfraApplicationUpdatePolicy, String>() {
       @Override
-      public final String apply(InfraApplicationUpdatePolicy it) {
+      public String apply(InfraApplicationUpdatePolicy it) {
         Intrinsics.checkNotNullExpressionValue(it, "it");
         return UIUtil.removeMnemonic(it.getName());
       }
     };
     Function hintProvider = new Function<InfraApplicationUpdatePolicy, String>() {
       @Override
-      public final String apply(InfraApplicationUpdatePolicy it) {
+      public String apply(InfraApplicationUpdatePolicy it) {
         String description = it.getDescription();
         if (description != null) {
           return StringUtil.removeHtmlTags(description, true);
@@ -741,20 +741,20 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             message("infra.run.config.fragment.framework.group"),
             new Supplier<InfraApplicationUpdatePolicy[]>() {
               @Override
-              public final InfraApplicationUpdatePolicy[] get() {
+              public InfraApplicationUpdatePolicy[] get() {
                 return InfraApplicationUpdatePolicy.getAvailablePolicies(false).toArray(new InfraApplicationUpdatePolicy[0]);
               }
             },
             new Function<InfraApplicationRunConfiguration, InfraApplicationUpdatePolicy>() {
               @Override
-              public final InfraApplicationUpdatePolicy apply(InfraApplicationRunConfiguration it) {
+              public InfraApplicationUpdatePolicy apply(InfraApplicationRunConfiguration it) {
                 InfraApplicationUpdatePolicy updateActionUpdatePolicy = it.getUpdateActionUpdatePolicy();
                 return Objects.requireNonNullElse(updateActionUpdatePolicy, ApplicationRunConfigurationFragmentedEditorKt.DO_NOTHING);
               }
             },
             new BiConsumer<InfraApplicationRunConfiguration, InfraApplicationUpdatePolicy>() {
               @Override
-              public final void accept(InfraApplicationRunConfiguration configuration, InfraApplicationUpdatePolicy policy) {
+              public void accept(InfraApplicationRunConfiguration configuration, InfraApplicationUpdatePolicy policy) {
                 configuration.setUpdateActionUpdatePolicy(Intrinsics.areEqual(
                         policy, ApplicationRunConfigurationFragmentedEditorKt.DO_NOTHING) ? null : policy);
               }
@@ -778,7 +778,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             message("infra.run.config.fragment.framework.group"),
             new Supplier<InfraApplicationUpdatePolicy[]>() {
               @Override
-              public final InfraApplicationUpdatePolicy[] get() {
+              public InfraApplicationUpdatePolicy[] get() {
                 ArrayList<InfraApplicationUpdatePolicy> policies = new ArrayList<>();
                 policies.add(ApplicationRunConfigurationFragmentedEditorKt.DO_NOTHING);
                 policies.addAll(InfraApplicationUpdatePolicy.getAvailablePolicies(true));
@@ -787,7 +787,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             },
             new Function<InfraApplicationRunConfiguration, InfraApplicationUpdatePolicy>() {
               @Override
-              public final InfraApplicationUpdatePolicy apply(InfraApplicationRunConfiguration it) {
+              public InfraApplicationUpdatePolicy apply(InfraApplicationRunConfiguration it) {
                 InfraApplicationUpdatePolicy frameDeactivationUpdatePolicy = it.getFrameDeactivationUpdatePolicy();
                 if (frameDeactivationUpdatePolicy != null) {
                   return frameDeactivationUpdatePolicy;
@@ -802,7 +802,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             },
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
-              public final boolean test(InfraApplicationRunConfiguration it) {
+              public boolean test(InfraApplicationRunConfiguration it) {
                 return it.getFrameDeactivationUpdatePolicy() != null;
               }
             });
@@ -864,7 +864,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     },
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
-              public final boolean test(InfraApplicationRunConfiguration it) {
+              public boolean test(InfraApplicationRunConfiguration it) {
                 Intrinsics.checkNotNullExpressionValue(it, "it");
                 List<InfraAdditionalParameter> additionalParameters = it.getAdditionalParameters();
                 Intrinsics.checkNotNullExpressionValue(additionalParameters, "it.additionalParameters");

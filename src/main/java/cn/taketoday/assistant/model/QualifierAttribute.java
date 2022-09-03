@@ -38,18 +38,18 @@ public interface QualifierAttribute {
 
   HashingStrategy<QualifierAttribute> HASHING_STRATEGY = new HashingStrategy<>() {
     @Override
-    public int hashCode(final QualifierAttribute object) {
+    public int hashCode(QualifierAttribute object) {
       if (object == null) {
         return 0;
       }
 
-      final String key = object.getAttributeKey();
-      final Object value = object.getAttributeValue();
+      String key = object.getAttributeKey();
+      Object value = object.getAttributeValue();
       return (key == null ? 0 : key.hashCode()) + (value == null ? 0 : value.hashCode());
     }
 
     @Override
-    public boolean equals(final QualifierAttribute o1, final QualifierAttribute o2) {
+    public boolean equals(QualifierAttribute o1, QualifierAttribute o2) {
       return o1 == o2 ||
               (o1 != null &&
                       o2 != null &&

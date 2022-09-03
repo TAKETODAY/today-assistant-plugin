@@ -102,7 +102,7 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
   }
 
   protected Set<CommonInfraBean> getScannedBeans(Module module) {
-    final Collection<BeanPointer<?>> scannedComponents =
+    Collection<BeanPointer<?>> scannedComponents =
             ComponentScanPackagesModel.getScannedComponents(getPsiPackages(),
                     module,
                     null,
@@ -142,9 +142,9 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
   private Set<PsiPackage> getDefaultPsiPackages() {
     PsiFile file = myPsiElement.getContainingFile();
     if (file instanceof PsiClassOwner) {
-      final String packageName = ((PsiClassOwner) file).getPackageName();
-      final PsiManager manager = myPsiElement.getManager();
-      final PsiPackage psiPackage = JavaPsiFacade.getInstance(manager.getProject()).findPackage(packageName);
+      String packageName = ((PsiClassOwner) file).getPackageName();
+      PsiManager manager = myPsiElement.getManager();
+      PsiPackage psiPackage = JavaPsiFacade.getInstance(manager.getProject()).findPackage(packageName);
       if (psiPackage != null) {
         return Collections.singleton(psiPackage);
       }
@@ -153,14 +153,14 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
   }
 
   private void addBasePackageClasses(Set<PsiPackage> importedResources) {
-    final List<JamClassAttributeElement> basePackageClasses = getBasePackageClassAttribute();
+    List<JamClassAttributeElement> basePackageClasses = getBasePackageClassAttribute();
     for (JamClassAttributeElement bpc : basePackageClasses) {
       PsiClass psiClass = bpc.getValue();
       if (psiClass != null) {
-        final PsiDirectory containingDirectory = psiClass.getContainingFile().getContainingDirectory();
+        PsiDirectory containingDirectory = psiClass.getContainingFile().getContainingDirectory();
 
         if (containingDirectory != null) {
-          final PsiPackage psiPackage = JavaDirectoryService.getInstance().getPackage(containingDirectory);
+          PsiPackage psiPackage = JavaDirectoryService.getInstance().getPackage(containingDirectory);
           if (psiPackage != null) {
             importedResources.add(psiPackage);
           }
@@ -170,7 +170,7 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
   }
 
   protected List<JamClassAttributeElement> getBasePackageClassAttribute() {
-    final JamClassAttributeMeta.Collection meta = getBasePackageClassMeta();
+    JamClassAttributeMeta.Collection meta = getBasePackageClassMeta();
 
     return meta != null ? meta.getJam(getAnnotationRef()) : Collections.emptyList();
   }
@@ -213,7 +213,7 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
           Collection<PsiPackage> psiPackages = element.getValue();
           if (psiPackages != null) {
             for (PsiPackage psiPackage : psiPackages) {
-              final PsiElement identifyingElement =
+              PsiElement identifyingElement =
                       useAnnotationAsElement && annotationElement != null ? annotationElement : element.getPsiElement();
               if (!processor.process(Pair.create(psiPackage, identifyingElement == null ? psiPackage : identifyingElement))) {
                 return false;
@@ -227,10 +227,10 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
     for (JamClassAttributeElement bpc : basePackageClasses) {
       PsiClass psiClass = bpc.getValue();
       if (psiClass != null) {
-        final PsiDirectory containingDirectory = psiClass.getContainingFile().getContainingDirectory();
+        PsiDirectory containingDirectory = psiClass.getContainingFile().getContainingDirectory();
 
         if (containingDirectory != null) {
-          final PsiPackage psiPackage = JavaDirectoryService.getInstance().getPackage(containingDirectory);
+          PsiPackage psiPackage = JavaDirectoryService.getInstance().getPackage(containingDirectory);
           if (psiPackage != null) {
             if (!processor.process(Pair.create(psiPackage, useAnnotationAsElement ? annotationElement : bpc.getPsiElement()))) {
               return false;
@@ -243,13 +243,11 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
     if (useCurrentPackageForScan) {
       PsiFile file = myPsiElement.getContainingFile();
       if (file instanceof PsiClassOwner) {
-        final String packageName = ((PsiClassOwner) file).getPackageName();
-        final PsiManager manager = myPsiElement.getManager();
-        final PsiPackage psiPackage = JavaPsiFacade.getInstance(manager.getProject()).findPackage(packageName);
+        String packageName = ((PsiClassOwner) file).getPackageName();
+        PsiManager manager = myPsiElement.getManager();
+        PsiPackage psiPackage = JavaPsiFacade.getInstance(manager.getProject()).findPackage(packageName);
         if (psiPackage != null) {
-          if (!processor.process(Pair.create(psiPackage, annotationElement))) {
-            return false;
-          }
+          return processor.process(Pair.create(psiPackage, annotationElement));
         }
       }
     }

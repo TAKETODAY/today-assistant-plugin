@@ -33,7 +33,7 @@ import cn.taketoday.assistant.model.xml.DomInfraBean;
 @Namespace(InfraConstant.TASK_NAMESPACE_KEY)
 @Presentation(typeName = PresentationConstant.TASK_EXECUTOR)
 public interface Executor extends DomInfraBean {
-  public static final String CLASS_NAME = "cn.taketoday.scheduling.concurrent.ThreadPoolTaskExecutor";
+  String CLASS_NAME = "cn.taketoday.scheduling.concurrent.ThreadPoolTaskExecutor";
 
   GenericAttributeValue<String> getPoolSize();
 

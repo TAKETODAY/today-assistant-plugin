@@ -89,7 +89,7 @@ public class InfraBeanFactoryMethodConverterImpl extends InfraBeanFactoryMethodC
         PsiClass psiClass = psiMethod.getContainingClass();
         assert psiClass != null;
         String containingClass = psiClass.getQualifiedName();
-        return (!forCompletion || containingClass == null || !"java.lang.Object".equals(containingClass)) && FactoryBeansManager.of()
+        return (!forCompletion || !"java.lang.Object".equals(containingClass)) && FactoryBeansManager.of()
                 .isValidFactoryMethod(psiMethod, fromFactoryBean) && (forCompletion || parametersResolved(infraBean, psiMethod));
       }
     };

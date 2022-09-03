@@ -32,7 +32,7 @@ public class InfraImplicitBean extends CustomInfraComponent implements InfraImpl
   public static InfraImplicitBean create(@Nullable Module module, @Nullable String providerName, String className, String beanName) {
     if (module == null)
       return null;
-    final PsiClass libraryClass = InfraUtils.findLibraryClass(module, className);
+    PsiClass libraryClass = InfraUtils.findLibraryClass(module, className);
     if (libraryClass == null)
       return null;
     return new InfraImplicitBean(providerName == null ? "" : providerName, libraryClass, beanName);
@@ -80,10 +80,7 @@ public class InfraImplicitBean extends CustomInfraComponent implements InfraImpl
 
     if (!myBeanName.equals(bean.myBeanName))
       return false;
-    if (!myProviderName.equals(bean.myProviderName))
-      return false;
-
-    return true;
+    return myProviderName.equals(bean.myProviderName);
   }
 
   @Override

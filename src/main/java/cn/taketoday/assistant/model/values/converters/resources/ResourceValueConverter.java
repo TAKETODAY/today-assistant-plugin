@@ -60,8 +60,8 @@ import cn.taketoday.lang.Nullable;
 public class ResourceValueConverter extends Converter<Set<PsiFileSystemItem>> implements CustomReferenceConverter {
 
   @Override
-  public Set<PsiFileSystemItem> fromString(@Nullable String s, final ConvertContext context) {
-    final GenericDomValue domValue = (GenericDomValue) context.getInvocationElement();
+  public Set<PsiFileSystemItem> fromString(@Nullable String s, ConvertContext context) {
+    GenericDomValue domValue = (GenericDomValue) context.getInvocationElement();
     if (StringUtil.isEmpty(s)) {
       return Collections.emptySet();
     }
@@ -69,12 +69,12 @@ public class ResourceValueConverter extends Converter<Set<PsiFileSystemItem>> im
     return addResourceFilesFrom(domValue, new LinkedHashSet<>(), getFilter(), this);
   }
 
-  private static <V extends PsiFileSystemItem> Set<V> addResourceFilesFrom(final GenericDomValue element,
-          final Set<V> result,
-          final Condition<PsiFileSystemItem> filter,
+  private static <V extends PsiFileSystemItem> Set<V> addResourceFilesFrom(GenericDomValue element,
+          Set<V> result,
+          Condition<PsiFileSystemItem> filter,
           Converter converter) {
     if (converter instanceof CustomReferenceConverter) {
-      @SuppressWarnings("unchecked") final PsiReference[] references =
+      @SuppressWarnings("unchecked") PsiReference[] references =
               ((CustomReferenceConverter) converter)
                       .createReferences(element, element.getXmlElement(), ConvertContextFactory.createConvertContext(element));
       result.addAll(ResourcesUtil.of().getResourceItems(references, filter));
@@ -84,19 +84,19 @@ public class ResourceValueConverter extends Converter<Set<PsiFileSystemItem>> im
   }
 
   @Override
-  public String toString(@Nullable Set<PsiFileSystemItem> o, final ConvertContext context) {
+  public String toString(@Nullable Set<PsiFileSystemItem> o, ConvertContext context) {
     return null;
   }
 
   @Override
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
-    final int startInElement = ElementManipulators.getOffsetInElement(element);
-    final Condition<PsiFileSystemItem> filterCondition = getFilter(genericDomValue);
-    final Function<PsiFile, Collection<PsiFileSystemItem>> customDefaultPathEvaluator = getCustomDefaultPathEvaluator(element);
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, PsiElement element, ConvertContext context) {
+    int startInElement = ElementManipulators.getOffsetInElement(element);
+    Condition<PsiFileSystemItem> filterCondition = getFilter(genericDomValue);
+    Function<PsiFile, Collection<PsiFileSystemItem>> customDefaultPathEvaluator = getCustomDefaultPathEvaluator(element);
 
-    final List<PsiReference> result = new SmartList<>();
+    List<PsiReference> result = new SmartList<>();
     InfraReferenceUtils.processSeparatedString(genericDomValue.getStringValue(), ",", (s, offset) -> {
-      final InfraResourcesBuilder builder = InfraResourcesBuilder.create(element, s).
+      InfraResourcesBuilder builder = InfraResourcesBuilder.create(element, s).
               fromRoot(true).
               offset(offset + startInElement).
               filter(filterCondition).
@@ -142,7 +142,7 @@ public class ResourceValueConverter extends Converter<Set<PsiFileSystemItem>> im
         return false;
       }
 
-      final String psiTypeText = psiType.getCanonicalText();
+      String psiTypeText = psiType.getCanonicalText();
       if (CommonClassNames.JAVA_LANG_STRING.equals(psiTypeText)) {
         return false;
       }

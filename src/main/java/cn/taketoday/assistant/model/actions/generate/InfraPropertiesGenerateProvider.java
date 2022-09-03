@@ -111,7 +111,7 @@ public class InfraPropertiesGenerateProvider extends AbstractDomGenerateProvider
 
   private static PsiMethodMember[] getPsiMethodMembers(Collection<PsiMethod> setters) {
     List<PsiMethodMember> psiMethodMembers = new ArrayList<>();
-    for (final PsiMethod psiMethod : setters) {
+    for (PsiMethod psiMethod : setters) {
       psiMethodMembers.add(new PsiMethodMember(psiMethod) {
 
         public void renderTreeNode(SimpleColoredComponent component, JTree tree) {

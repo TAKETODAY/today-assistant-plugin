@@ -54,7 +54,7 @@ public class PropertiesFileConverter extends JamSimpleReferenceConverter<Set<Pro
 
   @Override
   public Set<PropertiesFile> fromString(@Nullable String s, JamStringAttributeElement<Set<PropertiesFile>> context) {
-    final PsiAnnotationMemberValue psiElement = context.getPsiElement();
+    PsiAnnotationMemberValue psiElement = context.getPsiElement();
     if (s != null) {
       PsiLiteral psiLiteral = (psiElement instanceof PsiLiteral) ? (PsiLiteral) psiElement : getFakePsiLiteralElement(psiElement, s);
       if (psiLiteral != null) {
@@ -79,15 +79,15 @@ public class PropertiesFileConverter extends JamSimpleReferenceConverter<Set<Pro
             .getReferences(InfraResourcesBuilder.create(injectionHost, s).fromRoot(s.startsWith("/")).soft(false));
   }
 
-  private static List<PropertiesFile> getResourceFiles(final PsiLiteral element,
-          final String s,
-          final String delimiter,
-          final Condition<PsiFileSystemItem> filter) {
-    final List<PsiReference> references = new ArrayList<>();
-    final int startInElement = ElementManipulators.getOffsetInElement(element);
+  private static List<PropertiesFile> getResourceFiles(PsiLiteral element,
+          String s,
+          String delimiter,
+          Condition<PsiFileSystemItem> filter) {
+    List<PsiReference> references = new ArrayList<>();
+    int startInElement = ElementManipulators.getOffsetInElement(element);
 
     InfraReferenceUtils.processSeparatedString(s, delimiter, (separatedString, offset) -> {
-      final InfraResourcesBuilder builder =
+      InfraResourcesBuilder builder =
               InfraResourcesBuilder.create(element, separatedString).offset(offset + startInElement);
       ContainerUtil.addAll(references, ResourcesUtil.of().getReferences(builder));
       return true;
@@ -100,12 +100,12 @@ public class PropertiesFileConverter extends JamSimpleReferenceConverter<Set<Pro
   }
 
   @Nullable
-  private static PsiLiteral getFakePsiLiteralElement(final PsiElement element,
-          final String s) {
+  private static PsiLiteral getFakePsiLiteralElement(PsiElement element,
+          String s) {
     if (element == null)
       return null;
     try {
-      final PsiExpression psiExpression =
+      PsiExpression psiExpression =
               JavaPsiFacade.getElementFactory(element.getProject()).createExpressionFromText("\"" + s + "\"", element);
       if (psiExpression instanceof PsiLiteral) {
         return (PsiLiteral) psiExpression;

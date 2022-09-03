@@ -55,7 +55,7 @@ public final class StrategiesClassReferenceProvider extends PsiReferenceProvider
       protected void processToken(int start, int end, boolean delimitersOnly) {
         var classReferenceSet = new JavaClassReferenceSet(
                 text.substring(start, end), element, start, true,
-                StrategiesClassReferenceProvider.CLASS_REFERENCE_PROVIDER) {
+                CLASS_REFERENCE_PROVIDER) {
 
           @Override
           public boolean isAllowDollarInNames() {

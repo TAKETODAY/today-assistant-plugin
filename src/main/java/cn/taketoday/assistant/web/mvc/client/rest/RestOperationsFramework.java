@@ -44,7 +44,7 @@ public final class RestOperationsFramework extends RestTemplateFramework {
   private final SourceTestLibSearcher<WebClientHolder> myHoldersSearcher = new SourceTestLibSearcher<>("SPRING_REST_OPERATIONS",
           new Function2<Module, GlobalSearchScope, Collection<? extends WebClientHolder>>() {
             @Override
-            public final List<WebClientHolder> invoke(Module p1, GlobalSearchScope p2) {
+            public List<WebClientHolder> invoke(Module p1, GlobalSearchScope p2) {
               Intrinsics.checkNotNullParameter(p1, "p1");
               Intrinsics.checkNotNullParameter(p2, "p2");
               return RestOperationsModel.INSTANCE.findHolders(p1, p2);

@@ -184,7 +184,7 @@ public final class GenerateAutowiredDependenciesUtil {
     return existedNames;
   }
 
-  private static Expression getPsiFieldSuggestNamesExpression(final PsiField psiField, final Collection<String> suggestions, Set<String> existedNames) {
+  private static Expression getPsiFieldSuggestNamesExpression(PsiField psiField, Collection<String> suggestions, Set<String> existedNames) {
     return new Expression() {
 
       public Result calculateResult(ExpressionContext context) {

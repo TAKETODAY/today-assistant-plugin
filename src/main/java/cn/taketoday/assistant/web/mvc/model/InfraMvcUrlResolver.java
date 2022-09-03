@@ -138,7 +138,7 @@ public final class InfraMvcUrlResolver extends HttpUrlResolver {
         return SequencesKt.map(CollectionsKt.asSequence(getAppPathUrlMappingElements(module, urlMappingsWithoutSpringModel)),
                 new Function1<UrlMappingElement, UrlTargetInfo>() {
                   @Override
-                  public final WebMvcUrlTargetInfo invoke(UrlMappingElement urlPath) {
+                  public WebMvcUrlTargetInfo invoke(UrlMappingElement urlPath) {
                     return new WebMvcUrlTargetInfo(getSupportedSchemes(), urlPath, WebMvcUrlUtils.getAuthoritiesByModule(module));
                   }
                 });

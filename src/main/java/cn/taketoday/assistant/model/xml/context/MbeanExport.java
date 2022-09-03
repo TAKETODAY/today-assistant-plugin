@@ -32,7 +32,7 @@ import cn.taketoday.assistant.model.xml.RequiredBeanType;
 
 @BeanType(MbeanExport.CLASS_NAME)
 public interface MbeanExport extends DomInfraBean, InfraContextElement, InfrastructureBean {
-  public static final String CLASS_NAME = "cn.taketoday.jmx.export.annotation.AnnotationMBeanExporter";
+  String CLASS_NAME = "cn.taketoday.jmx.export.annotation.AnnotationMBeanExporter";
 
   @Convert(InfraBeanResolveConverter.class)
   @RequiredBeanType({ MbeanServer.PRODUCT_CLASSNAME })

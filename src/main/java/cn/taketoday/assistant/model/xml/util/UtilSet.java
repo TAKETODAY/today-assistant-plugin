@@ -35,7 +35,7 @@ import cn.taketoday.assistant.model.xml.beans.TypeHolder;
 @BeanType(UtilSet.CLASS_NAME)
 @Presentation(typeName = PresentationConstant.INFRA_SET)
 public interface UtilSet extends DomInfraBean, InfraUtilElement, ListOrSet, ScopedElement, TypeHolder {
-  public static final String CLASS_NAME = "cn.taketoday.beans.factory.config.SetFactoryBean";
+  String CLASS_NAME = "cn.taketoday.beans.factory.config.SetFactoryBean";
 
   @ExtendClass({ "java.util.Set" })
   GenericAttributeValue<PsiClass> getSetClass();

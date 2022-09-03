@@ -31,7 +31,7 @@ import cn.taketoday.lang.Nullable;
 public class InfraGeneralSettingsImpl extends InfraGeneralSettings implements PersistentStateComponent<InfraGeneralSettingsImpl> {
   private boolean showProfilesPanel = true;
   private boolean showMultipleContextsPanel = true;
-  private boolean allowAutoConfigurationMode = false;
+  private boolean allowAutoConfigurationMode;
 
   @Nullable
   public InfraGeneralSettingsImpl getState() {

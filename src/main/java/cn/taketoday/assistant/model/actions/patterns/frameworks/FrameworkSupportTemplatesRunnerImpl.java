@@ -90,7 +90,7 @@ public class FrameworkSupportTemplatesRunnerImpl extends FrameworkSupportTemplat
     }
   }
 
-  public static void runTemplates(final Project project, final Editor editor, final List<Template> templates, final int index, final Map<String, String> predefinedVars) {
+  public static void runTemplates(Project project, Editor editor, List<Template> templates, int index, Map<String, String> predefinedVars) {
     Template template = templates.get(index);
     template.setToReformat(true);
     TemplateManager.getInstance(project).startTemplate(editor, template, true, predefinedVars, new TemplateEditingAdapter() {
@@ -105,7 +105,7 @@ public class FrameworkSupportTemplatesRunnerImpl extends FrameworkSupportTemplat
           Map map = predefinedVars;
           application.invokeLater(() -> {
             WriteCommandAction.runWriteCommandAction(project2, () -> {
-              FrameworkSupportTemplatesRunnerImpl.runTemplates(project2, editor2, list, i + 1, map);
+              runTemplates(project2, editor2, list, i + 1, map);
             });
           });
         }

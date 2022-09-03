@@ -37,6 +37,7 @@ import com.intellij.util.containers.ContainerUtil;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.swing.Icon;
@@ -249,7 +250,7 @@ public abstract class InfraFileSet implements Disposable {
     else if (set.data != null) {
       return false;
     }
-    return facet != null ? facet.equals(set.facet) : set.facet == null;
+    return Objects.equals(facet, set.facet);
   }
 
   @Override

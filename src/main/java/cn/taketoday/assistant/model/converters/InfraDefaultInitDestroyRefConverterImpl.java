@@ -90,13 +90,13 @@ public class InfraDefaultInitDestroyRefConverterImpl extends InfraDefaultInitDes
     }
 
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-      Set<PsiMethod> methodsByName = InfraDefaultInitDestroyRefConverterImpl.getMethodsByName(
+      Set<PsiMethod> methodsByName = getMethodsByName(
               DomUtil.getParentOfType(this.myGenericDomValue, Beans.class, false), myGenericDomValue.getStringValue());
       return ContainerUtil.map2Array(methodsByName, ResolveResult.class, PsiElementResolveResult::new);
     }
 
     private static Set<PsiMethod> getAllMethods(@Nullable Beans beans) {
-      return InfraDefaultInitDestroyRefConverterImpl.getMethods(beans, psiClass -> Arrays.asList(psiClass.getAllMethods()));
+      return getMethods(beans, psiClass -> Arrays.asList(psiClass.getAllMethods()));
     }
 
   }

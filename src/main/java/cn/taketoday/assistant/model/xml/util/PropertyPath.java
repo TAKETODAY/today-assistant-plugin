@@ -28,7 +28,7 @@ import cn.taketoday.assistant.model.xml.DomInfraBean;
 
 @BeanType(PropertyPath.CLASS_NAME)
 public interface PropertyPath extends InfraUtilElement, DomInfraBean {
-  public static final String CLASS_NAME = "cn.taketoday.beans.factory.config.PropertyPathFactoryBean";
+  String CLASS_NAME = "cn.taketoday.beans.factory.config.PropertyPathFactoryBean";
 
   @Required
   GenericAttributeValue<String> getPath();

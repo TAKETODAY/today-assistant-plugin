@@ -131,7 +131,7 @@ public class StrategiesFileIndex extends FileBasedIndexExtension<String, List<St
     }
     else {
       HashMap<VirtualFile, List<String>> vfToValues = new HashMap<>();
-      FileBasedIndex.getInstance().processValues(StrategiesFileIndex.NAME, key, null, (file, value) -> {
+      FileBasedIndex.getInstance().processValues(NAME, key, null, (file, value) -> {
         vfToValues.put(file, value);
         return true;
       }, resolveScope);
@@ -179,7 +179,7 @@ public class StrategiesFileIndex extends FileBasedIndexExtension<String, List<St
     if (adjustedScope != null) {
       var collectKeysProcessor = new CollectUniquesProcessor<String>();
       FileBasedIndex.getInstance()
-              .processAllKeys(StrategiesFileIndex.NAME, collectKeysProcessor, adjustedScope, null);
+              .processAllKeys(NAME, collectKeysProcessor, adjustedScope, null);
 
       PsiManager psiManager = PsiManager.getInstance(project);
 
@@ -188,7 +188,7 @@ public class StrategiesFileIndex extends FileBasedIndexExtension<String, List<St
 
       for (String key : collectKeysProcessor.getResults()) {
         var map = new HashMap<VirtualFile, List<String>>();
-        FileBasedIndex.getInstance().processValues(StrategiesFileIndex.NAME, key, null,
+        FileBasedIndex.getInstance().processValues(NAME, key, null,
                 (file, value) -> {
                   if (valueHint == null) {
                     Intrinsics.checkNotNullExpressionValue(value, "value");

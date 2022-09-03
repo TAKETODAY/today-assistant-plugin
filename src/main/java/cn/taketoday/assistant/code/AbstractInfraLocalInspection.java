@@ -38,7 +38,6 @@ import cn.taketoday.assistant.InfraLibraryUtil;
 public abstract class AbstractInfraLocalInspection extends AbstractBaseUastLocalInspectionTool {
 
   protected AbstractInfraLocalInspection() {
-    super();
   }
 
   @SafeVarargs

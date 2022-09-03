@@ -93,7 +93,7 @@ public class FileSetNode extends AbstractFilesetNode {
     if (!propertiesFiles.isEmpty()) {
       nodes.add(new PropertiesGroupNode(this, propertiesFiles));
     }
-    for (final InfraFileSetEditorCustomization.CustomConfigFileGroup group2 : smartList) {
+    for (InfraFileSetEditorCustomization.CustomConfigFileGroup group2 : smartList) {
       nodes.add(new FilesetGroupNode(this, group2.getFiles()) {
         @Override
         protected String getGroupName() {

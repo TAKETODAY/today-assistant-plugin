@@ -190,7 +190,7 @@ public abstract class AbstractBeanNamespaceDescriptor<T extends PsiElement> exte
     }
   }
 
-  public static abstract class BeanAttributeDescriptor<T extends PsiElement> implements XmlAttributeDescriptorEx, PsiPresentableMetaData {
+  public abstract static class BeanAttributeDescriptor<T extends PsiElement> implements XmlAttributeDescriptorEx, PsiPresentableMetaData {
     protected final String myAttributeName;
     protected final String mySuffix;
     protected final T myPsiElement;

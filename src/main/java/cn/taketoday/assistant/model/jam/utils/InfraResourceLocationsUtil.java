@@ -48,7 +48,7 @@ public final class InfraResourceLocationsUtil {
 
   public void checkResourceLocation(ProblemsHolder holder, JamStringAttributeElement<?> jamStringAttributeElement) {
     String message;
-    final PsiAnnotationMemberValue value = jamStringAttributeElement.getPsiElement();
+    PsiAnnotationMemberValue value = jamStringAttributeElement.getPsiElement();
 
     if (value instanceof PsiLiteral psiLiteral) {
       for (PsiReference psiReference : psiLiteral.getReferences()) {

@@ -29,14 +29,14 @@ public abstract class InfraValueHolderDefinitionBase implements InfraValueHolder
   @Nullable
   @Override
   public String getValueAsString() {
-    final GenericDomValue<?> element = getValueElement();
+    GenericDomValue<?> element = getValueElement();
     return element == null ? null : element.getStringValue();
   }
 
   @Nullable
   @Override
   public BeanPointer<?> getRefValue() {
-    final GenericDomValue<BeanPointer<?>> refElement = getRefElement();
+    GenericDomValue<BeanPointer<?>> refElement = getRefElement();
     return refElement == null ? null : refElement.getValue();
   }
 }

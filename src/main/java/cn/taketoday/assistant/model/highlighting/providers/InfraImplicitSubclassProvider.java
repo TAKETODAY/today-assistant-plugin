@@ -130,7 +130,7 @@ public final class InfraImplicitSubclassProvider extends ImplicitSubclassProvide
     return InfraUtils.isBeanCandidateClassInProject(psiClass);
   }
 
-  private OverridingInfo getOverridingInfo(PsiMethod method, final Lazy<Boolean> lazy) {
+  private OverridingInfo getOverridingInfo(PsiMethod method, Lazy<Boolean> lazy) {
     PsiModifierList modifierList = method.getModifierList();
     PsiAnnotation[] annotations = modifierList.getAnnotations();
     if (annotations.length == 0) {

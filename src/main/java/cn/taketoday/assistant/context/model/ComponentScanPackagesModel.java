@@ -64,7 +64,7 @@ public class ComponentScanPackagesModel extends CacheableCommonInfraModel {
   private final Map<InfraQualifier, List<BeanPointer<?>>> myLocalBeansByQualifier;
 
   private final Module myModule;
-  private static boolean ourAllowDefaultPackageForTests = false;
+  private static boolean ourAllowDefaultPackageForTests;
 
   public ComponentScanPackagesModel(NotNullLazyValue<? extends Set<PsiPackage>> packages, Module module) {
     this.myPackages = packages;

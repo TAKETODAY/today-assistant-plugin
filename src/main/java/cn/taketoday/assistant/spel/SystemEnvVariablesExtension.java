@@ -49,7 +49,7 @@ import cn.taketoday.assistant.InfraBundle;
  * @since 1.0 2022/8/20 01:19
  */
 final class SystemEnvVariablesExtension extends SpringElContextsExtension {
-  private static final String[] ALL_SYSTEM_PROPERTIES = new String[] {
+  private static final String[] ALL_SYSTEM_PROPERTIES = {
           "systemProperties", "systemEnvironment"
   };
 

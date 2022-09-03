@@ -73,7 +73,7 @@ public final class InfraImplicitSubclassProviderKt {
         @Override
         public Boolean invoke(CommonInfraModel it) {
           if (!(it instanceof InfraModel)) {
-            return InfraImplicitSubclassProviderKt.hasAspectJTransactionMode(it);
+            return hasAspectJTransactionMode(it);
           }
           return false;
         }

@@ -42,13 +42,13 @@ public final class WebBootApplicationPortProvider implements WebApplicationPortP
     if (!InfraLibraryUtil.hasFrameworkLibrary(module)) {
       return CollectionsKt.emptyList();
     }
-    final List<String> smartList = new SmartList<>();
+    List<String> smartList = new SmartList<>();
 
     String serverPortProperty = "server.port";
     String defaultServerPort = "8080";
     final String randomPortValue = "0";
     InfraConfigValueSearcher.productionForAllProfiles(module, "server.port").process(new Processor<ConfigurationValueResult>() {
-      public final boolean process(ConfigurationValueResult configValue) {
+      public boolean process(ConfigurationValueResult configValue) {
         String str;
         List list = smartList;
         String it = configValue.getValueText();

@@ -39,7 +39,7 @@ public abstract class LazyDependenciesGraph<N, E> extends UserDataHolderBase imp
   private static final Key<CachedValue<Map<String, LazyModelDependenciesGraph>>> OUTS_KEY = Key.create("OUTS_KEY");
   private final Map<N, Collection<Pair<N, E>>> myIns = new ConcurrentHashMap<>();
   private final Map<N, Collection<Pair<N, E>>> myOuts = new ConcurrentHashMap<>();
-  private volatile boolean myIsBuilt = false;
+  private volatile boolean myIsBuilt;
   private final Function<Pair<N, E>, N> mySourceNodeFunction = pair -> {
     return pair.getFirst();
   };

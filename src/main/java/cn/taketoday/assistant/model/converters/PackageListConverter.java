@@ -42,7 +42,7 @@ public class PackageListConverter extends Converter<Collection<PsiPackage>> impl
 
   @Override
 
-  public Collection<PsiPackage> fromString(@Nullable final String s, final ConvertContext context) {
+  public Collection<PsiPackage> fromString(@Nullable String s, ConvertContext context) {
     if (s == null) {
       return Collections.emptyList();
     }
@@ -51,7 +51,7 @@ public class PackageListConverter extends Converter<Collection<PsiPackage>> impl
     }
 
     if (InfraConverterUtil.containsPatternReferences(s)) {
-      final PsiReference[] references = createReferences((GenericDomValue) context.getInvocationElement(), context.getXmlElement(), context);
+      PsiReference[] references = createReferences((GenericDomValue) context.getInvocationElement(), context.getXmlElement(), context);
       return InfraConverterUtil.getPsiPackages(references);
     }
 
@@ -59,13 +59,13 @@ public class PackageListConverter extends Converter<Collection<PsiPackage>> impl
   }
 
   @Override
-  public String toString(@Nullable final Collection<PsiPackage> psiPackages, final ConvertContext context) {
+  public String toString(@Nullable Collection<PsiPackage> psiPackages, ConvertContext context) {
     return null;
   }
 
   @Override
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
-    final String text = genericDomValue.getStringValue();
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, PsiElement element, ConvertContext context) {
+    String text = genericDomValue.getStringValue();
     if (text == null) {
       return PsiReference.EMPTY_ARRAY;
     }

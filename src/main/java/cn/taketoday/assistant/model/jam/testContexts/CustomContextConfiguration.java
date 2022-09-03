@@ -70,11 +70,11 @@ public class CustomContextConfiguration extends JamBaseElement<PsiClass> impleme
             @Nullable
             @Override
             protected InfraContextConfiguration compute() {
-              final PsiAnnotation definingMetaAnnotation = AliasForUtils
+              PsiAnnotation definingMetaAnnotation = AliasForUtils
                       .findDefiningMetaAnnotation(getPsiElement(), myAnnotationChildLink.getAnnotationQualifiedName(),
                               AnnotationConstant.CONTEXT_CONFIGURATION, true);
               if (definingMetaAnnotation != null) {
-                final PsiClass annotationType = PsiTreeUtil.getParentOfType(definingMetaAnnotation, PsiClass.class, true);
+                PsiClass annotationType = PsiTreeUtil.getParentOfType(definingMetaAnnotation, PsiClass.class, true);
                 if (annotationType != null) {
                   return InfraContextConfiguration.META.getJamElement(annotationType);
                 }
@@ -113,7 +113,7 @@ public class CustomContextConfiguration extends JamBaseElement<PsiClass> impleme
       }
     }
 
-    final ContextConfiguration definingContextConfiguration = getDefiningContextConfiguration();
+    ContextConfiguration definingContextConfiguration = getDefiningContextConfiguration();
     if (definingContextConfiguration != null) {
       return definingContextConfiguration.getLocations(definingContextConfiguration.getPsiElement());
     }
@@ -134,7 +134,7 @@ public class CustomContextConfiguration extends JamBaseElement<PsiClass> impleme
       return psiClasses;
     }
 
-    final ContextConfiguration definingContextConfiguration = getDefiningContextConfiguration();
+    ContextConfiguration definingContextConfiguration = getDefiningContextConfiguration();
     if (definingContextConfiguration != null) {
       return definingContextConfiguration.getConfigurationClasses();
     }
@@ -148,21 +148,21 @@ public class CustomContextConfiguration extends JamBaseElement<PsiClass> impleme
 
   @Override
   public boolean hasLocationsAttribute() {
-    final InfraAliasFor aliasAttribute = getAliasAttribute(LOCATIONS_ATTR_NAME);
+    InfraAliasFor aliasAttribute = getAliasAttribute(LOCATIONS_ATTR_NAME);
     if (aliasAttribute != null)
       return true;
 
-    final ContextConfiguration definingContextConfiguration = getDefiningContextConfiguration();
+    ContextConfiguration definingContextConfiguration = getDefiningContextConfiguration();
     return definingContextConfiguration != null && definingContextConfiguration.hasLocationsAttribute();
   }
 
   @Override
   public boolean hasValueAttribute() {
-    final InfraAliasFor aliasAttribute = getAliasAttribute(VALUE_ATTR_NAME);
+    InfraAliasFor aliasAttribute = getAliasAttribute(VALUE_ATTR_NAME);
     if (aliasAttribute != null)
       return true;
 
-    final ContextConfiguration definingContextConfiguration = getDefiningContextConfiguration();
+    ContextConfiguration definingContextConfiguration = getDefiningContextConfiguration();
     return definingContextConfiguration != null && definingContextConfiguration.hasValueAttribute();
   }
 

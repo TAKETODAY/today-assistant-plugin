@@ -96,7 +96,7 @@ public abstract class InfraReplacementTokenCompletionContributor extends Complet
               ProcessingContext context,
               CompletionResultSet result) {
         if (!parameters.isExtendedCompletion()) {
-          final String shortcut = KeymapUtil.getFirstKeyboardShortcutText(IdeActions.ACTION_CODE_COMPLETION);
+          String shortcut = KeymapUtil.getFirstKeyboardShortcutText(IdeActions.ACTION_CODE_COMPLETION);
           result.addLookupAdvertisement(InfraAppBundle.message(
                   "InfraReplacementTokenCompletionContributor.press.again.to.show.replacement.tokens", shortcut));
           return;

@@ -66,8 +66,8 @@ public class CachePut<T extends PsiMember & PsiNamedElement> extends JamBaseCach
   }
 
   public static void addElements(JamService service, GlobalSearchScope scope, Collection<CacheableElement> result) {
-    result.addAll(service.getJamMethodElements(CachePut.CACHE_PUT_JAM_KEY, CacheableConstant.CACHE_PUT, scope));
-    result.addAll(service.getJamClassElements(CachePut.CACHE_PUT_JAM_KEY, CacheableConstant.CACHE_PUT, scope));
+    result.addAll(service.getJamMethodElements(CACHE_PUT_JAM_KEY, CacheableConstant.CACHE_PUT, scope));
+    result.addAll(service.getJamClassElements(CACHE_PUT_JAM_KEY, CacheableConstant.CACHE_PUT, scope));
   }
 
   public static void register(SemRegistrar registrar, PsiMethodPattern psiMethod) {

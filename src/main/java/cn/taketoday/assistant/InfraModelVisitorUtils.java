@@ -158,7 +158,7 @@ public abstract class InfraModelVisitorUtils {
     return pointers;
   }
 
-  public static Collection<XmlTag> getCustomBeanCandidates(CommonInfraModel model, final String id) {
+  public static Collection<XmlTag> getCustomBeanCandidates(CommonInfraModel model, String id) {
     Set<XmlTag> tags = new HashSet<>();
     visitRecursionAwareRelatedModels(model, context(Processors.cancelableCollectProcessor(tags), (m, p) -> {
       if (m instanceof LocalXmlModel) {
@@ -172,7 +172,7 @@ public abstract class InfraModelVisitorUtils {
     return tags;
   }
 
-  public static List<BeanPointer<?>> getDescendants(CommonInfraModel model, final BeanPointer<?> context) {
+  public static List<BeanPointer<?>> getDescendants(CommonInfraModel model, BeanPointer<?> context) {
     List<BeanPointer<?>> pointers = new LinkedList<>();
 
     visitRecursionAwareRelatedModels(model, context(Processors.cancelableCollectProcessor(pointers), (m, p) -> {
@@ -188,7 +188,7 @@ public abstract class InfraModelVisitorUtils {
     return pointers;
   }
 
-  public static Set<String> getAllBeanNames(CommonInfraModel model, final BeanPointer<?> pointer) {
+  public static Set<String> getAllBeanNames(CommonInfraModel model, BeanPointer<?> pointer) {
     String name = pointer.getName();
     if (StringUtil.isEmptyOrSpaces(name))
       return Collections.emptySet();

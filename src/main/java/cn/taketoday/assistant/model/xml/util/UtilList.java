@@ -35,7 +35,7 @@ import cn.taketoday.assistant.model.xml.beans.TypeHolder;
 @BeanType(UtilList.CLASS_NAME)
 @Presentation(typeName = PresentationConstant.INFRA_LIST)
 public interface UtilList extends DomInfraBean, InfraUtilElement, ListOrSet, ScopedElement, TypeHolder {
-  public static final String CLASS_NAME = "cn.taketoday.beans.factory.config.ListFactoryBean";
+  String CLASS_NAME = "cn.taketoday.beans.factory.config.ListFactoryBean";
 
   @ExtendClass({ "java.util.List" })
   GenericAttributeValue<PsiClass> getListClass();

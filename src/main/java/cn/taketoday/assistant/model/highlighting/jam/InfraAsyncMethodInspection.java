@@ -196,18 +196,18 @@ public final class InfraAsyncMethodInspection extends AbstractInfraJavaInspectio
         return;
       }
       PsiMethod it = (PsiMethod) startElement;
-      final PsiMethod myMethod = SuperMethodWarningUtil.checkSuperMethod(it);
+      PsiMethod myMethod = SuperMethodWarningUtil.checkSuperMethod(it);
       if (myMethod == null) {
         return;
       }
-      final JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
-      final PsiType typeParameter = boxedIfPrimitive(myMethod, myMethod.getReturnType());
+      JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
+      PsiType typeParameter = boxedIfPrimitive(myMethod, myMethod.getReturnType());
       PsiClass forceReturnPsiClass = psiFacade.findClass(this.forceReturn, myMethod.getResolveScope());
       if (forceReturnPsiClass == null) {
         throw new IllegalArgumentException("class not found " + this.forceReturn);
       }
 
-      final PsiClassType createType = psiFacade.getElementFactory().createType(forceReturnPsiClass, typeParameter);
+      PsiClassType createType = psiFacade.getElementFactory().createType(forceReturnPsiClass, typeParameter);
       Project project2 = myMethod.getProject();
       String name = myMethod.getName();
       PsiParameterList parameterList = myMethod.getParameterList();
@@ -271,7 +271,7 @@ public final class InfraAsyncMethodInspection extends AbstractInfraJavaInspectio
             }
             break;
           case 1346935898:
-            if (!qualifiedName.equals("java.util.concurrent.Future")) {
+            if (!"java.util.concurrent.Future".equals(qualifiedName)) {
               return;
             }
             break;

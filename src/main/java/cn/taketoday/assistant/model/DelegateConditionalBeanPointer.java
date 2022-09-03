@@ -46,12 +46,14 @@ public final class DelegateConditionalBeanPointer implements JamBeanPointer, Con
   }
 
   @Override
-  public @Nullable PsiElement getPsiElement() {
+  @Nullable
+  public PsiElement getPsiElement() {
     return myDelegate.getPsiElement();
   }
 
   @Override
-  public @Nullable String getName() {
+  @Nullable
+  public String getName() {
     return myDelegate.getName();
   }
 
@@ -86,7 +88,8 @@ public final class DelegateConditionalBeanPointer implements JamBeanPointer, Con
   }
 
   @Override
-  public @Nullable PsiClass getBeanClass() {
+  @Nullable
+  public PsiClass getBeanClass() {
     return myDelegate.getBeanClass();
   }
 
@@ -106,7 +109,8 @@ public final class DelegateConditionalBeanPointer implements JamBeanPointer, Con
   }
 
   @Override
-  public @Nullable BeanPointer<?> getParentPointer() {
+  @Nullable
+  public BeanPointer<?> getParentPointer() {
     return myDelegate.getParentPointer();
   }
 

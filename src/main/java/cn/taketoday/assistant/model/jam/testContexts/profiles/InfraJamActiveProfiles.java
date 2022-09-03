@@ -93,7 +93,7 @@ public class InfraJamActiveProfiles extends CommonModelElement.PsiBase implement
           JamStringAttributeMeta.Collection<String> attrMeta) {
     for (JamStringAttributeElement<String> element : ANNO_META.getAttribute(myPsiMember, attrMeta)) {
       if (element != null) {
-        final String value = element.getValue();
+        String value = element.getValue();
         if (StringUtil.isNotEmpty(value))
           profiles.add(value);
       }

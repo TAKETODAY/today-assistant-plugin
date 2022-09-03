@@ -33,11 +33,11 @@ import cn.taketoday.assistant.dom.InfraDomUtils;
 @SuppressWarnings("ComponentNotRegistered")
 public class GenerateDomElementAction extends com.intellij.util.xml.ui.actions.generate.GenerateDomElementAction {
 
-  public GenerateDomElementAction(final GenerateDomElementProvider provider) {
+  public GenerateDomElementAction(GenerateDomElementProvider provider) {
     super(provider);
   }
 
-  public GenerateDomElementAction(final GenerateDomElementProvider provider, Icon icon) {
+  public GenerateDomElementAction(GenerateDomElementProvider provider, Icon icon) {
     super(provider);
     getTemplatePresentation().setIcon(icon);
   }

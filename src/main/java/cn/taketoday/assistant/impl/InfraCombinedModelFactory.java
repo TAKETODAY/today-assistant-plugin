@@ -140,7 +140,7 @@ public final class InfraCombinedModelFactory {
 
   @Nullable
   private static XmlInfraModel createXmlModel(Collection<XmlFile> configs, Module module, @Nullable InfraFileSet set,
-          final NullableFactory<Set<String>> activeProfilesFactory) {
+          NullableFactory<Set<String>> activeProfilesFactory) {
     Set<XmlFile> files = new LinkedHashSet<>(configs.size());
     for (XmlFile psiFile : configs) {
       if (InfraDomUtils.isInfraXml(psiFile)) {

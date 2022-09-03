@@ -249,7 +249,7 @@ public class CustomNamespaceBeanResolveQuickFixProvider implements BeanResolveQu
       return message("custom.namespace.quick.fixes.family.name");
     }
 
-    public void applyFix(final Project project, ProblemDescriptor descriptor) {
+    public void applyFix(Project project, ProblemDescriptor descriptor) {
       if (ApplicationManager.getApplication().isUnitTestMode()) {
         doApplyFix(ContainerUtil.getFirstItem(this.myQuickFixInfos), project);
         return;

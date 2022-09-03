@@ -46,8 +46,8 @@ public class ConstructorArgumentValues {
   private Map<Integer, ConstructorArgDefinition> indexedArgs;
   private List<ConstructorArg> genericArgs;
 
-  public int init(final InfraBean bean) {
-    final Set<ConstructorArg> args = bean.getAllConstructorArgs();
+  public int init(InfraBean bean) {
+    Set<ConstructorArg> args = bean.getAllConstructorArgs();
 
     indexedArgs = new HashMap<>(args.size());
     genericArgs = new ArrayList<>(args.size());
@@ -56,7 +56,7 @@ public class ConstructorArgumentValues {
     int minNrOfArgs = args.size();
 
     for (CNamespaceDomElement definition : bean.getCNamespaceConstructorArgDefinitions()) {
-      final String name = definition.getAttributeName();
+      String name = definition.getAttributeName();
       if (StringUtil.isEmptyOrSpaces(name))
         continue;
 
@@ -72,13 +72,13 @@ public class ConstructorArgumentValues {
     }
 
     for (ConstructorArg arg : args) {
-      final Integer index = arg.getIndex().getValue();
+      Integer index = arg.getIndex().getValue();
       if (index != null) {
         indexedArgs.put(index, arg);
         minNrOfArgs = Math.max(minNrOfArgs, index);
       }
       else if (DomUtil.hasXml(arg.getNameAttr())) {
-        final String name = arg.getNameAttr().getStringValue();
+        String name = arg.getNameAttr().getStringValue();
         if (!StringUtil.isEmptyOrSpaces(name)) {
           namedArgs.put(name, arg);
         }
@@ -92,10 +92,10 @@ public class ConstructorArgumentValues {
   }
 
   @Nullable
-  public ConstructorArgDefinition resolve(final int index,
+  public ConstructorArgDefinition resolve(int index,
           PsiParameter parameter,
           @Nullable Set<ConstructorArgDefinition> usedArgs) {
-    final PsiType paramType = parameter.getType();
+    PsiType paramType = parameter.getType();
 
     if (!namedArgs.isEmpty()) {
       ConstructorArgDefinition arg = resolveNamed(parameter.getName(), paramType);
@@ -111,12 +111,12 @@ public class ConstructorArgumentValues {
   }
 
   @Nullable
-  public ConstructorArg resolveGeneric(@Nullable final PsiType requiredType, @Nullable Set<ConstructorArgDefinition> usedArgs) {
-    for (final ConstructorArg arg : genericArgs) {
+  public ConstructorArg resolveGeneric(@Nullable PsiType requiredType, @Nullable Set<ConstructorArgDefinition> usedArgs) {
+    for (ConstructorArg arg : genericArgs) {
       if (usedArgs != null && usedArgs.contains(arg)) {
         continue;
       }
-      final PsiType type = arg.getType().getValue();
+      PsiType type = arg.getType().getValue();
       if (requiredType == null) {
         if (type == null) {
           return arg;
@@ -137,8 +137,8 @@ public class ConstructorArgumentValues {
   }
 
   @Nullable
-  private ConstructorArgDefinition resolveIndexed(int index, final PsiType paramType) {
-    final ConstructorArgDefinition arg = indexedArgs.get(index);
+  private ConstructorArgDefinition resolveIndexed(int index, PsiType paramType) {
+    ConstructorArgDefinition arg = indexedArgs.get(index);
 
     // here are resolved c:namespace indexed arguments
     //  <bean id="foo" class="x.y.Foo" c:_0-ref="bar" c:_1-ref="baz" c:_2="foo@bar.com">
@@ -146,7 +146,7 @@ public class ConstructorArgumentValues {
       return arg;
     }
 
-    final PsiType type = ((ConstructorArg) arg).getType().getValue();
+    PsiType type = ((ConstructorArg) arg).getType().getValue();
     if (type == null || type.isAssignableFrom(paramType)) {
       return arg;
     }
@@ -154,8 +154,8 @@ public class ConstructorArgumentValues {
   }
 
   @Nullable
-  private ConstructorArgDefinition resolveNamed(String name, final PsiType paramType) {
-    final ConstructorArgDefinition arg = namedArgs.get(name);
+  private ConstructorArgDefinition resolveNamed(String name, PsiType paramType) {
+    ConstructorArgDefinition arg = namedArgs.get(name);
     if (arg == null) {
       return null;
     }
@@ -168,7 +168,7 @@ public class ConstructorArgumentValues {
 
     // user can use both "name" and "type" attributes... it isn't recommended but possible
     // <constructor-arg name="list" type="my.Type" ... />
-    final PsiType type = ((ConstructorArg) arg).getType().getValue();
+    PsiType type = ((ConstructorArg) arg).getType().getValue();
     if (type == null || type.isAssignableFrom(paramType)) {
       return arg;
     }

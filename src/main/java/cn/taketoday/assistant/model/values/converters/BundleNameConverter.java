@@ -125,9 +125,9 @@ public class BundleNameConverter extends Converter<PropertiesFile> implements Cu
   }
 
   public static class BundleNameConverterCondition implements Condition<Pair<PsiType, GenericDomValue>> {
-    private static final Condition<GenericDomValue> CONDITION = InfraValueConditionFactory.createBeanPropertyCondition(BundleNameConverter.RESOURCE_BUNDLE_MESSAGE_SOURCE, "basename", "basenames");
+    private static final Condition<GenericDomValue> CONDITION = InfraValueConditionFactory.createBeanPropertyCondition(RESOURCE_BUNDLE_MESSAGE_SOURCE, "basename", "basenames");
     private static final Condition<GenericDomValue> RELOADABLE_MESSAGE_SOURCE_CONDITION = InfraValueConditionFactory.createBeanPropertyCondition(
-            BundleNameConverter.RELOADABLE_RESOURCE_BUNDLE_MESSAGE_SOURCE, "basename", "basenames");
+            RELOADABLE_RESOURCE_BUNDLE_MESSAGE_SOURCE, "basename", "basenames");
 
     public boolean value(Pair<PsiType, GenericDomValue> pair) {
       PsiType psiType = pair.getFirst();

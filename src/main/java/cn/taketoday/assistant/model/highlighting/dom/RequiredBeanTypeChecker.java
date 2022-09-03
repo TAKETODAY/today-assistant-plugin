@@ -52,7 +52,7 @@ public final class RequiredBeanTypeChecker {
       return;
     }
 
-    final RequiredBeanType requiredBeanType = element.getAnnotation(RequiredBeanType.class);
+    RequiredBeanType requiredBeanType = element.getAnnotation(RequiredBeanType.class);
     if (requiredBeanType == null) {
       return;
     }
@@ -62,11 +62,11 @@ public final class RequiredBeanTypeChecker {
       return;
     }
 
-    final String[] requiredClasses = requiredBeanType.value();
+    String[] requiredClasses = requiredBeanType.value();
     short notFoundRequiredClasses = 0;
-    final List<PsiClass> foundRequiredClasses = new SmartList<>();
+    List<PsiClass> foundRequiredClasses = new SmartList<>();
     for (String requiredClassName : requiredClasses) {
-      final PsiClass requiredClass = DomJavaUtil.findClass(requiredClassName, element);
+      PsiClass requiredClass = DomJavaUtil.findClass(requiredClassName, element);
       if (requiredClass == null) {
         notFoundRequiredClasses++;
         continue;
@@ -75,9 +75,9 @@ public final class RequiredBeanTypeChecker {
     }
 
     // stop if we cannot resolve any of base class(es)
-    final boolean isOneRequiredClass = requiredClasses.length == 1;
+    boolean isOneRequiredClass = requiredClasses.length == 1;
     if (notFoundRequiredClasses == requiredClasses.length) {
-      final String message = isOneRequiredClass
+      String message = isOneRequiredClass
                              ? InfraBundle.message("bean.base.class.not.found", requiredClasses[0])
                              : InfraBundle.message("bean.base.classes.not.found", StringUtil.join(requiredClasses, ","));
       holder.createProblem(element, message);
@@ -117,15 +117,15 @@ public final class RequiredBeanTypeChecker {
       }
     }
 
-    final String classText = oneRequiredClass ? requiredClasses[0] : StringUtil.join(requiredClasses, ",");
-    final String message;
+    String classText = oneRequiredClass ? requiredClasses[0] : StringUtil.join(requiredClasses, ",");
+    String message;
     if (!multiple) {
       message = oneRequiredClass
                 ? InfraBundle.message("bean.must.be.of.type", classText)
                 : InfraBundle.message("bean.must.be.one.of.these.types", classText);
     }
     else {
-      final String beanName = beanPointer.getName();
+      String beanName = beanPointer.getName();
       message = oneRequiredClass
                 ? InfraBundle.message("bean.name.must.be.of.type", beanName, classText)
                 : InfraBundle.message("bean.name.must.be.one.of.these.types", beanName, classText);
@@ -133,7 +133,7 @@ public final class RequiredBeanTypeChecker {
 
     List<LocalQuickFix> quickfixes = new ArrayList<>(foundRequiredClasses.size());
     if (psiTypes.length > 0) {
-      final PsiClass psiClass = PsiTypesUtil.getPsiClass(psiTypes[0]);
+      PsiClass psiClass = PsiTypesUtil.getPsiClass(psiTypes[0]);
       if (psiClass != null) {
         for (PsiClass foundRequiredClass : foundRequiredClasses) {
           quickfixes.add(new ExtendsListFix(psiClass, foundRequiredClass, true));

@@ -44,7 +44,7 @@ public final class CharsetConverter extends ResolvingConverter.StringConverter {
   });
 
   @Override
-  public String fromString(final String s, final ConvertContext convertContext) {
+  public String fromString(String s, ConvertContext convertContext) {
     if (StringUtil.isEmpty(s)) {
       return null;
     }
@@ -58,7 +58,7 @@ public final class CharsetConverter extends ResolvingConverter.StringConverter {
   }
 
   @Override
-  public Collection<String> getVariants(final ConvertContext convertContext) {
+  public Collection<String> getVariants(ConvertContext convertContext) {
     return charSets.getValue();
   }
 

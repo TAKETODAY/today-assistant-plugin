@@ -73,23 +73,23 @@ public final class InfraConverterUtil {
   }
 
   @Nullable
-  public static InfraModel getSpringModel(final ConvertContext context) {
+  public static InfraModel getSpringModel(ConvertContext context) {
     return getSpringModel(context.getInvocationElement());
   }
 
   @Nullable
-  public static InfraModel getSpringModel(final DomElement element) {
-    final XmlFile xmlFile = (XmlFile) DomUtil.getFile(element).getOriginalFile();
+  public static InfraModel getSpringModel(DomElement element) {
+    XmlFile xmlFile = (XmlFile) DomUtil.getFile(element).getOriginalFile();
     return InfraManager.from(xmlFile.getProject()).getInfraModelByFile(xmlFile);
   }
 
   @Nullable
-  public static DomInfraBean getCurrentBean(final ConvertContext context) {
+  public static DomInfraBean getCurrentBean(ConvertContext context) {
     return getCurrentBean(context.getInvocationElement());
   }
 
   @Nullable
-  public static CommonInfraBean getCurrentBeanCustomAware(final ConvertContext context) {
+  public static CommonInfraBean getCurrentBeanCustomAware(ConvertContext context) {
     DomInfraBean bean = getCurrentBean(context);
     if (bean instanceof final CustomBeanWrapper wrapper) {
       List<CustomBean> list = wrapper.getCustomBeans();
@@ -101,14 +101,14 @@ public final class InfraConverterUtil {
   }
 
   @Nullable
-  public static DomInfraBean getCurrentBean(final DomElement element) {
-    final XmlTag tag = element.getXmlTag();
+  public static DomInfraBean getCurrentBean(DomElement element) {
+    XmlTag tag = element.getXmlTag();
     if (tag != null) {
-      final XmlTag originalElement = CompletionUtil.getOriginalElement(tag);
+      XmlTag originalElement = CompletionUtil.getOriginalElement(tag);
       if (originalElement != tag) {
-        final DomElement domElement = DomManager.getDomManager(tag.getProject()).getDomElement(originalElement);
+        DomElement domElement = DomManager.getDomManager(tag.getProject()).getDomElement(originalElement);
         if (domElement != null) {
-          final DomInfraBean infraBean = domElement.getParentOfType(DomInfraBean.class, false);
+          DomInfraBean infraBean = domElement.getParentOfType(DomInfraBean.class, false);
           if (infraBean != null) {
             return infraBean;
           }
@@ -119,7 +119,7 @@ public final class InfraConverterUtil {
   }
 
   public static Collection<PsiPackage> getPsiPackages(PsiReference... psiReferences) {
-    final Collection<PsiPackage> list = new LinkedHashSet<>();
+    Collection<PsiPackage> list = new LinkedHashSet<>();
     for (PsiReference psiReference : psiReferences) {
       if (psiReference instanceof PsiPackageReference) {
         list.addAll(((PsiPackageReference) psiReference).getReferenceSet().resolvePackage());
@@ -129,15 +129,15 @@ public final class InfraConverterUtil {
   }
 
   public static List<PsiClassType> getRequiredBeanTypeClasses(ConvertContext context) {
-    final DomElement element = context.getInvocationElement();
-    final RequiredBeanType type = element.getAnnotation(RequiredBeanType.class);
+    DomElement element = context.getInvocationElement();
+    RequiredBeanType type = element.getAnnotation(RequiredBeanType.class);
     if (type == null) {
       return Collections.emptyList();
     }
 
     List<PsiClassType> types = new SmartList<>();
     for (String className : type.value()) {
-      final PsiClass psiClass = DomJavaUtil.findClass(className, element);
+      PsiClass psiClass = DomJavaUtil.findClass(className, element);
       if (psiClass != null) {
         types.add(PsiTypesUtil.getClassType(psiClass));
       }
@@ -149,18 +149,18 @@ public final class InfraConverterUtil {
   public static Collection<BeanPointer<?>> getSmartVariants(CommonInfraBean currentBean,
           List<? extends PsiClassType> requiredClasses,
           CommonInfraModel model) {
-    final List<BeanPointer<?>> variants = new SmartList<>();
-    for (final PsiClassType requiredClass : requiredClasses) {
-      final PsiClass psiClass = PsiUtil.resolveClassInType(requiredClass);
+    List<BeanPointer<?>> variants = new SmartList<>();
+    for (PsiClassType requiredClass : requiredClasses) {
+      PsiClass psiClass = PsiUtil.resolveClassInType(requiredClass);
       if (isSearchableClass(psiClass)) {
-        final ModelSearchParameters.BeanClass searchParameters =
+        ModelSearchParameters.BeanClass searchParameters =
                 ModelSearchParameters.byClass(psiClass).withInheritors().effectiveBeanTypes();
         processBeans(model, variants, InfraModelSearchers.findBeans(model, searchParameters),
                 false, currentBean);
       }
-      final PsiClass componentClass = PsiUtil.resolveClassInType(PsiUtil.extractIterableTypeParameter(requiredClass, false));
+      PsiClass componentClass = PsiUtil.resolveClassInType(PsiUtil.extractIterableTypeParameter(requiredClass, false));
       if (isSearchableClass(componentClass)) {
-        final ModelSearchParameters.BeanClass searchParameters =
+        ModelSearchParameters.BeanClass searchParameters =
                 ModelSearchParameters.byClass(componentClass).withInheritors().effectiveBeanTypes();
         processBeans(model, variants, InfraModelSearchers.findBeans(model, searchParameters),
                 false, currentBean);
@@ -194,7 +194,7 @@ public final class InfraConverterUtil {
 
   @Nullable
   public static LookupElement createCompletionVariant(BeanPointer<?> variant) {
-    final String name = variant.getName();
+    String name = variant.getName();
     if (name == null) {
       return null;
     }
@@ -208,7 +208,7 @@ public final class InfraConverterUtil {
 
     PsiElement element = pointer.getPsiElement();
     if (element instanceof PomTargetPsiElement) {
-      final PomTarget target = ((PomTargetPsiElement) element).getTarget();
+      PomTarget target = ((PomTargetPsiElement) element).getTarget();
       if (target instanceof PsiTarget) {
         element = ((PsiTarget) target).getNavigationElement();
       }
@@ -229,24 +229,24 @@ public final class InfraConverterUtil {
     return lookupElement.withTailText(" (" + InfraPresentationProvider.getInfraBeanLocation(pointer) + ")", true);
   }
 
-  public static boolean containsPatternReferences(@Nullable final String text) {
+  public static boolean containsPatternReferences(@Nullable String text) {
     return text != null && (StringUtil.containsChar(text, '*') || StringUtil.containsChar(text, '?'));
   }
 
-  public static Collection<PsiPackage> getPackages(@Nullable final String text, Project project) {
+  public static Collection<PsiPackage> getPackages(@Nullable String text, Project project) {
     return getPackages(text, ",; \n\t", project);
   }
 
-  public static Collection<PsiPackage> getPackages(@Nullable final String text, String delimiters, Project project) {
+  public static Collection<PsiPackage> getPackages(@Nullable String text, String delimiters, Project project) {
     if (StringUtil.isEmptyOrSpaces(text)) {
       return Collections.emptySet();
     }
-    final JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
-    final List<PsiPackage> list = new SmartList<>();
+    JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
+    List<PsiPackage> list = new SmartList<>();
     new DelimitedListProcessor(delimiters) {
       @Override
-      protected void processToken(final int start, final int end, final boolean delimitersOnly) {
-        final String packageName = text.substring(start, end);
+      protected void processToken(int start, int end, boolean delimitersOnly) {
+        String packageName = text.substring(start, end);
         ContainerUtil.addIfNotNull(list, psiFacade.findPackage(packageName.trim()));
       }
     }.processText(text);
