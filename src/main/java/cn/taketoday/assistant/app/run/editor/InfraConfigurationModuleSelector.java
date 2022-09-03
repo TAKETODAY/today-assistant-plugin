@@ -21,23 +21,26 @@
 package cn.taketoday.assistant.app.run.editor;
 
 import com.intellij.application.options.ModulesCombo;
+import com.intellij.execution.ui.ConfigurationModuleSelector;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 
 import cn.taketoday.assistant.InfraLibraryUtil;
 
-public final class ConfigurationModuleSelector extends com.intellij.execution.ui.ConfigurationModuleSelector {
-  final ApplicationRunConfigurationFragmentedEditor this$0;
-  final ModulesCombo $modulesCombo;
+public final class InfraConfigurationModuleSelector extends ConfigurationModuleSelector {
+  final ApplicationRunConfigurationFragmentedEditor editor;
+  final ModulesCombo modulesCombo;
 
-  ConfigurationModuleSelector(ApplicationRunConfigurationFragmentedEditor editor,
+  InfraConfigurationModuleSelector(ApplicationRunConfigurationFragmentedEditor editor,
           ModulesCombo combo, Project project, ModulesCombo modulesCombo) {
     super(project, modulesCombo);
-    this.this$0 = editor;
-    this.$modulesCombo = combo;
+    this.editor = editor;
+    this.modulesCombo = combo;
   }
 
+  @Override
   public boolean isModuleAccepted(Module module) {
     return InfraLibraryUtil.hasFrameworkLibrary(module);
   }
+
 }

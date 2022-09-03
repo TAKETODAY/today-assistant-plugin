@@ -61,14 +61,14 @@ public class ApplicationRunConfigurationEditor
         implements PanelWithAnchor, TargetAwareRunConfigurationEditor {
 
   private static final String EXPAND_JAVA_OPTIONS_PANEL_PROPERTY_KEY = "ExpandInfraJavaOptionsPanel";
-  private static final String EXPAND_SPRING_BOOT_SETTINGS_PANEL_PROPERTY_KEY = "ExpandInfraSettingsPanel";
+  private static final String EXPAND_INFRA_SETTINGS_PANEL_PROPERTY_KEY = "ExpandInfraSettingsPanel";
   private final Project myProject;
   private JPanel myWholePanel;
   private LabeledComponent<EditorTextFieldWithBrowseButton> myMainClass;
   private JPanel myHideableEnvironmentSettingsPanel;
   private EnvironmentSettingsPanel myEnvironmentSettingsPanel;
-  private JPanel myHideableSpringBootSettingPanel;
-  private InfraSettingsPanel mySpringBootSettings;
+  private JPanel myHideableInfraSettingPanel;
+  private InfraSettingsPanel infraSettings;
   private JComponent myAnchor;
 
   private void $$$setupUI$$$() {
@@ -82,7 +82,7 @@ public class ApplicationRunConfigurationEditor
             DynamicBundle.getBundle("messages/InfraRunBundle", ApplicationRunConfigurationEditor.class).getString("infra.application.run.configuration.main.class"));
     jPanel.add(labeledComponent, new GridConstraints(0, 0, 1, 1, 0, 1, 3, 3, null, null, null));
     jPanel.add(this.myHideableEnvironmentSettingsPanel, new GridConstraints(1, 0, 1, 1, 0, 3, 3, 3, null, null, null));
-    jPanel.add(this.myHideableSpringBootSettingPanel, new GridConstraints(3, 0, 1, 1, 0, 3, 3, 3, null, null, null));
+    jPanel.add(this.myHideableInfraSettingPanel, new GridConstraints(3, 0, 1, 1, 0, 3, 3, 3, null, null, null));
     jPanel.add(new Spacer(), new GridConstraints(2, 0, 1, 1, 0, 2, 1, 0, null, new Dimension(-1, 10), null));
     jPanel.add(new Spacer(), new GridConstraints(4, 0, 1, 1, 0, 2, 1, 6, null, null, null));
   }
@@ -94,7 +94,7 @@ public class ApplicationRunConfigurationEditor
   public ApplicationRunConfigurationEditor(Project project) {
     this.myProject = project;
     $$$setupUI$$$();
-    this.myAnchor = UIUtil.mergeComponentsWithAnchor(this.myMainClass, this.myEnvironmentSettingsPanel, this.mySpringBootSettings);
+    this.myAnchor = UIUtil.mergeComponentsWithAnchor(this.myMainClass, this.myEnvironmentSettingsPanel, this.infraSettings);
   }
 
   private void createUIComponents() {
@@ -114,22 +114,22 @@ public class ApplicationRunConfigurationEditor
             message("infra.application.run.configuration.environment.section"),
             EXPAND_JAVA_OPTIONS_PANEL_PROPERTY_KEY, false);
 
-    this.myHideableSpringBootSettingPanel = new JPanel(new BorderLayout());
-    this.mySpringBootSettings = new InfraSettingsPanel(this.myProject);
+    this.myHideableInfraSettingPanel = new JPanel(new BorderLayout());
+    this.infraSettings = new InfraSettingsPanel(this.myProject);
 
-    installHideableDecorator(this.myHideableSpringBootSettingPanel, this.mySpringBootSettings.getComponent(),
+    installHideableDecorator(this.myHideableInfraSettingPanel, this.infraSettings.getComponent(),
             message("infra.application.run.configuration.framework.section"),
-            EXPAND_SPRING_BOOT_SETTINGS_PANEL_PROPERTY_KEY, true);
+            EXPAND_INFRA_SETTINGS_PANEL_PROPERTY_KEY, true);
 
     EnvironmentSettingsPanel environmentSettingsPanel = this.myEnvironmentSettingsPanel;
-    environmentSettingsPanel.addModuleChangeListener(mySpringBootSettings::setModule);
+    environmentSettingsPanel.addModuleChangeListener(infraSettings::setModule);
     new InfraClassBrowser(this.myProject, this.myEnvironmentSettingsPanel.getModuleSelector()).setField(getMainClassField());
   }
 
   public void resetEditorFrom(InfraApplicationRunConfiguration configuration) {
     getMainClassField().setText(configuration.getInfraMainClass() != null ? configuration.getInfraMainClass().replace('$', '.') : "");
     this.myEnvironmentSettingsPanel.resetEditorFrom(configuration);
-    this.mySpringBootSettings.resetEditorFrom(configuration);
+    this.infraSettings.resetEditorFrom(configuration);
   }
 
   public void applyEditorTo(InfraApplicationRunConfiguration configuration) {
@@ -137,7 +137,7 @@ public class ApplicationRunConfigurationEditor
     PsiClass aClass = this.myEnvironmentSettingsPanel.getModuleSelector().findClass(className);
     configuration.setInfraMainClass(aClass != null ? JavaExecutionUtil.getRuntimeQualifiedName(aClass) : className);
     this.myEnvironmentSettingsPanel.applyEditorTo(configuration);
-    this.mySpringBootSettings.applyEditorTo(configuration);
+    this.infraSettings.applyEditorTo(configuration);
   }
 
   protected JComponent createEditor() {
@@ -152,7 +152,7 @@ public class ApplicationRunConfigurationEditor
     this.myAnchor = anchor;
     this.myMainClass.setAnchor(anchor);
     this.myEnvironmentSettingsPanel.setAnchor(anchor);
-    this.mySpringBootSettings.setAnchor(anchor);
+    this.infraSettings.setAnchor(anchor);
   }
 
   private EditorTextFieldWithBrowseButton getMainClassField() {
@@ -184,17 +184,14 @@ public class ApplicationRunConfigurationEditor
   }
 
   static class InfraClassBrowser extends ClassBrowser.MainClassBrowser<EditorTextField> {
+
     InfraClassBrowser(Project project, ConfigurationModuleSelector moduleSelector) {
       super(project, moduleSelector, message("infra.choose.class.dialog.title"));
     }
 
     protected ClassFilter createFilter(Module module) {
-      return new ClassFilter() {
-        public boolean isAccepted(PsiClass aClass) {
-          return InfraApplicationService.of().isInfraApplication(aClass)
-                  && ReadAction.compute(() -> InfraApplicationService.of().hasMainMethod(aClass));
-        }
-      };
+      return aClass -> InfraApplicationService.of().isInfraApplication(aClass)
+              && ReadAction.compute(() -> InfraApplicationService.of().hasMainMethod(aClass));
     }
   }
 }

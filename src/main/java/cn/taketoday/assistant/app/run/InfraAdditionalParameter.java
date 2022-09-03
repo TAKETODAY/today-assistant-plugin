@@ -30,6 +30,8 @@ public class InfraAdditionalParameter {
   private String myName;
   private String myValue;
 
+  public InfraAdditionalParameter() { }
+
   public InfraAdditionalParameter(boolean enabled, String name, String value) {
     this.myEnabled = enabled;
     this.myName = name;

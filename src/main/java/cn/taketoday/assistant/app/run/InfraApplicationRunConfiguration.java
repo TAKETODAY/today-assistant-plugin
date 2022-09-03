@@ -91,10 +91,12 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     super(name, project, factory);
   }
 
+  @Override
   public Collection<Module> getValidModules() {
     return JavaRunConfigurationModule.getModulesForClass(getProject(), getInfraMainClass());
   }
 
+  @Override
   public String suggestedName() {
     String mainClass = getOptions().getMainClassName();
     if (mainClass == null) {
@@ -103,6 +105,7 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     return JavaExecutionUtil.getPresentableClassName(mainClass);
   }
 
+  @Override
   public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
     if (Registry.is("ide.new.run.config", true)) {
       return new ApplicationRunConfigurationFragmentedEditor(this);
@@ -110,10 +113,11 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     SettingsEditorGroup<InfraApplicationRunConfiguration> group = new SettingsEditorGroup<>();
     group.addEditor(ExecutionBundle.message("run.configuration.configuration.tab.title"), new ApplicationRunConfigurationEditor(getProject()));
     JavaRunConfigurationExtensionManager.getInstance().appendEditors(this, group);
-    group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel());
+    group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel<>());
     return group;
   }
 
+  @Override
   public void checkConfiguration() throws RuntimeConfigurationException {
     getConfigurationModule().checkForWarning();
     checkClass();
@@ -128,6 +132,7 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     validateRunTarget(getProject());
   }
 
+  @Override
   public JavaRunConfigurationModule checkClass() throws RuntimeConfigurationException {
     JavaRunConfigurationModule configurationModule = getConfigurationModule();
     PsiClass mainClass = configurationModule.checkClassName(
@@ -354,11 +359,7 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
         }
       };
       contentManager.addContentManagerListener(listener);
-      Disposer.register(tab, new Disposable() {
-        public void dispose() {
-          contentManager.removeContentManagerListener(listener);
-        }
-      });
+      Disposer.register(tab, () -> contentManager.removeContentManagerListener(listener));
     }
   }
 

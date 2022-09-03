@@ -92,6 +92,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -104,6 +105,7 @@ import javax.accessibility.AccessibleContext;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import cn.taketoday.assistant.app.InfraApplicationService;
 import cn.taketoday.assistant.app.run.InfraAdditionalParameter;
@@ -128,31 +130,27 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
   }
 
   protected List<SettingsEditorFragment<InfraApplicationRunConfiguration, ?>> createRunFragments() {
-    ArrayList<SettingsEditorFragment<InfraApplicationRunConfiguration, ?>> fragments = new ArrayList<>();
     SettingsEditorFragment<InfraApplicationRunConfiguration, ModuleClasspathCombo> moduleClasspath = CommonJavaFragments.moduleClasspath();
     ModuleClasspathCombo moduleClasspathCombo = moduleClasspath.component();
     moduleClasspath.setValidation(new Function<InfraApplicationRunConfiguration, List<ValidationInfo>>() {
       @Override
       public List<ValidationInfo> apply(InfraApplicationRunConfiguration it) {
-        return CollectionsKt.listOf(RuntimeConfigurationException.validate(moduleClasspathCombo, (ThrowableRunnable) () -> {
+        return List.of(RuntimeConfigurationException.validate(moduleClasspathCombo, () -> {
           it.getConfigurationModule().checkForWarning();
         }));
       }
     });
+
     Consumer<Consumer<Module>> moduleListenerHolder = consumer -> {
-      moduleClasspathCombo.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent it) {
-          consumer.accept(moduleClasspathCombo.getSelectedModule());
-        }
-      });
+      moduleClasspathCombo.addActionListener(event -> consumer.accept(moduleClasspathCombo.getSelectedModule()));
     };
 
-    fragments.addAll(createSpringBootFragments(moduleListenerHolder));
+    var fragments = new ArrayList<>(createInfraFragments(moduleListenerHolder));
     fragments.add(CommonTags.parallelRun());
     fragments.addAll(createBeforeRunFragments());
-    fragments.add(new LogsGroupFragment());
+    fragments.add(new LogsGroupFragment<>());
     fragments.addAll(createEnvironmentFragments(moduleClasspath, moduleListenerHolder));
-    fragments.add(new TargetPathFragment());
+    fragments.add(new TargetPathFragment<>());
     fragments.add(createAdditionalParamsFragment(moduleListenerHolder));
     return fragments;
   }
@@ -241,15 +239,14 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
               }
             }));
     JComponent component2 = jrePath.component();
-    JComponent component3 = mainClass.component();
-    fragments.add(createShortenClasspath(moduleClasspathCombo, (JrePathEditor) component2, (EditorTextField) component3));
+    fragments.add(createShortenClasspath(moduleClasspathCombo, (JrePathEditor) component2, mainClass.component()));
     fragments.add(createWorkingDirectory(moduleClasspathCombo, hasModule));
     fragments.add(createEnvParameters());
     return fragments;
   }
 
   private SettingsEditorFragment<InfraApplicationRunConfiguration, EditorTextField> createMainClass(ModulesCombo modulesCombo) {
-    ConfigurationModuleSelector moduleSelector = new ConfigurationModuleSelector(
+    InfraConfigurationModuleSelector moduleSelector = new InfraConfigurationModuleSelector(
             this, modulesCombo, getProject(), modulesCombo);
     JavaCodeFragment.VisibilityChecker visibilityChecker = (declaration, element) -> {
       if ((declaration instanceof PsiClass) && InfraApplicationService.of().isInfraApplication((PsiClass) declaration) && InfraApplicationService.of()
@@ -259,27 +256,25 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
       return JavaCodeFragment.VisibilityChecker.Visibility.NOT_VISIBLE;
     };
 
-    EditorTextField createClassField = ClassEditorField.createClassField(getProject(), null, visibilityChecker,
+    ClassEditorField classEditorField = ClassEditorField.createClassField(getProject(), null, visibilityChecker,
             new InfraClassBrowser(getProject(), moduleSelector));
-    createClassField.setBackground(UIUtil.getTextFieldBackground());
-    createClassField.setShowPlaceholderWhenFocused(true);
-    CommonParameterFragments.setMonospaced(createClassField);
+    classEditorField.setBackground(UIUtil.getTextFieldBackground());
+    classEditorField.setShowPlaceholderWhenFocused(true);
+    CommonParameterFragments.setMonospaced(classEditorField);
     String placeholder = ExecutionBundle.message("application.configuration.main.class.placeholder");
-    createClassField.setPlaceholder(placeholder);
-    AccessibleContext accessibleContext = createClassField.getAccessibleContext();
+    classEditorField.setPlaceholder(placeholder);
+    AccessibleContext accessibleContext = classEditorField.getAccessibleContext();
     accessibleContext.setAccessibleName(placeholder);
-    CommandLinePanel.setMinimumWidth(createClassField, 300);
-    SettingsEditorFragment mainClassFragment = new SettingsEditorFragment("mainClass", ExecutionBundle.message("application.configuration.main.class"), null, createClassField,
+    CommandLinePanel.setMinimumWidth(classEditorField, 300);
+    var mainClassFragment = new SettingsEditorFragment("mainClass", ExecutionBundle.message("application.configuration.main.class"), null, classEditorField,
             20, new BiConsumer<InfraApplicationRunConfiguration, EditorTextField>() {
       @Override
       public void accept(InfraApplicationRunConfiguration configuration, EditorTextField component) {
-        String str;
-        String springBootMainClass = configuration.getInfraMainClass();
-        if (springBootMainClass != null) {
-          str = StringsKt.replace(springBootMainClass, '$', '.', false);
+        String mainClass = configuration.getInfraMainClass();
+        if (mainClass != null) {
+          mainClass = StringsKt.replace(mainClass, '$', '.', false);
+          component.setText(mainClass);
         }
-        str = "";
-        component.setText(str);
       }
     }, new BiConsumer<InfraApplicationRunConfiguration, EditorTextField>() {
       @Override
@@ -288,12 +283,8 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
         PsiClass aClass = moduleSelector.findClass(className);
         configuration.setInfraMainClass(aClass != null ? JavaExecutionUtil.getRuntimeQualifiedName(aClass) : className);
       }
-    }, new Predicate() {
-      @Override
-      public boolean test(Object o) {
-        return true;
-      }
-    });
+    }, (Predicate<?>) o -> true);
+
     mainClassFragment.setRemovable(false);
     mainClassFragment.setEditorGetter(new Function<EditorTextField, JComponent>() {
       @Override
@@ -308,30 +299,22 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     mainClassFragment.setValidation(new Function<InfraApplicationRunConfiguration, List<ValidationInfo>>() {
       @Override
       public List<ValidationInfo> apply(InfraApplicationRunConfiguration it) {
-        return CollectionsKt.listOf(RuntimeConfigurationException.validate(createClassField, new ThrowableRunnable() {
-          public void run() throws Exception {
-            it.checkClass();
-          }
-        }));
+        return List.of(RuntimeConfigurationException.validate(classEditorField, it::checkClass));
       }
     });
-    createClassField.addDocumentListener(new DocumentListener() {
+    classEditorField.addDocumentListener(new DocumentListener() {
+      @Override
       public void documentChanged(DocumentEvent event) {
-        Project project;
-        Project project2;
-        Intrinsics.checkNotNullParameter(event, "event");
-        project = ApplicationRunConfigurationFragmentedEditor.this.getProject();
+        Project project = getProject();
         DumbService dumbService = DumbService.getInstance(project);
         if (dumbService.isDumb()) {
           return;
         }
-        ClassEditorField classEditorField = (ClassEditorField) createClassField;
         String text = classEditorField.getText();
         if (moduleSelector.getModule() != null && moduleSelector.findClass(text) != null) {
           return;
         }
-        project2 = ApplicationRunConfigurationFragmentedEditor.this.getProject();
-        JavaRunConfigurationModule configurationModule = new JavaRunConfigurationModule(project2, false);
+        JavaRunConfigurationModule configurationModule = new JavaRunConfigurationModule(project, false);
         PsiElement findClass = configurationModule.findClass(text);
         if (findClass == null) {
           return;
@@ -345,36 +328,25 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     return mainClassFragment;
   }
 
-  private SettingsEditorFragment<InfraApplicationRunConfiguration, LabeledComponent<ShortenCommandLineModeCombo>> createShortenClasspath(ModuleClasspathCombo modulesCombo,
-          JrePathEditor jrePathEditor, EditorTextField mainClassField) {
+  private SettingsEditorFragment<InfraApplicationRunConfiguration, LabeledComponent<ShortenCommandLineModeCombo>> createShortenClasspath(
+          ModuleClasspathCombo modulesCombo, JrePathEditor jrePathEditor, EditorTextField mainClassField) {
     Project project = getProject();
-    Supplier supplier = new Computable() {
-      @Nullable
-      public Module compute() {
-        return modulesCombo.getSelectedModule();
-      }
-    };
-    Consumer consumer = new Consumer<ActionListener>() {
-      @Override
-      public void accept(ActionListener it) {
-        modulesCombo.addActionListener(it);
-      }
-    };
+
+    Supplier<Module> supplier = modulesCombo::getSelectedModule;
+    Consumer<ActionListener> consumer = modulesCombo::addActionListener;
+
     JComponent create = LabeledComponent.create(new ShortenCommandLineModeCombo(project, jrePathEditor, supplier, consumer) {
       protected boolean productionOnly() {
         Module module = modulesCombo.getSelectedModule();
         if (module != null) {
-          Intrinsics.checkNotNullExpressionValue(module, "modulesCombo.selectedModule ?: return false");
           Boolean isClassInProductionSources = JavaParametersUtil.isClassInProductionSources(mainClassField.getText(), module);
-          if (isClassInProductionSources == null) {
-            return false;
-          }
-          return isClassInProductionSources;
+          return Objects.requireNonNullElse(isClassInProductionSources, false);
         }
         return false;
       }
     }, ExecutionBundle.message("application.configuration.shorten.command.line.label"), "West");
-    SettingsEditorFragment fragment = new SettingsEditorFragment("shorten.command.line", ExecutionBundle.message("application.configuration.shorten.command.line"),
+    var fragment = new SettingsEditorFragment("shorten.command.line",
+            ExecutionBundle.message("application.configuration.shorten.command.line"),
             ExecutionBundle.message("group.java.options"), create,
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<ShortenCommandLineModeCombo>>() {
               @Override
@@ -452,14 +424,11 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     return parameters;
   }
 
-  private SettingsEditorFragment<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithBrowseButton>> createWorkingDirectory(ModulesCombo modulesCombo,
-          Computable<Boolean> computable) {
+  private SettingsEditorFragment<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithBrowseButton>> createWorkingDirectory(
+          ModulesCombo modulesCombo, Computable<Boolean> computable) {
     ExtendableTextField extendableTextField = new ExtendableTextField(10);
-    MacrosDialog.addMacroSupport(extendableTextField, MacrosDialog.Filters.DIRECTORY_PATH, new Computable() {
-      public Boolean compute() {
-        return computable.compute();
-      }
-    });
+    MacrosDialog.addMacroSupport(extendableTextField, MacrosDialog.Filters.DIRECTORY_PATH, computable);
+
     TextFieldWithBrowseButton textFieldWithBrowseButton = new TextFieldWithBrowseButton(extendableTextField);
     textFieldWithBrowseButton.addBrowseFolderListener(ExecutionBundle.message("select.working.directory.message"), null, getProject(),
             FileChooserDescriptorFactory.createSingleFolderDescriptor(), TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
@@ -475,17 +444,13 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithBrowseButton>>() {
               @Override
               public void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithBrowseButton> labeledComponent) {
-                Intrinsics.checkNotNullExpressionValue(settings, "settings");
-                Intrinsics.checkNotNullExpressionValue(labeledComponent, "component");
                 TextFieldWithBrowseButton component = labeledComponent.getComponent();
-                Intrinsics.checkNotNullExpressionValue(component, "component.component");
                 settings.setWorkingDirectory(component.getText());
               }
             },
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
               public boolean test(InfraApplicationRunConfiguration it) {
-                Intrinsics.checkNotNullExpressionValue(it, "it");
                 String workingDirectory = it.getWorkingDirectory();
                 return !(workingDirectory == null || workingDirectory.length() == 0);
               }
@@ -499,7 +464,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
           ProgramParametersUtil.checkWorkingDirectoryExist(settings, project, modulesCombo.getSelectedModule());
         };
         ValidationInfo validationInfo = RuntimeConfigurationException.validate(extendableTextField, runnable);
-        return CollectionsKt.listOf(validationInfo);
+        return List.of(validationInfo);
       }
     });
 
@@ -510,7 +475,6 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     EnvironmentVariablesComponent environmentVariablesComponent = new EnvironmentVariablesComponent();
     environmentVariablesComponent.setLabelLocation("West");
     TextFieldWithBrowseButton component = environmentVariablesComponent.getComponent();
-    Intrinsics.checkNotNullExpressionValue(component, "env.component");
     CommonParameterFragments.setMonospaced(component.getTextField());
     SettingsEditorFragment fragment = new SettingsEditorFragment("environmentVariables", ExecutionBundle.message("environment.variables.fragment.name"),
             ExecutionBundle.message("group.operating.system"), environmentVariablesComponent,
@@ -542,64 +506,46 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     return fragment;
   }
 
-  private List<SettingsEditorFragment<InfraApplicationRunConfiguration, ?>> createSpringBootFragments(Consumer<Consumer<Module>> consumer) {
-    ArrayList fragments = new ArrayList();
+  private List<SettingsEditorFragment<InfraApplicationRunConfiguration, ?>> createInfraFragments(Consumer<Consumer<Module>> consumer) {
+    var fragments = new ArrayList<SettingsEditorFragment<InfraApplicationRunConfiguration, ?>>();
     fragments.add(createActiveProfilesFragment(consumer));
-    fragments.addAll(createSpringBootTags());
+    fragments.addAll(createInfraTags());
     fragments.addAll(createUpdateGroups());
     return fragments;
   }
 
   private SettingsEditorFragment<InfraApplicationRunConfiguration, ?> createActiveProfilesFragment(Consumer<Consumer<Module>> consumer) {
     InfraProfileCompletionProvider completionProvider = new InfraProfileCompletionProvider(false);
-    consumer.accept(new Consumer<Module>() {
-      @Override
-      public void accept(@Nullable Module it) {
-        completionProvider.setContext(it == null ? CollectionsKt.emptyList() : new SmartList(it));
-      }
-    });
-    InfraApplicationRunConfiguration infraApplicationRunConfiguration = this.mySettings;
-    Intrinsics.checkNotNullExpressionValue(infraApplicationRunConfiguration, "mySettings");
-    JComponent create = LabeledComponent.create(new TextFieldWithAutoCompletion(infraApplicationRunConfiguration.getProject(), completionProvider, true, ""),
+    consumer.accept(module -> completionProvider.setContext(module == null ? Collections.emptyList() : new SmartList<>(module)));
+
+    JComponent create = LabeledComponent.create(new TextFieldWithAutoCompletion<>(mySettings.getProject(), completionProvider, true, ""),
             message("infra.application.run.configuration.active.profiles"), "West");
-    Intrinsics.checkNotNullExpressionValue(create, "LabeledComponent.create(…\n      BorderLayout.WEST)");
-    SettingsEditorFragment fragment = new SettingsEditorFragment("infra.profiles", message("infra.application.run.configuration.active.profiles"),
+    var fragment = new SettingsEditorFragment("infra.profiles", message("infra.application.run.configuration.active.profiles"),
             message("infra.run.config.fragment.framework.group"), create,
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithAutoCompletion<String>>>() {
               @Override
               public void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithAutoCompletion<String>> labeledComponent) {
-                Intrinsics.checkNotNullExpressionValue(labeledComponent, "c");
-                Intrinsics.checkNotNullExpressionValue(settings, "settings");
                 labeledComponent.getComponent().setText(settings.getActiveProfiles());
               }
             },
             new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<TextFieldWithAutoCompletion<String>>>() {
               @Override
               public void accept(InfraApplicationRunConfiguration settings, LabeledComponent<TextFieldWithAutoCompletion<String>> labeledComponent) {
-                Intrinsics.checkNotNullExpressionValue(labeledComponent, "c");
                 if (!labeledComponent.isVisible()) {
-                  Intrinsics.checkNotNullExpressionValue(settings, "settings");
                   settings.setActiveProfiles("");
                   return;
                 }
-                Intrinsics.checkNotNullExpressionValue(settings, "settings");
-                TextFieldWithAutoCompletion component = labeledComponent.getComponent();
-                Intrinsics.checkNotNullExpressionValue(component, "c.component");
+                TextFieldWithAutoCompletion<String> component = labeledComponent.getComponent();
                 settings.setActiveProfiles(component.getText());
               }
             },
-            new Predicate() {
-              @Override
-              public boolean test(Object o) {
-                return true;
-              }
-            });
+            o -> true);
     fragment.setCanBeHidden(true);
     fragment.setHint(message("infra.application.run.configuration.active.profiles.tooltip"));
     return fragment;
   }
 
-  private List<SettingsEditorFragment<InfraApplicationRunConfiguration, ?>> createSpringBootTags() {
+  private List<SettingsEditorFragment<InfraApplicationRunConfiguration, ?>> createInfraTags() {
     ArrayList fragments = new ArrayList();
     SettingsEditorFragment debugOutput = SettingsEditorFragment.createTag("infra.debug.output",
             message("infra.application.run.configuration.debug.output"),
@@ -613,7 +559,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             new BiConsumer<InfraApplicationRunConfiguration, Boolean>() {
               @Override
               public void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
-                configuration.setDebugMode(value.booleanValue());
+                configuration.setDebugMode(value);
               }
             });
     debugOutput.setActionDescription("-Ddebug");
@@ -624,7 +570,6 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
               public boolean test(InfraApplicationRunConfiguration it) {
-                Intrinsics.checkNotNullExpressionValue(it, "it");
                 return it.isHideBanner();
               }
             },
@@ -634,8 +579,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
                 configuration.setHideBanner(value.booleanValue());
               }
             });
-    Intrinsics.checkNotNullExpressionValue(hideBanner, "hideBanner");
-    hideBanner.setActionDescription("-Dspring.main.banner-mode=OFF");
+    hideBanner.setActionDescription("-Dapp.main.banner-mode=OFF");
     hideBanner.setActionHint(StringUtil.removeHtmlTags(message("infra.application.run.configuration.hide.banner.tooltip")));
     fragments.add(hideBanner);
     SettingsEditorFragment launchOptimization = SettingsEditorFragment.createTag("infra.launch.optimization",
@@ -653,22 +597,17 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
                 configuration.setEnableLaunchOptimization(!value.booleanValue());
               }
             });
-    Intrinsics.checkNotNullExpressionValue(launchOptimization, "launchOptimization");
     launchOptimization.setActionDescription("-XX:TieredStopAtLevel=1 -noverify");
     launchOptimization.setActionHint(StringUtil.removeHtmlTags(message("infra.application.run.configuration.launch.optimization.tooltip")));
-    this.jrePathListeners.add(new Consumer<>() {
-      @Override
-      public void accept(JrePathEditor.JreComboBoxItem item) {
-        Intrinsics.checkNotNullParameter(item, "item");
-        String it = item.getVersion();
-        JavaSdkVersion version = it != null ? JavaSdkVersion.fromVersionString(it) : null;
-        boolean noVerify = version == null || !version.isAtLeast(JavaSdkVersion.JDK_13);
-        if (noVerify) {
-          launchOptimization.setActionDescription("-XX:TieredStopAtLevel=1 -noverify");
-          return;
-        }
-        launchOptimization.setActionDescription("-XX:TieredStopAtLevel=1");
+    this.jrePathListeners.add(item -> {
+      String it = item.getVersion();
+      JavaSdkVersion version = it != null ? JavaSdkVersion.fromVersionString(it) : null;
+      boolean noVerify = version == null || !version.isAtLeast(JavaSdkVersion.JDK_13);
+      if (noVerify) {
+        launchOptimization.setActionDescription("-XX:TieredStopAtLevel=1 -noverify");
+        return;
       }
+      launchOptimization.setActionDescription("-XX:TieredStopAtLevel=1");
     });
     fragments.add(launchOptimization);
     SettingsEditorFragment jmxAgent = SettingsEditorFragment.createTag("infra.jmx.agent", message("infra.run.config.fragment.jmx.agent"),
@@ -682,35 +621,22 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             new BiConsumer<InfraApplicationRunConfiguration, Boolean>() {
               @Override
               public void accept(InfraApplicationRunConfiguration configuration, Boolean value) {
-                Intrinsics.checkNotNullExpressionValue(configuration, "configuration");
                 configuration.setEnableJmxAgent(!value);
               }
             });
-    Intrinsics.checkNotNullExpressionValue(jmxAgent, "jmxAgent");
     jmxAgent.setActionHint(StringUtil.removeHtmlTags(message("infra.application.run.configuration.jmx.agent.tooltip")));
     fragments.add(jmxAgent);
     if (AdvancedSettings.Companion.getBoolean("compiler.automake.allow.when.app.running")) {
       SettingsEditorFragment devToolsMessage = new SettingsEditorFragment("infra.dev.tools.message",
               message("infra.run.config.settings.background.compilation.enabled"), null,
-              new JLabel(message("infra.run.config.settings.background.compilation.enabled"), AllIcons.General.BalloonError, 0), 1,
-              SettingsEditorFragmentType.TAG, new BiConsumer() {
-        @Override
-        public void accept(Object o, Object o2) {
+              new JLabel(message("infra.run.config.settings.background.compilation.enabled"), AllIcons.General.BalloonError, SwingConstants.CENTER), 1,
+              SettingsEditorFragmentType.TAG, (o, o2) -> {
 
-        }
       },
-              new BiConsumer() {
-                @Override
-                public void accept(Object o, Object o2) {
+              (o, o2) -> {
 
-                }
               },
-              new Predicate() {
-                @Override
-                public boolean test(Object o) {
-                  return true;
-                }
-              });
+              o -> true);
       devToolsMessage.setRemovable(false);
       fragments.add(devToolsMessage);
     }
@@ -722,7 +648,6 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     Function nameProvider = new Function<InfraApplicationUpdatePolicy, String>() {
       @Override
       public String apply(InfraApplicationUpdatePolicy it) {
-        Intrinsics.checkNotNullExpressionValue(it, "it");
         return UIUtil.removeMnemonic(it.getName());
       }
     };
@@ -765,7 +690,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     updateAction.setValidation(new Function<InfraApplicationRunConfiguration, List<ValidationInfo>>() {
       @Override
       public List<ValidationInfo> apply(InfraApplicationRunConfiguration it) {
-        return CollectionsKt.listOf(RuntimeConfigurationException.validate(TagButton.COMPONENT_VALIDATOR_TAG_PROVIDER.apply(updateAction.component()), new ThrowableRunnable() {
+        return List.of(RuntimeConfigurationException.validate(TagButton.COMPONENT_VALIDATOR_TAG_PROVIDER.apply(updateAction.component()), new ThrowableRunnable() {
           public void run() throws Exception {
             it.checkUpdateActionUpdatePolicy();
           }
@@ -796,7 +721,6 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
               }
             },
             (configuration, policy) -> {
-              Intrinsics.checkNotNullExpressionValue(configuration, "configuration");
               configuration.setFrameDeactivationUpdatePolicy(Intrinsics.areEqual(
                       policy, ApplicationRunConfigurationFragmentedEditorKt.DO_NOTHING) ? null : policy);
             },
@@ -811,7 +735,7 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     frameDeactivation.setValidation(new Function<InfraApplicationRunConfiguration, List<ValidationInfo>>() {
       @Override
       public List<ValidationInfo> apply(InfraApplicationRunConfiguration it) {
-        return CollectionsKt.listOf(RuntimeConfigurationException.validate(TagButton.COMPONENT_VALIDATOR_TAG_PROVIDER.apply(frameDeactivation.component()), new ThrowableRunnable() {
+        return List.of(RuntimeConfigurationException.validate(TagButton.COMPONENT_VALIDATOR_TAG_PROVIDER.apply(frameDeactivation.component()), new ThrowableRunnable() {
           public void run() throws Exception {
             it.checkFrameDeactivationUpdatePolicy();
           }
@@ -824,21 +748,11 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
 
   private SettingsEditorFragment<InfraApplicationRunConfiguration, ?> createAdditionalParamsFragment(Consumer<Consumer<Module>> consumer) {
     AdditionalParamsTableView toolbarDecorator = new AdditionalParamsTableView(getProject());
-    consumer.accept(new Consumer<Module>() {
-      @Override
-      public void accept(@Nullable Module it) {
-        toolbarDecorator.setModule(it);
-      }
-    });
-    JComponent createPanel = ToolbarDecorator.createDecorator(toolbarDecorator).setAddAction(new AnActionButtonRunnable() {
-      public void run(AnActionButton it) {
-        toolbarDecorator.addAdditionalParameter();
-      }
-    }).setRemoveAction(new AnActionButtonRunnable() {
-      public void run(AnActionButton it) {
-        TableUtil.removeSelectedItems(toolbarDecorator);
-      }
-    }).createPanel();
+    consumer.accept(toolbarDecorator::setModule);
+    JPanel createPanel = ToolbarDecorator.createDecorator(toolbarDecorator)
+            .setAddAction(it -> toolbarDecorator.addAdditionalParameter())
+            .setRemoveAction(it -> TableUtil.removeSelectedItems(toolbarDecorator))
+            .createPanel();
 
     JComponent create = LabeledComponent.create(createPanel, message("infra.run.config.fragment.override.properties"));
     SettingsEditorFragment fragment = new SettingsEditorFragment("infra.additional.params",
@@ -852,22 +766,17 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
             }, new BiConsumer<InfraApplicationRunConfiguration, LabeledComponent<JPanel>>() {
       @Override
       public void accept(InfraApplicationRunConfiguration settings, LabeledComponent<JPanel> labeledComponent) {
-        Intrinsics.checkNotNullExpressionValue(labeledComponent, "c");
         if (!labeledComponent.isVisible()) {
-          Intrinsics.checkNotNullExpressionValue(settings, "settings");
           settings.setAdditionalParameters(new SmartList());
           return;
         }
-        Intrinsics.checkNotNullExpressionValue(settings, "settings");
         settings.setAdditionalParameters(toolbarDecorator.getAdditionalParameters());
       }
     },
             new Predicate<InfraApplicationRunConfiguration>() {
               @Override
               public boolean test(InfraApplicationRunConfiguration it) {
-                Intrinsics.checkNotNullExpressionValue(it, "it");
                 List<InfraAdditionalParameter> additionalParameters = it.getAdditionalParameters();
-                Intrinsics.checkNotNullExpressionValue(additionalParameters, "it.additionalParameters");
                 return !additionalParameters.isEmpty();
               }
             });
@@ -880,14 +789,10 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
     fragment.setValidation(new Function<InfraApplicationRunConfiguration, List<ValidationInfo>>() {
       @Override
       public List<ValidationInfo> apply(InfraApplicationRunConfiguration it) {
-        return CollectionsKt.listOf(RuntimeConfigurationException.validate(toolbarDecorator, new ThrowableRunnable() {
-          public void run() {
+        return List.of(RuntimeConfigurationException.validate(toolbarDecorator, new ThrowableRunnable() {
+          public void run() throws Exception {
             if (!toolbarDecorator.isEditing()) {
-              ReadAction.run(new ThrowableRunnable() {
-                public void run() throws Exception {
-                  it.checkAdditionalParams();
-                }
-              });
+              ReadAction.run(it::checkAdditionalParams);
             }
           }
         }));
