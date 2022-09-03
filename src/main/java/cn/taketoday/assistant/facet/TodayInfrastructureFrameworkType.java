@@ -35,7 +35,7 @@ public class TodayInfrastructureFrameworkType extends LibraryBasedFrameworkType 
 
   @Override
   public final String getUnderlyingFrameworkTypeId() {
-    return FacetBasedFrameworkSupportProvider.getProviderId(TodayFacet.FACET_TYPE_ID);
+    return FacetBasedFrameworkSupportProvider.getProviderId(InfraFacet.FACET_TYPE_ID);
   }
 
   @Override

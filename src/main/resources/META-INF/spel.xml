@@ -35,6 +35,8 @@
 
     <spring.el.injection.context implementation="cn.taketoday.assistant.spel.AliasedAttributeInjectionContext" />
 
+    <multiHostInjector implementation="cn.taketoday.assistant.model.config.autoconfigure.jam.el.InfraAutoconfigureELInjector" />
+
   </extensions>
 
 

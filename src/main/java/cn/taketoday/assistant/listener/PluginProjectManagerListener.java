@@ -36,7 +36,6 @@ public class PluginProjectManagerListener implements ProjectManagerListener {
     ProjectService service = project.getService(ProjectService.class);
 
     System.out.println(service);
-    System.out.println(project.getService(ProjectService.class));
   }
 
 }

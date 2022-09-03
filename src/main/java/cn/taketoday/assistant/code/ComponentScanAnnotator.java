@@ -29,14 +29,6 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.model.BeanService;
-import com.intellij.spring.model.CommonSpringBean;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.jam.stereotype.SpringComponentScan;
-import com.intellij.spring.model.jam.stereotype.SpringJamComponentScan;
-import com.intellij.spring.model.jam.stereotype.SpringJamComponentScans;
-import com.intellij.spring.model.xml.context.SpringBeansPackagesScan;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -58,7 +50,15 @@ import java.util.stream.Collectors;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.beans.stereotype.ComponentScan;
+import cn.taketoday.assistant.beans.stereotype.ComponentScans;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.CommonInfraBean;
+import cn.taketoday.assistant.model.InfraBeanService;
+import cn.taketoday.assistant.model.jam.stereotype.AbstractComponentScan;
+import cn.taketoday.assistant.model.xml.context.InfraBeansPackagesScan;
 import cn.taketoday.assistant.service.InfraJamService;
 
 /**
@@ -79,7 +79,7 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
 
   @Override
   public Icon getIcon() {
-    return SpringApiIcons.Gutter.SpringScan;
+    return Icons.Gutter.SpringScan;
   }
 
   @Override
@@ -99,7 +99,7 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
       return true;
     }
     PsiClass psiClass = PsiTreeUtil.getParentOfType(psiAnnotation, PsiClass.class);
-    return psiClass != null && JamService.getJamService(psiAnnotation.getProject()).getJamElement(SpringComponentScan.COMPONENT_SCAN_JAM_KEY, psiClass) != null;
+    return psiClass != null && JamService.getJamService(psiAnnotation.getProject()).getJamElement(AbstractComponentScan.COMPONENT_SCAN_JAM_KEY, psiClass) != null;
   }
 
   private static void annotateComponentScans(UAnnotation uAnnotation, Collection<? super RelatedItemLineMarkerInfo<?>> result) {
@@ -111,9 +111,9 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
         PsiElement identifier = UAnnotationKt.getNamePsiElement(uAnnotation);
         if (identifier != null) {
           JamService service = JamService.getJamService(psiClass.getProject());
-          SpringJamComponentScans componentScans = service.getJamElement(psiClass, SpringJamComponentScans.META);
+          ComponentScans componentScans = service.getJamElement(psiClass, ComponentScans.META);
           if (componentScans != null) {
-            for (SpringJamComponentScan componentScan : componentScans.getComponentScans()) {
+            for (ComponentScan componentScan : componentScans.getComponentScans()) {
               if (psiAnnotation.equals(componentScan.getAnnotation())) {
                 annotateSpringBeansPackagesScan(result, identifier, componentScan);
               }
@@ -132,13 +132,13 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
       PsiClass owner = UElementKt.getAsJavaPsiElement(uDeclaration, PsiClass.class);
       PsiElement identifier = UAnnotationKt.getNamePsiElement(uAnnotation);
       if (identifier != null && owner != null) {
-        List<? extends SpringBeansPackagesScan> allScans = InfraJamService.getInstance().getBeansPackagesScan(owner);
-        List<SpringComponentScan> scans = allScans.stream().filter(scan -> {
-          return (scan instanceof SpringComponentScan) && element.equals(((SpringComponentScan) scan).getAnnotation());
+        List<? extends InfraBeansPackagesScan> allScans = InfraJamService.of().getBeansPackagesScan(owner);
+        List<AbstractComponentScan> scans = allScans.stream().filter(scan -> {
+          return (scan instanceof AbstractComponentScan) && element.equals(((AbstractComponentScan) scan).getAnnotation());
         }).map(scan2 -> {
-          return (SpringComponentScan) scan2;
+          return (AbstractComponentScan) scan2;
         }).collect(Collectors.toList());
-        SpringComponentScan scan3 = ContainerUtil.getFirstItem(scans);
+        AbstractComponentScan scan3 = ContainerUtil.getFirstItem(scans);
         PsiAnnotation psiAnnotation = scan3 == null ? null : scan3.getAnnotation();
         if (psiAnnotation != null) {
           annotateSpringBeansPackagesScan(result, identifier, psiAnnotation, scans);
@@ -157,7 +157,7 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
 
   private static void annotateSpringBeansPackagesScan(
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement identifier,
-          SpringComponentScan scan) {
+          AbstractComponentScan scan) {
     PsiAnnotation psiAnnotation = scan.getAnnotation();
     if (psiAnnotation == null) {
       return;
@@ -167,19 +167,19 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
 
   private static void annotateSpringBeansPackagesScan(
           Collection<? super RelatedItemLineMarkerInfo<?>> result,
-          PsiElement identifier, PsiAnnotation psiAnnotation, List<? extends SpringComponentScan> scans) {
+          PsiElement identifier, PsiAnnotation psiAnnotation, List<? extends AbstractComponentScan> scans) {
     addJavaBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
       Module module = ModuleUtilCore.findModuleForPsiElement(psiAnnotation);
       if (module == null) {
         return Collections.emptySet();
       }
-      Set<CommonSpringBean> scannedElements = scans.stream().flatMap(scan -> {
+      Set<CommonInfraBean> scannedElements = scans.stream().flatMap(scan -> {
         return scan.getScannedElements(module).stream();
       }).collect(Collectors.toSet());
-      List<SpringBeanPointer<?>> beans = new ArrayList<>(BeanService.getInstance().mapSpringBeans(scannedElements));
-      beans.sort(SpringBeanPointer.DISPLAY_COMPARATOR);
-      return ContainerUtil.map(beans, SpringBeanPointer.TO_BEAN);
-    }), SpringApiIcons.Gutter.SpringScan);
+      List<BeanPointer<?>> beans = new ArrayList<>(InfraBeanService.of().mapBeans(scannedElements));
+      beans.sort(BeanPointer.DISPLAY_COMPARATOR);
+      return ContainerUtil.map(beans, BeanPointer.TO_BEAN);
+    }), Icons.Gutter.SpringScan);
   }
 }
 

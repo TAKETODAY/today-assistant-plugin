@@ -44,7 +44,6 @@ import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.InheritanceUtil;
 import com.intellij.psi.util.PsiTypesUtil;
-import com.intellij.spring.boot.reactor.ReactorConstants;
 import com.intellij.uast.UastModificationTracker;
 import com.intellij.util.Query;
 import com.intellij.util.SmartList;
@@ -68,8 +67,9 @@ import java.util.stream.Collectors;
 
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.ReactorConstants;
 import cn.taketoday.assistant.code.event.beans.PublishEventPointDescriptor;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 import static cn.taketoday.assistant.InfraConstant.APPLICATION_EVENT;
@@ -175,7 +175,7 @@ public abstract class EventModelUtils {
   private static List<PsiMethod> getEventMethods(
           Project project, @Nullable Module module, String className, String methodName) {
     if (module != null) {
-      PsiClass eventPublisherClass = CommonUtils.findLibraryClass(module, className);
+      PsiClass eventPublisherClass = InfraUtils.findLibraryClass(module, className);
       if (eventPublisherClass != null) {
         return List.of(eventPublisherClass.findMethodsByName(methodName, false));
       }
@@ -222,7 +222,7 @@ public abstract class EventModelUtils {
       SmartList<EventListenerElement> smartList = new SmartList<>();
       for (Module m : ModuleManager.getInstance(project).getModules()) {
         if (InfraLibraryUtil.hasLibrary(m)
-                && CommonUtils.hasFacet(m) && !m.getName().endsWith(".test")) {
+                && InfraUtils.hasFacet(m) && !m.getName().endsWith(".test")) {
           findModuleEventListeners(m, smartList, GlobalSearchScope.moduleScope(m), GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(m));
         }
       }
@@ -243,7 +243,7 @@ public abstract class EventModelUtils {
       PsiClass applicationEventClass = javaPsiFacade.findClass(APPLICATION_EVENT, apiScope);
       Query<PsiClass> entries = ClassInheritorsSearch.search(listenerInterface, scope, true, true, false);
       for (PsiClass entry : entries) {
-        if (CommonUtils.isBeanCandidateClass(entry)) {
+        if (InfraUtils.isBeanCandidateClass(entry)) {
           PsiMethod[] onEventMethods = entry.findMethodsByName(ON_APPLICATION_EVENT_METHOD, false);
           for (PsiMethod method : onEventMethods) {
             if (isValidReceiverMethod(method, applicationEventClass)) {

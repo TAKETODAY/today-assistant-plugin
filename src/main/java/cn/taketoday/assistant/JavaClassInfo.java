@@ -33,26 +33,6 @@ import com.intellij.psi.impl.compiled.ClsFileImpl;
 import com.intellij.psi.util.CachedValue;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
-import com.intellij.spring.CommonSpringModel;
-import com.intellij.spring.SpringModelVisitorUtils;
-import com.intellij.spring.SpringModificationTrackersManager;
-import com.intellij.spring.model.CommonSpringBean;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.SpringModelSearchParameters;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.JamSpringBeanPointer;
-import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
-import com.intellij.spring.model.utils.SpringBeanUtils;
-import com.intellij.spring.model.utils.SpringConstructorArgUtils;
-import com.intellij.spring.model.utils.SpringModelSearchers;
-import com.intellij.spring.model.utils.SpringModelUtils;
-import com.intellij.spring.model.xml.DomSpringBean;
-import com.intellij.spring.model.xml.DomSpringBeanPointer;
-import com.intellij.spring.model.xml.beans.Autowire;
-import com.intellij.spring.model.xml.beans.Beans;
-import com.intellij.spring.model.xml.beans.LookupMethod;
-import com.intellij.spring.model.xml.beans.SpringBean;
-import com.intellij.spring.model.xml.beans.SpringPropertyDefinition;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.CommonProcessors;
 import com.intellij.util.containers.ContainerUtil;
@@ -71,6 +51,24 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.CommonInfraBean;
+import cn.taketoday.assistant.model.ModelSearchParameters;
+import cn.taketoday.assistant.model.jam.JamBeanPointer;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
+import cn.taketoday.assistant.model.jam.javaConfig.ContextJavaBean;
+import cn.taketoday.assistant.model.utils.InfraBeanUtils;
+import cn.taketoday.assistant.model.utils.InfraConstructorArgUtils;
+import cn.taketoday.assistant.model.utils.InfraModelSearchers;
+import cn.taketoday.assistant.model.utils.InfraModelService;
+import cn.taketoday.assistant.model.xml.DomBeanPointer;
+import cn.taketoday.assistant.model.xml.DomInfraBean;
+import cn.taketoday.assistant.model.xml.beans.Autowire;
+import cn.taketoday.assistant.model.xml.beans.Beans;
+import cn.taketoday.assistant.model.xml.beans.InfraBean;
+import cn.taketoday.assistant.model.xml.beans.InfraPropertyDefinition;
+import cn.taketoday.assistant.model.xml.beans.LookupMethod;
+
 /**
  * Caches mappings for given PsiClass.
  *
@@ -80,14 +78,14 @@ import java.util.stream.Collectors;
 public class JavaClassInfo {
   private static final Key<JavaClassInfo> KEY = Key.create("Java Class Info");
 
-  private final PsiClass myPsiClass;
-  private final CachedValue<Boolean> myIsMapped;
-  private final CachedValue<Set<SpringBeanPointer<?>>> myBeans;
-  private final CachedValue<MultiMap<String, SpringPropertyDefinition>> myProperties;
-  private final CachedValue<MultiMap<PsiMethod, SpringBeanPointer<?>>> myConstructors;
-  private final CachedValue<MultiMap<PsiMethod, Pair<PsiElement, JavaClassInfo.SpringMethodType>>> myMethods;
+  private final PsiClass psiClass;
+  private final CachedValue<Boolean> isMapped;
+  private final CachedValue<Set<BeanPointer<?>>> beans;
+  private final CachedValue<MultiMap<String, InfraPropertyDefinition>> properties;
+  private final CachedValue<MultiMap<PsiMethod, BeanPointer<?>>> constructors;
+  private final CachedValue<MultiMap<PsiMethod, Pair<PsiElement, MethodType>>> methods;
 
-  public static JavaClassInfo getSpringJavaClassInfo(PsiClass psiClass) {
+  public static JavaClassInfo from(PsiClass psiClass) {
     JavaClassInfo info = psiClass.getUserData(KEY);
     if (info == null) {
       info = new JavaClassInfo(psiClass);
@@ -97,35 +95,35 @@ public class JavaClassInfo {
   }
 
   private JavaClassInfo(PsiClass psiClass) {
-    myPsiClass = psiClass;
-    final Project project = psiClass.getProject();
+    this.psiClass = psiClass;
+    Project project = psiClass.getProject();
 
     CachedValuesManager cachedValuesManager = CachedValuesManager.getManager(project);
-    myIsMapped = cachedValuesManager.createCachedValue(() -> {
-      CommonSpringModel model = SpringModelUtils.getInstance().getPsiClassSpringModel(myPsiClass);
+    isMapped = cachedValuesManager.createCachedValue(() -> {
+      CommonInfraModel model = InfraModelService.of().getPsiClassModel(this.psiClass);
 
-      boolean exists = SpringModelSearchers.doesBeanExist(model, myPsiClass);
+      boolean exists = InfraModelSearchers.doesBeanExist(model, this.psiClass);
       return new CachedValueProvider.Result<>(exists, getDependencies(project, model));
     }, false);
 
-    myBeans = cachedValuesManager.createCachedValue(() -> {
-      CommonSpringModel model = SpringModelUtils.getInstance().getPsiClassSpringModel(myPsiClass);
-      List<SpringBeanPointer<?>> byInheritance =
-              SpringModelSearchers.findBeans(model, SpringModelSearchParameters.byClass(myPsiClass).withInheritors().effectiveBeanTypes());
+    beans = cachedValuesManager.createCachedValue(() -> {
+      CommonInfraModel model = InfraModelService.of().getPsiClassModel(this.psiClass);
+      List<BeanPointer<?>> byInheritance =
+              InfraModelSearchers.findBeans(model, ModelSearchParameters.byClass(this.psiClass).withInheritors().effectiveBeanTypes());
       return new CachedValueProvider.Result<>(new LinkedHashSet<>(byInheritance),
               getDependencies(project, model));
     }, false);
 
-    myProperties = cachedValuesManager.createCachedValue(() -> {
-      List<DomSpringBeanPointer> list = getMappedDomBeans();
-      MultiMap<String, SpringPropertyDefinition> map = MultiMap.createConcurrent();
-      for (DomSpringBeanPointer beanPointer : list) {
+    properties = cachedValuesManager.createCachedValue(() -> {
+      List<DomBeanPointer> list = getMappedDomBeans();
+      MultiMap<String, InfraPropertyDefinition> map = MultiMap.createConcurrent();
+      for (DomBeanPointer beanPointer : list) {
         if (!beanPointer.isValid())
           continue;
-        DomSpringBean bean = beanPointer.getSpringBean();
-        if (bean instanceof SpringBean) {
-          List<SpringPropertyDefinition> properties = ((SpringBean) bean).getAllProperties();
-          for (SpringPropertyDefinition property : properties) {
+        DomInfraBean bean = beanPointer.getBean();
+        if (bean instanceof InfraBean) {
+          List<InfraPropertyDefinition> properties = ((InfraBean) bean).getAllProperties();
+          for (InfraPropertyDefinition property : properties) {
             String propertyName = property.getPropertyName();
             if (propertyName != null) {
               map.putValue(propertyName, property);
@@ -135,16 +133,16 @@ public class JavaClassInfo {
       }
       return new CachedValueProvider.Result<>(map, DomManager.getDomManager(project));
     }, false);
-    myConstructors = cachedValuesManager.createCachedValue(() -> {
-      List<DomSpringBeanPointer> list = getMappedDomBeans();
-      MultiMap<PsiMethod, SpringBeanPointer<?>> map = MultiMap.createConcurrent();
-      for (DomSpringBeanPointer beanPointer : list) {
+    constructors = cachedValuesManager.createCachedValue(() -> {
+      List<DomBeanPointer> list = getMappedDomBeans();
+      MultiMap<PsiMethod, BeanPointer<?>> map = MultiMap.createConcurrent();
+      for (DomBeanPointer beanPointer : list) {
         if (!beanPointer.isValid())
           continue;
-        DomSpringBean bean = beanPointer.getSpringBean();
-        if (bean instanceof SpringBean) {
-          CommonSpringModel model = SpringModelUtils.getInstance().getPsiClassSpringModel(myPsiClass);
-          PsiMethod constructor = SpringConstructorArgUtils.getInstance().getSpringBeanConstructor((SpringBean) bean, model);
+        DomInfraBean bean = beanPointer.getBean();
+        if (bean instanceof InfraBean) {
+          CommonInfraModel model = InfraModelService.of().getPsiClassModel(this.psiClass);
+          PsiMethod constructor = InfraConstructorArgUtils.of().getInfraBeanConstructor((InfraBean) bean, model);
           if (constructor != null) {
             map.putValue(constructor, beanPointer);
           }
@@ -152,64 +150,64 @@ public class JavaClassInfo {
       }
       return new CachedValueProvider.Result<>(map, DomManager.getDomManager(project));
     }, false);
-    myMethods = cachedValuesManager.createCachedValue(() -> {
+    methods = cachedValuesManager.createCachedValue(() -> {
       List<PsiMethod> psiMethods = Arrays.asList(psiClass.getMethods());
 
-      List<DomSpringBeanPointer> list = getMappedDomBeans();
-      MultiMap<PsiMethod, Pair<PsiElement, JavaClassInfo.SpringMethodType>> map = MultiMap.createConcurrent();
+      List<DomBeanPointer> list = getMappedDomBeans();
+      MultiMap<PsiMethod, Pair<PsiElement, MethodType>> map = MultiMap.createConcurrent();
 
-      for (JamSpringBeanPointer pointer : getStereotypeMappedBeans()) {
-        JamPsiMemberSpringBean bean = pointer.getSpringBean();
+      for (JamBeanPointer pointer : getStereotypeMappedBeans()) {
+        JamPsiMemberInfraBean bean = pointer.getBean();
         if (bean instanceof ContextJavaBean) {
-          addStereotypeBeanMethod(map, ((ContextJavaBean) bean).getInitMethodAttributeElement(), JavaClassInfo.SpringMethodType.INIT);
-          addStereotypeBeanMethod(map, ((ContextJavaBean) bean).getDestroyMethodAttributeElement(), JavaClassInfo.SpringMethodType.DESTROY);
+          addStereotypeBeanMethod(map, ((ContextJavaBean) bean).getInitMethodAttributeElement(), MethodType.INIT);
+          addStereotypeBeanMethod(map, ((ContextJavaBean) bean).getDestroyMethodAttributeElement(), MethodType.DESTROY);
         }
       }
 
-      for (DomSpringBeanPointer beanPointer : list) {
+      for (DomBeanPointer beanPointer : list) {
         if (!beanPointer.isValid())
           continue;
-        DomSpringBean bean = beanPointer.getSpringBean();
-        if (bean instanceof SpringBean springBean) {
+        DomInfraBean bean = beanPointer.getBean();
+        if (bean instanceof InfraBean infraBean) {
           Beans beans = DomUtil.getParentOfType(bean, Beans.class, false);
           if (beans != null) {
-            addSpringBeanMethods(map, psiMethods, JavaClassInfo.SpringMethodType.INIT, beans.getDefaultInitMethod());
-            addSpringBeanMethods(map, psiMethods, JavaClassInfo.SpringMethodType.DESTROY, beans.getDefaultDestroyMethod());
+            addInfraBeanMethods(map, psiMethods, MethodType.INIT, beans.getDefaultInitMethod());
+            addInfraBeanMethods(map, psiMethods, MethodType.DESTROY, beans.getDefaultDestroyMethod());
           }
 
-          addSpringBeanMethod(map, psiMethods, JavaClassInfo.SpringMethodType.INIT, springBean.getInitMethod());
-          addSpringBeanMethod(map, psiMethods, JavaClassInfo.SpringMethodType.DESTROY, springBean.getDestroyMethod());
+          addInfraBeanMethod(map, psiMethods, MethodType.INIT, infraBean.getInitMethod());
+          addInfraBeanMethod(map, psiMethods, MethodType.DESTROY, infraBean.getDestroyMethod());
 
-          for (LookupMethod lookupMethod : springBean.getLookupMethods()) {
-            addSpringBeanMethod(map, psiMethods, JavaClassInfo.SpringMethodType.LOOKUP, lookupMethod.getName());
+          for (LookupMethod lookupMethod : infraBean.getLookupMethods()) {
+            addInfraBeanMethod(map, psiMethods, MethodType.LOOKUP, lookupMethod.getName());
           }
         }
       }
 
-      CommonProcessors.CollectProcessor<SpringBeanPointer<?>> processor = new CommonProcessors.CollectProcessor<>();
-      SpringBeanUtils.getInstance().processXmlFactoryBeans(myPsiClass.getProject(), myPsiClass.getResolveScope(), processor);
-      for (SpringBeanPointer pointer : processor.getResults()) {
+      var processor = new CommonProcessors.CollectProcessor<BeanPointer<?>>();
+      InfraBeanUtils.of().processXmlFactoryBeans(this.psiClass.getProject(), this.psiClass.getResolveScope(), processor);
+      for (BeanPointer pointer : processor.getResults()) {
         if (!pointer.isValid())
           continue;
-        CommonSpringBean commonSpringBean = pointer.getSpringBean();
-        if (commonSpringBean instanceof SpringBean springBean && commonSpringBean.isValid()) {
-          GenericAttributeValue<PsiMethod> domFactoryMethod = springBean.getFactoryMethod();
+        CommonInfraBean commonInfraBean = pointer.getBean();
+        if (commonInfraBean instanceof InfraBean infraBean && commonInfraBean.isValid()) {
+          GenericAttributeValue<PsiMethod> domFactoryMethod = infraBean.getFactoryMethod();
           if (DomUtil.hasXml(domFactoryMethod)) {
             PsiMethod factoryMethod = domFactoryMethod.getValue();
             if (factoryMethod != null && psiMethods.contains(factoryMethod)) {
-              addSpringBeanMethod(map, psiMethods, JavaClassInfo.SpringMethodType.FACTORY, domFactoryMethod);
+              addInfraBeanMethod(map, psiMethods, MethodType.FACTORY, domFactoryMethod);
             }
           }
         }
       }
 
-      return new CachedValueProvider.Result<>(map, DomManager.getDomManager(project), myPsiClass);
+      return new CachedValueProvider.Result<>(map, DomManager.getDomManager(project), this.psiClass);
     }, false);
   }
 
-  private static void addStereotypeBeanMethod(MultiMap<PsiMethod, Pair<PsiElement, JavaClassInfo.SpringMethodType>> map,
+  private static void addStereotypeBeanMethod(MultiMap<PsiMethod, Pair<PsiElement, MethodType>> map,
           JamStringAttributeElement<PsiMethod> attributeElement,
-          JavaClassInfo.SpringMethodType type) {
+          MethodType type) {
     PsiMethod psiMethod = attributeElement.getValue();
     if (psiMethod != null) {
       PsiAnnotationMemberValue identifyingElement = attributeElement.getPsiElement();
@@ -219,20 +217,20 @@ public class JavaClassInfo {
     }
   }
 
-  private Object[] getDependencies(Project project, CommonSpringModel model) {
+  private Object[] getDependencies(Project project, CommonInfraModel model) {
     Set<Object> dependencies = new LinkedHashSet<>();
-    ContainerUtil.addIfNotNull(dependencies, myPsiClass.getContainingFile());
+    ContainerUtil.addIfNotNull(dependencies, psiClass.getContainingFile());
 
-    ContainerUtil.addAll(dependencies, SpringModificationTrackersManager.getInstance(project).getOuterModelsDependencies());
-    dependencies.addAll(SpringModelVisitorUtils.getConfigFiles(model).stream().filter(file -> !(file instanceof ClsFileImpl))
+    ContainerUtil.addAll(dependencies, InfraModificationTrackersManager.from(project).getOuterModelsDependencies());
+    dependencies.addAll(InfraModelVisitorUtils.getConfigFiles(model).stream().filter(file -> !(file instanceof ClsFileImpl))
             .collect(Collectors.toSet()));
 
     return ArrayUtil.toObjectArray(dependencies);
   }
 
-  private static void addSpringBeanMethod(MultiMap<PsiMethod, Pair<PsiElement, JavaClassInfo.SpringMethodType>> map,
+  private static void addInfraBeanMethod(MultiMap<PsiMethod, Pair<PsiElement, MethodType>> map,
           List<PsiMethod> psiMethods,
-          JavaClassInfo.SpringMethodType type,
+          MethodType type,
           GenericAttributeValue<PsiMethod> genericAttributeValue) {
     if (!DomUtil.hasXml(genericAttributeValue))
       return;
@@ -243,9 +241,9 @@ public class JavaClassInfo {
     }
   }
 
-  private static void addSpringBeanMethods(MultiMap<PsiMethod, Pair<PsiElement, JavaClassInfo.SpringMethodType>> map,
+  private static void addInfraBeanMethods(MultiMap<PsiMethod, Pair<PsiElement, MethodType>> map,
           List<PsiMethod> psiMethods,
-          JavaClassInfo.SpringMethodType type,
+          MethodType type,
           GenericAttributeValue<Set<PsiMethod>> genericAttributeValue) {
     if (!DomUtil.hasXml(genericAttributeValue))
       return;
@@ -261,40 +259,40 @@ public class JavaClassInfo {
   }
 
   public boolean isMapped() {
-    return myIsMapped.getValue();
+    return isMapped.getValue();
   }
 
   public boolean isCalculatedMapped() {
-    Supplier<Boolean> getter = myIsMapped.getUpToDateOrNull();
+    Supplier<Boolean> getter = isMapped.getUpToDateOrNull();
     return getter != null && getter.get();
   }
 
   public boolean isMappedDomBean() {
-    return isMapped() && ContainerUtil.findInstance(myBeans.getValue(), DomSpringBeanPointer.class) != null;
+    return isMapped() && ContainerUtil.findInstance(beans.getValue(), DomBeanPointer.class) != null;
   }
 
-  public List<DomSpringBeanPointer> getMappedDomBeans() {
+  public List<DomBeanPointer> getMappedDomBeans() {
     return !isMapped()
            ? Collections.emptyList()
-           : ContainerUtil.findAll(myBeans.getValue(), DomSpringBeanPointer.class);
+           : ContainerUtil.findAll(beans.getValue(), DomBeanPointer.class);
   }
 
   public boolean isStereotypeJavaBean() {
-    return isMapped() && ContainerUtil.findInstance(myBeans.getValue(), JamSpringBeanPointer.class) != null;
+    return isMapped() && ContainerUtil.findInstance(beans.getValue(), JamBeanPointer.class) != null;
   }
 
-  public List<JamSpringBeanPointer> getStereotypeMappedBeans() {
+  public List<JamBeanPointer> getStereotypeMappedBeans() {
     return !isMapped()
            ? Collections.emptyList()
-           : ContainerUtil.findAll(myBeans.getValue(), JamSpringBeanPointer.class);
+           : ContainerUtil.findAll(beans.getValue(), JamBeanPointer.class);
   }
 
   public boolean isAutowired() {
-    List<DomSpringBeanPointer> pointers = getMappedDomBeans();
-    for (DomSpringBeanPointer pointer : pointers) {
-      DomSpringBean springBean = pointer.getSpringBean();
-      if (springBean instanceof SpringBean) {
-        Autowire autowire = ((SpringBean) springBean).getBeanAutowire();
+    List<DomBeanPointer> pointers = getMappedDomBeans();
+    for (DomBeanPointer pointer : pointers) {
+      DomInfraBean infraBean = pointer.getBean();
+      if (infraBean instanceof InfraBean) {
+        Autowire autowire = ((InfraBean) infraBean).getBeanAutowire();
         if (autowire.isAutowired()) {
           return true;
         }
@@ -305,10 +303,10 @@ public class JavaClassInfo {
 
   public Set<Autowire> getAutowires() {
     Set<Autowire> autowires = EnumSet.noneOf(Autowire.class);
-    for (DomSpringBeanPointer pointer : getMappedDomBeans()) {
-      DomSpringBean springBean = pointer.getSpringBean();
-      if (springBean instanceof SpringBean) {
-        Autowire autowire = ((SpringBean) springBean).getBeanAutowire();
+    for (DomBeanPointer pointer : getMappedDomBeans()) {
+      DomInfraBean bean = pointer.getBean();
+      if (bean instanceof InfraBean infraBean) {
+        Autowire autowire = infraBean.getBeanAutowire();
         if (autowire.isAutowired()) {
           autowires.add(autowire);
         }
@@ -317,24 +315,24 @@ public class JavaClassInfo {
     return autowires;
   }
 
-  public Collection<SpringPropertyDefinition> getMappedProperties(String propertyName) {
-    MultiMap<String, SpringPropertyDefinition> value = myProperties.getValue();
+  public Collection<InfraPropertyDefinition> getMappedProperties(String propertyName) {
+    MultiMap<String, InfraPropertyDefinition> value = properties.getValue();
     if (value == null) {
       return Collections.emptyList();
     }
     return value.get(propertyName);
   }
 
-  public Collection<SpringBeanPointer<?>> getMappedConstructorDefinitions(PsiMethod psiMethod) {
-    MultiMap<PsiMethod, SpringBeanPointer<?>> value = myConstructors.getValue();
+  public Collection<BeanPointer<?>> getMappedConstructorDefinitions(PsiMethod psiMethod) {
+    MultiMap<PsiMethod, BeanPointer<?>> value = constructors.getValue();
     if (value == null) {
       return Collections.emptyList();
     }
     return value.get(psiMethod);
   }
 
-  public Collection<Pair<PsiElement, JavaClassInfo.SpringMethodType>> getMethodTypes(PsiMethod psiMethod) {
-    MultiMap<PsiMethod, Pair<PsiElement, JavaClassInfo.SpringMethodType>> value = myMethods.getValue();
+  public Collection<Pair<PsiElement, MethodType>> getMethodTypes(PsiMethod psiMethod) {
+    MultiMap<PsiMethod, Pair<PsiElement, MethodType>> value = methods.getValue();
     if (value == null) {
       return Collections.emptyList();
     }
@@ -352,15 +350,17 @@ public class JavaClassInfo {
     if (!method.isConstructor())
       return false;
 
-    return myConstructors.getValue().containsKey(method);
+    return constructors.getValue().containsKey(method);
   }
 
-  public enum SpringMethodType {
-    INIT("init"), DESTROY("destroy"),
-    FACTORY("factory"), LOOKUP("lookup");
+  public enum MethodType {
+    INIT("init"),
+    DESTROY("destroy"),
+    FACTORY("factory"),
+    LOOKUP("lookup");
     private final String myName;
 
-    SpringMethodType(String name) {
+    MethodType(String name) {
       myName = name;
     }
 

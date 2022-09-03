@@ -25,48 +25,54 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMember;
-
-import org.jetbrains.uast.UClass;
-import org.jetbrains.uast.UMethod;
+import com.intellij.psi.PsiMethod;
 
 import cn.taketoday.assistant.InfraBundle;
-import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.assistant.code.cache.jam.CachingGroup;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
+import cn.taketoday.assistant.model.highlighting.jam.BeanPointerResolveInspection;
 import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:20
  */
-public final class CacheableComponentsInspection extends AbstractInfraLocalInspection {
+public final class CacheableComponentsInspection extends BeanPointerResolveInspection {
 
   @Override
-  public ProblemDescriptor[] checkMethod(UMethod method, InspectionManager manager, boolean isOnTheFly) {
-    PsiAnnotation annotation;
-    ProblemsHolder holder = new ProblemsHolder(manager, method.getContainingFile(), isOnTheFly);
+  public ProblemDescriptor[] checkMethod(PsiMethod method, InspectionManager manager, boolean isOnTheFly) {
 
-    for (JamBaseCacheableElement cacheable : JamBaseCacheableElement.getElements(method)) {
-      if (!method.getModifierList().hasModifierProperty("public")
-              && (annotation = cacheable.getAnnotation()) != null) {
-        holder.registerProblem(annotation, InfraBundle.message("cacheable.annotations.should.be.defined.on.public.methods"),
-                ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+    if (isPlainJavaFileInInfraModule(method)) {
+      PsiAnnotation annotation;
+      ProblemsHolder holder = new ProblemsHolder(manager, method.getContainingFile(), isOnTheFly);
+
+      for (JamBaseCacheableElement cacheable : JamBaseCacheableElement.getElements(method)) {
+        if (!method.getModifierList().hasModifierProperty("public")
+                && (annotation = cacheable.getAnnotation()) != null) {
+          holder.registerProblem(annotation, InfraBundle.message("cacheable.annotations.should.be.defined.on.public.methods"),
+                  ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+        }
+        checkBeansResolve(cacheable, holder);
       }
-      checkBeansResolve(cacheable, holder);
+      checkCachingGroups(holder, CachingGroup.forMethod(method));
+      return holder.getResultsArray();
     }
-    checkCachingGroups(holder, CachingGroup.forMethod(method));
-    return holder.getResultsArray();
+    return null;
   }
 
   @Override
-  public ProblemDescriptor[] checkClass(UClass aClass, InspectionManager manager, boolean isOnTheFly) {
-    ProblemsHolder holder = new ProblemsHolder(manager, aClass.getContainingFile(), isOnTheFly);
-    for (JamBaseCacheableElement cacheable : JamBaseCacheableElement.getElements(aClass)) {
-      checkBeansResolve(cacheable, holder);
+  public ProblemDescriptor[] checkClass(PsiClass aClass, InspectionManager manager, boolean isOnTheFly) {
+    if (isPlainJavaFileInInfraModule(aClass)) {
+      ProblemsHolder holder = new ProblemsHolder(manager, aClass.getContainingFile(), isOnTheFly);
+      for (JamBaseCacheableElement cacheable : JamBaseCacheableElement.getElements(aClass)) {
+        checkBeansResolve(cacheable, holder);
+      }
+      checkCachingGroups(holder, CachingGroup.forClass(aClass));
+      return holder.getResultsArray();
     }
-    checkCachingGroups(holder, CachingGroup.forClass(aClass));
-    return holder.getResultsArray();
+    return null;
   }
 
   public void checkCachingGroups(ProblemsHolder holder, @Nullable CachingGroup<? extends PsiMember> cachingGroups) {
@@ -84,9 +90,8 @@ public final class CacheableComponentsInspection extends AbstractInfraLocalInspe
   }
 
   private static void checkBeansResolve(JamBaseCacheableElement cacheable, ProblemsHolder holder) {
-    // FIXME
-//    checkBeanPointerResolve(holder, cacheable.getCacheManagerElement());
-//    checkBeanPointerResolve(holder, cacheable.getCacheResolverElement());
-//    checkBeanPointerResolve(holder, cacheable.getKeyGeneratorElement());
+    checkBeanPointerResolve(holder, cacheable.getCacheManagerElement());
+    checkBeanPointerResolve(holder, cacheable.getCacheResolverElement());
+    checkBeanPointerResolve(holder, cacheable.getKeyGeneratorElement());
   }
 }

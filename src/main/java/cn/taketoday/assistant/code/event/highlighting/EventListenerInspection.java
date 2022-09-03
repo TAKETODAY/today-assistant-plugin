@@ -131,19 +131,14 @@ public final class EventListenerInspection extends AbstractInfraLocalInspection 
 
   private void reportIfEventListener(UMethod method, ProblemsHolder holder,
           @InspectionMessage String message, Function0<? extends List<? extends IntentionAction>> function0) {
-    UAnnotation obj;
-    Iterator<UAnnotation> it = method.getUAnnotations().iterator();
-    while (true) {
-      if (!it.hasNext()) {
-        obj = null;
-        break;
-      }
-      UAnnotation next = it.next();
+    UAnnotation obj = null;
+    for (UAnnotation next : method.getUAnnotations()) {
       if (isListenerAnnotation(next)) {
         obj = next;
         break;
       }
     }
+
     PsiElement listenerAnnotation = UAnnotationKt.getNamePsiElement(obj);
     if (listenerAnnotation != null) {
       ProblemHighlightType problemHighlightType = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;

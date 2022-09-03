@@ -1,0 +1,89 @@
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+
+<html>
+<body>
+Reports warnings on incorrectly used proxy methods.
+
+Infra 4.0 has introduced an optimization for @Configuration class processing that can be enabled via an attribute
+@Configuration(proxyBeanMethods = false).
+<br><br>
+If you disable
+<pre><code>proxyBeanMethods</code></pre>
+the proxy instances are no longer created and calling the method invokes it again (returning a new instance every time).
+As a result, you have no guarantee that you're actually injecting the corresponding bean in the context.
+<!-- tooltip end -->
+<br><br>
+<strong>Incorrect bean method call example:</strong><br><br>
+<pre>
+@Configuration(proxyBeanMethods = false)
+class TestConfiguration {
+  @Bean
+  public FirstBean firstBean() {
+    return new FirstBean();
+  }
+
+  @Bean
+  public SecondBean secondBean() {
+    return new SecondBean(firstBean()); // -> <strong>incorrect call</strong>
+  }
+}
+</pre>
+<br>
+
+<hr>
+<strong>You can set
+  <pre><code>proxyBeanMethods</code></pre>
+  to true or rewrite the code as follows:</strong><br><br>
+<pre>
+@Configuration(proxyBeanMethods = false)
+class TestConfiguration {
+  @Bean
+  public FirstBean firstBean() {
+    return new FirstBean();
+  }
+
+  @Bean
+  public SecondBean secondBean(FirstBean someBean) { // -> <strong>correct injected instance</strong>
+    return new SecondBean(someBean);
+  }
+}
+</pre>
+<br>
+
+<hr>
+<strong>Also, the inspection checks @Bean method calls in a class without the @Configuration stereotype (in "bean lite mode"):</strong><br><br>
+<pre>
+@Component
+class TestComponent {
+  @Bean
+  public FirstBean firstBean() {
+    return new FirstBean();
+  }
+
+  @Bean
+  public SecondBean secondBean() {
+    return new SecondBean(firstBean()); // -> <strong>incorrect call</strong>
+  }
+}
+</pre>
+
+</body>
+</html>

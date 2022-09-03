@@ -48,7 +48,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import cn.taketoday.assistant.InfraLibraryUtil;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 import kotlin.Pair;
 
@@ -102,7 +102,7 @@ final class EventListenerContextVariables extends SpringElContextsExtension {
   }
 
   private static @Nullable PsiVariable getEventExpressionRootObject(PsiMethod method) {
-    PsiClass rootObjectClass = CommonUtils.findLibraryClass(ModuleUtilCore.findModuleForPsiElement(method), "cn.taketoday.context.event.EventExpressionRootObject");
+    PsiClass rootObjectClass = InfraUtils.findLibraryClass(ModuleUtilCore.findModuleForPsiElement(method), "cn.taketoday.context.event.EventExpressionRootObject");
     if (rootObjectClass == null) {
       return null;
     }

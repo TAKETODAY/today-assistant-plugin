@@ -26,6 +26,8 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
     // Java support
     id("java")
+    // Kotlin support
+    id("org.jetbrains.kotlin.jvm") version "1.7.10"
     // Gradle IntelliJ Plugin
     id("org.jetbrains.intellij") version "1.8.0"
     // Gradle Changelog Plugin
@@ -54,6 +56,7 @@ dependencies {
     implementation(fileTree("libs"))
     //  implementation("cn.taketoday", "today-core", "4.0.0-Draft.1")
 
+    implementation("cn.taketoday", "today-beans", "4.0.0-Draft.1")
 
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.1")
     testImplementation("org.mockito", "mockito-core", "2.12.0")

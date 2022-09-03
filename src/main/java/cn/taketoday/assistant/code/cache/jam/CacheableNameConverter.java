@@ -32,7 +32,6 @@ import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceBase;
-import com.intellij.spring.SpringApiIcons;
 
 import org.jetbrains.uast.UElement;
 import org.jetbrains.uast.UExpression;
@@ -42,6 +41,7 @@ import org.jetbrains.uast.UastUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.code.CacheableAnnotator;
 import cn.taketoday.lang.Nullable;
 import kotlin.collections.CollectionsKt;
@@ -88,7 +88,7 @@ public final class CacheableNameConverter extends JamConverter<String> {
       }
       ArrayList<LookupElementBuilder> ret = new ArrayList<>(Math.max(existingCacheableNames.size(), 10));
       for (String item$iv$iv : existingCacheableNames) {
-        ret.add(LookupElementBuilder.create(item$iv$iv).withIcon(SpringApiIcons.ShowCacheable));
+        ret.add(LookupElementBuilder.create(item$iv$iv).withIcon(Icons.ShowCacheable));
       }
       return ret.toArray(new Object[0]);
     }

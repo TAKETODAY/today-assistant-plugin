@@ -23,7 +23,6 @@ package cn.taketoday.assistant.context;
 import com.intellij.jam.JamElement;
 import com.intellij.jam.JamService;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.model.SpringConditional;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -31,7 +30,7 @@ import com.intellij.spring.model.SpringConditional;
  */
 public interface InfraConditional extends JamElement {
 
-  SemKey<SpringConditional> CONDITIONAL_JAM_ELEMENT_KEY =
+  SemKey<cn.taketoday.assistant.model.InfraConditional> CONDITIONAL_JAM_ELEMENT_KEY =
           JamService.JAM_ELEMENT_KEY.subKey("ConditionalJamElement");
 }
 

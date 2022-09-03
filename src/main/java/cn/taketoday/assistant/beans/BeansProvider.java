@@ -32,24 +32,24 @@ import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AnnotatedElementsSearch;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
-import com.intellij.spring.contexts.model.LocalModel;
-import com.intellij.spring.contexts.model.LocalXmlModel;
-import com.intellij.spring.index.SpringXmlBeansIndex;
-import com.intellij.spring.model.CommonSpringBean;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.SpringModelSearchParameters;
-import com.intellij.spring.model.custom.CustomLocalComponentsDiscoverer;
-import com.intellij.spring.model.utils.SpringPropertyUtils;
-import com.intellij.spring.model.utils.search.SpringBeanSearchParameters;
-import com.intellij.spring.model.xml.beans.SpringPropertyDefinition;
 import com.intellij.util.CommonProcessors;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import cn.taketoday.assistant.beans.stereotype.CustomComponent;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.context.model.LocalModel;
+import cn.taketoday.assistant.context.model.LocalXmlModel;
+import cn.taketoday.assistant.index.InfraXmlBeansIndex;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.CommonInfraBean;
+import cn.taketoday.assistant.model.ModelSearchParameters;
+import cn.taketoday.assistant.model.custom.CustomLocalComponentsDiscoverer;
+import cn.taketoday.assistant.model.jam.stereotype.CustomInfraComponent;
+import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
+import cn.taketoday.assistant.model.utils.search.BeanSearchParameters;
+import cn.taketoday.assistant.model.xml.beans.InfraPropertyDefinition;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 public class BeansProvider extends CustomLocalComponentsDiscoverer {
@@ -57,72 +57,72 @@ public class BeansProvider extends CustomLocalComponentsDiscoverer {
   private static final String MAPPER_SCANNER_CONFIGURER = "org.mybatis.spring.mapper.MapperScannerConfigurer";
 
   @Override
-  public Collection<CommonSpringBean> getCustomComponents(LocalModel springModel) {
-    System.out.println("getCustomComponents");
+  public Collection<CommonInfraBean> getCustomComponents(LocalModel springModel) {
+//    System.out.println("getCustomComponents");
     Module module = springModel.getModule();
     if (module == null || !(springModel instanceof LocalXmlModel) || DumbService.isDumb(module.getProject())) {
       return Collections.emptyList();
     }
-    Collection<CommonSpringBean> myBatisMappers = new HashSet<>();
+    Collection<CommonInfraBean> myBatisMappers = new HashSet<>();
     collectMappers((LocalXmlModel) springModel, module, myBatisMappers, MAPPER_FACTORY_BEAN);
     collectMappers((LocalXmlModel) springModel, module, myBatisMappers, MAPPER_SCANNER_CONFIGURER);
     return myBatisMappers;
   }
 
-  public void collectMappers(LocalXmlModel springModel, Module module, Collection<CommonSpringBean> myBatisMappers, String className) {
+  public void collectMappers(LocalXmlModel springModel, Module module, Collection<CommonInfraBean> myBatisMappers, String className) {
     VirtualFile configFile;
-    PsiClass mapperFactoryBeanClass = CommonUtils.findLibraryClass(module, className);
+    PsiClass mapperFactoryBeanClass = InfraUtils.findLibraryClass(module, className);
     if (mapperFactoryBeanClass == null || (configFile = springModel.getConfig().getVirtualFile()) == null) {
       return;
     }
     Project project = module.getProject();
-    SpringBeanSearchParameters.BeanClass params = SpringBeanSearchParameters.byClass(project, SpringModelSearchParameters.byClass(mapperFactoryBeanClass));
+    BeanSearchParameters.BeanClass params = BeanSearchParameters.byClass(project, ModelSearchParameters.byClass(mapperFactoryBeanClass));
     params.setVirtualFile(configFile);
-    CommonProcessors.CollectProcessor<SpringBeanPointer<?>> processor = new CommonProcessors.CollectProcessor<>();
-    SpringXmlBeansIndex.processBeansByClass(params, processor);
+    CommonProcessors.CollectProcessor<BeanPointer<?>> processor = new CommonProcessors.CollectProcessor<>();
+    InfraXmlBeansIndex.processBeansByClass(params, processor);
     boolean includeTests = ProjectRootsUtil.isInTestSource(configFile, project);
     GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, includeTests);
     JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
-    for (SpringBeanPointer springBaseBeanPointer : processor.getResults()) {
+    for (BeanPointer springBaseBeanPointer : processor.getResults()) {
       processBasePackages(myBatisMappers, facade, scope, springBaseBeanPointer);
       processMarkerInterface(myBatisMappers, facade, scope, springBaseBeanPointer);
       processCustomAnnotations(myBatisMappers, facade, scope, springBaseBeanPointer);
     }
   }
 
-  private static void processMarkerInterface(Collection<CommonSpringBean> mappers, JavaPsiFacade facade, GlobalSearchScope scope, SpringBeanPointer<?> pointer) {
+  private static void processMarkerInterface(Collection<CommonInfraBean> mappers, JavaPsiFacade facade, GlobalSearchScope scope, BeanPointer<?> pointer) {
     processMarkerInterface(mappers, facade, scope, getPropertyNameByName(pointer, "markerInterface"));
     processMarkerInterface(mappers, facade, scope, getPropertyNameByName(pointer, "mapperInterface"));
   }
 
-  private static void processMarkerInterface(Collection<CommonSpringBean> mappers, JavaPsiFacade facade, GlobalSearchScope scope,
-          @Nullable SpringPropertyDefinition markerInterface) {
+  private static void processMarkerInterface(Collection<CommonInfraBean> mappers, JavaPsiFacade facade, GlobalSearchScope scope,
+          @Nullable InfraPropertyDefinition markerInterface) {
     String value;
     PsiClass aClass;
     if (markerInterface != null && (value = markerInterface.getValueAsString()) != null && (aClass = facade.findClass(value, scope)) != null) {
-      mappers.add(new CustomComponent(aClass));
+      mappers.add(new CustomInfraComponent(aClass));
       for (PsiClass psiClass : ClassInheritorsSearch.search(aClass, scope, true).findAll()) {
-        mappers.add(new CustomComponent(psiClass));
+        mappers.add(new CustomInfraComponent(psiClass));
       }
     }
   }
 
-  private static void processCustomAnnotations(Collection<CommonSpringBean> mappers, JavaPsiFacade facade, GlobalSearchScope scope, SpringBeanPointer<?> pointer) {
+  private static void processCustomAnnotations(Collection<CommonInfraBean> mappers, JavaPsiFacade facade, GlobalSearchScope scope, BeanPointer<?> pointer) {
     String value;
     PsiClass aClass;
-    SpringPropertyDefinition annotationClass = getPropertyNameByName(pointer, "annotationClass");
+    InfraPropertyDefinition annotationClass = getPropertyNameByName(pointer, "annotationClass");
     if (annotationClass != null && (value = annotationClass.getValueAsString()) != null && (aClass = facade.findClass(value, scope)) != null && aClass.isAnnotationType()) {
       for (PsiClass annotatedClass : AnnotatedElementsSearch.searchPsiClasses(aClass, scope).findAll()) {
-        mappers.add(new CustomComponent(annotatedClass));
+        mappers.add(new CustomInfraComponent(annotatedClass));
       }
     }
   }
 
-  private static void processBasePackages(final Collection<CommonSpringBean> myBatisMappers, final JavaPsiFacade facade, final GlobalSearchScope scope,
-          SpringBeanPointer<?> springBaseBeanPointer) {
+  private static void processBasePackages(final Collection<CommonInfraBean> myBatisMappers, final JavaPsiFacade facade, final GlobalSearchScope scope,
+          BeanPointer<?> springBaseBeanPointer) {
     final String value;
 
-    SpringPropertyDefinition basePackages = getPropertyNameByName(springBaseBeanPointer, "basePackage");
+    InfraPropertyDefinition basePackages = getPropertyNameByName(springBaseBeanPointer, "basePackage");
     if (basePackages != null && (value = basePackages.getValueAsString()) != null) {
       new DelimitedListProcessor(" ,") {
         protected void processToken(int start, int end, boolean delimitersOnly) {
@@ -137,8 +137,8 @@ public class BeansProvider extends CustomLocalComponentsDiscoverer {
   }
 
   @Nullable
-  private static SpringPropertyDefinition getPropertyNameByName(SpringBeanPointer<?> springBaseBeanPointer, String propertyName) {
-    for (SpringPropertyDefinition property : SpringPropertyUtils.getProperties(springBaseBeanPointer.getSpringBean())) {
+  private static InfraPropertyDefinition getPropertyNameByName(BeanPointer<?> springBaseBeanPointer, String propertyName) {
+    for (InfraPropertyDefinition property : InfraPropertyUtils.getProperties(springBaseBeanPointer.getBean())) {
       if (propertyName.equals(property.getPropertyName())) {
         return property;
       }
@@ -146,10 +146,10 @@ public class BeansProvider extends CustomLocalComponentsDiscoverer {
     return null;
   }
 
-  private static void processBasePackage(GlobalSearchScope scope, PsiPackage aPackage, Collection<CommonSpringBean> myBatisMappers) {
+  private static void processBasePackage(GlobalSearchScope scope, PsiPackage aPackage, Collection<CommonInfraBean> myBatisMappers) {
     for (PsiClass aClass : aPackage.getClasses(scope)) {
       if (aClass.isInterface()) {
-        myBatisMappers.add(new CustomComponent(aClass));
+        myBatisMappers.add(new CustomInfraComponent(aClass));
       }
     }
     for (PsiPackage psiPackage : aPackage.getSubPackages(scope)) {

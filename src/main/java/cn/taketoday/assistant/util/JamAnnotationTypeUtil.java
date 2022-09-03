@@ -29,18 +29,9 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
-import com.intellij.spring.SpringManager;
-import com.intellij.spring.contexts.model.SpringModel;
-import com.intellij.spring.model.CommonSpringBean;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.SpringModelSearchParameters;
-import com.intellij.spring.model.utils.SpringModelSearchers;
-import com.intellij.spring.model.utils.SpringPropertyUtils;
-import com.intellij.spring.model.xml.beans.SpringProperty;
-import com.intellij.spring.model.xml.beans.SpringPropertyDefinition;
-import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -48,8 +39,17 @@ import java.util.List;
 import java.util.Set;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.InfraManager;
 import cn.taketoday.assistant.JavaeeConstant;
-import cn.taketoday.assistant.beans.SemContributorUtil;
+import cn.taketoday.assistant.context.model.InfraModel;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.CommonInfraBean;
+import cn.taketoday.assistant.model.ModelSearchParameters;
+import cn.taketoday.assistant.model.jam.SemContributorUtil;
+import cn.taketoday.assistant.model.utils.InfraModelSearchers;
+import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
+import cn.taketoday.assistant.model.xml.beans.InfraProperty;
+import cn.taketoday.assistant.model.xml.beans.InfraPropertyDefinition;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -58,7 +58,7 @@ import cn.taketoday.assistant.beans.SemContributorUtil;
 public abstract class JamAnnotationTypeUtil {
 
   public static List<PsiClass> getQualifierAnnotationTypesWithChildren(Module module) {
-    SmartList<PsiClass> smartList = new SmartList<>();
+    ArrayList<PsiClass> smartList = new ArrayList<>();
     smartList.addAll(getAnnotationTypesWithChildren(module, AnnotationConstant.QUALIFIER));
     smartList.addAll(getAnnotationTypesWithChildren(module, JavaeeConstant.JAVAX_INJECT_QUALIFIER));
     smartList.addAll(getImplicitQualifierAnnotations(module));
@@ -67,22 +67,22 @@ public abstract class JamAnnotationTypeUtil {
 
   private static Set<PsiClass> getImplicitQualifierAnnotations(Module module) {
     return CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
-      PsiClass customAutowireConfigurerClass = CommonUtils.findLibraryClass(module, AnnotationConstant.CUSTOM_AUTOWIRE_CONFIGURER_CLASS);
+      PsiClass customAutowireConfigurerClass = InfraUtils.findLibraryClass(module, AnnotationConstant.CUSTOM_AUTOWIRE_CONFIGURER_CLASS);
       if (customAutowireConfigurerClass == null) {
         return CachedValueProvider.Result.create(Collections.emptySet(), new Object[] { PsiModificationTracker.MODIFICATION_COUNT });
       }
       GlobalSearchScope moduleSearchScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
-      SpringModelSearchParameters.BeanClass searchParameters = SpringModelSearchParameters.byClass(customAutowireConfigurerClass).withInheritors();
+      ModelSearchParameters.BeanClass searchParameters = ModelSearchParameters.byClass(customAutowireConfigurerClass).withInheritors();
       JavaPsiFacade facade = JavaPsiFacade.getInstance(module.getProject());
       Set<PsiClass> types = new HashSet<>();
       PsiClass psiClass;
-      for (SpringModel model : SpringManager.getInstance(module.getProject()).getAllModels(module)) {
-        List<SpringBeanPointer<?>> beanPointers = SpringModelSearchers.findBeans(model, searchParameters);
-        for (SpringBeanPointer beanPointer : beanPointers) {
-          CommonSpringBean bean = beanPointer.getSpringBean();
-          SpringPropertyDefinition propertyDefinition = SpringPropertyUtils.findPropertyByName(bean, "customQualifierTypes");
-          if (propertyDefinition instanceof SpringProperty) {
-            for (String value : SpringPropertyUtils.getListOrSetValues((SpringProperty) propertyDefinition)) {
+      for (InfraModel model : InfraManager.from(module.getProject()).getAllModels(module)) {
+        List<BeanPointer<?>> beanPointers = InfraModelSearchers.findBeans(model, searchParameters);
+        for (BeanPointer beanPointer : beanPointers) {
+          CommonInfraBean bean = beanPointer.getBean();
+          InfraPropertyDefinition propertyDefinition = InfraPropertyUtils.findPropertyByName(bean, "customQualifierTypes");
+          if (propertyDefinition instanceof InfraProperty) {
+            for (String value : InfraPropertyUtils.getListOrSetValues((InfraProperty) propertyDefinition)) {
               if (!StringUtil.isEmptyOrSpaces(value)
                       && (psiClass = facade.findClass(value, moduleSearchScope)) != null && psiClass.isAnnotationType()) {
                 types.add(psiClass);

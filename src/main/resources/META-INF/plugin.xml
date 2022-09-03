@@ -26,37 +26,150 @@
   <id>cn.taketoday.assistant</id>
   <vendor email="taketoday@foxmail.com" url="https://taketoday.cn">Harry Yang</vendor>
 
+  <resource-bundle>messages.InfraBundle</resource-bundle>
+
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.java</depends>
   <depends>com.intellij.modules.lang</depends>
   <depends>org.jetbrains.plugins.yaml</depends>
   <depends>com.intellij.properties</depends>
+  <depends>org.jetbrains.plugins.yaml</depends>
+  <depends>com.intellij.microservices.jvm</depends>
 
   <!-- Optional dependency on another plugin.
      If the plugin with the "com.MySecondPlugin" ID is installed, the contents of mysecondplugin.xml
      (the format of this file conforms to the format of plugin.xml) will be loaded. -->
   <depends config-file="spel.xml" optional="true">com.intellij.spring</depends>
-  <depends config-file="spring.xml" optional="true">com.intellij.spring</depends>
+  <depends config-file="infra.xml" optional="true">com.intellij.spring</depends>
   <depends config-file="maven.xml" optional="true">org.jetbrains.idea.maven</depends>
   <depends config-file="lang-injections.xml" optional="true">org.intellij.intelliLang</depends>
   <depends config-file="inspections.xml" optional="true">org.intellij.intelliLang</depends>
+  <depends config-file="webmvc.xml" optional="true">com.intellij</depends>
+  <depends config-file="app.xml" optional="true">com.intellij</depends>
 
   <extensionPoints>
-    <extensionPoint name="componentScanImporter" dynamic="true"
-        interface="cn.taketoday.assistant.beans.stereotype.ComponentScanImporter" />
+    <!--@formatter:off-->
+    <extensionPoint name="infraModelProvider" interface="cn.taketoday.assistant.service.InfraModelProvider" dynamic="true" />
+    <extensionPoint name="configurator" interface="cn.taketoday.assistant.facet.InfraConfigurator" dynamic="true" />
+    <extensionPoint name="localModelProducer" interface="cn.taketoday.assistant.LocalModelProducer" dynamic="true" />
+    <extensionPoint name="componentScanImporter" interface="cn.taketoday.assistant.beans.stereotype.ComponentScanImporter" dynamic="true" />
+    <extensionPoint name="effective.types.provider" interface="cn.taketoday.assistant.model.BeanEffectiveTypeProvider" dynamic="true"/>
+    <extensionPoint name="factoryMethodTypeHandler" interface="cn.taketoday.assistant.factories.CustomFactoryMethodTypeHandler" dynamic="true"/>
+    <extensionPoint name="configSearcherScopeModifier" interface="cn.taketoday.assistant.facet.searchers.ConfigSearcherScopeModifier"  dynamic="true"/>
+    <extensionPoint name="customLocalComponentsDiscoverer" interface="cn.taketoday.assistant.model.custom.CustomLocalComponentsDiscoverer" dynamic="true" />
+    <extensionPoint name="customModuleComponentsDiscoverer" interface="cn.taketoday.assistant.model.custom.CustomModuleComponentsDiscoverer" dynamic="true" />
+    <extensionPoint name="testingAnnotationsProvider" interface="cn.taketoday.assistant.model.jam.testContexts.InfraTestingAnnotationsProvider" dynamic="true" />
+    <extensionPoint name="testingImplicitContextsProvider" interface="cn.taketoday.assistant.model.jam.testContexts.TestingImplicitContextsProvider" dynamic="true" />
+    <extensionPoint name="resourceTypeProvider" interface="cn.taketoday.assistant.model.values.converters.resources.InfraResourceTypeProvider" dynamic="true"/>
+    <extensionPoint name="inspectionsRegistryContributor" interface="cn.taketoday.assistant.InfraInspectionsRegistry$Contributor" dynamic="true"/>
+    <extensionPoint name="inspectionsRegistryAdditionalFilesContributor" interface="cn.taketoday.assistant.InfraInspectionsRegistry$AdditionalFilesContributor" dynamic="true"/>
+    <extensionPoint name="customBeanScope" interface="cn.taketoday.assistant.model.scope.InfraCustomBeanScope" dynamic="true"/>
+    <extensionPoint name="localAnnotationModelDependentModelsProvider" interface="cn.taketoday.assistant.context.model.LocalAnnotationModelDependentModelsProvider" dynamic="true"/>
+    <extensionPoint name="fileSetEditorCustomization" interface="cn.taketoday.assistant.facet.InfraFileSetEditorCustomization" dynamic="true"/>
+    <extensionPoint name="customNamespaces" interface="cn.taketoday.assistant.dom.InfraCustomNamespaces" dynamic="true"/>
+    <extensionPoint name="jam.customMetaImplementation" interface="cn.taketoday.assistant.model.jam.JamCustomImplementationBean" dynamic="true"/>
+    <extensionPoint name="componentScanExtender" interface="cn.taketoday.assistant.model.custom.ComponentScanExtender" dynamic="true"/>
+    <extensionPoint name="scriptBeanPsiClassDiscoverer" interface="cn.taketoday.assistant.model.scripts.ScriptBeanPsiClassDiscoverer" dynamic="true"/>
+    <extensionPoint name="customConverterProvider" interface="cn.taketoday.assistant.model.converters.CustomConverterRegistry$Provider" dynamic="true"/>
+    <extensionPoint name="valueConverter" interface="cn.taketoday.assistant.model.values.InfraValueConvertersProvider" dynamic="true"/>
+    <extensionPoint name="beanPointerPanelContent" interface="cn.taketoday.assistant.toolWindow.panels.InfraBeanPointerFinderRecursivePanel$BeanPointerPanelContent" dynamic="true" />
+    <extensionPoint name="conditionalEvaluatorProvider" interface="cn.taketoday.assistant.model.ConditionalEvaluatorProvider" dynamic="true"/>
+    <extensionPoint name="placeholderReferenceResolver" interface="cn.taketoday.assistant.model.values.InfraPlaceholderReferenceResolver" dynamic="true"/>
+    <extensionPoint name="modelConfigFileContributor" interface="cn.taketoday.assistant.app.InfraModelConfigFileContributor" dynamic="true"/>
+    <extensionPoint name="modelConfigFileNameContributor" interface="cn.taketoday.assistant.app.InfraModelConfigFileNameContributor" dynamic="true"/>
+    <extensionPoint name="replacementTokenResolver" interface="cn.taketoday.assistant.app.application.config.InfraReplacementTokenResolver" dynamic="true"/>
+    <extensionPoint name="customHintReferenceProvider" interface="cn.taketoday.assistant.app.application.config.hints.InfraCustomHintReferenceProvider" dynamic="true"/>
+    <extensionPoint name="configFileDetector" interface="cn.taketoday.assistant.model.config.InfraConfigFileDetector" dynamic="true"/>
+    <extensionPoint name="viewResolverFactory" interface="cn.taketoday.assistant.web.mvc.views.ViewResolverFactory" dynamic="true"/>
+    <extensionPoint name="mergingMvcRequestMappingLineMarkerProvider" interface="cn.taketoday.assistant.web.mvc.request.InfraMergingMvcRequestMappingLineMarkerProvider" dynamic="true"/>
+    <extensionPoint name="applicationPortProvider" interface="cn.taketoday.assistant.web.mvc.config.WebApplicationPortProvider" dynamic="true"/>
+    <extensionPoint name="applicationPathProvider" interface="cn.taketoday.assistant.web.mvc.config.WebApplicationPathProvider" dynamic="true"/>
+
+    <extensionPoint name="modelConditionalContributor" beanClass="cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionalContributorEP" dynamic="true" >
+      <with attribute="implementation" implements="cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionalContributor"/>
+    </extensionPoint>
+
+    <extensionPoint name="toolWindowContent" beanClass="cn.taketoday.assistant.toolWindow.InfraToolWindowContent" dynamic="true">
+      <with attribute="implementation" implements="cn.taketoday.assistant.toolWindow.InfraToolWindowContentProvider"/>
+    </extensionPoint>
+
+    <!--@formatter:on-->
 
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
-    <facetType implementation="cn.taketoday.assistant.facet.TodayFacetType" />
+    <facetType implementation="cn.taketoday.assistant.facet.InfraFacetType" />
     <library.type implementation="cn.taketoday.assistant.facet.InfraLibraryType" />
     <framework.type implementation="cn.taketoday.assistant.facet.TodayInfrastructureFrameworkType" />
-    <spellchecker.bundledDictionaryProvider implementation="cn.taketoday.assistant.InfraBundledDictionaryProvider" />
+    <frameworkSupport implementation="cn.taketoday.assistant.facet.InfraFrameworkSupportProvider" />
+    <framework.detector implementation="cn.taketoday.assistant.facet.InfraFrameworkDetector" />
+    <projectWizard.projectCategory implementation="cn.taketoday.assistant.facet.InfraProjectCategory" />
 
-    <applicationService serviceImplementation="cn.taketoday.assistant.service.InfraJamService" />
+    <spellchecker.bundledDictionaryProvider implementation="cn.taketoday.assistant.InfraBundledDictionaryProvider" />
+    <projectConfigurable id="infra" groupId="language" bundle="messages.InfraBundle" key="settings.displayName"
+        instance="cn.taketoday.assistant.settings.InfraConfigurable" />
+
+    <!--@formatter:off-->
+    <applicationService serviceImplementation="cn.taketoday.assistant.model.InfraBeanService" />
     <applicationService serviceImplementation="cn.taketoday.assistant.service.IconService" />
+    <applicationService serviceImplementation="cn.taketoday.assistant.service.InfraJamService" />
+    <applicationService serviceImplementation="cn.taketoday.assistant.LocalModelFactory" />
+    <applicationService serviceImplementation="cn.taketoday.assistant.facet.InfraFileSetService" />
     <applicationService serviceImplementation="cn.taketoday.assistant.service.ApplicationService" />
+    <applicationService serviceImplementation="cn.taketoday.assistant.profiles.InfraProfilesFactory" />
+    <applicationService serviceImplementation="cn.taketoday.assistant.factories.FactoryBeansManager" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.utils.InfraBeanUtils" serviceImplementation="cn.taketoday.assistant.model.utils.InfraBeanUtilsImpl" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.utils.resources.ResourcesUtil" serviceImplementation="cn.taketoday.assistant.model.utils.resources.ResourcesUtilImpl" />
+    <applicationService serviceInterface="cn.taketoday.assistant.InfraInspectionsRegistry" serviceImplementation="cn.taketoday.assistant.InfraInspectionsRegistryImpl" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.values.PlaceholderUtils" serviceImplementation="cn.taketoday.assistant.model.values.PlaceholderUtilsImpl" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.actions.patterns.frameworks.util.StandardBeansDocLinksManager" serviceImplementation="cn.taketoday.assistant.model.actions.patterns.frameworks.util.StandardBeansDocLinksManagerImpl" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.utils.InfraModelService" serviceImplementation="cn.taketoday.assistant.model.utils.InfraModelServiceImpl" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.jam.testContexts.InfraTestContextUtil" serviceImplementation="cn.taketoday.assistant.model.jam.testContexts.InfraTestContextUtilImpl" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.converters.fixes.bean.InfraBeanResolveQuickFixManager" serviceImplementation="cn.taketoday.assistant.model.converters.fixes.bean.InfraBeanResolveQuickFixManagerImpl" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.values.InfraValueConvertersRegistry" serviceImplementation="cn.taketoday.assistant.model.values.InfraValueConvertersRegistryImpl" />
+
+    <applicationService serviceInterface="cn.taketoday.assistant.model.actions.patterns.frameworks.FrameworkSupportTemplatesRunner" serviceImplementation="cn.taketoday.assistant.model.actions.patterns.frameworks.FrameworkSupportTemplatesRunnerImpl" />
+    <applicationService serviceImplementation="cn.taketoday.assistant.context.chooser.InfraMultipleContextsManager" />
+    <applicationService serviceInterface="cn.taketoday.assistant.model.utils.InfraConstructorArgUtils" serviceImplementation="cn.taketoday.assistant.model.highlighting.xml.InfraConstructorArgResolveUtil" />
+
+
+    <projectService serviceImplementation="cn.taketoday.assistant.InfraManager" />
     <projectService serviceImplementation="cn.taketoday.assistant.service.ProjectService" />
+    <projectService serviceImplementation="cn.taketoday.assistant.InfraModificationTrackersManager" />
+    <projectService serviceImplementation="cn.taketoday.assistant.toolWindow.InfraBeansViewSettings" />
+    <projectService serviceImplementation="cn.taketoday.assistant.model.xml.custom.CustomBeanRegistry"/>
+    <projectService serviceInterface="cn.taketoday.assistant.model.utils.PsiTypeUtil" serviceImplementation="cn.taketoday.assistant.model.utils.PsiTypeUtilImpl" />
+    <projectService serviceInterface="cn.taketoday.assistant.settings.InfraGeneralSettings" serviceImplementation="cn.taketoday.assistant.settings.InfraGeneralSettingsImpl"/>
+    <projectService serviceImplementation="cn.taketoday.assistant.facet.InfraConfigurationTabSettings"/>
+
+    <!-- settings -->
+
+    <moduleService serviceImplementation="cn.taketoday.assistant.beans.stereotype.InfraJamModel"/>
+
+    <externalProjectDataService implementation="cn.taketoday.assistant.facet.InfraExternalSystemDataService" />
+
+    <postStartupActivity implementation="cn.taketoday.assistant.facet.validation.InfraConfigurationCheckStartupActivity" />
+    <!--@formatter:on-->
+    <xml.schemaProvider implementation="cn.taketoday.assistant.schemas.InfraSchemaProvider" />
+
+    <lang.documentationProvider language="XML" implementationClass="cn.taketoday.assistant.editor.InfraBeanDocumentationProvider"
+        id="infraXml" order="before dom" />
+    <documentationProvider id="infraBean" implementation="cn.taketoday.assistant.editor.InfraBeanDocumentationProvider" />
+
+    <stacktrace.fold substring="at cn.taketoday.web.filter." />
+    <stacktrace.fold substring="at cn.taketoday.web.method." />
+    <stacktrace.fold substring="at cn.taketoday.web.servlet." />
+
+    <consoleFilterProvider implementation="cn.taketoday.assistant.run.InfraConsoleFilterProvider" />
+
+    <implicitUsageProvider order="last" implementation="cn.taketoday.assistant.code.InfraImplicitUsageProvider" />
+
+    <completion.contributor language="any"
+        implementationClass="cn.taketoday.assistant.model.values.PlaceholderPropertyCompletionContributor"
+        id="placeholderPropertiesCompletion" order="before javaClassReference" />
+
+    <lang.foldingBuilder language="XML" implementationClass="cn.taketoday.assistant.folding.XmlPropertyPlaceholderFoldingBuilder" />
+    <lang.foldingBuilder language="UAST" implementationClass="cn.taketoday.assistant.folding.CodePropertyPlaceholderFoldingBuilder" />
 
     <!-- today-strategies.properties -->
     <fileType name="today-strategies.properties" fieldName="FILE_TYPE"
@@ -75,6 +188,7 @@
 
     <moduleService serviceImplementation="cn.taketoday.assistant.core.StrategiesManager" />
     <fileBasedIndex implementation="cn.taketoday.assistant.core.StrategiesFileIndex" />
+    <fileBasedIndex implementation="cn.taketoday.assistant.index.InfraXmlBeansIndex" />
 
     <!--@formatter:off-->
     <problemFileHighlightFilter implementation="cn.taketoday.assistant.code.ProblemFileHighlightFilter"/>
@@ -88,20 +202,248 @@
     <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.code.TestConfigurationAnnotator" />
     <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.core.StrategiesRegistrationAnnotator" />
 
-<!--    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="com.intellij.spring.gutter.SpringClassFilesetLineMarkerProvider" />-->
-<!--    <codeInsight.lineMarkerProvider language="XML" order="last"  implementationClass="com.intellij.spring.gutter.SpringDomAnnotator" />-->
-    <!--@formatter:on-->
+<!--    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.gutter.SpringClassFilesetLineMarkerProvider" />-->
+<!--    <codeInsight.lineMarkerProvider language="XML" order="last"  implementationClass="cn.taketoday.assistant.gutter.SpringDomAnnotator" />-->
 
     <semContributor implementation="cn.taketoday.assistant.code.cache.jam.CacheableSemContributor" />
     <semContributor implementation="cn.taketoday.assistant.beans.InfraSemContributor" />
 
     <dependencySupport coordinate="cn.taketoday:today-core" kind="java" displayName="Today Infrastructure" />
 
+    <xmlStructureViewElementProvider implementation="cn.taketoday.assistant.model.structure.InfraStructureViewElementProvider" />
+    <xmlStructureViewBuilderProvider implementation="cn.taketoday.assistant.model.structure.InfraXmlStructureViewBuilderProvider" />
+    <fileStructureGroupRuleProvider implementation="cn.taketoday.assistant.usages.InfraBeanGroupRuleProvider" />
+
+    <gotoSymbolContributor implementation="cn.taketoday.assistant.navigation.GotoInfraBeanProvider" />
+    <gotoRelatedProvider implementation="cn.taketoday.assistant.navigation.InfraGotoRelatedProvider" />
+    <gotoRelatedProvider implementation="cn.taketoday.assistant.navigation.InfraModelRelatedFileProvider" />
+
+    <psi.referenceContributor language="XML" implementation="cn.taketoday.assistant.references.InfraXmlReferenceContributor" />
+    <psi.referenceContributor language="UAST" implementation="cn.taketoday.assistant.references.InfraUastReferenceContributor" />
+    <psi.referenceContributor language="UAST" implementation="cn.taketoday.assistant.profiles.InfraProfilesReferenceContributor" />
+    <psi.referenceContributor language="JAVA" implementation="cn.taketoday.assistant.references.InfraAnnotationReferenceContributor" />
+
+    <referenceInjector implementation="cn.taketoday.assistant.references.injector.ResourceReferenceInjector" />
+    <referenceInjector implementation="cn.taketoday.assistant.references.injector.InfraBeanReferenceInjector" />
+    <referenceInjector implementation="cn.taketoday.assistant.references.injector.InfraPlaceholderReferenceInjector" />
+    <refactoring.moveHandler implementation="cn.taketoday.assistant.refactoring.InfraBeanMoveHandler" />
+    <refactoring.inlineHandler language="XML" implementationClass="cn.taketoday.assistant.refactoring.InfraInlineHandler" />
+
+    <useScopeEnlarger implementation="cn.taketoday.assistant.references.InfraBeansScopeEnlarger" />
+
+    <compiler.inspectionValidator implementation="cn.taketoday.assistant.model.highlighting.InfraValidator" />
+    <problemFileHighlightFilter implementation="cn.taketoday.assistant.InfraProblemFileHighlightFilter" />
+    <elementDescriptionProvider implementation="cn.taketoday.assistant.model.jam.javaConfig.InfraPomTargetDescriptionProvider" />
+
+    <completion.contributor language="XML" implementationClass="cn.taketoday.assistant.model.converters.InfraCompletionContributor"
+        order="first, before dom" />
+
+    <findUsagesHandlerFactory implementation="cn.taketoday.assistant.InfraFindUsagesHandlerFactory" />
+
+    <xml.implicitNamespaceDescriptorProvider
+        implementation="cn.taketoday.assistant.dom.namespaces.InfraBeanNamespacesImplicitDescriptorProvider" />
+    <xml.undefinedElementFixProvider implementation="cn.taketoday.assistant.dom.namespaces.PNamespaceUndefinedElementFixProvider" />
+
+    <nameSuggestionProvider implementation="cn.taketoday.assistant.InfraBeanNameSuggestionProvider" order="first" />
+    <renameInputValidator implementation="cn.taketoday.assistant.refactoring.InfraBeanRenameInputValidator" order="first" />
+
+    <multiHostInjector implementation="cn.taketoday.assistant.injection.InfraContextSchemaInjector" />
+
+    <aliasingPsiTargetMapper implementation="cn.taketoday.assistant.model.jam.stereotype.StereotypeAliasingPsiTargetMapper" />
+    <fileTemplateGroup implementation="cn.taketoday.assistant.InfraBeansTemplatesFactory" />
+
+    <editorNotificationProvider id="infraMultipleContexts" implementation="cn.taketoday.assistant.context.chooser.InfraMultipleContextsEditorNotification" />
+    <editorNotificationProvider id="infraProfiles" implementation="cn.taketoday.assistant.profiles.InfraProfilesEditorNotificationsProvider" order="after springMultipleContexts" />
+
+    <!-- spring.handlers/spring.schemas files -->
+    <fileType name="Properties" fileNames="spring.handlers;spring.schemas" />
+    <psi.referenceContributor language="Properties" implementation="cn.taketoday.assistant.model.xml.custom.registration.InfraSchemasReferenceContributor" />
+    <properties.alphaUnsortedInspectionSuppressor implementation="cn.taketoday.assistant.model.xml.custom.registration.InfraHandlersSchemasPropertiesFileInspectionSuppressor" />
+    <properties.implicitPropertyUsageProvider implementation="cn.taketoday.assistant.model.xml.custom.registration.InfraHandlersSchemasImplicitPropertyUsageProvider" />
+
+    <!--suppress PluginXmlValidity -->
+    <dom.fileMetaData implementation="cn.taketoday.assistant.dom.InfraDomFileDescription" rootTagName="beans" />
+
+    <library.toolWindow librarySearchClass="cn.taketoday.assistant.toolWindow.InfraLibrarySearcher"
+        id="Infra" anchor="bottom" icon="cn.taketoday.assistant.Icons.ToolWindowTab"
+        factoryClass="cn.taketoday.assistant.toolWindow.InfraToolWindowFactory" />
+
+    <selectInTarget implementation="cn.taketoday.assistant.toolWindow.InfraBeansViewSelectInTarget" />
+
+    <codeInsight.implicitSubclassProvider implementation="cn.taketoday.assistant.model.highlighting.providers.InfraImplicitSubclassProvider" />
+
+    <cantBeStatic implementation="cn.taketoday.assistant.model.highlighting.jam.InfraCoreCantBeStaticExtension" />
+
+    <dom.extender domClass="cn.taketoday.assistant.model.xml.beans.Beans" extenderClass="cn.taketoday.assistant.dom.InfraDefaultDomExtender$BeansExtender" />
+    <dom.extender domClass="cn.taketoday.assistant.model.xml.beans.ListOrSet" extenderClass="cn.taketoday.assistant.dom.InfraDefaultDomExtender$ListOrSetExtender" />
+    <dom.extender domClass="cn.taketoday.assistant.model.xml.beans.InfraBean" extenderClass="cn.taketoday.assistant.dom.InfraXNamespaceDomExtender$P" />
+    <dom.extender domClass="cn.taketoday.assistant.model.xml.beans.InfraBean" extenderClass="cn.taketoday.assistant.dom.InfraXNamespaceDomExtender$C" />
+    <dom.extender domClass="cn.taketoday.assistant.model.xml.CustomBeanWrapper" extenderClass="cn.taketoday.assistant.dom.InfraToolDomExtender" />
+    <dom.extender domClass="cn.taketoday.assistant.model.xml.beans.InfraElementsHolder" extenderClass="cn.taketoday.assistant.dom.InfraDefaultDomExtender$InfraElementsHolderExtender" />
+
+    <vetoRenameCondition implementation="cn.taketoday.assistant.model.xml.DomInfraBeanRenameVetoCondition" />
+
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.Beans" implementationClass="com.intellij.jam.model.common.BaseRootImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.InfraBean" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.InfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.InfraProperty" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.InfraPropertyImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.ConstructorArg" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.ConstructorArgImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.ReplacedMethod" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.ReplacedMethodImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.InfraValue" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.InfraValueImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.InfraEntry" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.InfraEntryImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.InfraKey" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.InfraKeyImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.ListOrSet" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.ListOrSetImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.MetadataValue" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.MetadataValueImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.TypedBeanPointerAttribute" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.TypedBeanPointerAttributeImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.InfraDomQualifier" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.InfraDomQualifierImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.InfraDomAttribute" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.InfraDomAttributeImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.util.UtilProperties" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.util.UtilList" implementationClass="cn.taketoday.assistant.model.xml.util.impl.UtilListImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.util.UtilMap" implementationClass="cn.taketoday.assistant.model.xml.util.impl.UtilMapImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.util.UtilMap" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.util.UtilSet" implementationClass="cn.taketoday.assistant.model.xml.util.impl.UtilSetImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.util.InfraConstant" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.util.PropertyPath" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.PropertyPlaceholder" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.PropertyOverride" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.ComponentScan" implementationClass="cn.taketoday.assistant.model.xml.context.impl.ComponentScanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.LoadTimeWeaver" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.Filter" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.AnnotationConfig" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.InfraConfigured" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.MbeanServer" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.context.MbeanExport" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.jee.JndiLookup" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.jee.RemoteSlsb" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.jee.LocalSlsb" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.PNamespaceValue" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.PNamespaceValueImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.PNamespaceRefValue" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.PNamespaceRefValueImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.CNamespaceValue" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.CNamespaceValueImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.beans.CNamespaceRefValue" implementationClass="cn.taketoday.assistant.model.xml.beans.impl.CNamespaceRefValueImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.CustomBeanWrapper" implementationClass="cn.taketoday.assistant.model.xml.impl.CustomBeanWrapperImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.lang.LangBean" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.task.Executor" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.task.Scheduler" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.jdbc.EmbeddedDatabase" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.cache.Advice" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.cache.AnnotationDriven" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.lang.Defaults" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.tx.Advice" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+    <dom.implementation interfaceClass="cn.taketoday.assistant.model.xml.tx.JtaTransactionManager" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl" />
+
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.AliasNameConverter" implementationClass="cn.taketoday.assistant.model.converters.AliasNameConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.BeanPropertyConverter" implementationClass="cn.taketoday.assistant.model.converters.BeanPropertyConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.ConstructorArgIndexConverter" implementationClass="cn.taketoday.assistant.model.converters.ConstructorArgIndexConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.ConstructorArgNameConverter" implementationClass="cn.taketoday.assistant.model.converters.ConstructorArgNameConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.values.converters.FieldRetrievingFactoryBeanConverter" implementationClass="cn.taketoday.assistant.model.values.converters.FieldRetrievingFactoryBeanConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.KeyInfraBeanResolveConverter" implementationClass="cn.taketoday.assistant.model.converters.KeyInfraBeanResolveConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.ParentRefConverter" implementationClass="cn.taketoday.assistant.model.converters.ParentRefConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.PsiClassListConverter" implementationClass="cn.taketoday.assistant.model.converters.PsiClassListConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.PropertyLocalInfraBeanResolveConverter" implementationClass="cn.taketoday.assistant.model.converters.PropertyLocalInfraBeanResolveConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.values.PropertyValueConverter" implementationClass="cn.taketoday.assistant.model.values.PropertyValueConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraBeanClassConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraBeanClassConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraBeanDestroyMethodConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraBeanDestroyMethodConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraBeanFactoryMethodConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraBeanFactoryMethodConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.BeanIdConverter" implementationClass="cn.taketoday.assistant.model.converters.BeanIdConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraBeanInitMethodConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraBeanInitMethodConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraBeanLookupMethodConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraBeanLookupMethodConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraBeanNamesConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraBeanNamesConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraBeanReplacedMethodConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraBeanReplacedMethodConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraBeanScopeConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraBeanScopeConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraDefaultInitDestroyRefConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraDefaultInitDestroyRefConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraImportResourceConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraImportResourceConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraProfileConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraProfileConverterImpl" />
+    <dom.converter interfaceClass="cn.taketoday.assistant.model.converters.InfraProfilesDomConverter" implementationClass="cn.taketoday.assistant.model.converters.InfraProfilesDomConverterImpl" />
+
+    <!--@formatter:on-->
+
+    <registryKey key="infra.use.uast.modification.tracker" defaultValue="true"
+        description="Enables Uast based modification tracker which is more precise for Kotlin" />
+    <registryKey key="infra.urlpath.completion.smart" defaultValue="true"
+        description="Enables modules ordering based on statistics for UrlPath reference completion in Spring" />
+
+    <renameHandler implementation="cn.taketoday.assistant.model.properties.InfraPropertyRenameHandler" />
+    <renameHandler implementation="cn.taketoday.assistant.model.xml.custom.InfraCustomBeanRenameHandler" />
+
+    <!--
+    Action
+    -->
+
+    <intentionAction>
+      <className>cn.taketoday.assistant.model.intentions.HardCodedStringToPlaceholderMoveIntention</className>
+      <categoryKey>infra.intention.category</categoryKey>
+    </intentionAction>
+
+    <intentionAction>
+      <className>cn.taketoday.assistant.refactoring.InfraIntroduceBeanIntention</className>
+      <categoryKey>infra.intention.category</categoryKey>
+    </intentionAction>
+
+    <intentionAction>
+      <className>cn.taketoday.assistant.refactoring.InfraUpdateSchemaIntention</className>
+      <categoryKey>infra.intention.category</categoryKey>
+    </intentionAction>
+
+    <intentionAction>
+      <className>cn.taketoday.assistant.model.xml.custom.ParseCustomBeanIntention</className>
+      <categoryKey>infra.intention.category</categoryKey>
+    </intentionAction>
+
+    <intentionAction>
+      <className>cn.taketoday.assistant.refactoring.UsePNamespaceIntention</className>
+      <categoryKey>infra.intention.category</categoryKey>
+    </intentionAction>
+
   </extensions>
+
 
   <applicationListeners>
     <listener class="cn.taketoday.assistant.listener.PluginProjectManagerListener"
         topic="com.intellij.openapi.project.ProjectManagerListener" />
   </applicationListeners>
+
+
+  <actions>
+    <group id="InfraGenerateGroup">
+      <action id="Infra.Beans.Generate.Action" class="cn.taketoday.assistant.model.actions.GenerateDomElementActionGroup" />
+      <separator />
+      <add-to-group anchor="first" group-id="GenerateGroup" />
+    </group>
+
+    <action id="Infra.Beans.Generate.Setter.Dependency.Action"
+        class="cn.taketoday.assistant.model.actions.GenerateBeanSetterDependencyAction">
+      <add-to-group anchor="last" group-id="GenerateGroup" />
+    </action>
+
+    <action id="Infra.Beans.Generate.Constructor.Dependency.Action"
+        class="cn.taketoday.assistant.model.actions.GenerateBeanConstructorDependencyAction">
+      <add-to-group anchor="last" group-id="GenerateGroup" />
+    </action>
+
+    <action id="Infra.Beans.Generate.Testing.Dependency.Action"
+        class="cn.taketoday.assistant.model.actions.GenerateAutowiredDependencyAction">
+      <add-to-group anchor="last" group-id="GenerateGroup" />
+    </action>
+
+
+    <action id="Infra.Create.Context.File" class="cn.taketoday.assistant.model.actions.create.CreateInfraConfigAction">
+      <add-to-group anchor="last" group-id="NewXmlDescriptor" />
+    </action>
+
+    <action id="InfraChangeActiveProfiles"
+        class="cn.taketoday.assistant.profiles.ChangeActiveProfilesAction"
+        icon="cn.taketoday.assistant.Icons.SpringProfile">
+    </action>
+
+    <action id="InfraConfigurationCheckAction"
+        class="cn.taketoday.assistant.facet.validation.InfraConfigurationCheckAction" />
+
+    <group id="Internal.Infra" popup="true" compact="true">
+      <action id="DumpInfraConfiguration" class="cn.taketoday.assistant.model.actions.DumpInfraConfigurationAction"
+          icon="cn.taketoday.assistant.Icons.Today">
+      </action>
+      <add-to-group group-id="Internal" anchor="last" />
+    </group>
+
+  </actions>
 
 </idea-plugin>

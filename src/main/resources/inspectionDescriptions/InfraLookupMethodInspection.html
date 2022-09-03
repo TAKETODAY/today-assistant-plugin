@@ -1,0 +1,16 @@
+<html>
+<body>
+<p>Reports incorrect method references in the <code>factory-method</code> attribute of the  <code>&lt;bean&gt;</code> element.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+public class MyFactory {
+public static FooBean createBean() {}
+}
+&lt;beans&gt;
+  &lt;bean class="MyFactory" id="factory"/&gt;
+  &lt;bean factory-bean="factory" factory-method="createBean"/&gt; // Factory method 'createBean' must not be static
+&lt;/beans&gt;
+</code></pre>
+</body>
+</html>

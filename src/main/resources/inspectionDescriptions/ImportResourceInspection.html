@@ -1,0 +1,14 @@
+<html>
+<body>
+<p>Reports unresolved files and directories in <code>locations</code> attributes
+of <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/ImportResource.html">@ImportResource</a> annotations
+and the corresponding aliased attributes of the <code>@ImportResource</code> meta annotations.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  @Configuration
+  @ImportResource(locations = "classpath:META-INF/unknown-context.xml") // reports "Cannot resolve file 'unknown-context.xml'"
+  public class MyConfiguration {...}
+</code></pre>
+</body>
+</html>

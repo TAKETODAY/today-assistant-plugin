@@ -25,7 +25,8 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PackageScope;
-import com.intellij.spring.facet.searchers.ConfigSearcherScopeModifier;
+
+import cn.taketoday.assistant.facet.searchers.ConfigSearcherScopeModifier;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

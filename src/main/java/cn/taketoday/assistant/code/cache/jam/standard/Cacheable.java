@@ -71,7 +71,7 @@ public class Cacheable<T extends PsiMember & PsiNamedElement> extends JamBaseCac
   }
 
   public static void addElements(JamService service, GlobalSearchScope scope, Collection<CacheableElement> result) {
-    result.addAll(service.getJamMethodElements(Cacheable.CACHEABLE_JAM_KEY, CacheableConstant.CACHEABLE, scope));
+    result.addAll(service.getJamMethodElements(CACHEABLE_JAM_KEY, CacheableConstant.CACHEABLE, scope));
     result.addAll(service.getJamClassElements(CACHEABLE_JAM_KEY, CacheableConstant.CACHEABLE, scope));
   }
 
@@ -98,13 +98,11 @@ public class Cacheable<T extends PsiMember & PsiNamedElement> extends JamBaseCac
     public ForClass(PsiClass aClass) {
       super(aClass);
       this.myRef = null;
-      System.out.println("ForClass aClass," + aClass);
     }
 
     public ForClass(PsiAnnotation annotation) {
       super(PsiTreeUtil.getParentOfType(annotation, PsiClass.class, true));
       this.myRef = PsiElementRef.real(annotation);
-      System.out.println("ForClass annotation," + annotation);
     }
 
     @Override

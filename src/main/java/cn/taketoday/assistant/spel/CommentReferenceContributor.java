@@ -57,7 +57,7 @@ final class CommentReferenceContributor extends PsiReferenceContributor {
                       int startInElement = startOffset + start;
                       int endInElement = startOffset + end;
                       String varDeclaration = text.substring(startInElement, endInElement);
-                      int indexOf = varDeclaration.indexOf(":");
+                      int indexOf = varDeclaration.indexOf(':');
                       if (indexOf > 0 && varDeclaration.length() > indexOf + 1) {
                         String type = varDeclaration.substring(indexOf + 1);
                         PsiReference[] references = (new JavaClassReferenceProvider()).getReferencesByString(type, element, startInElement + indexOf + 1);

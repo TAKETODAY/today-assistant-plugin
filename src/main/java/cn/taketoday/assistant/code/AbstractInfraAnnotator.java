@@ -28,8 +28,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.NotNullLazyValue;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.settings.SpringGeneralSettings;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -46,8 +44,10 @@ import javax.swing.Icon;
 
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.gutter.BeansPsiElementCellRenderer;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.settings.InfraGeneralSettings;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -100,8 +100,8 @@ public class AbstractInfraAnnotator extends RelatedItemLineMarkerProvider {
   }
 
   private static boolean hasFacetsOrAutoConfigurationMode(PsiElement psiElement) {
-    return CommonUtils.hasFacets(psiElement.getProject())
-            || SpringGeneralSettings.getInstance(psiElement.getProject()).isAllowAutoConfigurationMode();
+    return InfraUtils.hasFacets(psiElement.getProject())
+            || InfraGeneralSettings.from(psiElement.getProject()).isAllowAutoConfigurationMode();
   }
 
   protected static void addJavaBeanGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier,
@@ -115,7 +115,7 @@ public class AbstractInfraAnnotator extends RelatedItemLineMarkerProvider {
     builder.setTargets(targets)
             .setEmptyPopupText(InfraBundle.message("gutter.navigate.no.matching.beans"))
             .setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
-            .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
+            .setCellRenderer(BeansPsiElementCellRenderer::new)
             .setTooltipText(InfraBundle.message("bean.class.tooltip.navigate.declaration"));
     result.add(builder.createGroupLineMarkerInfo(psiIdentifier));
   }

@@ -1,0 +1,134 @@
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+
+<!-- todo increment cn.taketoday.assistant.factories.FactoryBeansManager.BUNDLED_FACTORIES_VERSION when changing this file -->
+<root>
+  <factories>
+    <!-- @formatter:off-->
+    <!-- factories with known objectType -->
+    <factoryBean factory="cn.taketoday.beans.factory.config.ResourceFactoryBean" objectType="cn.taketoday.core.io.Resource"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.ListFactoryBean" objectType="java.util.List"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.PropertiesFactoryBean" objectType="java.util.Properties"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.MapFactoryBean" objectType="java.util.Map"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.SetFactoryBean" objectType="java.util.Set"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.ProviderCreatingFactoryBean" objectType="javax.inject.Provider"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.YamlMapFactoryBean" objectType="java.util.Map&lt;java.lang.String,java.lang.Object&gt;"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.YamlPropertiesFactoryBean" objectType="java.util.Properties"/>
+
+    <factoryBean factory="cn.taketoday.cache.ehcache.EhCacheFactoryBean" objectType="net.sf.ehcache.Ehcache;net.sf.ehcache.Cache"/>
+    <factoryBean factory="cn.taketoday.cache.ehcache.EhCacheManagerFactoryBean" objectType="net.sf.ehcache.CacheManager"/>
+    <factoryBean factory="cn.taketoday.cache.jcache.JCacheManagerFactoryBean" objectType="javax.cache.CacheManager"/>
+
+    <factoryBean factory="cn.taketoday.context.support.ConversionServiceFactoryBean" objectType="cn.taketoday.core.convert.ConversionService"/>
+
+    <factoryBean factory="cn.taketoday.format.datetime.joda.DateTimeFormatterFactoryBean" objectType="org.joda.time.format.DateTimeFormatter"/>
+    <factoryBean factory="cn.taketoday.format.datetime.standard.DateTimeFormatterFactoryBean" objectType="java.time.format.DateTimeFormatter"/>
+    <factoryBean factory="cn.taketoday.format.support.FormattingConversionServiceFactoryBean" objectType="cn.taketoday.format.support.FormattingConversionService"/>
+
+    <factoryBean factory="cn.taketoday.jdbc.datasource.embedded.EmbeddedDatabaseFactoryBean" objectType="javax.sql.DataSource"/>
+    <factoryBean factory="cn.taketoday.jdbc.config.SortedResourcesFactoryBean" objectType="cn.taketoday.core.io.Resource[]"/>
+
+    <factoryBean factory="cn.taketoday.jmx.support.ConnectorServerFactoryBean" objectType="javax.management.remote.JMXConnectorServer"/>
+    <factoryBean factory="cn.taketoday.jmx.support.MBeanServerConnectionFactoryBean" objectType="javax.management.MBeanServerConnection"/>
+    <factoryBean factory="cn.taketoday.jmx.support.MBeanServerFactoryBean" objectType="javax.management.MBeanServer"/>
+    <factoryBean factory="cn.taketoday.jmx.support.WebLogicJndiMBeanServerFactoryBean" objectType="javax.management.MBeanServer"/>
+    <factoryBean factory="cn.taketoday.jmx.support.WebLogicMBeanServerFactoryBean" objectType="javax.management.MBeanServer"/>
+
+    <factoryBean factory="cn.taketoday.orm.hibernate5.LocalSessionFactoryBean" objectType="org.hibernate.SessionFactory"/>
+
+    <factoryBean factory="cn.taketoday.orm.ibatis.SqlMapClientFactoryBean" objectType="com.ibatis.sqlmap.client.SqlMapClient"/>
+    <factoryBean factory="cn.taketoday.orm.jdo.LocalPersistenceManagerFactoryBean" objectType="javax.jdo.PersistenceManagerFactory"/>
+    <factoryBean factory="cn.taketoday.orm.jdo.TransactionAwarePersistenceManagerFactoryProxy" objectType="javax.jdo.PersistenceManagerFactory"/>
+    <factoryBean factory="cn.taketoday.orm.jdo.support.SpringPersistenceManagerProxyBean" objectType="javax.jdo.PersistenceManager"/>
+    <factoryBean factory="cn.taketoday.orm.jdo.support.StandardPersistenceManagerProxyBean" objectType="javax.jdo.PersistenceManager"/>
+    <factoryBean factory="cn.taketoday.orm.jpa.support.SharedEntityManagerBean" objectType="javax.persistence.EntityManager"/>
+    <factoryBean factory="cn.taketoday.orm.jpa.AbstractEntityManagerFactoryBean" objectType="javax.persistence.EntityManagerFactory;javax.persistence.EntityManager"/>
+    <factoryBean factory="cn.taketoday.orm.jpa.LocalContainerEntityManagerFactoryBean" objectType="javax.persistence.EntityManagerFactory;javax.persistence.EntityManager"/>
+    <factoryBean factory="cn.taketoday.orm.jpa.LocalEntityManagerFactoryBean" objectType="javax.persistence.EntityManagerFactory;javax.persistence.EntityManager"/>
+    <factoryBean factory="cn.taketoday.orm.jpa.vendor.HibernateJpaSessionFactoryBean" objectType="org.hibernate.SessionFactory"/>
+    <factoryBean factory="cn.taketoday.orm.toplink.LocalSessionFactoryBean" objectType="cn.taketoday.orm.toplink.SessionFactory"/>
+
+    <factoryBean factory="cn.taketoday.oxm.xmlbeans.XmlOptionsFactoryBean" objectType="org.apache.xmlbeans.XmlOptions"/>
+
+    <factoryBean factory="cn.taketoday.remoting.jaxrpc.LocalJaxRpcServiceFactoryBean" objectType="javax.xml.rpc.Service"/>
+    <factoryBean factory="cn.taketoday.remoting.rmi.RmiRegistryFactoryBean" objectType="java.rmi.registry.Registry"/>
+    <factoryBean factory="cn.taketoday.remoting.support.SimpleHttpServerFactoryBean" objectType="com.sun.net.httpserver.HttpServer"/>
+
+    <factoryBean factory="cn.taketoday.scheduling.backportconcurrent.ScheduledExecutorFactoryBean" objectType="edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService"/>
+    <factoryBean factory="cn.taketoday.scheduling.quartz.CronTriggerFactoryBean" objectType="org.quartz.CronTrigger"/>
+    <factoryBean factory="cn.taketoday.scheduling.quartz.SchedulerFactoryBean" objectType="org.quartz.Scheduler;org.quartz.impl.StdScheduler"/>
+    <factoryBean factory="cn.taketoday.scheduling.quartz.JobDetailFactoryBean" objectType="org.quartz.JobDetail"/>
+    <factoryBean factory="cn.taketoday.scheduling.quartz.SimpleTriggerFactoryBean" objectType="org.quartz.SimpleTrigger"/>
+    <factoryBean factory="cn.taketoday.scheduling.concurrent.ForkJoinPoolFactoryBean" objectType="java.util.concurrent.ForkJoinPool"/>
+    <factoryBean factory="cn.taketoday.scheduling.concurrent.ScheduledExecutorFactoryBean" objectType="java.util.concurrent.ScheduledExecutorService"/>
+    <factoryBean factory="cn.taketoday.scheduling.concurrent.ThreadPoolExecutorFactoryBean" objectType="java.util.concurrent.ExecutorService"/>
+    <factoryBean factory="cn.taketoday.scheduling.config.TaskExecutorFactoryBean" objectType="cn.taketoday.core.task.TaskExecutor"/>
+    <factoryBean factory="cn.taketoday.scheduling.commonj.TimerManagerFactoryBean" objectType="commonj.timers.TimerManager"/>
+
+    <factoryBean factory="cn.taketoday.transaction.jta.JotmFactoryBean" objectType="org.objectweb.jotm.Current"/>
+    <factoryBean factory="cn.taketoday.transaction.jta.WebLogicServerTransactionManagerFactoryBean" objectType="javax.transaction.TransactionManager"/>
+    <factoryBean factory="cn.taketoday.transaction.jta.WebSphereTransactionManagerFactoryBean" objectType="javax.transaction.TransactionManager"/>
+
+    <factoryBean factory="cn.taketoday.ui.freemarker.FreeMarkerConfigurationFactoryBean" objectType="freemarker.template.Configuration"/>
+    <factoryBean factory="cn.taketoday.ui.velocity.VelocityEngineFactoryBean" objectType="org.apache.velocity.app.VelocityEngine"/>
+
+    <factoryBean factory="cn.taketoday.web.context.support.ServletContextFactoryBean" objectType="javax.servlet.ServletContext"/>
+    <factoryBean factory="cn.taketoday.web.servlet.view.velocity.VelocityConfigurer" objectType="org.apache.velocity.app.VelocityEngine"/>
+
+     <!-- object type resolved from properties of FactoryBean(in order of evaluation) -->
+    <factoryBean factory="cn.taketoday.beans.factory.config.ServiceLocatorFactoryBean" propertyNames="serviceLocatorInterface"/>
+    <factoryBean factory="cn.taketoday.beans.factory.serviceloader.ServiceFactoryBean" propertyNames="serviceType"/>
+    <factoryBean factory="cn.taketoday.beans.factory.serviceloader.ServiceListFactoryBean" propertyNames="serviceType"/>
+    <factoryBean factory="cn.taketoday.jms.remoting.JmsInvokerProxyFactoryBean" propertyNames="proxyInterface"/>
+    <factoryBean factory="cn.taketoday.jmx.access.MBeanProxyFactoryBean" propertyNames="proxyInterface"/>
+    <factoryBean factory="cn.taketoday.remoting.caucho.BurlapProxyFactoryBean" propertyNames="serviceInterface"/>
+    <factoryBean factory="cn.taketoday.remoting.caucho.HessianProxyFactoryBean" propertyNames="serviceInterface"/>
+    <factoryBean factory="cn.taketoday.remoting.httpinvoker.HttpInvokerProxyFactoryBean" propertyNames="serviceInterface"/>
+    <factoryBean factory="cn.taketoday.remoting.jaxrpc.JaxRpcPortProxyFactoryBean" propertyNames="serviceInterface"/>
+    <factoryBean factory="cn.taketoday.remoting.rmi.JndiRmiProxyFactoryBean" propertyNames="serviceInterface"/>
+    <factoryBean factory="cn.taketoday.remoting.rmi.RmiProxyFactoryBean" propertyNames="serviceInterface"/>
+    <factoryBean factory="cn.taketoday.remoting.jaxws.JaxWsPortProxyFactoryBean" propertyNames="serviceInterface"/>
+
+    <!-- type is (or could be) resolved by a custom ObjectTypeResolver -->
+    <factoryBean factory="cn.taketoday.aop.framework.ProxyFactoryBean" resolver="ProxyFactoryBeanTypeResolver"/>
+    <factoryBean factory="cn.taketoday.aop.scope.ScopedProxyFactoryBean" resolver="ScopedProxyFactoryBeanTypeResolver"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.BeanReferenceFactoryBean" resolver="BeanReferenceFactoryBeanTypeResolver"/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.MethodInvokingFactoryBean" objectType=""/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.PropertyPathFactoryBean" objectType=""/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.FieldRetrievingFactoryBean" objectType=""/>
+    <factoryBean factory="cn.taketoday.transaction.interceptor.TransactionProxyFactoryBean" resolver="TransactionProxyFactoryBeanTypeResolver"/>
+    <factoryBean factory="cn.taketoday.jndi.JndiObjectFactoryBean" resolver="JndiObjectFactoryBeanTypeResolver"/>
+    <factoryBean factory="cn.taketoday.ejb.access.LocalStatelessSessionProxyFactoryBean" objectType="" resolver="SpringEjbTypeResolver"/>
+    <factoryBean factory="cn.taketoday.ejb.access.SimpleRemoteStatelessSessionProxyFactoryBean" objectType="" resolver="SpringEjbTypeResolver"/>
+
+    <!-- type can not be resolved or has no meaning. listed for completeness -->
+    <factoryBean factory="cn.taketoday.aop.framework.AbstractSingletonProxyFactoryBean" objectType=""/>
+    <factoryBean factory="cn.taketoday.beans.factory.config.AbstractFactoryBean" objectType=""/>
+    <factoryBean factory="cn.taketoday.jca.support.LocalConnectionFactoryBean" objectType=""/>
+    <factoryBean factory="cn.taketoday.web.context.support.ServletContextAttributeFactoryBean" objectType=""/>
+    <factoryBean factory="cn.taketoday.cache.interceptor.CacheProxyFactoryBean" objectType=""/>
+
+    <!-- MyBatis integration-->
+    <factoryBean factory="cn.taketoday.orm.mybatis.SqlSessionFactoryBean" objectType="org.apache.ibatis.session.SqlSessionFactory"/>
+    <factoryBean factory="cn.taketoday.orm.mybatis.mapper.MapperFactoryBean" objectType=""/>
+
+  </factories>
+</root>
+

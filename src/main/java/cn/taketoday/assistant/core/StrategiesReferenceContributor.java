@@ -47,6 +47,7 @@ import com.intellij.util.SmartList;
 import java.util.List;
 import java.util.Set;
 
+import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.lang.Constant;
 
@@ -86,7 +87,7 @@ public class StrategiesReferenceContributor extends PsiReferenceContributor {
             "cn.taketoday.context.ApplicationContextInitializer",
             "cn.taketoday.test.context.TestExecutionListener",
             "cn.taketoday.test.context.ContextCustomizerFactory",
-            "cn.taketoday.context.annotation.config.EnableAutoConfiguration"
+            AnnotationConstant.EnableAutoConfiguration
     );
 
     private KeyReference(PsiElement element) {

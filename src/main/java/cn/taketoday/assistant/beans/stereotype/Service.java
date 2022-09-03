@@ -28,18 +28,18 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.constants.SpringCorePresentationConstants;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.util.Function;
 
 import java.util.Collection;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.PresentationConstant;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
 
-@Presentation(typeName = SpringCorePresentationConstants.SERVICE)
+@Presentation(typeName = PresentationConstant.SERVICE)
 public class Service extends InfraMetaStereotypeComponent {
   public static final SemKey<JamMemberMeta<PsiClass, Service>> META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("ServiceMeta");
-  public static final SemKey<Service> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("Service");
+  public static final SemKey<Service> JAM_KEY = JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("Service");
   public static final JamClassMeta<Service> META = new JamClassMeta<>(null, Service.class, JAM_KEY);
 
   private static final Function<Module, Collection<String>> ANNOTATIONS = module -> {

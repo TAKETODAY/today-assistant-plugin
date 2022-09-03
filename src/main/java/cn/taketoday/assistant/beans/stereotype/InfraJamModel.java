@@ -25,9 +25,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValueProvider.Result;
 import com.intellij.psi.util.CachedValuesManager;
-import com.intellij.spring.SpringModificationTrackersManager;
 import com.intellij.util.SmartList;
 
 import java.util.ArrayList;
@@ -35,12 +34,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.InfraModificationTrackersManager;
 import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.stereotype.javaee.CdiJakartaNamed;
 import cn.taketoday.assistant.beans.stereotype.javaee.CdiJavaxNamed;
 import cn.taketoday.assistant.beans.stereotype.javaee.JakartaManagedBean;
 import cn.taketoday.assistant.beans.stereotype.javaee.JavaxManagedBean;
+import cn.taketoday.assistant.model.jam.stereotype.CustomInfraComponent;
 import cn.taketoday.assistant.util.JamAnnotationTypeUtil;
 
 /**
@@ -63,8 +63,9 @@ public class InfraJamModel {
     }
     else {
       return CachedValuesManager.getManager(project).getCachedValue(myModule, () -> {
-        List<InfraStereotypeElement> components = getStereotypeComponents(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(this.myModule));
-        return CachedValueProvider.Result.create(components, SpringModificationTrackersManager.getInstance(project).getOuterModelsDependencies());
+        var components = getStereotypeComponents(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(this.myModule));
+        return Result.create(components,
+                InfraModificationTrackersManager.from(project).getOuterModelsDependencies());
       });
     }
   }
@@ -85,10 +86,10 @@ public class InfraJamModel {
     return stereotypeElements;
   }
 
-  private List<CustomComponent> getCustomStereotypeComponents(GlobalSearchScope scope) {
-    SmartList<CustomComponent> smartList = new SmartList<>();
+  private List<CustomInfraComponent> getCustomStereotypeComponents(GlobalSearchScope scope) {
+    SmartList<CustomInfraComponent> smartList = new SmartList<>();
     for (String anno : JamAnnotationTypeUtil.getUserDefinedCustomComponentAnnotations(myModule)) {
-      smartList.addAll(myJamService.getJamClassElements(CustomComponent.JAM_KEY, anno, scope));
+      smartList.addAll(myJamService.getJamClassElements(CustomInfraComponent.JAM_KEY, anno, scope));
     }
     return smartList;
   }
@@ -102,7 +103,14 @@ public class InfraJamModel {
   }
 
   private List<Component> getComponents(GlobalSearchScope scope) {
-    return this.myJamService.getJamClassElements(Component.META, AnnotationConstant.COMPONENT, scope);
+    ArrayList<Component> smartList = new ArrayList<>();
+    Collection<String> collection = Component.getAnnotations().fun(this.myModule);
+    for (String anno : collection) {
+      smartList.addAll(myJamService.getJamClassElements(Component.META, anno, scope));
+    }
+
+//    this.myJamService.getJamClassElements(Component.META, AnnotationConstant.COMPONENT, scope);
+    return smartList;
   }
 
   private List<CdiJavaxNamed> getCdiJavaxNamed(GlobalSearchScope scope) {
@@ -123,6 +131,7 @@ public class InfraJamModel {
   }
 
   private List<Repository> getRepositories(GlobalSearchScope scope) {
+    // FIXME
     SmartList<Repository> smartList = new SmartList<>();
     Collection<String> repositoryAnnotations = Repository.getRepositoryAnnotations().fun(this.myModule);
     for (String anno : repositoryAnnotations) {

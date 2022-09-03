@@ -35,7 +35,6 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.presentation.java.SymbolPresentationUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.SpringApiIcons;
 import com.intellij.util.NotNullFunction;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -55,13 +54,14 @@ import java.util.function.Supplier;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.code.event.beans.PublishEventPointDescriptor;
 import cn.taketoday.assistant.code.event.jam.EventListenerElement;
 import cn.taketoday.assistant.code.event.jam.EventModelUtils;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -88,7 +88,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   @Override
   public Icon getIcon() {
-    return SpringApiIcons.Listener;
+    return Icons.Listener;
   }
 
   @Override
@@ -97,7 +97,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
     PsiElement psiElement = ContainerUtil.getFirstItem(elements);
     if (psiElement != null
-            && CommonUtils.hasFacets(psiElement.getProject())
+            && InfraUtils.hasFacets(psiElement.getProject())
             && InfraLibraryUtil.hasLibrary(psiElement.getProject())) {
 
       super.collectNavigationMarkers(elements, result, forNavigation);
@@ -193,7 +193,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   private static RelatedItemLineMarkerInfo<?> createEventListenerMarker(Supplier<Collection<PublishEventPointDescriptor>> supplier, PsiElement identifier) {
 
-    var builder = GutterIconBuilder.create(SpringApiIcons.Gutter.Publisher, PUBLISH_EVENT_CONVERTOR, null);
+    var builder = GutterIconBuilder.create(Icons.Gutter.Publisher, PUBLISH_EVENT_CONVERTOR, null);
     builder.setTargets(NotNullLazyValue.lazy(supplier)).setPopupTitle(InfraBundle.message("event.publisher.choose.title"))
             .setTooltipText(InfraBundle.message("event.publisher.tooltip.text"))
             .setEmptyPopupText(InfraBundle.message("event.publisher.empty.tooltip.text"))
@@ -205,7 +205,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
     return new DefaultPsiElementCellRenderer() {
       @Override
       protected Icon getIcon(PsiElement element) {
-        return UastContextKt.toUElement(element, UCallExpression.class) != null ? SpringApiIcons.Gutter.Publisher : super.getIcon(element);
+        return UastContextKt.toUElement(element, UCallExpression.class) != null ? Icons.Gutter.Publisher : super.getIcon(element);
       }
 
       @Override
@@ -260,7 +260,7 @@ public class EventListenerAnnotator extends RelatedItemLineMarkerProvider {
 
   private static void annotatePublishPoints(Project project, @Nullable Module module,
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiType publishedType, PsiElement element) {
-    var builder = GutterIconBuilder.create(SpringApiIcons.Gutter.Listener, EVENT_LISTENER_CONVERTOR, null);
+    var builder = GutterIconBuilder.create(Icons.Gutter.Listener, EVENT_LISTENER_CONVERTOR, null);
     builder.setTargets(NotNullLazyValue.lazy(() -> EventModelUtils.getEventListeners(project, module, publishedType)))
             .setPopupTitle(InfraBundle.message("event.listener.choose.title"))
             .setTooltipText(InfraBundle.message("event.listener.tooltip.text"))

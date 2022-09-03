@@ -1,0 +1,4 @@
+<bean id="foo" class="BeanClass">
+    <property name="string" <spot>ref="s"</spot>/>
+</bean>
+<spot><bean class="java.lang.String" id="s"/></spot>

@@ -1,0 +1,15 @@
+<html>
+<body>
+<p>Reports incorrect bean references in the <code>value</code> parameter of the
+<a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/DependsOn.html">@DependsOn</a>
+annotation.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  @Component
+  @DependsOn("unknown")  // reports "Cannot resolve bean 'unknown'"
+  public class MyComponent {
+  }
+</code></pre>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+<idea-plugin>
+
+  <resource-bundle>messages.InfraAppBundle</resource-bundle>
+  <depends>com.intellij.javaee.web</depends>
+  <depends>cn.taketoday.assistant</depends>
+  <id>cn.taketoday.assistant.web.mvc</id>
+  <vendor email="taketoday@foxmail.com" url="https://taketoday.cn">Harry Yang</vendor>
+
+  <!--@formatter:off-->
+
+  <extensions defaultExtensionNs="com.intellij">
+
+    <javaee.web.webModelContributor implementation="cn.taketoday.assistant.app.mvc.config.InfraDispatcherServletWebModelContributor"/>
+    <externalProjectDataService implementation="cn.taketoday.assistant.app.mvc.importer.InfraMvcExternalSystemDataService"/>
+
+    <projectService serviceImplementation="cn.taketoday.assistant.web.mvc.toolwindow.WebMvcViewSettings"/>
+    <projectService serviceInterface="cn.taketoday.assistant.web.mvc.model.RequestMappingService"
+        serviceImplementation="cn.taketoday.assistant.web.mvc.model.RequestMappingServiceImpl"/>
+
+    <selectInTarget implementation="cn.taketoday.assistant.web.mvc.toolwindow.WebMvcViewSelectInTarget"/>
+
+    <applicationService serviceInterface="cn.taketoday.assistant.web.mvc.views.ViewResolverRegistry"
+        serviceImplementation="cn.taketoday.assistant.web.mvc.views.ViewResolverRegistryImpl"/>
+    <applicationService serviceInterface="cn.taketoday.assistant.web.mvc.model.WebMvcVariablesService"
+        serviceImplementation="cn.taketoday.assistant.web.mvc.model.WebMvcVariablesServiceImpl"/>
+
+    <applicationService serviceInterface="cn.taketoday.assistant.web.mvc.services.WebMvcService"
+        serviceImplementation="cn.taketoday.assistant.web.mvc.services.WebMvcServiceImpl"/>
+
+    <applicationService
+        serviceInterface="cn.taketoday.assistant.web.mvc.model.WebUrlPathSpecificationProvider"
+        serviceImplementation="cn.taketoday.assistant.web.mvc.model.jam.InfraMvcUrlPathSpecification$Provider"/>
+    <projectService serviceImplementation="cn.taketoday.assistant.app.mvc.lifecycle.mappings.tab.RequestMappingsEndpointTabSettings"/>
+
+    <implicitUsageProvider implementation="cn.taketoday.assistant.web.mvc.code.WebMVCImplicitUsageProvider"/>
+    <cantBeStatic implementation="cn.taketoday.assistant.web.mvc.code.WebMVCCantBeStaticExtension"/>
+
+    <documentationProvider id="infraWeb" implementation="cn.taketoday.assistant.web.mvc.WebMvcRequestMappingDocumentationProvider"
+        order="before springBean"/>
+
+    <lang.documentationProvider language="JSP" id="infraWebJSP" order="first"
+        implementationClass="cn.taketoday.assistant.web.mvc.WebMvcRequestMappingDocumentationProvider"/>
+    <lang.documentationProvider language="JSPX" id="infraWebJSPX" order="first"
+        implementationClass="cn.taketoday.assistant.web.mvc.WebMvcRequestMappingDocumentationProvider"/>
+
+    <multiHostInjector implementation="cn.taketoday.assistant.web.mvc.pathVariables.MVCRequestMappingRegexInjector"/>
+
+    <psi.referenceContributor language="UAST" implementation="cn.taketoday.assistant.web.mvc.WebMVCUastReferenceContributor"/>
+    <psi.referenceContributor language="UAST" implementation="cn.taketoday.assistant.web.mvc.WebMvcVariablesReferenceContributor"/>
+    <javaee.contextParamsProvider implementation="cn.taketoday.assistant.web.mvc.config.webXml.WebContextParamsProvider"/>
+
+    <referenceProviderType key="Web MVC View" implementationClass="cn.taketoday.assistant.web.mvc.views.InfraMVCViewReferenceProvider"/>
+
+    <psi.fileReferenceHelper implementation="cn.taketoday.assistant.web.InfraWebFileReferenceHelper"/>
+    <psi.referenceContributor language="XML" implementation="cn.taketoday.assistant.web.mvc.config.webXml.InfraWebConfigLocationReferenceContributor"/>
+
+    <javaee.web.customServletReferenceProvider implementation="cn.taketoday.assistant.web.mvc.WebMvcCustomServletReferenceProvider"/>
+    <javaee.web.webModelContributor implementation="cn.taketoday.assistant.web.mvc.config.anno.WebMvcPsiBasedServletWebModelContributor"/>
+
+    <semContributor implementation="cn.taketoday.assistant.web.InfraWebSemContributor"/>
+    <semContributor implementation="cn.taketoday.assistant.web.mvc.model.jam.InfraMVCSemContributor"/>
+
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.AnnotationDriven" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.DefaultServletHandler" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.FreeMarkerConfigurer" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.GroovyConfigurer" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.Interceptor" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.Interceptors" implementationClass="cn.taketoday.assistant.web.mvc.model.xml.impl.InterceptorsImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.RedirectViewController" implementationClass="cn.taketoday.assistant.web.mvc.model.xml.impl.RedirectViewControllerImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.Resources" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.StatusController" implementationClass="cn.taketoday.assistant.web.mvc.model.xml.impl.StatusControllerImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.TilesConfigurer" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.VelocityConfigurer" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.ViewController" implementationClass="cn.taketoday.assistant.web.mvc.model.xml.impl.ViewControllerImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.ViewResolverContentNegotiation" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+    <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.ViewResolvers" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
+
+    <localInspection language="UAST" shortName="InfraMVCViewInspection" key="mvc.inspection.view.reference"
+        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Spring"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.web.mvc.views.InfraMVCViewInspection"/>
+    <localInspection language="UAST" shortName="InfraMVCPathVariableInspection" key="mvc.inspection.path.variable"
+        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Spring"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.web.mvc.pathVariables.MVCPathVariableInspection"/>
+    <localInspection language="JAVA" key="mvc.inspection.init.binder"
+        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Spring"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.web.mvc.model.jam.InfraMVCInitBinderInspection"/>
+
+    <codeInsight.lineMarkerProvider language="UAST" implementationClass="cn.taketoday.assistant.web.mvc.navigation.InfraMvcRequestMappingRelatedItemLineMarkerProvider" order="last"/>
+    <codeInsight.lineMarkerProvider language="UAST" implementationClass="cn.taketoday.assistant.web.mvc.navigation.requests.WebMvcRequestMappingLineMarkerProvider" order="last"/>
+
+    <microservices.urlResolverFactory implementation="cn.taketoday.assistant.web.mvc.model.InfraMvcUrlResolver$Factory"/>
+    <microservices.endpointsProvider implementation="cn.taketoday.assistant.web.mvc.providers.InfraMvcControllersEndpointsProvider" order="first"/>
+    <microservices.endpointsProvider implementation="cn.taketoday.assistant.web.mvc.client.rest.RestOperationsFramework"/>
+    <microservices.endpointsProvider implementation="cn.taketoday.assistant.web.mvc.client.rest.TestRestTemplateFramework"/>
+    <microservices.endpointsProvider implementation="cn.taketoday.assistant.web.mvc.client.exchange.InfraExchangeEndpointsProvider"/>
+
+    <psi.referenceContributor language="UAST" implementation="cn.taketoday.assistant.web.mvc.model.WebUrlPathReferenceContributor"/>
+
+    <dependencySupport kind="java" coordinate="org.springframework:spring-webmvc" displayName="Spring MVC"/>
+
+    <codeInsight.blockingMethodChecker implementation="cn.taketoday.assistant.web.mvc.client.rest.RestTemplateBlockingMethodChecker"/>
+
+    <registryKey key="spring.urlpath.completion.smart" defaultValue="true"
+        description="Enables modules ordering based on statistics for UrlPath reference completion in Spring"/>
+
+    <languageInjectionContributor language="UAST" implementationClass="cn.taketoday.assistant.web.mvc.client.WebTestClientBodyLanguageInjector"/>
+
+
+    <statistics.counterUsagesCollector groupId="infra.mvc.usages" version="2"/>
+
+    <notificationGroup id="Infra Application Request Mappings" displayType="TOOL_WINDOW" isLogByDefault="false"/>
+
+  </extensions>
+
+  <extensions defaultExtensionNs="cn.taketoday.assistant">
+    <!-- must be last to be able to access data from other model providers-->
+    <infraModelProvider implementation="cn.taketoday.assistant.web.mvc.config.webXml.WebXmlWebModelContributor"/>
+    <infraModelProvider implementation="cn.taketoday.assistant.web.mvc.config.anno.AnnotationConfigInfraWebModelContributor"/>
+
+    <!--suppress PluginXmlCapitalization -->
+    <toolWindowContent id="mvc" displayName="mvc.tab.title" icon="cn.taketoday.assistant.Icons.WebMvc"
+        bundle="messages.InfraMvcBundle" implementation="cn.taketoday.assistant.web.mvc.toolwindow.InfraMvcToolWindowContent"/>
+
+    <valueConverter implementation="cn.taketoday.assistant.web.mvc.model.xml.SimpleUrlHandlerMappingConverter"/>
+    <customNamespaces implementation="cn.taketoday.assistant.web.mvc.model.xml.WebMVCInfraCustomNamespaces"/>
+
+    <!-- lifecycle -->
+    <!-- "Request Mappings" endpoint -->
+    <app.run.endpoint implementation="cn.taketoday.assistant.app.mvc.lifecycle.mappings.RequestMappingsEndpoint"
+        id="mappings" order="after health"/>
+    <app.run.applicationUrlPathProviderFactory
+        implementation="cn.taketoday.assistant.app.mvc.lifecycle.mappings.RequestMappingsUrlPathProviderFactory"/>
+
+    <mergingMvcRequestMappingLineMarkerProvider
+        implementation="cn.taketoday.assistant.web.mvc.navigation.requests.rest.WebWebOpenInHttpClientLineMarkerProvider"
+        order="last"/>
+
+    <viewResolverFactory implementation="cn.taketoday.assistant.web.mvc.views.ViewResolversViewResolverFactory"/>
+    <viewResolverFactory implementation="cn.taketoday.assistant.web.mvc.views.ViewResolverCompositeViewResolverFactory"/>
+
+    <mergingMvcRequestMappingLineMarkerProvider
+        implementation="cn.taketoday.assistant.app.mvc.lifecycle.mappings.gutter.LiveRequestMappingsLineMarkerProvider"
+        order="first"/>
+
+    <applicationPortProvider implementation="cn.taketoday.assistant.app.mvc.providers.WebBootApplicationPortProvider"/>
+    <applicationPathProvider implementation="cn.taketoday.assistant.app.mvc.providers.WebBootApplicationPathProvider"/>
+
+  </extensions>
+
+  <actions>
+    <action id="DumpInfraMVCModel" class="cn.taketoday.assistant.web.mvc.model.DumpInfraMVCModelAction"
+        icon="cn.taketoday.assistant.Icons.WebMvc">
+      <add-to-group group-id="Internal.Infra"/>
+    </action>
+    <action id="DumpInfraModulesSorter" class="cn.taketoday.assistant.web.mvc.model.DumpInfraModulesSorterAction"
+        icon="cn.taketoday.assistant.Icons.WebMvc">
+      <add-to-group group-id="Internal.Infra"/>
+    </action>
+  </actions>
+
+</idea-plugin>

@@ -26,13 +26,13 @@ package cn.taketoday.assistant;
  */
 public interface JavaeeConstant {
 
-  String JAVAX_INJECT = "javax.inject.Inject"; // spring 3.0 support for JSR-330
-  String JAKARTA_INJECT = "jakarta.inject.Inject"; // spring 6.0
+  String JAVAX_INJECT = "javax.inject.Inject"; //  support for JSR-330
+  String JAKARTA_INJECT = "jakarta.inject.Inject"; //
 
-  String JAVAX_NAMED = "javax.inject.Named"; // spring 3.0 support for JSR-330
-  String JAKARTA_NAMED = "jakarta.inject.Named"; // spring 6.0
+  String JAVAX_NAMED = "javax.inject.Named"; // support for JSR-330
+  String JAKARTA_NAMED = "jakarta.inject.Named"; //
 
-  String JAVAX_INJECT_QUALIFIER = "javax.inject.Qualifier"; // spring 3.0 support for JSR-330
+  String JAVAX_INJECT_QUALIFIER = "javax.inject.Qualifier"; // support for JSR-330
   // javax annotations
   String JAVAX_MANAGED_BEAN = "javax.annotation.ManagedBean";
   String JAKARTA_MANAGED_BEAN = "jakarta.annotation.ManagedBean";

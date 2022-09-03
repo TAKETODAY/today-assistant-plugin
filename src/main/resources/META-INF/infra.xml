@@ -1,0 +1,76 @@
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+
+<idea-plugin>
+
+  <extensions defaultExtensionNs="cn.taketoday.assistant">
+    <!--@formatter:off-->
+    <configSearcherScopeModifier order="last" implementation="cn.taketoday.assistant.beans.PackagesConfigSearcherScopeModifier" />
+    <testingAnnotationsProvider implementation="cn.taketoday.assistant.beans.TestingAnnotationsProvider" />
+
+    <customLocalComponentsDiscoverer implementation="cn.taketoday.assistant.beans.BeansProvider" />
+
+    <customModuleComponentsDiscoverer implementation="cn.taketoday.assistant.beans.ImplicitBeansProvider" />
+    <testingImplicitContextsProvider implementation="cn.taketoday.assistant.beans.TestingImplicitContextsProvider" />
+    <testingImplicitContextsProvider implementation="cn.taketoday.assistant.web.testing.InfraTestingWebContextProvider" />
+
+    <testingAnnotationsProvider implementation="cn.taketoday.assistant.model.jam.testContexts.InfraContextConfigurationAnnotationsProvider" />
+    <customBeanScope implementation="cn.taketoday.assistant.model.scope.InfraCustomScopeConfigurerBeanScope" />
+    <customBeanScope implementation="cn.taketoday.assistant.web.scope.InfraWebCustomBeanScope" />
+
+    <toolWindowContent id="infraBeans" displayName="beans.tab.title" icon="cn.taketoday.assistant.Icons.Today"
+        bundle="messages.InfraBundle" implementation="cn.taketoday.assistant.toolWindow.InfraBeansToolWindowContent" order="first" />
+
+    <componentScanImporter implementation="cn.taketoday.assistant.model.extensions.myBatis.InfraMyBatisComponentScanExtender" />
+    <factoryMethodTypeHandler implementation="cn.taketoday.assistant.factories.resolvers.MockitoEasyMockCustomFactoryMethodTypeHandler" />
+
+    <effective.types.provider implementation="cn.taketoday.assistant.model.FactoryBeansEffectiveTypesProviders" id="factory" order="first" />
+    <effective.types.provider implementation="cn.taketoday.assistant.model.ObjectFactoryEffectiveTypeProvider" id="objectFactory" />
+    <effective.types.provider implementation="cn.taketoday.assistant.model.InfraBeanFactoryAwareTypeProvider" id="beanFactoryAware" order="last" />
+
+    <factoryMethodTypeHandler
+        implementation="cn.taketoday.assistant.factories.resolvers.MockitoEasyMockCustomFactoryMethodTypeHandler" />
+
+    <resourceTypeProvider implementation="cn.taketoday.assistant.model.values.converters.resources.InfraCustomResourceTypeProvider" />
+    <resourceTypeProvider implementation="cn.taketoday.assistant.model.converters.InfraImportResourceConverterImpl" />
+
+    <customLocalComponentsDiscoverer implementation="cn.taketoday.assistant.model.extensions.myBatis.InfraMyBatisBeansProvider" />
+    <customLocalComponentsDiscoverer implementation="cn.taketoday.assistant.model.extensions.beanValidation.InfraValidationCustomComponentsDiscoverer" />
+
+    <infraModelProvider implementation="cn.taketoday.assistant.service.DefaultInfraModelProvider" />
+
+  </extensions>
+
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Auto configuration -->
+    <fileType name="Infrastructure imports" fieldName="FILE_TYPE" implementationClass="cn.taketoday.assistant.app.spi.InfraImportsFileType"/>
+
+    <fileBasedIndex implementation="cn.taketoday.assistant.app.spi.InfraImportsFileIndex"/>
+    <moduleService serviceInterface="cn.taketoday.assistant.app.spi.InfraImportsManager" serviceImplementation="cn.taketoday.assistant.app.spi.InfraImportsManagerImpl"/>
+    <completion.contributor language="SPI" implementationClass="cn.taketoday.assistant.app.spi.InfraImportsCompletionContributor"/>
+    <codeInsight.lineMarkerProvider language="UAST" order="last" implementationClass="cn.taketoday.assistant.app.spi.InfraImportsRegistrationLineMarkerProvider"/>
+    <psi.referenceContributor language="SPI" implementation="cn.taketoday.assistant.app.spi.InfraImportsReferenceContributor"/>
+    <referencesSearch implementation="cn.taketoday.assistant.app.spi.InfraImportsReferencesSearcher"/>
+
+  </extensions>
+
+
+</idea-plugin>

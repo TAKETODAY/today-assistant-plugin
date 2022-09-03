@@ -1,0 +1,3 @@
+<bean class="BeanClass">
+    <spot><property name="beanProperty" value="0"/></spot>
+</bean>

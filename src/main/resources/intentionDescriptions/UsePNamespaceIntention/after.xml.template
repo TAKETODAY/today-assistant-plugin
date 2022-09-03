@@ -1,0 +1,2 @@
+<bean class="BeanClass" <spot>p:beanProperty="0"</spot>>
+</bean>

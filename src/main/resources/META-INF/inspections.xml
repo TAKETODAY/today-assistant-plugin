@@ -52,5 +52,305 @@
         enabledByDefault="true" level="WARNING"
         implementationClass="cn.taketoday.assistant.code.cache.highlighting.CacheableAndCachePutInspection" />
 
+    <!--suppress PluginXmlCapitalization -->
+    <localInspection shortName="InfraHandlersSchemasHighlightingInspection"
+        language="Properties" enabledByDefault="true" level="ERROR"
+        bundle="messages.InfraBundle" key="custom.namespace.registration.inspection.key"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.core" groupPath="Today,Infra"
+        implementationClass="cn.taketoday.assistant.model.xml.custom.registration.InfraHandlersSchemasHighlightingInspection" />
+
+    <!--
+    
+    -->
+
+    <localInspection language="XML" shortName="InfraXmlModelInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraXmlModelInspection" />
+
+    <localInspection language="XML" shortName="InfraScopesInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="scopes.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraScopesInspection" />
+
+    <localInspection language="XML" shortName="InfraPlaceholdersInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="placeholders.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraPlaceholdersInspection" />
+
+    <localInspection language="XML" shortName="InfraBeanNameConvention" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.display.bean.name.convention"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraBeanNameConventionInspection" />
+
+    <localInspection language="XML" shortName="InfraInjectionValueTypeInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.bean.property.value"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraInjectionValueTypeInspection" />
+
+    <localInspection language="XML" shortName="InfraXmlAutowiring" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.bean.autowiring"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.autowire.xml.InfraXmlAutowiringInspection" />
+
+    <localInspection language="XML" shortName="InfraConstructorArg" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.bean.constructor.arg"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraConstructorArgInspection" />
+
+    <localInspection language="XML" shortName="FactoryMethodInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.bean.factory.method"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.FactoryMethodInspection" />
+
+    <localInspection language="XML" shortName="PublicFactoryMethodInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.bean.public.factory.method"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraPublicFactoryMethodInspection" />
+
+    <localInspection language="XML" shortName="InfraLookupMethodInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="bean.lookup.method.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraLookupMethodInspection" />
+
+    <localInspection language="XML" shortName="InjectionValueStyleInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.injection.value.style"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InjectionValueStyleInspection" />
+
+    <localInspection language="XML" shortName="InjectionValueConsistencyInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.injection.value.consistency"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InjectionValueConsistencyInspection" />
+
+    <localInspection language="XML" shortName="InfraAbstractBeanReferencesInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="bean.abstract.bean.references.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraAbstractBeanReferencesInspection" />
+
+    <localInspection language="XML" shortName="XmlAutowireExplicitlyInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="bean.autowire.escape.inspection.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.autowire.xml.XmlAutowireExplicitlyInspection" />
+
+    <localInspection language="XML" shortName="InfraDuplicatedBeanNamesInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="bean.duplicated.bean.name.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraDuplicatedBeanNamesInspection" />
+
+    <localInspection language="XML" shortName="InfraUtilSchemaInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="util.schema.inspection.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraUtilSchemaInspection" />
+
+    <localInspection language="XML" shortName="BeanInstantiationInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="bean.instantiation.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.BeanInstantiationInspection" />
+
+    <localInspection language="XML" shortName="BeanAttributesInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="bean.attributes.inspection.key"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.BeanAttributesInspection" />
+
+    <localInspection language="XML" shortName="TodayFacetInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="facet.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.setup" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.config.TodayFacetInspection" />
+
+    <localInspection language="XML" shortName="RequiredPropertyInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="required.property.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.RequiredPropertyInspection" />
+
+    <localInspection language="XML" shortName="InfraUnparsedCustomBeanInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="unparsed.custom.bean.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraUnparsedCustomBeanInspection" />
+
+    <localInspection language="UAST" shortName="TodayFacetCodeInspection"
+        bundle="messages.InfraBundle" key="facet.code.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.setup" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.config.TodayFacetUastInspection" />
+
+    <localInspection language="JAVA" shortName="InfraFacetProgrammatic"
+        bundle="messages.InfraBundle" key="facet.programmatic.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.setup" groupPath="Today,Infra"
+        enabledByDefault="true" level="WEAK WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.config.InfraFacetProgrammaticInspection" />
+
+    <localInspection language="UAST" shortName="InfraInjectionPointsAutowiringInspection"
+        bundle="messages.InfraBundle" key="model.qualifiers.in.class.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.autowire.InfraInjectionPointsAutowiringInspection" />
+
+    <localInspection language="UAST" shortName="InfraConstructorAutowiringInspection"
+        bundle="messages.InfraBundle" key="java.class.constructor.autowiring.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.autowire.InfraConstructorAutowiringInspection" />
+
+    <localInspection language="UAST" shortName="InfraUastAutowiredMembersInspection"
+        bundle="messages.InfraBundle" key="autowiredMembersInspection.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.autowire.InfraUastAutowiredMembersInspection" />
+
+    <localInspection language="JAVA" shortName="RequiredAnnotationInspection"
+        bundle="messages.InfraBundle" key="required.properties.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.RequiredAnnotationInspection" />
+
+    <localInspection language="XML" shortName="InfraRequiredBeanTypeInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="required.bean.type.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraRequiredBeanTypeInspection" />
+
+    <localInspection language="XML" shortName="InfraIncorrectResourceTypeInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="incorrect.resource.type.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraIncorrectResourceTypeInspection" />
+
+    <localInspection language="UAST" shortName="ContextConfiguration"
+        bundle="messages.InfraBundle" key="context.configuration.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.jam.testContexts.ContextConfigurationInspection" />
+
+    <localInspection language="UAST" shortName="TestingSqlInspection"
+        bundle="messages.InfraBundle" key="testing.sql.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.jam.testContexts.TestingSqlInspection" />
+
+    <localInspection language="JAVA" shortName="TestingDirtiesContextInspection"
+        bundle="messages.InfraBundle" key="testing.context.dirties.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.jam.testContexts.TestingDirtiesContextInspection" />
+
+    <localInspection language="JAVA" shortName="TestingTransactionalInspection"
+        bundle="messages.InfraBundle" key="testing.transactional.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.jam.testContexts.TestingTransactionalInspection" />
+
+    <localInspection language="XML" shortName="InfraContextComponentScanInconsistencyInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="context.schema.inspection.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InfraContextComponentScanInconsistencyInspection" />
+
+    <localInspection language="JAVA" shortName="TransactionalComponentInspection"
+        bundle="messages.InfraBundle" key="transaction.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.jam.transaction.TransactionalComponentInspection" />
+
+    <localInspection language="JAVA" shortName="LookupInjectionInspection"
+        bundle="messages.InfraBundle" key="lookup.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.jam.lookup.LookupInjectionInspection" />
+
+    <localInspection language="JAVA" shortName="DependsOnUnresolvedBeanInspection"
+        bundle="messages.InfraBundle" key="depends.on.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.jam.dependsOn.DependsOnUnresolvedBeanInspection" />
+
+    <localInspection language="UAST" shortName="InfraContextJavaBeanUnresolvedMethodsInspection"
+        bundle="messages.InfraBundle" key="ContextJavaBeanUnresolvedMethodsInspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.InfraContextJavaBeanUnresolvedMethodsInspection" />
+
+    <localInspection language="JAVA" shortName="JavaStaticMembersAutowiringInspection"
+        bundle="messages.InfraBundle" key="StaticMembersAutowiringInspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.autowire.JavaStaticMembersAutowiringInspection" />
+
+    <localInspection language="UAST" key="component.scan.setup.inspection.key"
+        bundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR" shortName="ComponentScanInspection"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.ComponentScanInspection" />
+
+    <localInspection language="XML" shortName="InactiveProfileHighlightingInspection" applyToDialects="false"
+        bundle="messages.InfraBundle" key="model.inspection.inactive.profile"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.xml" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.xml.InactiveProfileHighlightingInspection" />
+
+    <localInspection language="JAVA" shortName="JavaAutowiredFieldsWarningInspection"
+        bundle="messages.InfraBundle" key="AutowiredFieldsWarningInspection.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WEAK WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.JavaAutowiredFieldsWarningInspection" />
+
+    <localInspection language="JAVA" shortName="InfraScheduledMethodInspection"
+        bundle="messages.InfraBundle" key="ScheduledMethodInspection.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.InfraScheduledMethodInspection" />
+
+    <localInspection language="JAVA" shortName="InfraAsyncMethodInspection"
+        bundle="messages.InfraBundle" key="AsyncMethodInspection.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.InfraAsyncMethodInspection" />
+
+    <localInspection language="UAST" shortName="ImportResourceInspection"
+        bundle="messages.InfraBundle" key="import.resource.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.ImportResourceInspection" />
+
+    <localInspection language="UAST" shortName="PropertySourceInspection"
+        bundle="messages.InfraBundle" key="property.source.inspection.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.PropertySourceInspection" />
+
+
+    <localInspection language="UAST" shortName="ConfigurationProxyMethodsInspection"
+        bundle="messages.InfraBundle" key="configuration.proxy.methods.display.name"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.highlighting.jam.ConfigurationProxyMethodsInspection" />
+
+    <localInspection language="UAST" shortName="ProfileExpressionInspection"
+        bundle="messages.InfraBundle" key="profile.expression.inspection"
+        groupBundle="messages.InfraBundle" groupKey="inspection.group.code" groupPath="Today,Infra"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.profiles.ProfileExpressionInspection" />
+
+
   </extensions>
 </idea-plugin>

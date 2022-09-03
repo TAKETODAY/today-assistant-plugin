@@ -26,13 +26,9 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.codeInsight.navigation.NavigationGutterIconRenderer;
 import com.intellij.navigation.GotoRelatedItem;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.psi.PsiElement;
-import com.intellij.spring.SpringApiBundle;
 import com.intellij.util.ConstantFunction;
 import com.intellij.util.NotNullFunction;
-
-import org.gradle.internal.impldep.org.jetbrains.annotations.Nls;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +37,7 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -51,8 +48,8 @@ public class GutterIconBuilder<T> extends NavigationGutterIconBuilder<T> {
 
   public static final GutterIconRenderer.Alignment DEFAULT_GUTTER_ICON_ALIGNMENT = GutterIconRenderer.Alignment.LEFT;
 
-  protected static final NotNullFunction<PsiElement, Collection<? extends GotoRelatedItem>> SPRING_GOTO_RELATED_ITEM_PROVIDER =
-          psiElement -> List.of(new GotoRelatedItem(psiElement, SpringApiBundle.SPRING_NAME));
+  protected static final NotNullFunction<PsiElement, Collection<? extends GotoRelatedItem>> GOTO_RELATED_ITEM_PROVIDER =
+          psiElement -> List.of(new GotoRelatedItem(psiElement, InfraBundle.message("infra")));
 
   private GutterIconBuilder(Icon icon,
           NotNullFunction<? super T, ? extends Collection<? extends PsiElement>> converter,
@@ -62,16 +59,16 @@ public class GutterIconBuilder<T> extends NavigationGutterIconBuilder<T> {
 
   public RelatedItemLineMarkerInfo<PsiElement> createGroupLineMarkerInfo(PsiElement element) {
     NavigationGutterIconRenderer renderer = createGutterIconRenderer(element.getProject());
-    return new SpringGroupRelatedItemLineMarkerInfo(element, renderer, renderer, () -> computeGotoTargets());
+    return new InfraGroupRelatedItemLineMarkerInfo(element, renderer, renderer, this::computeGotoTargets);
   }
 
   public RelatedItemLineMarkerInfo<PsiElement> createRelatedMergeableLineMarkerInfo(PsiElement element) {
     NavigationGutterIconRenderer renderer = createGutterIconRenderer(element.getProject());
-    return new SpringRelatedMergeableLineMarkerInfo(element, renderer, renderer, () -> computeGotoTargets());
+    return new RelatedMergeableLineMarkerInfo(element, renderer, renderer, this::computeGotoTargets);
   }
 
   public static GutterIconBuilder<PsiElement> create(Icon icon) {
-    return new GutterIconBuilder<>(icon, DEFAULT_PSI_CONVERTOR, SPRING_GOTO_RELATED_ITEM_PROVIDER);
+    return new GutterIconBuilder<>(icon, DEFAULT_PSI_CONVERTOR, GOTO_RELATED_ITEM_PROVIDER);
   }
 
   public static <T> GutterIconBuilder<T> create(Icon icon,
@@ -84,13 +81,13 @@ public class GutterIconBuilder<T> extends NavigationGutterIconBuilder<T> {
 
     private final GutterIconNavigationHandler<PsiElement> myNavigationHandler;
 
-    private @Nullable
-    @Nls String myElementPresentation;
+    @Nullable
+    private String myElementPresentation;
 
     private Collection<GotoRelatedItem> myAdditionalGotoRelatedItems = Collections.emptyList();
 
     private CustomNavigationHandlerBuilder(Icon icon,
-            @NlsContexts.Tooltip String tooltipText,
+            String tooltipText,
             GutterIconNavigationHandler<PsiElement> navigationHandler,
             NotNullFunction<T, Collection<? extends PsiElement>> converter,
             @Nullable NotNullFunction<T, Collection<? extends GotoRelatedItem>> gotoRelatedItemProvider) {
@@ -110,7 +107,7 @@ public class GutterIconBuilder<T> extends NavigationGutterIconBuilder<T> {
      * @return Builder instance.
      */
     public static <T> CustomNavigationHandlerBuilder<T> createBuilder(Icon icon,
-            @NlsContexts.Tooltip String tooltipText,
+            String tooltipText,
             GutterIconNavigationHandler<PsiElement> navigationHandler,
             @Nullable NotNullFunction<T, Collection<? extends GotoRelatedItem>> gotoRelatedItemProvider) {
       return new CustomNavigationHandlerBuilder<>(icon, tooltipText, navigationHandler,
@@ -118,8 +115,13 @@ public class GutterIconBuilder<T> extends NavigationGutterIconBuilder<T> {
               gotoRelatedItemProvider);
     }
 
-    public CustomNavigationHandlerBuilder<T> withElementPresentation(@Nls String elementPresentation) {
+    public CustomNavigationHandlerBuilder<T> withElementPresentation(String elementPresentation) {
       myElementPresentation = elementPresentation;
+      return this;
+    }
+
+    public CustomNavigationHandlerBuilder<T> withAdditionalGotoRelatedItems(GotoRelatedItem... items) {
+      myAdditionalGotoRelatedItems = List.of(items);
       return this;
     }
 
@@ -129,9 +131,8 @@ public class GutterIconBuilder<T> extends NavigationGutterIconBuilder<T> {
     }
 
     @Override
-
     public RelatedItemLineMarkerInfo<PsiElement> createRelatedMergeableLineMarkerInfo(PsiElement element) {
-      return new SpringRelatedMergeableLineMarkerInfo(element, myIcon, myTooltipText, myNavigationHandler,
+      return new RelatedMergeableLineMarkerInfo(element, myIcon, myTooltipText, myNavigationHandler,
               () -> {
                 List<GotoRelatedItem> result = new ArrayList<>(computeGotoTargets());
                 result.addAll(myAdditionalGotoRelatedItems);

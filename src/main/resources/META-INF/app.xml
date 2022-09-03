@@ -1,0 +1,323 @@
+<!--
+  ~ Original Author -> Harry Yang (taketoday@foxmail.com) https://taketoday.cn
+  ~ Copyright © TODAY & 2017 - 2022 All Rights Reserved.
+  ~
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+  -->
+<idea-plugin package="cn.taketoday.assistant.app">
+  <resource-bundle>messages.InfraAppBundle</resource-bundle>
+  <depends>com.intellij.javaee.web</depends>
+
+  <!--@formatter:off-->
+
+  <extensionPoints>
+
+    <extensionPoint qualifiedName="cn.taketoday.assistant.app.run.endpoint"
+        dynamic="true" interface="cn.taketoday.assistant.app.run.lifecycle.Endpoint" />
+
+    <extensionPoint qualifiedName="cn.taketoday.assistant.app.run.endpointTabConfigurable"
+        dynamic="true"
+        interface="cn.taketoday.assistant.app.run.lifecycle.tabs.EndpointTabConfigurable"
+        area="IDEA_PROJECT" />
+
+    <extensionPoint qualifiedName="cn.taketoday.assistant.app.run.liveBeansPanelContent"
+        dynamic="true"
+        interface="cn.taketoday.assistant.app.run.lifecycle.beans.tab.LiveBeansPanelContent" />
+
+    <extensionPoint qualifiedName="cn.taketoday.assistant.app.run.applicationUpdatePolicy"
+        dynamic="true"
+        interface="cn.taketoday.assistant.app.run.update.InfraApplicationUpdatePolicy" />
+
+    <extensionPoint qualifiedName="cn.taketoday.assistant.app.run.applicationUrlPathProviderFactory"
+        dynamic="true"
+        interface="cn.taketoday.assistant.app.run.InfraApplicationUrlPathProviderFactory" />
+
+  </extensionPoints>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <statistics.projectUsagesCollector implementation="cn.taketoday.assistant.app.run.statistics.InfraRunFeatureUsagesCollector" />
+    <statistics.counterUsagesCollector implementationClass="cn.taketoday.assistant.app.run.statistics.InfraRunUsageTriggerCollector" />
+
+    <!-- lifecycle -->
+    <applicationService serviceImplementation="cn.taketoday.assistant.app.run.lifecycle.InfraApplicationUrlUtil" />
+
+    <projectConfigurable id="infra.web.mvc" parentId="infra"
+        bundle="messages.InfraAppBundle" key="infra.name"
+        instance="cn.taketoday.assistant.app.run.lifecycle.tabs.InfraConfigurable" />
+
+    <!-- settings -->
+    <projectService serviceImplementation="cn.taketoday.assistant.app.options.InfrastructureSettings" />
+
+    <!-- config files -->
+    <vetoRenameCondition
+        implementation="cn.taketoday.assistant.app.application.metadata.ConfigKeyPsiRenameVetoCondition"/>
+    <automaticRenamerFactory
+        implementation="cn.taketoday.assistant.app.application.config.InfraProfileConfigFileAutomaticRenamerFactory"/>
+    <methodReferencesSearch
+        implementation="cn.taketoday.assistant.app.application.config.InfraConfigurationPropertyReferenceSearcher"/>
+
+    <usageTypeProvider implementation="cn.taketoday.assistant.app.application.config.InfraConfigFileUsageTypeProvider"/>
+
+    <applicationService
+        serviceInterface="cn.taketoday.assistant.app.application.config.InfraHintReferencesProvider"
+        serviceImplementation="cn.taketoday.assistant.app.application.config.hints.InfraHintReferencesProviderImpl"/>
+    <applicationService serviceImplementation="cn.taketoday.assistant.app.InfraConfigurationFileService" />
+    <applicationService serviceImplementation="cn.taketoday.assistant.app.InfraApplicationService"/>
+
+    <applicationService
+        serviceInterface="cn.taketoday.assistant.app.application.metadata.InfraApplicationMetaConfigKeyManager"
+        serviceImplementation="cn.taketoday.assistant.app.application.metadata.InfraApplicationMetaConfigKeyManagerImpl"/>
+    <compiler.task execute="AFTER" implementation="cn.taketoday.assistant.app.application.metadata.InfraMetadataCompilerAfterTask"/>
+
+    <referencesSearch implementation="cn.taketoday.assistant.app.application.metadata.InfraConfigKeyReferenceSearcher"/>
+
+    <annotator language="Properties"
+        implementationClass="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesAnnotator"/>
+    <multiHostInjector implementation="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesValueRegexInjector"/>
+    <vetoRenameCondition
+        implementation="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesRenameVetoCondition"/>
+    <properties.implicitPropertyUsageProvider
+        implementation="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesImplicitPropertyUsageProvider"/>
+    <properties.alphaUnsortedInspectionSuppressor
+        implementation="cn.taketoday.assistant.app.application.properties.InfraAlphaUnsortedPropertiesFileInspectionSuppressor"/>
+    <properties.duplicatePropertyKeyAnnotationSuppressor
+        implementation="cn.taketoday.assistant.app.application.properties.InfraDuplicatePropertyKeyAnnotationSuppressor"/>
+    <psi.referenceContributor language="Properties"
+        implementation="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesReferenceContributor"/>
+    <psi.referenceContributor language="UAST"
+        implementation="cn.taketoday.assistant.app.application.properties.InfraDynamicPropertyReferenceContributor"/>
+    <completion.contributor
+        language="Properties"
+        order="first"
+        implementationClass="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesSmartClassReferenceCompletionContributor"/>
+    <completion.contributor
+        language="Properties"
+        order="first"
+        implementationClass="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesReplacementTokenCompletionContributor"/>
+    <lookup.actionProvider
+        implementation="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesReplacementTokenCompletionContributor"/>
+    <renameHandler
+        implementation="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesConfigKeyPathBeanPropertyRenameHandler"/>
+
+    <lang.documentationProvider language="Properties"
+        order="first"
+        implementationClass="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesDocumentationProvider"/>
+    <spellchecker.support language="Properties" order="before propertiesSpellcheckingStrategy"
+        implementationClass="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesSpellcheckingStrategy"/>
+
+    <!-- additional.json -->
+    <editorNotificationProvider
+        implementation="cn.taketoday.assistant.app.application.metadata.InfraMetadataEditorNotificationsProvider"/>
+    <json.jsonWidgetSuppressor
+        implementation="cn.taketoday.assistant.app.application.metadata.additional.InfraAdditionalConfigJsonWidgetSuppressor"/>
+
+    <psi.referenceContributor language="JSON"
+        implementation="cn.taketoday.assistant.app.application.metadata.additional.InfraAdditionalConfigReferenceContributor"/>
+    <annotator language="JSON"
+        implementationClass="cn.taketoday.assistant.app.application.metadata.additional.InfraAdditionalConfigAnnotator"/>
+    <spellchecker.support language="JSON"
+        order="first"
+        implementationClass="cn.taketoday.assistant.app.application.metadata.additional.InfraAdditionalSpellcheckingStrategy"/>
+
+    <gotoRelatedProvider
+        implementation="cn.taketoday.assistant.app.application.metadata.additional.InfraAdditionalConfigGotoRelatedProvider"/>
+
+    <!-- run config -->
+    <configurationType implementation="cn.taketoday.assistant.app.run.InfraApplicationConfigurationType" />
+    <runConfigurationProducer order="first" implementation="cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationProducer" />
+    <runDashboardCustomizer implementation="cn.taketoday.assistant.app.run.InfraApplicationRunDashboardCustomizer" order="before commonJavaCustomizer" />
+
+    <postStartupActivity implementation="cn.taketoday.assistant.app.run.InfraApplicationRunDashboardCheckerActivity" />
+
+    <projectService
+        serviceInterface="cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManager"
+        serviceImplementation="cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManagerImpl" />
+    <projectService
+        serviceInterface="cn.taketoday.assistant.app.run.lifecycle.tabs.InfraEndpointsTabSettings"
+        serviceImplementation="cn.taketoday.assistant.app.run.lifecycle.tabs.InfraEndpointsTabSettingsImpl" />
+
+    <projectService serviceImplementation="cn.taketoday.assistant.app.run.lifecycle.beans.tab.BeansEndpointTabSettings" />
+    <projectService serviceImplementation="cn.taketoday.assistant.app.run.lifecycle.health.tab.HealthEndpointTabSettings" />
+
+    <runningApplicationUpdaterProvider order="first" implementation="cn.taketoday.assistant.app.run.update.InfraApplicationUpdaterProvider" />
+
+    <codeInsight.lineMarkerProvider language="UAST" implementationClass="cn.taketoday.assistant.app.run.lifecycle.beans.gutter.LiveBeansClassLineMarkerProvider" />
+    <codeInsight.lineMarkerProvider language="XML" implementationClass="cn.taketoday.assistant.app.run.lifecycle.beans.gutter.LiveBeansDomLineMarkerProvider" />
+
+    <pathMacroFilter
+        implementation="cn.taketoday.assistant.app.facet.AppInfraFileSetEditorCustomization$InfraCustomConfigFilesSettingPathMacroFilter"/>
+
+    <iconProvider implementation="cn.taketoday.assistant.app.InfraIconProvider"/>
+
+    <iconDescriptionBundle resourceBundle="messages.InfraAppBundle"/>
+
+
+    <!-- model -->
+
+    <semContributor implementation="cn.taketoday.assistant.model.config.autoconfigure.jam.InfraAutoconfigureSemContributor"/>
+
+    <applicationService serviceInterface="cn.taketoday.assistant.model.config.autoconfigure.InfraAutoConfigClassFilterService"
+        serviceImplementation="cn.taketoday.assistant.model.config.autoconfigure.InfraAutoConfigClassFilterServiceImpl"/>
+    <fileBasedIndex implementation="cn.taketoday.assistant.model.config.autoconfigure.AutoConfigureMetadataIndex"/>
+
+  </extensions>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <iconProvider implementation="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlIconProvider"/>
+
+    <annotator language="yaml"
+        implementationClass="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlAnnotator"/>
+
+    <psi.referenceContributor language="yaml" implementation="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlReferenceContributor"/>
+    <completion.contributor language="yaml" implementationClass="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlKeyCompletionContributor"/>
+    <completion.contributor language="yaml" order="first" implementationClass="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlSmartClassReferenceCompletionContributor"/>
+    <vetoRenameCondition implementation="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlKeyRenameVetoCondition"/>
+
+    <completion.contributor
+        id="infraYamlToken"
+        language="yaml"
+        order="first"
+        implementationClass="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlReplacementTokenCompletionContributor"/>
+    <lookup.actionProvider implementation="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlReplacementTokenCompletionContributor"/>
+    <completion.contributor language="yaml" order="last, after infraYamlToken, before javaClassName"
+        implementationClass="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlClassNameCompletionSuppressor"/>
+
+    <lang.documentationProvider language="yaml" order="first" implementationClass="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlDocumentationProvider"/>
+
+
+    <json.jsonWidgetSuppressor implementation="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlJsonWidgetSuppressor"/>
+
+<!--    <library.presentationProvider implementation="cn.taketoday.assistant.library.LibraryPresentationProvider"/>-->
+    <psi.referenceContributor language="UAST" implementation="cn.taketoday.assistant.app.InfraProfilesUastReferenceContributor"/>
+
+    <!-- config properties -->
+    <implicitUsageProvider implementation="cn.taketoday.assistant.model.config.properties.ConfigurationPropertiesImplicitUsageProvider"/>
+    <codeInsight.lineMarkerProvider language="JAVA"
+        implementationClass="cn.taketoday.assistant.model.config.properties.ConfigurationPropertyRelatedItemLineMarkerProvider"/>
+
+    <!-- local-inspection -->
+
+    <localInspection
+        language="UAST" shortName="ConfigurationPropertiesInspection"
+        bundle="messages.InfraAppBundle"
+        key="infra.config.properties.inspection.key"
+        groupPath="Today,Infra"
+        groupKey="infra.intention.category"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.model.config.properties.ConfigurationPropertiesInspection"/>
+
+    <localInspection
+        language="yaml"
+        bundle="messages.InfraAppBundle"
+        key="infra.application.yaml.inspection.key"
+        groupPath="Today,Infra"
+        groupKey="infra.intention.category"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlInspection"/>
+
+    <localInspection
+        language="JSON"
+        bundle="messages.InfraAppBundle"
+        key="infra.additional.config.metadata.inspection.key"
+        groupPath="Today,Infra"
+        groupKey="infra.intention.category"
+        enabledByDefault="true" level="ERROR"
+        implementationClass="cn.taketoday.assistant.app.application.metadata.additional.InfraAdditionalConfigInspection"/>
+
+    <localInspection
+        language="Properties"
+        bundle="messages.InfraAppBundle"
+        key="infra.application.properties.inspection.key"
+        groupPath="Today,Infra"
+        groupKey="infra.intention.category"
+        enabledByDefault="true" level="WARNING"
+        implementationClass="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesInspection"/>
+
+  </extensions>
+
+  <extensions defaultExtensionNs="cn.taketoday.assistant">
+    <inspectionsRegistryAdditionalFilesContributor
+        implementation="cn.taketoday.assistant.model.config.InfraConfigFileAdditionalFilesContributor"/>
+
+    <configSearcherScopeModifier implementation="cn.taketoday.assistant.app.facet.InfraAutoConfigureConfigSearcherScopeModifier"/>
+    <fileSetEditorCustomization implementation="cn.taketoday.assistant.app.facet.AppInfraFileSetEditorCustomization"/>
+
+    <!-- application.properties -->
+    <inspectionsRegistryContributor implementation="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesInspectionsRegistryContributor"/>
+    <inspectionsRegistryContributor implementation="cn.taketoday.assistant.app.application.metadata.additional.InfraAdditionalConfigInspectionsRegistryContributor"/>
+
+    <modelConfigFileContributor implementation="cn.taketoday.assistant.app.application.properties.InfraModelApplicationPropertiesConfigFileContributor" order="first"/>
+    <modelConfigFileContributor implementation="cn.taketoday.assistant.app.application.yaml.InfraModelApplicationYamlConfigFileContributor"/>
+
+    <inspectionsRegistryAdditionalFilesContributor
+        implementation="cn.taketoday.assistant.app.application.metadata.additional.InfraAdditionalConfigInspectionsRegistryContributor$Contributor"/>
+
+    <app.run.applicationUpdatePolicy implementation="cn.taketoday.assistant.app.run.update.UpdateResourcesPolicy" />
+    <app.run.applicationUpdatePolicy implementation="cn.taketoday.assistant.app.run.update.UpdateClassesAndResourcesPolicy" />
+    <app.run.applicationUpdatePolicy implementation="cn.taketoday.assistant.app.run.update.UpdateClassesAndTriggerFilePolicy" />
+
+    <!-- "Beans" endpoint -->
+    <app.run.endpoint implementation="cn.taketoday.assistant.app.run.lifecycle.beans.BeansEndpoint"
+        id="beans" order="first" />
+
+    <!-- "Health" endpoint -->
+    <app.run.endpoint implementation="cn.taketoday.assistant.app.run.lifecycle.health.HealthEndpoint"
+        id="health" order="after beans" />
+    <app.run.endpointTabConfigurable
+        implementation="cn.taketoday.assistant.app.run.lifecycle.health.tab.HealthEndpointTabConfigurable" />
+
+    <placeholderReferenceResolver implementation="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlPlaceholderReferenceResolver"/>
+    <placeholderReferenceResolver implementation="cn.taketoday.assistant.app.application.properties.InfraApplicationPropertiesPlaceholderReferenceResolver"/>
+
+    <inspectionsRegistryContributor implementation="cn.taketoday.assistant.app.application.yaml.InfraApplicationYamlInspectionsRegistryContributor"/>
+
+    <customLocalComponentsDiscoverer implementation="cn.taketoday.assistant.model.config.properties.ConfigurationPropertiesDiscoverer"/>
+    <localAnnotationModelDependentModelsProvider implementation="cn.taketoday.assistant.model.config.autoconfigure.EnableAutoConfigDependentModelsProvider"/>
+    <localAnnotationModelDependentModelsProvider implementation="cn.taketoday.assistant.model.config.autoconfigure.EnableCachingModelProvider"/>
+    <localAnnotationModelDependentModelsProvider implementation="cn.taketoday.assistant.model.config.autoconfigure.ImportAutoConfigDependentModelsProvider"/>
+
+    <modelConfigFileNameContributor implementation="cn.taketoday.assistant.app.InfraApplicationConfigFileNameContributor" id="infraApplication"/>
+
+    <localModelProducer implementation="cn.taketoday.assistant.model.config.InfraApplicationLocalModel$InfraApplicationLocalModelProducer"/>
+    <conditionalEvaluatorProvider implementation="cn.taketoday.assistant.model.config.autoconfigure.InfraConditionalEvaluatorProvider"/>
+
+    <!-- infra conditions -->
+
+    <!--
+    <modelConditionalContributor
+        condition="org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.HibernateEntityManagerCondition"
+        implementation="cn.taketoday.assistant.model.config.autoconfigure.conditions.HibernateEntityManagerCondition"/>
+-->
+
+    <modelConditionalContributor
+        condition="cn.taketoday.jdbc.config.DataSourceAutoConfiguration.EmbeddedDatabaseCondition"
+        implementation="cn.taketoday.assistant.model.config.autoconfigure.conditions.EmbeddedDatabaseCondition"/>
+
+    <modelConditionalContributor
+        condition="cn.taketoday.jdbc.config.DataSourceAutoConfiguration.PooledDataSourceCondition"
+        implementation="cn.taketoday.assistant.model.config.autoconfigure.conditions.PooledDataSourceCondition"/>
+
+  </extensions>
+
+
+  <actions>
+    <action id="InfraApplicationUrlPathEditAction" class="cn.taketoday.assistant.app.run.InfraApplicationUrlPathEditAction"
+        icon="AllIcons.Actions.Edit">
+      <add-to-group group-id="RunDashboardPopup" anchor="last" />
+    </action>
+
+  </actions>
+</idea-plugin>

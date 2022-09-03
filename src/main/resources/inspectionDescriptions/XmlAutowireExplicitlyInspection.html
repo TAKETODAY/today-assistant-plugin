@@ -1,0 +1,32 @@
+<html>
+<body>
+<p>Reports <code>autowire</code> attributes in <code>&lt;bean&gt;</code> elements and suggests to explicitly inject bean properties if possible.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  public class MyComponent {
+    public void setOtherBean(OtherBean bean){...}
+  }
+
+<hr/>
+
+  &lt;beans&gt;
+    &lt;bean class="beans.OtherBean" id="bar"/&gt;
+    &lt;bean autowire="byType" class="beans.MyComponent"/&gt;
+    // "Unnecessary autowired dependency"
+    // suggests "Make autowired dependency explicit"
+  &lt;/beans&gt;
+</code></pre>
+
+<p>After applying the quick-fix:</p>
+
+<pre><code>
+  &lt;beans&gt;
+    &lt;bean class="beans.OtherBean" id="bar"/&gt;
+    &lt;bean class="beans.MyComponent" id="foo"&gt;
+      &lt;property name="otherBean" ref="otherBean"/&gt;
+    &lt;/bean&gt;
+  &lt;/beans&gt;
+</code></pre>
+</body>
+</html>

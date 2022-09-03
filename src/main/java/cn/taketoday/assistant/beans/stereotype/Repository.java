@@ -28,12 +28,12 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.util.Function;
 
 import java.util.Collection;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -60,7 +60,7 @@ public class Repository extends InfraMetaStereotypeComponent {
 
   static {
     META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("RepositoryMeta");
-    JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("Repository");
+    JAM_KEY = JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("Repository");
     META = new JamClassMeta<>(null, Repository.class, JAM_KEY);
     addPomTargetProducer(META);
     ANNOTATIONS = (module) -> {

@@ -68,7 +68,7 @@ public interface InfraConstant {
   String AOP_ALLIANCE_ADVICE_CLASS = "org.aopalliance.aop.Advice";
 
   String BEAN_FACTORY_CLASS = "cn.taketoday.beans.factory.BeanFactory";
-  String OBJECT_FACTORY_CLASS = "cn.taketoday.beans.factory.ObjectFactory";
+  String OBJECT_FACTORY_CLASS = "java.util.function.Supplier";
   String BEAN_FACTORY_AWARE = "cn.taketoday.beans.factory.BeanFactoryAware";
   String BEAN_FACTORY_POST_PROCESSOR = "cn.taketoday.beans.factory.config.BeanFactoryPostProcessor";
   String CONFIGURABLE_BEAN_FACTORY = "cn.taketoday.beans.factory.config.ConfigurableBeanFactory";

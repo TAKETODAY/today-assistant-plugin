@@ -1,0 +1,27 @@
+<html>
+<body>
+<p>Reports incorrect autowiring of Infra beans configured in XML application contexts.</p>
+
+<p><b>Example:</b></p>
+<pre>
+public interface FooInterface {...}
+@Component public class FooBean implements FooInterface {...}
+@Component public class OtherBean implements FooInterface {...}
+
+@Component
+public class MyComponent {
+	 public void setFooInterface(FooInterface foo) {...}
+}
+
+<hr/>
+
+&lt;beans&gt;
+	&lt;bean class="beans.OtherBean" id="otherBean"/&gt;
+	&lt;bean class="beans.FooBean" id="fooBean"/&gt;
+
+	&lt;bean autowire="byType" class="beans.MyComponent" id="foo"/&gt; // reports "Could not autowire. There is more than one bean of 'FooInterface' type.
+                                                               //          Beans: otherBean,fooBean. Properties: 'fooInterface' "
+&lt;/beans&gt;
+</pre>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<html>
+<body>
+<p>Reports referenced abstract beans.</p>
+
+<p>Abstract beans can be used only as template bean definitions, that is, parents for child definitions.
+  Trying to use such an abstract parent bean on its own by referring to it as a ref property of another bean,
+  or by calling <code>getBean()</code> with the parent bean id, will result in an error.</p>
+
+<p><b>Example:</b></p>
+
+<pre><code>
+  &lt;bean abstract="true" id="parentBeanWithoutClass"/&gt;
+  &lt;bean class="com.my.company.FooBean" id="childBean" parent="parentBeanWithoutClass"&gt;
+  &lt;!--  properties --&gt;
+  &lt;/bean&gt;
+</code></pre>
+
+<p>In this example, the parent bean can't be instantiated on its own since it is incomplete and explicitly marked as abstract.</p>
+</body>
+</html>
+

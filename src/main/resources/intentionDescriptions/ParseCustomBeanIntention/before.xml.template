@@ -1,0 +1,3 @@
+<<spot>myns:dateformat</spot> id="dateFormat"
+    pattern="yyyy-MM-dd HH:mm"
+    lenient="true"/>

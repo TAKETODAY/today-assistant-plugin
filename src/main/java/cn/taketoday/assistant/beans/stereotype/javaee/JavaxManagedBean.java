@@ -23,10 +23,10 @@ package cn.taketoday.assistant.beans.stereotype.javaee;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 
 import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -34,7 +34,7 @@ import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
  */
 public class JavaxManagedBean extends InfraStereotypeElement {
   public static final JamClassMeta<JavaxManagedBean> META = new JamClassMeta<>(null, JavaxManagedBean.class,
-          JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("JavaxManagedBean"));
+          JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("JavaxManagedBean"));
 
   static {
     addPomTargetProducer(META);

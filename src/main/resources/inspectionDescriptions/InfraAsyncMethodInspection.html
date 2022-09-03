@@ -1,0 +1,11 @@
+<html>
+<body>
+<p>Reports incorrect return types of <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/scheduling/annotation/Async.html">@Async</a> methods.</p>
+
+<p>For target method signatures, any parameter types are allowed.
+  However, the return type should be either <code>void</code> or <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Future.html">Future</a>.
+  It is also possible to return the more specific <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/util/concurrent/ListenableFuture.html">ListenableFuture</a> or <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html">CompletableFuture</a> types,
+  which allow for richer interaction with the asynchronous task and for immediate composition with further processing steps.</p>
+
+</body>
+</html>

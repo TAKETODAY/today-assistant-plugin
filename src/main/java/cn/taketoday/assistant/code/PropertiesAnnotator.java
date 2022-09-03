@@ -36,12 +36,6 @@ import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PropertyUtilBase;
 import com.intellij.psi.xml.XmlElement;
 import com.intellij.psi.xml.XmlFile;
-import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringModelVisitorUtils;
-import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.model.utils.SpringModelUtils;
-import com.intellij.spring.model.xml.beans.SpringBean;
-import com.intellij.spring.model.xml.beans.SpringProperty;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.xml.DomElement;
 import com.intellij.util.xml.DomUtil;
@@ -61,10 +55,16 @@ import java.util.Set;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.JavaClassInfo;
+import cn.taketoday.assistant.InfraModelVisitorUtils;
+import cn.taketoday.assistant.gutter.BeansPsiElementCellRenderer;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.model.utils.InfraModelService;
+import cn.taketoday.assistant.model.xml.beans.InfraBean;
+import cn.taketoday.assistant.model.xml.beans.InfraProperty;
+import cn.taketoday.assistant.util.InfraUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -84,7 +84,7 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
 
   @Override
   public Icon getIcon() {
-    return SpringApiIcons.Gutter.SpringProperty;
+    return Icons.Gutter.SpringProperty;
   }
 
   @Override
@@ -92,7 +92,7 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
     UClass uClass;
     PsiClass psiClass;
     UElement element = UastUtils.getUParentForIdentifier(psiElement);
-    if (!(element instanceof UClass) || (psiClass = UElementKt.getAsJavaPsiElement((uClass = (UClass) element), PsiClass.class)) == null || !CommonUtils.isBeanCandidateClass(psiClass)) {
+    if (!(element instanceof UClass) || (psiClass = UElementKt.getAsJavaPsiElement((uClass = (UClass) element), PsiClass.class)) == null || !InfraUtils.isBeanCandidateClass(psiClass)) {
       return;
     }
     annotateClass(result, uClass);
@@ -103,12 +103,12 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
 
   private static void addPropertiesGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier, NotNullLazyValue<Collection<? extends DomElement>> targets) {
     var builder = GutterIconBuilder.create(
-            SpringApiIcons.Gutter.SpringProperty,
+            Icons.Gutter.SpringProperty,
             NavigationGutterIconBuilder.DEFAULT_DOM_CONVERTOR,
             NavigationGutterIconBuilder.DOM_GOTO_RELATED_ITEM_PROVIDER
     );
     builder.setTargets(targets)
-            .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
+            .setCellRenderer(BeansPsiElementCellRenderer::new)
             .setPopupTitle(InfraBundle.message("bean.property.navigate.choose.class.title"))
             .setTooltipText(InfraBundle.message("bean.property.tooltip.navigate.declaration"));
     result.add(builder.createRelatedMergeableLineMarkerInfo(psiIdentifier));
@@ -119,14 +119,14 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
     if (psiClass != null) {
       Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
-      if (CommonUtils.isInfraEnabledModule(module)) {
-        JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
+      if (InfraUtils.isInfraEnabledModule(module)) {
+        JavaClassInfo info = JavaClassInfo.from(psiClass);
         if (info.isMappedDomBean() || info.isStereotypeJavaBean()) {
           return;
         }
         annotatePsiClassSpringPropertyValues(
                 result, psiClass, identifier,
-                SpringModelVisitorUtils.getConfigFiles(SpringModelUtils.getInstance().getSpringModel(psiClass)));
+                InfraModelVisitorUtils.getConfigFiles(InfraModelService.of().getModel(psiClass)));
       }
 
     }
@@ -139,11 +139,11 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
     if (method == null || (psiClass = method.getContainingClass()) == null) {
       return;
     }
-    JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
+    JavaClassInfo info = JavaClassInfo.from(psiClass);
     if (PropertyUtilBase.isSimplePropertySetter(method) && info.isMappedProperty(method)) {
       addPropertiesGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
         String propertyName = PropertyUtilBase.getPropertyNameBySetter(method);
-        return JavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedProperties(propertyName);
+        return JavaClassInfo.from(psiClass).getMappedProperties(propertyName);
       }));
     }
   }
@@ -152,7 +152,7 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
           Collection<? super RelatedItemLineMarkerInfo<?>> result,
           PsiClass psiClass, PsiElement identifier, Set<? extends PsiFile> xmlConfigFiles) {
     if (!DumbService.isDumb(psiClass.getProject()) && !xmlConfigFiles.isEmpty()) {
-      List<SpringProperty> values = Collections.synchronizedList(new ArrayList());
+      List<InfraProperty> values = Collections.synchronizedList(new ArrayList());
       List<VirtualFile> springFiles = ContainerUtil.mapNotNull(xmlConfigFiles, psiFile -> {
         if (psiFile instanceof XmlFile) {
           return psiFile.getVirtualFile();
@@ -161,10 +161,10 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
       });
       ReferencesSearch.search(psiClass, GlobalSearchScope.filesScope(psiClass.getProject(), springFiles)).forEach(psiReference -> {
         DomElement domElement;
-        SpringProperty value;
+        InfraProperty value;
         PsiElement element = psiReference.getElement();
         if ((element instanceof XmlElement) && (domElement = DomUtil.getDomElement(element)) != null && !isAnonymousBeanClass(domElement) && (value = domElement.getParentOfType(
-                SpringProperty.class, false)) != null) {
+                InfraProperty.class, false)) != null) {
           values.add(value);
           return true;
         }
@@ -181,7 +181,7 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
   private static boolean isAnonymousBeanClass(DomElement domElement) {
     GenericAttributeValue genericAttributeValue = domElement.getParentOfType(GenericAttributeValue.class, false);
     if (genericAttributeValue != null && "class".equals(genericAttributeValue.getXmlElementName())) {
-      return genericAttributeValue.getParent() instanceof SpringBean;
+      return genericAttributeValue.getParent() instanceof InfraBean;
     }
     return false;
   }

@@ -26,11 +26,6 @@ import com.intellij.jam.model.common.CommonModelElement;
 import com.intellij.navigation.GotoRelatedItem;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
-import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.model.CommonSpringBean;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.xml.DomSpringBean;
 import com.intellij.util.NotNullFunction;
 
 import java.util.ArrayList;
@@ -42,21 +37,25 @@ import javax.swing.Icon;
 
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.gutter.BeansPsiElementCellRenderer;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.CommonInfraBean;
+import cn.taketoday.assistant.model.xml.DomInfraBean;
 
 final class NavigationGutterIconBuilderUtil {
 
-  static final NotNullFunction<SpringBeanPointer<?>, Collection<? extends PsiElement>> BEAN_POINTER_CONVERTOR
-          = (pointer) -> !pointer.isValid() ? Collections.emptySet() : Collections.singleton(pointer.getSpringBean().getIdentifyingPsiElement());
+  static final NotNullFunction<BeanPointer<?>, Collection<? extends PsiElement>> BEAN_POINTER_CONVERTOR
+          = pointer -> !pointer.isValid() ? Collections.emptySet() : Collections.singleton(pointer.getBean().getIdentifyingPsiElement());
 
   static final NotNullFunction<CommonModelElement, Collection<? extends PsiElement>> COMMON_MODEL_ELEMENT_CONVERTOR
-          = (modelElement) -> Collections.singleton(modelElement.getIdentifyingPsiElement());
+          = modelElement -> Collections.singleton(modelElement.getIdentifyingPsiElement());
 
-  static final NotNullFunction<SpringBeanPointer<?>, Collection<? extends GotoRelatedItem>> AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
-          = (pointer) -> {
-    CommonSpringBean bean = pointer.getSpringBean();
-    if (bean instanceof DomSpringBean) {
-      return Collections.singletonList(new DomGotoRelatedItem((DomSpringBean) bean,
+  static final NotNullFunction<BeanPointer<?>, Collection<? extends GotoRelatedItem>> AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
+          = pointer -> {
+    CommonInfraBean bean = pointer.getBean();
+    if (bean instanceof DomInfraBean) {
+      return Collections.singletonList(new DomGotoRelatedItem((DomInfraBean) bean,
               InfraBundle.message("autowired.dependencies.goto.related.item.group.name")));
     }
     else {
@@ -67,11 +66,11 @@ final class NavigationGutterIconBuilderUtil {
   };
 
   static final NotNullFunction<CommonModelElement, Collection<? extends GotoRelatedItem>> COMMON_MODEL_ELEMENT_GOTO_PROVIDER = (modelElement) -> {
-    if (modelElement instanceof DomSpringBean) {
-      return Collections.singletonList(new DomGotoRelatedItem((DomSpringBean) modelElement));
+    if (modelElement instanceof DomInfraBean) {
+      return Collections.singletonList(new DomGotoRelatedItem((DomInfraBean) modelElement));
     }
     else {
-      final PsiElement element = modelElement.getIdentifyingPsiElement();
+      PsiElement element = modelElement.getIdentifyingPsiElement();
       return element != null ? Collections.singletonList(new GotoRelatedItem(element, "Today") {
         public Icon getCustomIcon() {
           return element instanceof PsiAnnotation ? Icons.Today : null;
@@ -80,26 +79,26 @@ final class NavigationGutterIconBuilderUtil {
     }
   };
 
-  static void addAutowiredBeansGutterIcon(
-          Collection<? extends SpringBeanPointer<?>> collection,
+  static void addAutowiredDependenciesIcon(
+          Collection<? extends BeanPointer<?>> collection,
           Collection<? super RelatedItemLineMarkerInfo<?>> holder, PsiElement identifier) {
 
-    addAutowiredBeansGutterIcon(collection, holder, identifier, InfraBundle.message("navigate.to.autowired.dependencies"));
+    addAutowiredDependenciesIcon(collection, holder, identifier, InfraBundle.message("navigate.to.autowired.dependencies"));
   }
 
-  static void addAutowiredBeansGutterIcon(
-          Collection<? extends SpringBeanPointer<?>> collection,
+  static void addAutowiredDependenciesIcon(
+          Collection<? extends BeanPointer<?>> collection,
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement identifier, String tooltipText) {
 
-    List<SpringBeanPointer<?>> sorted = new ArrayList<>(collection);
-    sorted.sort(SpringBeanPointer.DISPLAY_COMPARATOR);
-    GutterIconBuilder<SpringBeanPointer<?>> builder = GutterIconBuilder.create(
-            SpringApiIcons.Gutter.ShowAutowiredDependencies,
+    ArrayList<BeanPointer<?>> sorted = new ArrayList<>(collection);
+    sorted.sort(BeanPointer.DISPLAY_COMPARATOR);
+    GutterIconBuilder<BeanPointer<?>> builder = GutterIconBuilder.create(
+            Icons.Gutter.ShowAutowiredDependencies,
             BEAN_POINTER_CONVERTOR,
             AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
     );
     builder.setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
-            .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
+            .setCellRenderer(BeansPsiElementCellRenderer::new)
             .setTooltipText(tooltipText)
             .setTargets(sorted);
     result.add(builder.createRelatedMergeableLineMarkerInfo(identifier));

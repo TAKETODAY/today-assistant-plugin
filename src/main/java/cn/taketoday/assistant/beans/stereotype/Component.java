@@ -21,28 +21,48 @@
 package cn.taketoday.assistant.beans.stereotype;
 
 import com.intellij.ide.presentation.Presentation;
+import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamClassMeta;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.Pair;
 import com.intellij.patterns.PsiClassPattern;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.semantic.SemRegistrar;
-import com.intellij.spring.constants.SpringCorePresentationConstants;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
+import com.intellij.util.Function;
+
+import java.util.Collection;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.PresentationConstant;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
+import cn.taketoday.lang.Nullable;
 
-@Presentation(typeName = SpringCorePresentationConstants.COMPONENT)
-public class Component extends InfraStereotypeElement {
+@Presentation(typeName = PresentationConstant.COMPONENT)
+public class Component extends InfraMetaStereotypeComponent {
 
   public static final JamClassMeta<Component> META = new JamClassMeta<>(null, Component.class,
-          JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("ComponentBean"));
+          JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("ComponentBean"));
 
   static {
     addPomTargetProducer(META);
   }
 
+  private static final Function<Module, Collection<String>> ANNOTATIONS
+          = module -> getAnnotations(module, AnnotationConstant.COMPONENT);
+
+  public static Function<Module, Collection<String>> getAnnotations() {
+    return ANNOTATIONS;
+  }
+
   public Component(PsiClass psiClass) {
-    super(AnnotationConstant.COMPONENT, PsiElementRef.real(psiClass));
+    super(AnnotationConstant.COMPONENT, psiClass);
+  }
+
+  @Nullable
+  public static Component from(PsiElement element) {
+    return JamService.getJamService(element.getProject()).getJamElement(element, META);
   }
 
   public static void register(SemRegistrar registrar, PsiClassPattern prototype) {

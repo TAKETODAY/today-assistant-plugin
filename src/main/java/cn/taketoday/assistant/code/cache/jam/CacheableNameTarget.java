@@ -22,8 +22,8 @@ package cn.taketoday.assistant.code.cache.jam;
 
 import com.intellij.ide.presentation.Presentation;
 import com.intellij.pom.PomRenameableTarget;
-import com.intellij.spring.presentation.SpringCorePresentationConstants;
 
+import cn.taketoday.assistant.PresentationConstant;
 import cn.taketoday.lang.NonNull;
 import cn.taketoday.lang.Nullable;
 import kotlin.jvm.internal.Intrinsics;
@@ -32,8 +32,8 @@ import kotlin.jvm.internal.Intrinsics;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 0:20
  */
-@Presentation(typeName = SpringCorePresentationConstants.CACHE,
-              icon = "com.intellij.spring.SpringApiIcons.ShowCacheable")
+@Presentation(typeName = PresentationConstant.CACHE,
+              icon = "cn.taketoday.assistant.Icons.ShowCacheable")
 public final class CacheableNameTarget implements PomRenameableTarget<Object> {
   private String name;
 

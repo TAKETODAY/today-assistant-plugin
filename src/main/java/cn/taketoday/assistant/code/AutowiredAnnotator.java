@@ -42,16 +42,6 @@ import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.util.PropertyUtilBase;
-import com.intellij.spring.CommonSpringModel;
-import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.impl.SpringAutoConfiguredModels;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
-import com.intellij.spring.model.utils.SpringBeanFactoryUtils;
-import com.intellij.spring.model.utils.SpringModelSearchers;
-import com.intellij.spring.model.utils.SpringModelUtils;
-import com.intellij.spring.model.xml.beans.Autowire;
 
 import org.jetbrains.uast.UAnnotation;
 import org.jetbrains.uast.UElement;
@@ -72,14 +62,26 @@ import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.CommonInfraModel;
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.JavaClassInfo;
 import cn.taketoday.assistant.beans.AutowireUtil;
+import cn.taketoday.assistant.gutter.BeansPsiElementCellRenderer;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.impl.InfraAutoConfiguredModels;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.jam.javaConfig.ContextJavaBean;
+import cn.taketoday.assistant.model.utils.InfraModelSearchers;
+import cn.taketoday.assistant.model.utils.InfraBeanFactoryUtils;
+import cn.taketoday.assistant.model.utils.InfraModelService;
+import cn.taketoday.assistant.model.xml.beans.Autowire;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
+ * Autowired candidate or dependencies Annotator
+ *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:44
  */
@@ -97,7 +99,7 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
 
   @Override
   public Icon getIcon() {
-    return SpringApiIcons.ShowAutowiredDependencies;
+    return Icons.ShowAutowiredDependencies;
   }
 
   @Override
@@ -134,25 +136,23 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
     PsiMethod method = UElementKt.getAsJavaPsiElement(uMethod, PsiMethod.class);
     if (method != null) {
       PsiClass psiClass = method.getContainingClass();
-      if (psiClass != null) {
-        if (CommonUtils.isBeanCandidateClassInProject(psiClass)) {
-          JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
-          if (PropertyUtilBase.isSimplePropertySetter(method)) {
-            if (info.isAutowired()) {
-              checkAutowiredMethod(method, result, info, identifier);
-            }
+      if (InfraUtils.isBeanCandidateClassInProject(psiClass)) {
+        JavaClassInfo info = JavaClassInfo.from(psiClass);
+        if (PropertyUtilBase.isSimplePropertySetter(method)) {
+          if (info.isAutowired()) {
+            checkAutowiredMethod(method, result, info, identifier);
           }
-          else if (uMethod.isConstructor()) {
-            if (info.isMappedConstructor(method)) {
-              addConstructorArgsGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
-                return JavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedConstructorDefinitions(method);
-              }));
-            }
-            else if (uMethod.getJavaPsi().getModifierList().hasModifierProperty("public") && info.isStereotypeJavaBean()) {
-              PsiIdentifier nameIdentifier = uMethod.getJavaPsi().getNameIdentifier();
-              if (nameIdentifier != null) {
-                addStereotypeBeanFactoryCallsGutterIcon(result, uMethod.getJavaPsi(), nameIdentifier);
-              }
+        }
+        else if (uMethod.isConstructor()) {
+          if (info.isMappedConstructor(method)) {
+            addConstructorArgsGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
+              return JavaClassInfo.from(psiClass).getMappedConstructorDefinitions(method);
+            }));
+          }
+          else if (uMethod.getJavaPsi().getModifierList().hasModifierProperty("public") && info.isStereotypeJavaBean()) {
+            PsiIdentifier nameIdentifier = uMethod.getJavaPsi().getNameIdentifier();
+            if (nameIdentifier != null) {
+              addStereotypeBeanFactoryCallsGutterIcon(result, uMethod.getJavaPsi(), nameIdentifier);
             }
           }
         }
@@ -162,19 +162,22 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
   }
 
   private static void annotateAnnotation(PsiElement psiElement, Collection<? super RelatedItemLineMarkerInfo<?>> result, UAnnotation uAnnotation) {
-
     UElement annotatedElement = uAnnotation.getUastParent();
-    if (annotatedElement instanceof UMethod) {
-      PsiMethod method = ((UMethod) annotatedElement).getJavaPsi();
+    if (annotatedElement instanceof UMethod uMethod) {
+      PsiMethod method = uMethod.getJavaPsi();
       if (method.isConstructor() || PropertyUtilBase.isSimplePropertySetter(method)) {
         return;
       }
 
+      // show
       ContextJavaBean bean = getStereotypeBean(method);
       if (bean != null) {
         UAnnotation annotationFromBean = UastContextKt.toUElement(bean.getPsiAnnotation(), UAnnotation.class);
         if (Objects.equals(annotationFromBean, uAnnotation)) {
-          result.add(getNavigateToAutowiredCandidatesBuilder(method, method.getReturnType()).createRelatedMergeableLineMarkerInfo(psiElement));
+          result.add(
+                  getNavigateToAutowiredCandidatesBuilder(method, method.getReturnType())
+                          .createRelatedMergeableLineMarkerInfo(psiElement)
+          );
         }
       }
     }
@@ -182,13 +185,13 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
   }
 
   private static ContextJavaBean getStereotypeBean(PsiMethod method) {
-
     return JamService.getJamService(method.getProject()).getJamElement(ContextJavaBean.BEAN_JAM_KEY, method);
   }
 
-  public static boolean checkAutowiredMethod(PsiMethod method, @Nullable Collection<? super RelatedItemLineMarkerInfo<?>> result, JavaClassInfo info, PsiElement identifier) {
+  public static boolean checkAutowiredMethod(PsiMethod method, @Nullable Collection<? super RelatedItemLineMarkerInfo<?>> result,
+          JavaClassInfo info, PsiElement identifier) {
 
-    CommonSpringModel model = AutowireUtil.getProcessingSpringModel(method.getContainingClass());
+    CommonInfraModel model = AutowireUtil.getProcessingInfraModel(method.getContainingClass());
     if (model != null) {
       for (Autowire autowire : info.getAutowires()) {
         if (autowire == Autowire.BY_TYPE) {
@@ -208,12 +211,12 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
 
   private static boolean annotateByNameAutowiredMethod(
           PsiModifierListOwner owner, @Nullable Collection<? super RelatedItemLineMarkerInfo<?>> result,
-          CommonSpringModel model, PsiElement identifier) {
+          CommonInfraModel model, PsiElement identifier) {
 
-    Collection<SpringBeanPointer<?>> collection = getByNameAutowiredBean(owner, model);
+    Collection<BeanPointer<?>> collection = getByNameAutowiredBean(owner, model);
     if (collection != null && !collection.isEmpty()) {
       if (result != null) {
-        NavigationGutterIconBuilderUtil.addAutowiredBeansGutterIcon(collection, result, identifier,
+        NavigationGutterIconBuilderUtil.addAutowiredDependenciesIcon(collection, result, identifier,
                 InfraBundle.message("navigate.to.by.name.autowired.dependencies"));
       }
 
@@ -224,7 +227,7 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
     }
   }
 
-  private static Collection<SpringBeanPointer<?>> getByNameAutowiredBean(PsiModifierListOwner owner, CommonSpringModel model) {
+  private static Collection<BeanPointer<?>> getByNameAutowiredBean(PsiModifierListOwner owner, CommonInfraModel model) {
 
     String name = null;
     if (owner instanceof PsiMethod) {
@@ -235,7 +238,7 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
     }
 
     if (name != null) {
-      SpringBeanPointer<?> bean = SpringModelSearchers.findBean(model, name);
+      BeanPointer<?> bean = InfraModelSearchers.findBean(model, name);
       if (bean != null) {
         return Collections.singleton(bean.getBasePointer());
       }
@@ -249,13 +252,13 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
     if (identifier != null) {
       PsiField field = UElementKt.getAsJavaPsiElement(ufield, PsiField.class);
       if (field != null) {
-        if (AutowireUtil.isAutowiredByAnnotation(field)) {
-          CommonSpringModel processor = AutowireUtil.getProcessingSpringModel(field.getContainingClass());
-          if (processor != null) {
-            processVariable(field, result, processor, identifier, field.getType());
+        // final , @Autowired
+        if (ufield.isFinal() || AutowireUtil.isAutowiredByAnnotation(field)) {
+          CommonInfraModel model = AutowireUtil.getProcessingInfraModel(field.getContainingClass());
+          if (model != null) {
+            processVariable(field, result, model, identifier, field.getType());
           }
         }
-
       }
     }
   }
@@ -263,7 +266,7 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
   private static void processAnnotatedMethod(UMethod uMethod, PsiElement identifier, Collection<? super RelatedItemLineMarkerInfo<?>> result) {
     PsiMethod method = uMethod.getJavaPsi();
     if (AutowireUtil.isInjectionPoint(method)) {
-      CommonSpringModel model = AutowireUtil.getProcessingSpringModel(method.getContainingClass());
+      CommonInfraModel model = AutowireUtil.getProcessingInfraModel(method.getContainingClass());
       if (model != null) {
         if (AutowireUtil.getResourceAnnotation(method) != null && PropertyUtilBase.isSimplePropertySetter(method)) {
           UParameter uParameter = uMethod.getUastParameters().get(0);
@@ -287,12 +290,12 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
 
   private static boolean processVariable(
           PsiModifierListOwner variable, @Nullable Collection<? super RelatedItemLineMarkerInfo<?>> result,
-          CommonSpringModel model, PsiElement identifier, PsiType type) {
+          CommonInfraModel model, PsiElement identifier, PsiType type) {
 
-    Collection<SpringBeanPointer<?>> list = AutowireUtil.getAutowiredBeansFor(variable, getAutowiredType(type), model);
+    Collection<BeanPointer<?>> list = AutowireUtil.getAutowiredBeansFor(variable, getAutowiredType(type), model);
     if (!list.isEmpty()) {
       if (result != null) {
-        NavigationGutterIconBuilderUtil.addAutowiredBeansGutterIcon(list, result, identifier);
+        NavigationGutterIconBuilderUtil.addAutowiredDependenciesIcon(list, result, identifier);
       }
 
       return true;
@@ -313,11 +316,11 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
   }
 
   public static GutterIconBuilder<PsiElement> getNavigateToAutowiredCandidatesBuilder(PsiMember psiMember, PsiType type) {
-
-    var builder = GutterIconBuilder.create(SpringApiIcons.Gutter.ShowAutowiredCandidates);
-    builder.setPopupTitle(InfraBundle.message("gutter.choose.autowired.candidates.title"))
-            .setEmptyPopupText(InfraBundle.message("gutter.navigate.no.matching.autowired.candidates"))
-            .setTooltipText(InfraBundle.message("gutter.navigate.to.autowired.candidates.title")).setTargets(NotNullLazyValue.lazy(() -> {
+    var builder = GutterIconBuilder.create(Icons.Gutter.ShowAutowiredCandidates);
+    builder.setPopupTitle(InfraBundle.message("choose.autowired.candidates.title"))
+            .setEmptyPopupText(InfraBundle.message("navigate.no.matching.autowired.candidates"))
+            .setTooltipText(InfraBundle.message("navigate.to.autowired.candidates.title"))
+            .setTargets(NotNullLazyValue.lazy(() -> {
               if (!psiMember.isValid()) {
                 return Collections.emptySet();
               }
@@ -328,7 +331,7 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
                 }
                 else {
                   Set<PsiModifierListOwner> members = new LinkedHashSet<>();
-                  for (Module module : getRelatedSpringModules(psiMember)) {
+                  for (Module module : getRelatedModules(psiMember)) {
                     members.addAll(AutowireUtil.getAutowiredMembers(type, module, psiMember));
                   }
                   return members;
@@ -346,9 +349,9 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
         PsiClass containingClass = method.getContainingClass();
         if (containingClass != null) {
           PsiClassType psiClassType = JavaPsiFacade.getInstance(method.getProject()).getElementFactory().createType(containingClass);
-          Set<PsiElement> callsForBean = SpringBeanFactoryUtils.findBeanFactoryCallsForBean(moduleForPsiElement, psiClassType, method.getName(), SpringBeanFactoryUtils.getParamTypes(method));
+          Set<PsiElement> callsForBean = InfraBeanFactoryUtils.findBeanFactoryCallsForBean(moduleForPsiElement, psiClassType, method.getName(), InfraBeanFactoryUtils.getParamTypes(method));
           if (!callsForBean.isEmpty()) {
-            GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(SpringApiIcons.Gutter.ShowAutowiredCandidates);
+            GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(Icons.Gutter.ShowAutowiredCandidates);
             builder.setPopupTitle(InfraBundle.message("gutter.choose.bean.factory.calls.title"))
                     .setEmptyPopupText(InfraBundle.message("gutter.navigate.no.bean.factory.calls"))
                     .setTooltipText(InfraBundle.message("gutter.navigate.to.bean.factory.calls.title")).setTargets(callsForBean);
@@ -360,20 +363,20 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
   }
 
   private static void addConstructorArgsGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier,
-          NotNullLazyValue<Collection<? extends SpringBeanPointer<?>>> targets) {
-    GutterIconBuilder<SpringBeanPointer<?>> builder = GutterIconBuilder.create(
-            SpringApiIcons.Gutter.SpringBeanMethod,
+          NotNullLazyValue<Collection<? extends BeanPointer<?>>> targets) {
+    GutterIconBuilder<BeanPointer<?>> builder = GutterIconBuilder.create(
+            Icons.Gutter.SpringBeanMethod,
             NavigationGutterIconBuilderUtil.BEAN_POINTER_CONVERTOR,
             NavigationGutterIconBuilderUtil.AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
     );
     builder.setTargets(targets)
-            .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
+            .setCellRenderer(BeansPsiElementCellRenderer::new)
             .setPopupTitle(InfraBundle.message("bean.constructor.navigate.choose.class.title"))
             .setTooltipText(InfraBundle.message("bean.constructor.tooltip.navigate.declaration"));
     result.add(builder.createRelatedMergeableLineMarkerInfo(psiIdentifier));
   }
 
-  private static Set<Module> getRelatedSpringModules(PsiElement element) {
+  private static Set<Module> getRelatedModules(PsiElement element) {
     PsiFile psiFile = element.getContainingFile();
     if (psiFile == null) {
       return Collections.emptySet();
@@ -389,9 +392,9 @@ public class AutowiredAnnotator extends AbstractInfraAnnotator {
           return Collections.emptySet();
         }
         else {
-          boolean allowAutoConfig = SpringAutoConfiguredModels.isAllowAutoConfiguration(element.getProject());
+          boolean allowAutoConfig = InfraAutoConfiguredModels.isAllowAutoConfiguration(element.getProject());
           return fileIndex.getOrderEntriesForFile(virtualFile).stream().map(OrderEntry::getOwnerModule).filter((module) -> {
-            return CommonUtils.hasFacet(module) || allowAutoConfig && SpringModelUtils.getInstance().hasAutoConfiguredModels(module);
+            return InfraUtils.hasFacet(module) || allowAutoConfig && InfraModelService.of().hasAutoConfiguredModels(module);
           }).collect(Collectors.toSet());
         }
       }

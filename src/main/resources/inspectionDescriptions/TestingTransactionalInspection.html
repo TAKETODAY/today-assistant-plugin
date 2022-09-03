@@ -1,0 +1,24 @@
+<html>
+<body>
+<p>Reports invalid transactional lifecycle method declarations annotated with
+<a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/context/transaction/BeforeTransaction.html">@BeforeTransaction</a>
+and <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/context/transaction/AfterTransaction.html">@AfterTransaction</a>
+in testing classes annotated as
+<a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/transaction/annotation/Transactional.html">@Transactional</a>.</p>
+
+<p>Annotated methods must have no arguments and no return type.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  @ContextConfiguration
+  @Transactional
+  public class AbstractShowcaseTest {
+    @BeforeTransaction // Expected method return type is 'void'
+    public boolean setupData() {...}
+
+    @AfterTransaction // Wrong number of arguments
+    public void disposeData(boolean a) throws Exception {...}
+  }
+</code></pre>
+</body>
+</html>

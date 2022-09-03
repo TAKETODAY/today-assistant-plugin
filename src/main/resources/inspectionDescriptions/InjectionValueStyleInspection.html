@@ -1,0 +1,29 @@
+<html>
+<body>
+<p>Reports properties configured via <code>&lt;value&gt;</code> or <code>&lt;ref&gt;</code> sub-elements and offers to replace them with the corresponding attributes.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  &lt;beans&gt;
+    &lt;bean class="MyBean" id="myBean"/&gt;
+
+    &lt;bean class="MyFactory"&gt;
+      &lt;property name="bean"&gt;
+        &lt;ref bean="myBean"/&gt; // reports 'Usage of explicit &lt;ref&gt; element'
+      &lt;/property&gt;
+    &lt;/bean&gt;
+  &lt;/beans&gt;
+</code></pre>
+
+<p>After applying the quick-fix:</p>
+
+<pre><code>
+  &lt;beans&gt;
+    &lt;bean class="MyBean" id="myBean"/&gt;
+    &lt;bean class="MyFactory"&gt;
+      &lt;property name="bean" ref="myBean"/&gt;
+    &lt;/bean&gt;
+  &lt;/beans&gt;
+</code></pre>
+</body>
+</html>

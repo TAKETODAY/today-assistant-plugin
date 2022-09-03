@@ -1,0 +1,35 @@
+<html>
+<body>
+<p>Reports incorrect <strong>&lt;lookup-method&gt;</strong> for a bean in XML application contexts.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  public abstract class FooLookupBean {
+    protected abstract FooBean createCommand();
+    private FooBean createCommand() {...}
+    protected static FooBean createCommandStatic() {...}
+    protected abstract FooBean createWithArgs(String foo);
+    protected abstract OtherBean createOtherBean();
+  }
+
+  &lt;beans&gt;
+    &lt;bean class="FooLookupBean" id="lookupTest"&gt;
+      &lt;lookup-method bean="fooBean" name="createCommand"/&gt;
+      &lt;!-- private --&gt;
+      &lt;lookup-method bean="fooBean" name="createCommand"/&gt;// "Method must be public or protected"
+      &lt;!-- static --&gt;
+      &lt;lookup-method bean="fooBean" name="createCommandStatic"/&gt; // Static method not allowed here
+      &lt;!-- with arguments --&gt;
+      &lt;lookup-method bean="fooBean" name="createWithArgs"/&gt;// Method must have no parameters
+      &lt;!-- not exist --&gt;
+      &lt;lookup-method bean="fooBean" name="unknown"/&gt;  // unknown method
+      &lt;!-- mismatch --&gt;
+      &lt;lookup-method bean="fooBean" name="createOtherBean"/&gt; // Lookup method return type does not match the 'FooBean' bean class
+    &lt;/bean&gt;
+
+    &lt;bean class="FooBean" id="fooBean"/&gt;
+    &lt;bean class="OtherBean" id="otherBean"/&gt;
+  &lt;/beans&gt;
+</code></pre>
+</body>
+</html>

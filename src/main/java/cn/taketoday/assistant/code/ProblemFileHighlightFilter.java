@@ -31,9 +31,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
-import com.intellij.spring.dom.SpringDomUtils;
 
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.dom.InfraDomUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -57,9 +57,9 @@ public class ProblemFileHighlightFilter implements Condition<VirtualFile> {
         return false;
       }
       else {
-        return CommonUtils.hasFacet(module) && ReadAction.compute(() -> {
+        return InfraUtils.hasFacet(module) && ReadAction.compute(() -> {
           PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-          return psiFile instanceof XmlFile && SpringDomUtils.isSpringXml((XmlFile) psiFile);
+          return psiFile instanceof XmlFile && InfraDomUtils.isInfraXml((XmlFile) psiFile);
         });
       }
     }

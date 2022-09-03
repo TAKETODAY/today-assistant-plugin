@@ -45,7 +45,6 @@ public abstract class CacheableElement<T extends PsiMember & PsiNamedElement> im
   private final JamAnnotationMeta myMeta;
   private final PsiElementRef<PsiAnnotation> myPsiAnnotationRef;
   private static final Map<String, JamAnnotationMeta> annotationMetaMap = new HashMap<>();
-  static final boolean $assertionsDisabled = !CacheableElement.class.desiredAssertionStatus();
 
   public CacheableElement(T psiMember, String annoName) {
     this.myMeta = getMeta(annoName);
@@ -54,12 +53,8 @@ public abstract class CacheableElement<T extends PsiMember & PsiNamedElement> im
 
   public CacheableElement(PsiAnnotation annotation) {
     String qualifiedName = annotation.getQualifiedName();
-    if ($assertionsDisabled || qualifiedName != null) {
-      this.myMeta = getMeta(qualifiedName);
-      this.myPsiAnnotationRef = PsiElementRef.real(annotation);
-      return;
-    }
-    throw new AssertionError();
+    this.myMeta = getMeta(qualifiedName);
+    this.myPsiAnnotationRef = PsiElementRef.real(annotation);
   }
 
   private static synchronized JamAnnotationMeta getMeta(String anno) {

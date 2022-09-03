@@ -1,0 +1,17 @@
+
+<html>
+<body>
+<p>Reports injected or autowired fields/methods in classes that are not valid Infra beans:
+<a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Component.html">@Component</a>,
+<a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/stereotype/Service.html">@Service</a>,
+and so on.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+public class FooBeanClass {
+  @Autowired   // reports 'Autowired members must be defined in valid Infra beans: @Component, @Service, and so on'
+  ServiceBean bean;
+  }
+</code></pre>
+</body>
+</html>

@@ -26,6 +26,9 @@ package cn.taketoday.assistant;
  */
 public interface AnnotationConstant {
 
+  String AutoConfiguration = "cn.taketoday.context.annotation.config.AutoConfiguration";
+  String EnableAutoConfiguration = "cn.taketoday.context.annotation.config.EnableAutoConfiguration";
+
   String CONFIGURATION = "cn.taketoday.context.annotation.Configuration";
   String BEAN = "cn.taketoday.context.annotation.Bean";
 

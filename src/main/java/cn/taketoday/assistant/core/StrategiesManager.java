@@ -29,7 +29,7 @@ import com.intellij.util.PairProcessor;
 
 import java.util.List;
 
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -44,7 +44,7 @@ public class StrategiesManager {
   }
 
   public List<PropertiesFileImpl> getStrategiesFiles(boolean includeTests) {
-    return CommonUtils.findConfigFilesInMetaInf(this.myModule, includeTests,
+    return InfraUtils.findConfigFilesInMetaInf(this.myModule, includeTests,
             TodayStrategiesFileType.STRATEGIES_FILE_NAME, PropertiesFileImpl.class);
   }
 

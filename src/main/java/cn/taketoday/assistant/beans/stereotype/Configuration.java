@@ -34,23 +34,23 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.psi.PsiModifier;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.constants.SpringCorePresentationConstants;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.stereotype.SpringPropertySource;
-import com.intellij.spring.model.jam.utils.SpringJamUtils;
 import com.intellij.util.Function;
 
 import java.util.Collection;
 
 import cn.taketoday.assistant.AnnotationConstant;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.PresentationConstant;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
+import cn.taketoday.assistant.model.jam.stereotype.PropertySource;
+import cn.taketoday.assistant.service.InfraJamService;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 15:53
  */
-@Presentation(typeName = SpringCorePresentationConstants.CONFIGURATION)
+@Presentation(typeName = PresentationConstant.CONFIGURATION)
 public class Configuration extends InfraMetaStereotypeComponent {
 
   private static final String PROXY_BEAN_METHODS_ATTR_NAME = "proxyBeanMethods";
@@ -59,10 +59,10 @@ public class Configuration extends InfraMetaStereotypeComponent {
           JamService.ALIASING_MEMBER_META_KEY.subKey("ConfigurationMeta");
 
   /**
-   * @see CommonUtils#isConfiguration(PsiClass)
-   * @see CommonUtils#isConfigurationOrMeta(PsiClass)
+   * @see InfraUtils#isConfiguration(PsiClass)
+   * @see InfraUtils#isConfigurationOrMeta(PsiClass)
    */
-  public static final SemKey<Configuration> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("ConfigurationBean");
+  public static final SemKey<Configuration> JAM_KEY = JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("ConfigurationBean");
 
   public static final JamClassMeta<Configuration> META =
           new JamClassMeta<>(null, Configuration.class, JAM_KEY);
@@ -85,8 +85,8 @@ public class Configuration extends InfraMetaStereotypeComponent {
     super(anno, psiClass);
   }
 
-  public Collection<SpringPropertySource> getPropertySources() {
-    return SpringJamUtils.getInstance().getPropertySources(getPsiElement());
+  public Collection<PropertySource> getPropertySources() {
+    return InfraJamService.of().getPropertySources(getPsiElement());
   }
 
   public static Function<Module, Collection<String>> getAnnotations() {

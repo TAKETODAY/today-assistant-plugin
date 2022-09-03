@@ -49,7 +49,7 @@ import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.CachingGroup;
 import cn.taketoday.assistant.code.cache.jam.JamBaseCacheableElement;
 import cn.taketoday.assistant.code.cache.jam.standard.CacheConfig;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -64,7 +64,7 @@ public final class CacheNamesInspection extends AbstractInfraLocalInspection {
 
   @Override
   public ProblemDescriptor[] checkMethod(UMethod umethod, InspectionManager manager, boolean isOnTheFly) {
-    if (CommonUtils.isInInfraEnabledModule(umethod)) {
+    if (InfraUtils.isInInfraEnabledModule(umethod)) {
       PsiMethod method = umethod.getJavaPsi();
       PsiElement sourcePsi = umethod.getSourcePsi();
       if (sourcePsi == null) {
@@ -142,7 +142,7 @@ public final class CacheNamesInspection extends AbstractInfraLocalInspection {
 
   @Override
   public ProblemDescriptor[] checkClass(UClass uClass, InspectionManager manager, boolean isOnTheFly) {
-    if (CommonUtils.isInInfraEnabledModule(uClass)) {
+    if (InfraUtils.isInInfraEnabledModule(uClass)) {
       PsiClass aClass = uClass.getJavaPsi();
       PsiElement sourcePsi = uClass.getSourcePsi();
       if (sourcePsi == null) {

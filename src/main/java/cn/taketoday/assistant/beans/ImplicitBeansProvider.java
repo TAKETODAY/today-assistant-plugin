@@ -27,17 +27,18 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
-import com.intellij.spring.model.CommonSpringBean;
-import com.intellij.spring.model.SpringImplicitBeansProviderBase;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
+import cn.taketoday.assistant.model.CommonInfraBean;
+import cn.taketoday.assistant.model.InfraImplicitBeansProviderBase;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 15:30
  */
-public class ImplicitBeansProvider extends SpringImplicitBeansProviderBase {
+public class ImplicitBeansProvider extends InfraImplicitBeansProviderBase {
 
   @Override
   public boolean accepts(Module module) {
@@ -50,9 +51,9 @@ public class ImplicitBeansProvider extends SpringImplicitBeansProviderBase {
   }
 
   @Override
-  protected Collection<CommonSpringBean> getImplicitBeans(Module module) {
+  protected Collection<CommonInfraBean> getImplicitBeans(Module module) {
     return CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
-      ArrayList<CommonSpringBean> beans = new ArrayList<>(3);
+      ArrayList<CommonInfraBean> beans = new ArrayList<>(3);
       addImplicitLibraryBean(beans, module, "cn.taketoday.core.env.Environment", "environment");
       addImplicitLibraryBean(beans, module, "cn.taketoday.core.env.PropertyResolver", "propertyResolver");
       addImplicitLibraryBean(beans, module, "cn.taketoday.core.conversion.ConversionService", "conversionService");

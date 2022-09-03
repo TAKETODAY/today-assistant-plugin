@@ -1,0 +1,16 @@
+<html>
+<body>
+<p>Reports unresolved packages in
+<a href=https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/ComponentScan.html>@ComponentScan</a>
+annotations and corresponding aliased attributes of <code>@ComponentScan</code> meta annotations.<br></p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  @ComponentScan(basePackages = {
+     "com.my.company",
+     "com.unknown" // reports "'Cannot resolve package 'unknown'"
+  }) +
+  @Configuration +
+  public class MyConfiguration {}</code></pre>
+</body>
+</html>

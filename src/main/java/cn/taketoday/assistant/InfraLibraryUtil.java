@@ -21,17 +21,28 @@
 package cn.taketoday.assistant;
 
 import com.intellij.codeInsight.JavaLibraryModificationTracker;
+import com.intellij.compiler.CompilerConfiguration;
 import com.intellij.jam.JavaLibraryUtils;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.libraries.JarVersionDetectionUtil;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.patterns.PatternCondition;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.util.ArrayUtil;
+import com.intellij.util.ProcessingContext;
 
+import org.jetbrains.jps.model.java.compiler.AnnotationProcessingConfiguration;
+
+import java.io.File;
+import java.util.Set;
+
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -40,12 +51,41 @@ import cn.taketoday.lang.Nullable;
  */
 public class InfraLibraryUtil {
 
+  public static final PatternCondition<PsiElement> IS_WEB_MVC_PROJECT
+          = new PatternCondition<>("isWebMVCEnabledProject") {
+
+    public boolean accepts(PsiElement element, ProcessingContext context) {
+      return isWebMVCEnabled(element.getProject());
+    }
+  };
+
   public static boolean hasLibrary(Project project) {
     return JavaLibraryUtils.hasLibraryClass(project, TodayVersion.ANY.getDetectionClassFqn());
   }
 
   public static boolean hasLibrary(@Nullable Module module) {
     return isAtLeastVersion(module, TodayVersion.ANY);
+  }
+
+  public static boolean hasFrameworkLibrary(Project project) {
+    return JavaLibraryUtils.hasLibraryClass(project, "cn.taketoday.framework.Application");
+  }
+
+  public static boolean hasFrameworkLibrary(@Nullable Module module) {
+    return JavaLibraryUtils.hasLibraryClass(module, "cn.taketoday.framework.Application");
+  }
+
+  public static boolean hasWebMvcLibrary(Project project) {
+    return JavaLibraryUtils.hasLibraryClass(project, "cn.taketoday.web.RequestContext");
+  }
+
+  public static boolean hasWebMvcLibrary(@Nullable Module module) {
+    return JavaLibraryUtils.hasLibraryClass(module, "cn.taketoday.web.RequestContext");
+  }
+
+  public static boolean isWebMVCEnabled(Project project) {
+    return InfraUtils.hasFacets(project)
+            && hasWebMvcLibrary(project);
   }
 
   public static boolean isAtLeastVersion(@Nullable Module module, TodayVersion version) {
@@ -59,6 +99,53 @@ public class InfraLibraryUtil {
       TodayVersion cached = getCachedVersion(module);
       return cached != null && cached.isAtLeast(version);
     }
+  }
+
+  public static boolean hasRequestMappings(@Nullable Module module) {
+    return InfraUtils.findLibraryClass(module, "cn.taketoday.web.HandlerMapping") != null;
+  }
+
+  @Nullable
+  public static String getVersionFromJar(Module module) {
+    return JarVersionDetectionUtil.detectJarVersion(TodayVersion.V_4_0.getDetectionClassFqn(), module);
+  }
+
+  public static boolean hasConfigurationMetadataAnnotationProcessor(Module module) {
+    AnnotationProcessingConfiguration configuration = CompilerConfiguration.getInstance(module.getProject()).getAnnotationProcessingConfiguration(module);
+    if (!configuration.isEnabled()) {
+      return false;
+    }
+    else {
+      Set<String> processors = configuration.getProcessors();
+      if (!processors.isEmpty() && !processors.contains("cn.taketoday.framework.configurationprocessor.ConfigurationMetadataAnnotationProcessor")) {
+        return false;
+      }
+      else if (configuration.isObtainProcessorsFromClasspath()) {
+        PsiClass processor = InfraUtils.findLibraryClass(module, "cn.taketoday.framework.configurationprocessor.ConfigurationMetadataAnnotationProcessor");
+        return processor != null;
+      }
+      else {
+        Iterable<String> segments = StringUtil.tokenize(configuration.getProcessorPath(), File.pathSeparator);
+        for (String segment : segments) {
+          if (segment.endsWith(".jar")) {
+            int fileNameIndex = Integer.max(segment.lastIndexOf(47), segment.lastIndexOf(92));
+            if (fileNameIndex >= 0 && fileNameIndex < segment.length() - 1) {
+              segment = segment.substring(fileNameIndex + 1);
+            }
+
+            if (segment.contains("infra-boot-configuration-processor")) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      }
+    }
+  }
+
+  public static TodayVersion getVersion(Module module) {
+    return getCachedVersion(module);
   }
 
   @Nullable
@@ -81,7 +168,15 @@ public class InfraLibraryUtil {
     });
   }
 
-  public static enum TodayVersion {
+  public static boolean hasActuators(Module module) {
+    return InfraUtils.findLibraryClass(module, "cn.taketoday.framework.actuate.endpoint.Endpoint") != null;
+  }
+
+  public static boolean isBelowVersion(@Nullable Module module, TodayVersion version) {
+    return !isAtLeastVersion(module, version);
+  }
+
+  public enum TodayVersion {
     ANY("1.0", "cn.taketoday.beans.factory.BeanFactory"),
     V_4_0("4.0", "cn.taketoday.stereotype.Component");
 
@@ -93,20 +188,20 @@ public class InfraLibraryUtil {
       this.myDetectionClassFqn = detectionClassFqn;
     }
 
-    boolean isAtLeast(TodayVersion reference) {
+    public boolean isAtLeast(TodayVersion reference) {
       if (reference == ANY) {
         return true;
       }
       else {
-        return StringUtil.compareVersionNumbers(this.getVersion(), reference.getVersion()) >= 0;
+        return StringUtil.compareVersionNumbers(this.myVersion, reference.getVersion()) >= 0;
       }
     }
 
-    String getVersion() {
+    public String getVersion() {
       return this.myVersion;
     }
 
-    String getDetectionClassFqn() {
+    public String getDetectionClassFqn() {
       return this.myDetectionClassFqn;
     }
   }

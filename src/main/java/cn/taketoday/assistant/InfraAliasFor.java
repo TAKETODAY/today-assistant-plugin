@@ -18,11 +18,6 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package cn.taketoday.assistant;
 
 import com.intellij.jam.JamBaseElement;

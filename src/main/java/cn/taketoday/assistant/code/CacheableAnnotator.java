@@ -33,10 +33,6 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.SpringManager;
-import com.intellij.spring.contexts.model.SpringModel;
-import com.intellij.spring.model.utils.SpringModelSearchers;
 import com.intellij.util.NotNullFunction;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -55,8 +51,10 @@ import java.util.Set;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.InfraManager;
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.CachingGroup;
@@ -64,8 +62,10 @@ import cn.taketoday.assistant.code.cache.jam.standard.CacheConfig;
 import cn.taketoday.assistant.code.cache.jam.standard.CacheEvict;
 import cn.taketoday.assistant.code.cache.jam.standard.CachePut;
 import cn.taketoday.assistant.code.cache.jam.standard.Cacheable;
+import cn.taketoday.assistant.context.model.InfraModel;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.model.utils.InfraModelSearchers;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -112,7 +112,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
   @Nullable
   @Override
   public Icon getIcon() {
-    return SpringApiIcons.ShowCacheable;
+    return Icons.ShowCacheable;
   }
 
   @Override
@@ -121,7 +121,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
 
     PsiElement psiElement = ContainerUtil.getFirstItem(elements);
     if (psiElement != null
-            && CommonUtils.hasFacets(psiElement.getProject())
+            && InfraUtils.hasFacets(psiElement.getProject())
             && InfraLibraryUtil.hasLibrary(psiElement.getProject())) {
       super.collectNavigationMarkers(elements, result, forNavigation);
     }
@@ -202,7 +202,7 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
     if (psiAnnotationIdentifier == elementToAnnotate) {
       Set<CacheableElement<?>> cacheableElements = findCacheableWithTheSameName(cacheableElement);
       if (!cacheableElements.isEmpty()) {
-        var builder = GutterIconBuilder.create(SpringApiIcons.Gutter.ShowCacheable, CACHEABLE_CONVERTOR, null);
+        var builder = GutterIconBuilder.create(Icons.Gutter.ShowCacheable, CACHEABLE_CONVERTOR, null);
         builder.setTargets(cacheableElements)
                 .setCellRenderer(CacheableAnnotator::getCacheableListCellRenderer)
                 .setPopupTitle(InfraBundle.message("cacheable.element.choose.title"))
@@ -214,13 +214,13 @@ public class CacheableAnnotator extends RelatedItemLineMarkerProvider {
   }
 
   private static boolean hasCustomCacheResolver(Module module) {
-    PsiClass cacheResolver = CommonUtils.findLibraryClass(module, CacheableConstant.CACHE_RESOLVER_CLASS);
+    PsiClass cacheResolver = InfraUtils.findLibraryClass(module, CacheableConstant.CACHE_RESOLVER_CLASS);
     if (cacheResolver == null) {
       return true;
     }
     else {
-      SpringModel combinedModel = SpringManager.getInstance(module.getProject()).getCombinedModel(module);
-      return SpringModelSearchers.doesBeanExist(combinedModel, cacheResolver);
+      InfraModel combinedModel = InfraManager.from(module.getProject()).getCombinedModel(module);
+      return InfraModelSearchers.doesBeanExist(combinedModel, cacheResolver);
     }
   }
 

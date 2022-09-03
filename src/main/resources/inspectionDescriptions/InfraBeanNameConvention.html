@@ -1,0 +1,37 @@
+<html>
+<body>
+Write your description here.
+Start the description with a verb in 3rd person singular, like reports, detects, highlights.
+In the first sentence, briefly explain what exactly the inspection helps you detect.
+Make sure the sentence is not very long and complicated.
+<p>
+  The first sentence must be in a dedicated paragraph separated from the rest of the text. This will make the description easier to read.
+  Make sure the description doesn’t just repeat the inspection title.
+</p>
+<p>
+  See https://jetbrains.design/intellij/text/inspections/#descriptions for more information.
+</p>
+<!-- tooltip end -->
+<p>Text after this comment will only be shown in the settings of the inspection.</p>
+
+<p>To open related settings directly from the description, add a link with `settings://$` optionally followed by `?$` to pre-select a UI
+  element.</p>
+</body>
+</html>
+~ You should have received a copy of the GNU General Public License
+~ along with this program.  If not, see [http://www.gnu.org/licenses/]
+-->
+
+<html>
+<body>
+<p>Reports <strong>&lt;bean&gt;</strong> names that don't follow the bean naming conventions.</p>
+
+<p>
+  The convention is to use the standard Java convention for instance field names when naming beans.
+  That is, bean names start with a lowercase letter and are camel-cased from there.
+  Examples of such names include <code>accountManager</code>, <code>accountService</code>, <code>userDao</code>, <code>loginController</code>, and so on.
+  Naming beans consistently makes your configuration easier to read and understand.
+  Also, if you are using Infra AOP, it helps a lot when applying an advice to a set of beans related by name.
+</p>
+</body>
+</html>

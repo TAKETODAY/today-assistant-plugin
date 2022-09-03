@@ -38,11 +38,6 @@ import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiTarget;
 import com.intellij.psi.targets.DecapitalizedAliasingPsiTarget;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.model.jam.JamPsiClassSpringBean;
-import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
-import com.intellij.spring.model.jam.javaConfig.SpringJavaBean;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,18 +45,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import cn.taketoday.assistant.model.jam.JamPsiClassInfraBean;
+import cn.taketoday.assistant.model.jam.javaConfig.ContextJavaBean;
+import cn.taketoday.assistant.model.jam.javaConfig.InfraJavaBean;
+import cn.taketoday.lang.Nullable;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/23 01:53
  */
-public class InfraStereotypeElement extends JamPsiClassSpringBean {
+public class InfraStereotypeElement extends JamPsiClassInfraBean {
   private static final Map<String, JamAnnotationMeta> annotationMetaMap = new HashMap<>();
   private JamAnnotationMeta myMeta;
 
   private static final JamStringAttributeMeta.Single<String> NAME_VALUE_META = JamAttributeMeta.singleString("value");
 
-  public List<? extends SpringJavaBean> getBeans() {
-    List<SpringJavaBean> beans = new ArrayList<>();
+  public List<? extends InfraJavaBean> getBeans() {
+    List<InfraJavaBean> beans = new ArrayList<>();
 
     JamCommonUtil.processSuperClassList(getPsiElement(), new HashSet<>(), psiClass -> {
       for (PsiMethod method : psiClass.getMethods()) {
@@ -93,7 +93,7 @@ public class InfraStereotypeElement extends JamPsiClassSpringBean {
   }
 
   public PsiTarget getPsiTarget() {
-    final JamStringAttributeElement<String> namedAttributeValue = getNamedStringAttributeElement();
+    JamStringAttributeElement<String> namedAttributeValue = getNamedStringAttributeElement();
     if (namedAttributeValue == null || StringUtil.isEmptyOrSpaces(namedAttributeValue.getStringValue())) {
       return getAliasingPsiTarget();
     }
@@ -122,8 +122,7 @@ public class InfraStereotypeElement extends JamPsiClassSpringBean {
 
   @Override
   public String getBeanName() {
-    assert isValid();
-    final String definedName = getAnnotationDefinedBeanName();
+    String definedName = getAnnotationDefinedBeanName();
 
     if (!StringUtil.isEmptyOrSpaces(definedName))
       return definedName;
@@ -133,7 +132,7 @@ public class InfraStereotypeElement extends JamPsiClassSpringBean {
 
   @Nullable
   private String getAnnotationDefinedBeanName() {
-    final JamStringAttributeElement<String> namedStringAttributeElement = getNamedStringAttributeElement();
+    JamStringAttributeElement<String> namedStringAttributeElement = getNamedStringAttributeElement();
 
     return namedStringAttributeElement == null ? null : namedStringAttributeElement.getStringValue();
   }
@@ -146,7 +145,7 @@ public class InfraStereotypeElement extends JamPsiClassSpringBean {
 
   @Override
   public String toString() {
-    final String beanName = getBeanName();
+    String beanName = getBeanName();
     return beanName == null ? "" : beanName;
   }
 }

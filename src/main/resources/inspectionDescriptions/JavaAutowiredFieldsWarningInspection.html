@@ -1,0 +1,40 @@
+
+<html>
+<body>
+<p>Reports injected or autowired fields in Infra components.</p>
+
+<p>The quick-fix suggests the recommended constructor-based dependency injection in beans
+and assertions for mandatory fields.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+class MyComponent {
+  @Inject MyCollaborator collaborator; // injected field
+
+  public void myBusinessMethod() {
+    collaborator.doSomething(); // throws NullPointerException
+  }
+}
+</code></pre>
+<br>
+
+<p>After applying the quick-fix:</p>
+<pre><code>
+class MyComponent {
+
+  private final MyCollaborator collaborator;
+
+  @Inject
+  public MyComponent(MyCollaborator collaborator) {
+    Assert.notNull(collaborator, "MyCollaborator must not be null!");
+    this.collaborator = collaborator;
+  }
+
+  public void myBusinessMethod() {
+    collaborator.doSomething(); // now this call is safe
+  }
+}
+</code></pre>
+
+</body>
+</html>

@@ -41,7 +41,7 @@ import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
 import cn.taketoday.assistant.code.cache.jam.standard.CachePut;
 import cn.taketoday.assistant.code.cache.jam.standard.Cacheable;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -55,7 +55,7 @@ public final class CacheableAndCachePutInspection extends AbstractInfraLocalInsp
 
   @Override
   public ProblemDescriptor[] checkMethod(UMethod umethod, InspectionManager manager, boolean isOnTheFly) {
-    if (CommonUtils.isInInfraEnabledModule(umethod)) {
+    if (InfraUtils.isInInfraEnabledModule(umethod)) {
       PsiMethod method = umethod.getJavaPsi();
       PsiElement sourcePsi = umethod.getSourcePsi();
       if (sourcePsi != null) {

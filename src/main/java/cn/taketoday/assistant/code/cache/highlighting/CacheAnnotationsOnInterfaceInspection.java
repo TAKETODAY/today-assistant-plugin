@@ -48,7 +48,7 @@ import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.code.AbstractInfraLocalInspection;
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.cache.jam.CacheableElement;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -66,7 +66,7 @@ public final class CacheAnnotationsOnInterfaceInspection extends AbstractInfraLo
     UClass containingClass;
     PsiElement sourcePsi;
 
-    if (!CommonUtils.isInInfraEnabledModule(uMethod)
+    if (!InfraUtils.isInInfraEnabledModule(uMethod)
             || (containingClass = UastUtils.getContainingUClass(uMethod)) == null
             || !containingClass.isInterface()
             || (sourcePsi = containingClass.getSourcePsi()) == null
@@ -116,7 +116,7 @@ public final class CacheAnnotationsOnInterfaceInspection extends AbstractInfraLo
 
   @Override
   public ProblemDescriptor[] checkClass(UClass uClass, InspectionManager manager, boolean isOnTheFly) {
-    if (CommonUtils.isInInfraEnabledModule(uClass) && uClass.isInterface() && !uClass.isAnnotationType()) {
+    if (InfraUtils.isInInfraEnabledModule(uClass) && uClass.isInterface() && !uClass.isAnnotationType()) {
       PsiElement sourcePsi = uClass.getSourcePsi();
       if (sourcePsi == null) {
         return null;

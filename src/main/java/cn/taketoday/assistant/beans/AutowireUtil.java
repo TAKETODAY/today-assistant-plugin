@@ -30,7 +30,6 @@ import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
@@ -44,6 +43,7 @@ import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameIdentifierOwner;
@@ -54,6 +54,7 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiWildcardType;
 import com.intellij.psi.impl.cache.CacheManager;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.UsageSearchContext;
 import com.intellij.psi.search.searches.AnnotatedMembersSearch;
 import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.InheritanceUtil;
@@ -62,40 +63,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.psi.util.TypeConversionUtil;
-import com.intellij.spring.CommonSpringModel;
-import com.intellij.spring.SpringManager;
-import com.intellij.spring.SpringModelVisitorUtils;
-import com.intellij.spring.contexts.model.CombinedSpringModel;
-import com.intellij.spring.contexts.model.CombinedSpringModelImpl;
-import com.intellij.spring.contexts.model.SpringModel;
-import com.intellij.spring.facet.SpringFileSet;
-import com.intellij.spring.model.CommonSpringBean;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.SpringConditional;
-import com.intellij.spring.model.SpringImplicitBeanMarker;
-import com.intellij.spring.model.SpringModelSearchParameters;
-import com.intellij.spring.model.SpringObjectFactoryEffectiveTypeProvider;
-import com.intellij.spring.model.highlighting.xml.SpringConstructorArgResolveUtil;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.JamSpringBeanPointer;
-import com.intellij.spring.model.jam.contexts.CustomContextJavaBean;
-import com.intellij.spring.model.jam.qualifiers.SpringJamQualifier;
-import com.intellij.spring.model.jam.testContexts.SpringTestContextUtil;
-import com.intellij.spring.model.utils.ExplicitRedefinitionAwareBeansCollector;
-import com.intellij.spring.model.utils.SpringBeanUtils;
-import com.intellij.spring.model.utils.SpringConstructorArgUtils;
-import com.intellij.spring.model.utils.SpringModelSearchers;
-import com.intellij.spring.model.utils.SpringModelUtils;
-import com.intellij.spring.model.utils.SpringPropertyUtils;
-import com.intellij.spring.model.xml.beans.Autowire;
-import com.intellij.spring.model.xml.beans.Beans;
-import com.intellij.spring.model.xml.beans.ConstructorArg;
-import com.intellij.spring.model.xml.beans.DefaultableBoolean;
-import com.intellij.spring.model.xml.beans.SpringBean;
-import com.intellij.spring.model.xml.beans.SpringProperty;
-import com.intellij.spring.model.xml.beans.SpringPropertyDefinition;
-import com.intellij.spring.model.xml.beans.SpringValue;
-import com.intellij.spring.references.SpringBeanReference;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.CommonProcessors;
 import com.intellij.util.Processor;
@@ -109,7 +76,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -120,12 +86,47 @@ import java.util.stream.Collectors;
 
 import cn.taketoday.assistant.AliasForUtils;
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.CommonInfraModel;
 import cn.taketoday.assistant.InfraConstant;
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.InfraManager;
 import cn.taketoday.assistant.JavaeeConstant;
-import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.InfraModelVisitorUtils;
 import cn.taketoday.assistant.beans.stereotype.InfraJamModel;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.context.model.CombinedInfraModel;
+import cn.taketoday.assistant.context.model.CombinedInfraModelImpl;
+import cn.taketoday.assistant.context.model.InfraModel;
+import cn.taketoday.assistant.facet.InfraFileSet;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.CommonInfraBean;
+import cn.taketoday.assistant.model.InfraConditional;
+import cn.taketoday.assistant.model.InfraImplicitBeanMarker;
+import cn.taketoday.assistant.model.ModelSearchParameters;
+import cn.taketoday.assistant.model.ObjectFactoryEffectiveTypeProvider;
+import cn.taketoday.assistant.model.highlighting.xml.InfraConstructorArgResolveUtil;
+import cn.taketoday.assistant.model.jam.JamBeanPointer;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
+import cn.taketoday.assistant.model.jam.contexts.CustomContextJavaBean;
+import cn.taketoday.assistant.model.jam.qualifiers.InfraJamQualifier;
+import cn.taketoday.assistant.model.jam.testContexts.InfraTestContextUtil;
+import cn.taketoday.assistant.model.utils.ExplicitRedefinitionAwareBeansCollector;
+import cn.taketoday.assistant.model.utils.InfraBeanUtils;
+import cn.taketoday.assistant.model.utils.InfraModelSearchers;
+import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
+import cn.taketoday.assistant.model.utils.BeanCoreUtils;
+import cn.taketoday.assistant.model.utils.InfraConstructorArgUtils;
+import cn.taketoday.assistant.model.utils.InfraModelService;
+import cn.taketoday.assistant.model.xml.beans.Autowire;
+import cn.taketoday.assistant.model.xml.beans.Beans;
+import cn.taketoday.assistant.model.xml.beans.ConstructorArg;
+import cn.taketoday.assistant.model.xml.beans.DefaultableBoolean;
+import cn.taketoday.assistant.model.xml.beans.InfraBean;
+import cn.taketoday.assistant.model.xml.beans.InfraProperty;
+import cn.taketoday.assistant.model.xml.beans.InfraPropertyDefinition;
+import cn.taketoday.assistant.model.xml.beans.InfraValue;
+import cn.taketoday.assistant.references.InfraBeanReference;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.assistant.util.JamAnnotationTypeUtil;
 import cn.taketoday.lang.Nullable;
 
@@ -150,14 +151,14 @@ public final class AutowireUtil {
           InfraConstant.MESSAGE_SOURCE,
           InfraConstant.RESOURCE_LOADER, InfraConstant.ENVIRONMENT_CLASS);
 
-  public static Map<PsiMethod, Collection<SpringBeanPointer<?>>> getByTypeAutowiredProperties(SpringBean springBean, CommonSpringModel model) {
-    Map<PsiMethod, Collection<SpringBeanPointer<?>>> autowiredMap = new HashMap<>();
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
-    if (beanClass != null && model != null && isByTypeAutowired(springBean)) {
+  public static Map<PsiMethod, Collection<BeanPointer<?>>> getByTypeAutowiredProperties(InfraBean infraBean, CommonInfraModel model) {
+    Map<PsiMethod, Collection<BeanPointer<?>>> autowiredMap = new HashMap<>();
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
+    if (beanClass != null && model != null && isByTypeAutowired(infraBean)) {
       for (PsiMethod psiMethod : beanClass.getAllMethods()) {
-        if (isPropertyAutowired(psiMethod, springBean)) {
+        if (isPropertyAutowired(psiMethod, infraBean)) {
           PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
-          Collection<SpringBeanPointer<?>> list = new HashSet<>();
+          Collection<BeanPointer<?>> list = new HashSet<>();
           PsiAnnotation qualifiedAnnotation = getQualifiedAnnotation(psiMethod);
           if (qualifiedAnnotation != null) {
             list.addAll(getQualifiedBeans(qualifiedAnnotation, model));
@@ -175,22 +176,22 @@ public final class AutowireUtil {
     return autowiredMap;
   }
 
-  public static Set<SpringBeanPointer<?>> excludeAutowireCandidates(Collection<SpringBeanPointer<?>> beans, @Nullable CommonSpringModel model) {
+  public static Set<BeanPointer<?>> excludeAutowireCandidates(Collection<BeanPointer<?>> beans, @Nullable CommonInfraModel model) {
     return excludeAutowireCandidates(beans, null, model);
   }
 
-  public static Set<SpringBeanPointer<?>> excludeAutowireCandidates(Collection<SpringBeanPointer<?>> beans, @Nullable String primaryCandidateName, @Nullable CommonSpringModel model) {
-    Set<SpringBeanPointer<?>> pointers = new LinkedHashSet<>();
-    Collection<SpringBeanPointer<?>> primaryBeans = beans.size() > 1 ? getPrimaryBeans(beans, primaryCandidateName, model) : beans;
+  public static Set<BeanPointer<?>> excludeAutowireCandidates(Collection<BeanPointer<?>> beans, @Nullable String primaryCandidateName, @Nullable CommonInfraModel model) {
+    Set<BeanPointer<?>> pointers = new LinkedHashSet<>();
+    Collection<BeanPointer<?>> primaryBeans = beans.size() > 1 ? getPrimaryBeans(beans, primaryCandidateName, model) : beans;
     if (!primaryBeans.isEmpty()) {
-      for (SpringBeanPointer primaryBean : primaryBeans) {
+      for (BeanPointer primaryBean : primaryBeans) {
         if (isAutowireCandidate(primaryBean)) {
           pointers.add(primaryBean);
         }
       }
       return pointers;
     }
-    for (SpringBeanPointer beanPointer : beans) {
+    for (BeanPointer beanPointer : beans) {
       if (isAutowireCandidate(beanPointer)) {
         pointers.add(beanPointer);
       }
@@ -198,39 +199,39 @@ public final class AutowireUtil {
     return pointers;
   }
 
-  private static List<SpringBeanPointer<?>> getPrimaryBeans(Collection<? extends SpringBeanPointer<?>> beans, @Nullable String primaryCandidateName, @Nullable CommonSpringModel model) {
+  private static List<BeanPointer<?>> getPrimaryBeans(Collection<? extends BeanPointer<?>> beans, @Nullable String primaryCandidateName, @Nullable CommonInfraModel model) {
     if (primaryCandidateName == null) {
       return emptyList();
     }
-    List<SpringBeanPointer<?>> byPrimary = new SmartList<>();
-    List<SpringBeanPointer<?>> byName = new SmartList<>();
-    for (SpringBeanPointer springBeanPointer : beans) {
-      if (springBeanPointer.isValid()) {
-        CommonSpringBean springBean = springBeanPointer.getSpringBean();
-        if (springBean.isPrimary()) {
-          if (isMyName(primaryCandidateName, springBeanPointer, model)) {
-            return Collections.singletonList(springBeanPointer);
+    List<BeanPointer<?>> byPrimary = new SmartList<>();
+    List<BeanPointer<?>> byName = new SmartList<>();
+    for (BeanPointer beanPointer : beans) {
+      if (beanPointer.isValid()) {
+        CommonInfraBean infraBean = beanPointer.getBean();
+        if (infraBean.isPrimary()) {
+          if (isMyName(primaryCandidateName, beanPointer, model)) {
+            return Collections.singletonList(beanPointer);
           }
-          byPrimary.add(springBeanPointer);
+          byPrimary.add(beanPointer);
         }
-        else if (isMyName(primaryCandidateName, springBeanPointer, model)) {
-          byName.add(springBeanPointer);
+        else if (isMyName(primaryCandidateName, beanPointer, model)) {
+          byName.add(beanPointer);
         }
       }
     }
     return byPrimary.isEmpty() ? byName : byPrimary;
   }
 
-  private static boolean isMyName(@Nullable String name, SpringBeanPointer<?> springBeanPointer, @Nullable CommonSpringModel model) {
+  private static boolean isMyName(@Nullable String name, BeanPointer<?> beanPointer, @Nullable CommonInfraModel model) {
     if (name == null) {
       return false;
     }
-    String beanName = springBeanPointer.getName();
+    String beanName = beanPointer.getName();
     if (name.equals(beanName)) {
       return true;
     }
     if (beanName != null && model != null) {
-      for (String aliasName : SpringModelVisitorUtils.getAllBeanNames(model, springBeanPointer)) {
+      for (String aliasName : InfraModelVisitorUtils.getAllBeanNames(model, beanPointer)) {
         if (name.equals(aliasName)) {
           return true;
         }
@@ -240,28 +241,28 @@ public final class AutowireUtil {
     return false;
   }
 
-  private static boolean isAutowireCandidate(@Nullable SpringBeanPointer<?> pointer) {
+  private static boolean isAutowireCandidate(@Nullable BeanPointer<?> pointer) {
     if (pointer == null || !pointer.isValid()) {
       return false;
     }
-    var getSpringBean = pointer.getSpringBean();
-    if (!(getSpringBean instanceof SpringBean)) {
+    var getSpringBean = pointer.getBean();
+    if (!(getSpringBean instanceof InfraBean)) {
       return true;
     }
-    if (((SpringBean) getSpringBean).isAbstract()) {
+    if (((InfraBean) getSpringBean).isAbstract()) {
       return false;
     }
-    DefaultableBoolean autoWireCandidate = ((SpringBean) getSpringBean).getAutowireCandidate().getValue();
+    DefaultableBoolean autoWireCandidate = ((InfraBean) getSpringBean).getAutowireCandidate().getValue();
     return (autoWireCandidate == null || autoWireCandidate.getBooleanValue()) && isDefaultAutowireCandidate(getSpringBean);
   }
 
-  private static boolean isDefaultAutowireCandidate(CommonSpringBean springBean) {
+  private static boolean isDefaultAutowireCandidate(CommonInfraBean infraBean) {
     Beans beans;
-    if ((springBean instanceof SpringBean) && (beans = ((SpringBean) springBean).getParentOfType(Beans.class, false)) != null) {
+    if ((infraBean instanceof InfraBean) && (beans = ((InfraBean) infraBean).getParentOfType(Beans.class, false)) != null) {
       String autowireCandidates = beans.getDefaultAutowireCandidates().getValue();
       if (StringUtil.isNotEmpty(autowireCandidates)) {
-        String beanName = springBean.getBeanName();
-        String[] aliases = springBean.getAliases();
+        String beanName = infraBean.getBeanName();
+        String[] aliases = infraBean.getAliases();
         for (String patternText : StringUtil.split(autowireCandidates, ",")) {
           Pattern pattern = Pattern.compile(FileUtil.convertAntToRegexp(patternText.trim()));
           if (isMatched(pattern, beanName)) {
@@ -284,28 +285,29 @@ public final class AutowireUtil {
     return beanName != null && pattern.matcher(beanName).matches();
   }
 
-  public static Map<PsiType, Collection<SpringBeanPointer<?>>> getConstructorAutowiredProperties(SpringBean springBean, CommonSpringModel model) {
+  public static Map<PsiType, Collection<BeanPointer<?>>> getConstructorAutowiredProperties(InfraBean infraBean, CommonInfraModel model) {
     PsiMethod springBeanConstructor;
-    Collection<SpringBeanPointer<?>> autowireByType;
-    Map<PsiType, Collection<SpringBeanPointer<?>>> autowiredMap = new HashMap<>();
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
-    if (beanClass != null && isConstructorAutowire(springBean)) {
-      boolean instantiatedByFactory = SpringConstructorArgResolveUtil.isInstantiatedByFactory(springBean);
+    Collection<BeanPointer<?>> autowireByType;
+    Map<PsiType, Collection<BeanPointer<?>>> autowiredMap = new HashMap<>();
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
+    if (beanClass != null && isConstructorAutowire(infraBean)) {
+      boolean instantiatedByFactory = InfraConstructorArgResolveUtil.isInstantiatedByFactory(infraBean);
       if (instantiatedByFactory) {
-        springBeanConstructor = springBean.getFactoryMethod().getValue();
+        springBeanConstructor = infraBean.getFactoryMethod().getValue();
       }
       else {
-        springBeanConstructor = SpringConstructorArgUtils.getInstance().getSpringBeanConstructor(springBean, model);
+        springBeanConstructor = InfraConstructorArgUtils.of().getInfraBeanConstructor(infraBean, model);
       }
       PsiMethod checkedMethod = springBeanConstructor;
       if (checkedMethod != null) {
-        List<ConstructorArg> list = springBean.getConstructorArgs();
-        Map<Integer, ConstructorArg> indexedArgs = SpringConstructorArgResolveUtil.getIndexedConstructorArgs(list);
+        List<ConstructorArg> list = infraBean.getConstructorArgs();
+        Map<Integer, ConstructorArg> indexedArgs = InfraConstructorArgResolveUtil.getIndexedConstructorArgs(list);
         PsiParameter[] parameters = checkedMethod.getParameterList().getParameters();
         SmartList smartList = new SmartList();
         for (int i = 0; i < parameters.length; i++) {
           PsiParameter parameter = parameters[i];
-          if (!SpringConstructorArgResolveUtil.acceptParameter(parameter, new ArrayList<>(springBean.getConstructorArgs()), indexedArgs, i, smartList)) {
+          if (!InfraConstructorArgResolveUtil.acceptParameter(
+                  parameter, new ArrayList<>(infraBean.getConstructorArgs()), indexedArgs, i, smartList)) {
             PsiType psiType = parameter.getType();
             PsiAnnotation qualifiedAnnotation = getQualifiedAnnotation(parameter);
             if (qualifiedAnnotation != null) {
@@ -314,7 +316,7 @@ public final class AutowireUtil {
             else {
               autowireByType = autowireByType(model, getAutowiredEffectiveBeanTypes(psiType));
             }
-            Collection<SpringBeanPointer<?>> springBeans = autowireByType;
+            Collection<BeanPointer<?>> springBeans = autowireByType;
             if (!springBeans.isEmpty()) {
               autowiredMap.put(psiType, springBeans);
             }
@@ -325,23 +327,23 @@ public final class AutowireUtil {
     return autowiredMap;
   }
 
-  public static boolean isPropertyNotDefined(SpringBean springBean, String propertyName) {
-    return springBean.getProperty(propertyName) == null;
+  public static boolean isPropertyNotDefined(InfraBean infraBean, String propertyName) {
+    return infraBean.getProperty(propertyName) == null;
   }
 
-  public static Map<PsiMethod, SpringBeanPointer<?>> getByNameAutowiredProperties(SpringBean springBean) {
-    Map<PsiMethod, SpringBeanPointer<?>> autowiredMap = new HashMap<>();
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+  public static Map<PsiMethod, BeanPointer<?>> getByNameAutowiredProperties(InfraBean infraBean) {
+    Map<PsiMethod, BeanPointer<?>> autowiredMap = new HashMap<>();
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     if (beanClass != null) {
-      CommonSpringModel model = SpringModelUtils.getInstance().getSpringModelByBean(springBean);
-      if (isByNameAutowired(springBean)) {
+      CommonInfraModel model = InfraModelService.of().getModelByBean(infraBean);
+      if (isByNameAutowired(infraBean)) {
         for (PsiMethod psiMethod : beanClass.getAllMethods()) {
           if (PropertyUtilBase.isSimplePropertySetter(psiMethod)) {
             PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
-            Collection<SpringBeanPointer<?>> list = autowireByType(model, getAutowiredEffectiveBeanTypes(parameter.getType()));
+            Collection<BeanPointer<?>> list = autowireByType(model, getAutowiredEffectiveBeanTypes(parameter.getType()));
             String propertyName = PropertyUtilBase.getPropertyNameBySetter(psiMethod);
-            for (SpringBeanPointer pointer : list) {
-              if (pointer.isValid() && SpringBeanUtils.getInstance().findBeanNames(pointer.getSpringBean()).contains(propertyName) && isPropertyNotDefined(springBean, propertyName)) {
+            for (BeanPointer pointer : list) {
+              if (pointer.isValid() && InfraBeanUtils.of().findBeanNames(pointer.getBean()).contains(propertyName) && isPropertyNotDefined(infraBean, propertyName)) {
                 autowiredMap.put(psiMethod, pointer);
               }
             }
@@ -352,35 +354,35 @@ public final class AutowireUtil {
     return autowiredMap;
   }
 
-  private static boolean isPropertyAutowired(PsiMethod psiMethod, SpringBean springBean) {
+  private static boolean isPropertyAutowired(PsiMethod psiMethod, InfraBean infraBean) {
     if (PropertyUtilBase.isSimplePropertySetter(psiMethod)) {
       PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
       PsiType type = parameter.getType();
       if (type instanceof PsiClassType classType) {
         PsiClass psiClass = classType.resolve();
         return psiClass != null
-                && isPropertyNotDefined(springBean, PropertyUtilBase.getPropertyNameBySetter(psiMethod));
+                && isPropertyNotDefined(infraBean, PropertyUtilBase.getPropertyNameBySetter(psiMethod));
       }
       return false;
     }
     return false;
   }
 
-  public static boolean isByTypeAutowired(SpringBean springBean) {
-    return springBean.getBeanAutowire().equals(Autowire.BY_TYPE);
+  public static boolean isByTypeAutowired(InfraBean infraBean) {
+    return infraBean.getBeanAutowire() == Autowire.BY_TYPE;
   }
 
-  public static boolean isByNameAutowired(SpringBean springBean) {
-    return springBean.getBeanAutowire().equals(Autowire.BY_NAME);
+  public static boolean isByNameAutowired(InfraBean infraBean) {
+    return infraBean.getBeanAutowire() == Autowire.BY_NAME;
   }
 
-  public static boolean isConstructorAutowire(SpringBean springBean) {
-    return springBean.getBeanAutowire().equals(Autowire.CONSTRUCTOR);
+  public static boolean isConstructorAutowire(InfraBean bean) {
+    return bean.getBeanAutowire() == Autowire.CONSTRUCTOR;
   }
 
-  public static Map<PsiMember, Set<SpringBeanPointer<?>>> getAutowireAnnotationProperties(CommonSpringBean springBean, CommonSpringModel model) {
-    Map<PsiMember, Set<SpringBeanPointer<?>>> map = new HashMap<>();
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+  public static Map<PsiMember, Set<BeanPointer<?>>> getAutowireAnnotationProperties(CommonInfraBean infraBean, CommonInfraModel model) {
+    Map<PsiMember, Set<BeanPointer<?>>> map = new HashMap<>();
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     if (beanClass != null) {
       for (PsiMethod psiMethod : getAnnotatedAutowiredMethods(beanClass)) {
         for (PsiParameter parameter : psiMethod.getParameterList().getParameters()) {
@@ -389,7 +391,7 @@ public final class AutowireUtil {
             addAutowiredBeans(map, psiMethod, getQualifiedBeans(psiAnnotation, model), model);
           }
           else {
-            addAutowiredBeans(map, psiMethod, SpringBeanCoreUtils.getBeansByType(parameter.getType(), model), model);
+            addAutowiredBeans(map, psiMethod, BeanCoreUtils.getBeansByType(parameter.getType(), model), model);
           }
         }
       }
@@ -406,9 +408,9 @@ public final class AutowireUtil {
     return map;
   }
 
-  private static void addAutowiredBeans(Map<PsiMember, Set<SpringBeanPointer<?>>> map, PsiMember psiMember, Collection<SpringBeanPointer<?>> beans,
-          CommonSpringModel model) {
-    Set<SpringBeanPointer<?>> list = excludeAutowireCandidates(beans, null, model);
+  private static void addAutowiredBeans(Map<PsiMember, Set<BeanPointer<?>>> map, PsiMember psiMember, Collection<BeanPointer<?>> beans,
+          CommonInfraModel model) {
+    Set<BeanPointer<?>> list = excludeAutowireCandidates(beans, null, model);
     if (!list.isEmpty()) {
       if (!map.containsKey(psiMember)) {
         map.put(psiMember, list);
@@ -419,13 +421,12 @@ public final class AutowireUtil {
     }
   }
 
-  public static Set<SpringBeanPointer<?>> getQualifiedBeans(PsiAnnotation psiAnnotation, @Nullable CommonSpringModel model) {
+  public static Set<BeanPointer<?>> getQualifiedBeans(PsiAnnotation psiAnnotation, @Nullable CommonInfraModel model) {
     if (model == null) {
       return Collections.emptySet();
     }
-    SpringJamQualifier qualifier = getQualifier(null, psiAnnotation);
-    Set<SpringBeanPointer<?>> findQualifiedBeans = SpringModelVisitorUtils.findQualifiedBeans(model, qualifier);
-    return findQualifiedBeans;
+    InfraJamQualifier qualifier = getQualifier(null, psiAnnotation);
+    return InfraModelVisitorUtils.findQualifiedBeans(model, qualifier);
   }
 
   @Nullable
@@ -442,10 +443,10 @@ public final class AutowireUtil {
     }
     List<PsiClass> annotationTypeClasses = JamAnnotationTypeUtil.getQualifierAnnotationTypesWithChildren(module);
     for (PsiClass annotationTypeClass : annotationTypeClasses) {
-      if (((modifierListOwner instanceof PsiField) && AnnotationTargetUtil.findAnnotationTarget(annotationTypeClass,
-              PsiAnnotation.TargetType.FIELD) != null) || (((modifierListOwner instanceof PsiParameter)
-              && AnnotationTargetUtil.findAnnotationTarget(annotationTypeClass, PsiAnnotation.TargetType.PARAMETER) != null)
-              || ((modifierListOwner instanceof PsiMethod)
+      if (((modifierListOwner instanceof PsiField)
+              && AnnotationTargetUtil.findAnnotationTarget(annotationTypeClass, PsiAnnotation.TargetType.FIELD) != null)
+              || (((modifierListOwner instanceof PsiParameter) && AnnotationTargetUtil.findAnnotationTarget(annotationTypeClass,
+              PsiAnnotation.TargetType.PARAMETER) != null) || ((modifierListOwner instanceof PsiMethod)
               && AnnotationTargetUtil.findAnnotationTarget(annotationTypeClass, PsiAnnotation.TargetType.METHOD) != null))) {
         PsiAnnotation annotation2 = AnnotationUtil.findAnnotation(modifierListOwner, true, annotationTypeClass.getQualifiedName());
         if (annotation2 != null) {
@@ -456,8 +457,8 @@ public final class AutowireUtil {
     if ((modifierListOwner instanceof PsiParameter)
             && (psiMethod = PsiTreeUtil.getParentOfType(modifierListOwner, PsiMethod.class)) != null && isAutowiredByAnnotation(psiMethod)) {
       for (PsiClass annotationTypeClass2 : annotationTypeClasses) {
-        if (AnnotationTargetUtil.findAnnotationTarget(annotationTypeClass2, PsiAnnotation.TargetType.METHOD) != null && (annotation = AnnotationUtil.findAnnotation(
-                psiMethod, true, annotationTypeClass2.getQualifiedName())) != null) {
+        if (AnnotationTargetUtil.findAnnotationTarget(annotationTypeClass2, PsiAnnotation.TargetType.METHOD) != null
+                && (annotation = AnnotationUtil.findAnnotation(psiMethod, true, annotationTypeClass2.getQualifiedName())) != null) {
           return annotation;
         }
       }
@@ -508,7 +509,7 @@ public final class AutowireUtil {
 
   public static boolean isDefaultStereotypeComponentConstructor(PsiMethod method) {
     PsiClass containingClass;
-    return method.isConstructor() && (containingClass = method.getContainingClass()) != null && containingClass.getConstructors().length == 1 && CommonUtils.isStereotypeComponentOrMeta(
+    return method.isConstructor() && (containingClass = method.getContainingClass()) != null && containingClass.getConstructors().length == 1 && InfraUtils.isStereotypeComponentOrMeta(
             containingClass);
   }
 
@@ -518,12 +519,14 @@ public final class AutowireUtil {
 
   public static boolean isRequired(PsiModifierListOwner owner) {
     PsiAnnotation autowiredAnnotation;
-    Boolean value;
+    Boolean required;
     PsiModifierList modifierList = owner.getModifierList();
     if (modifierList != null) {
-      PsiAnnotation required = modifierList.findAnnotation(AnnotationConstant.REQUIRED);
-      return required != null || (autowiredAnnotation = getAutowiredAnnotation(owner)) == null || (value = JamCommonUtil.getObjectValue(autowiredAnnotation.findAttributeValue("required"),
-              Boolean.class)) == null || value.booleanValue();
+      PsiAnnotation requiredAnno = modifierList.findAnnotation(AnnotationConstant.REQUIRED);
+      return requiredAnno != null
+              || (autowiredAnnotation = getAutowiredAnnotation(owner)) == null
+              || (required = JamCommonUtil.getObjectValue(autowiredAnnotation.findAttributeValue("required"), Boolean.class)) == null
+              || required;
     }
     return true;
   }
@@ -548,41 +551,41 @@ public final class AutowireUtil {
     return smartList;
   }
 
-  public static Set<SpringBeanPointer<?>> autowireByType(CommonSpringModel model, PsiType psiType) {
+  public static Set<BeanPointer<?>> autowireByType(CommonInfraModel model, PsiType psiType) {
     return autowireByType(model, psiType, null);
   }
 
-  public static Set<SpringBeanPointer<?>> autowireByType(CommonSpringModel model, PsiType psiType, @Nullable String primaryCandidateName) {
+  public static Set<BeanPointer<?>> autowireByType(CommonInfraModel model, PsiType psiType, @Nullable String primaryCandidateName) {
     return autowireByType(model, psiType, primaryCandidateName, true);
   }
 
-  public static Set<SpringBeanPointer<?>> autowireByType(CommonSpringModel model, PsiType psiType, @Nullable String primaryCandidateName, boolean filterByGenerics) {
+  public static Set<BeanPointer<?>> autowireByType(CommonInfraModel model, PsiType psiType, @Nullable String primaryCandidateName, boolean filterByGenerics) {
     PsiClass psiClass = PsiTypesUtil.getPsiClass(psiType);
     if (psiClass != null && psiClass.getQualifiedName() == null) {
       return Collections.emptySet();
     }
-    SpringModelSearchParameters.BeanClass searchParameters = SpringModelSearchParameters.byType(psiType).withInheritors().effectiveBeanTypes();
-    List<SpringBeanPointer<?>> beans = SpringModelSearchers.findBeans(model, searchParameters);
+    ModelSearchParameters.BeanClass searchParameters = ModelSearchParameters.byType(psiType).withInheritors().effectiveBeanTypes();
+    List<BeanPointer<?>> beans = InfraModelSearchers.findBeans(model, searchParameters);
     if (beans.size() == 0 && (psiType instanceof PsiClassType)) {
       beans = findWildcardInjectedBeans(model, (PsiClassType) psiType);
       filterByGenerics = false;
     }
-    Set<SpringBeanPointer<?>> pointers = CommonUtils.filterInnerClassBeans(
+    Set<BeanPointer<?>> pointers = InfraUtils.filterInnerClassBeans(
             filterByPriority(excludeExplicitlyRedefined(excludeTheSameIdentifyingElements(excludeOverridenDefaultBeans(excludeAutowireCandidates(beans, primaryCandidateName, model)))),
                     model.getModule()));
     return filterByGenerics ? filterByGenerics(pointers, psiType) : pointers;
   }
 
-  private static List<SpringBeanPointer<?>> findWildcardInjectedBeans(CommonSpringModel model, PsiClassType psiType) {
+  private static List<BeanPointer<?>> findWildcardInjectedBeans(CommonInfraModel model, PsiClassType psiType) {
     PsiClass psiClass = psiType.resolve();
     if (psiClass == null) {
       return emptyList();
     }
-    List<SpringBeanPointer<?>> beansByClass = SpringModelSearchers.findBeans(model, SpringModelSearchParameters.byClass(psiClass).withInheritors().effectiveBeanTypes());
+    List<BeanPointer<?>> beansByClass = InfraModelSearchers.findBeans(model, ModelSearchParameters.byClass(psiClass).withInheritors().effectiveBeanTypes());
     return ContainerUtil.filter(beansByClass, pointer -> isAssignableWildcardTypeBean(psiType, pointer));
   }
 
-  public static boolean isAssignableWildcardTypeBean(PsiClassType searchType, SpringBeanPointer<?> bean) {
+  public static boolean isAssignableWildcardTypeBean(PsiClassType searchType, BeanPointer<?> bean) {
     for (PsiType effectiveBeanType : bean.getEffectiveBeanTypes()) {
       if (effectiveBeanType instanceof PsiClassType type) {
         for (PsiType parameter : type.getParameters()) {
@@ -602,9 +605,9 @@ public final class AutowireUtil {
 //            .anyMatch(effectiveType -> effectiveType.isAssignableFrom(searchType));
   }
 
-  private static Set<SpringBeanPointer<?>> filterByGenerics(Set<? extends SpringBeanPointer<?>> pointers, PsiType type) {
-    Set<SpringBeanPointer<?>> filtered = new HashSet<>();
-    for (SpringBeanPointer pointer : pointers) {
+  private static Set<BeanPointer<?>> filterByGenerics(Set<? extends BeanPointer<?>> pointers, PsiType type) {
+    Set<BeanPointer<?>> filtered = new HashSet<>();
+    for (BeanPointer pointer : pointers) {
       PsiType[] effectiveBeanTypes = pointer.getEffectiveBeanTypes();
       int length = effectiveBeanTypes.length;
       int i = 0;
@@ -642,27 +645,27 @@ public final class AutowireUtil {
       return beanType;
     }
     if (psiType instanceof PsiClassType) {
-      if (SpringObjectFactoryEffectiveTypeProvider.isJavaxInjectProvider((PsiClassType) psiType)) {
-        PsiType injectProviderType = SpringObjectFactoryEffectiveTypeProvider.getJavaxInjectProviderType((PsiClassType) psiType);
+      if (ObjectFactoryEffectiveTypeProvider.isJavaxInjectProvider((PsiClassType) psiType)) {
+        PsiType injectProviderType = ObjectFactoryEffectiveTypeProvider.getJavaxInjectProviderType((PsiClassType) psiType);
         if (injectProviderType != null) {
           return injectProviderType;
         }
       }
-      else if (SpringObjectFactoryEffectiveTypeProvider.isJakartaInjectProvider((PsiClassType) psiType)) {
-        PsiType injectProviderType2 = SpringObjectFactoryEffectiveTypeProvider.getJakartaInjectProviderType((PsiClassType) psiType);
+      else if (ObjectFactoryEffectiveTypeProvider.isJakartaInjectProvider((PsiClassType) psiType)) {
+        PsiType injectProviderType2 = ObjectFactoryEffectiveTypeProvider.getJakartaInjectProviderType((PsiClassType) psiType);
         if (injectProviderType2 != null) {
           return injectProviderType2;
         }
       }
-      else if (SpringObjectFactoryEffectiveTypeProvider.isObjectFactory((PsiClassType) psiType) && (objectFactoryType = SpringObjectFactoryEffectiveTypeProvider.getObjectFactoryType(
-              (PsiClassType) psiType)) != null) {
+      else if (ObjectFactoryEffectiveTypeProvider.isObjectFactory((PsiClassType) psiType)
+              && (objectFactoryType = ObjectFactoryEffectiveTypeProvider.getObjectFactoryType((PsiClassType) psiType)) != null) {
         return objectFactoryType;
       }
     }
     return psiType;
   }
 
-  private static List<SpringBeanPointer<?>> emptyList() {
+  private static List<BeanPointer<?>> emptyList() {
     return new ArrayList();
   }
 
@@ -682,19 +685,19 @@ public final class AutowireUtil {
     return false;
   }
 
-  public static boolean isAutowired(SpringBean springBean, CommonSpringModel springModel, PsiMethod psiMethod) {
+  public static boolean isAutowired(InfraBean infraBean, CommonInfraModel springModel, PsiMethod psiMethod) {
     PsiClass psiClass;
-    Autowire autowire = springBean.getBeanAutowire();
+    Autowire autowire = infraBean.getBeanAutowire();
     switch (autowire) {
       case BY_TYPE:
         PsiType type = psiMethod.getParameterList().getParameters()[0].getType();
         return type instanceof PsiClassType psiClassType
                 && (psiClass = psiClassType.resolve()) != null
-                && SpringModelSearchers.doesBeanExist(springModel, psiClass);
+                && InfraModelSearchers.doesBeanExist(springModel, psiClass);
       case BY_NAME:
         String propertyName = PropertyUtilBase.getPropertyNameBySetter(psiMethod);
-        SpringBeanPointer<?> bean = SpringModelSearchers.findBean(springModel, propertyName);
-        return bean != null && !bean.isReferenceTo(springBean);
+        BeanPointer<?> bean = InfraModelSearchers.findBean(springModel, propertyName);
+        return bean != null && !bean.isReferenceTo(infraBean);
       default:
         return false;
     }
@@ -704,7 +707,7 @@ public final class AutowireUtil {
     if (module == null) {
       return AUTOWIRED_ANNOTATIONS;
     }
-    Set<String> annotations = new LinkedHashSet<>();
+    var annotations = new LinkedHashSet<String>();
     annotations.addAll(AUTOWIRED_ANNOTATIONS);
     annotations.addAll(getMetaAutowiredAnnotations(module));
     if (isUsingAutowiredPostProcessor(module)) {
@@ -714,37 +717,36 @@ public final class AutowireUtil {
   }
 
   private static List<String> getMetaAutowiredAnnotations(Module module) {
-    return ContainerUtil.mapNotNull(MetaAnnotationUtil.getAnnotationTypesWithChildren(module, AnnotationConstant.AUTOWIRED, false), PsiClass::getQualifiedName);
+    return ContainerUtil.mapNotNull(
+            MetaAnnotationUtil.getAnnotationTypesWithChildren(module, AnnotationConstant.AUTOWIRED, false),
+            PsiClass::getQualifiedName);
   }
 
-  public static Set<PsiModifierListOwner> getAutowiredMembers(PsiType type, @Nullable Module module, PsiMember method) {
+  public static Set<PsiModifierListOwner> getAutowiredMembers(PsiType type, @Nullable Module module, PsiMember psiMember) {
     if (module == null) {
       return Collections.emptySet();
     }
-    Set<PsiModifierListOwner> membersCandidate = new LinkedHashSet<>();
-    GlobalSearchScope scope = method.getResolveScope();
+    var membersCandidate = new LinkedHashSet<PsiModifierListOwner>();
+    GlobalSearchScope scope = psiMember.getResolveScope();
     Set<PsiType> effectiveTypes = getEffectiveTypes(type);
+    // collector
     Processor<PsiMember> processor = member -> {
-      if (member instanceof PsiField) {
-        PsiType psiType = ((PsiField) member).getType();
+      if (member instanceof PsiField field) {
+        PsiType psiType = field.getType();
         for (PsiType effectiveType : effectiveTypes) {
           if (isAutowiredCandidate(psiType, effectiveType)) {
-            membersCandidate.add(member);
+            membersCandidate.add(field);
             return true;
           }
         }
         return true;
       }
-      else if (member instanceof PsiMethod) {
-        for (PsiParameter psiParameter : ((PsiMethod) member).getParameterList().getParameters()) {
-          Iterator<PsiType> it2 = effectiveTypes.iterator();
-          while (true) {
-            if (it2.hasNext()) {
-              PsiType effectiveType2 = it2.next();
-              if (isAutowiredCandidate(psiParameter.getType(), effectiveType2)) {
-                membersCandidate.add(psiParameter);
-                break;
-              }
+      else if (member instanceof PsiMethod method) {
+        for (PsiParameter psiParameter : method.getParameterList().getParameters()) {
+          for (PsiType effectiveType2 : effectiveTypes) {
+            if (isAutowiredCandidate(psiParameter.getType(), effectiveType2)) {
+              membersCandidate.add(psiParameter);
+              break;
             }
           }
         }
@@ -754,22 +756,40 @@ public final class AutowireUtil {
         return true;
       }
     };
+
+    // 遍历所有的 包括 字段注解 Autowired Bean Component 也需要
     Set<String> annotations = new HashSet<>(getAutowiredAnnotations(module));
     annotations.add(AnnotationConstant.BEAN);
+    annotations.add(AnnotationConstant.COMPONENT);
     for (String annotation : annotations) {
       PsiClass annoClass = JavaPsiFacade.getInstance(module.getProject()).findClass(annotation, scope);
       if (annoClass != null) {
         AnnotatedMembersSearch.search(annoClass, scope).forEach(processor);
       }
     }
-    for (InfraStereotypeElement stereotypeElement : InfraJamModel.from(module).getStereotypeComponents()) {
-      PsiClass psiClass = stereotypeElement.getPsiElement();
+
+    var components = InfraJamModel.from(module).getStereotypeComponents();
+    for (InfraStereotypeElement stereotype : components) {
+      PsiClass psiClass = stereotype.getPsiElement();
       PsiMethod[] constructors = psiClass.getConstructors();
       if (constructors.length == 1 && !membersCandidate.contains(constructors[0])) {
         processor.process(constructors[0]);
       }
+
+      // find final field
+      var allFields = psiClass.getFields();
+      for (PsiField field : allFields) {
+        PsiModifierList modifierList = field.getModifierList();
+        if (modifierList != null) {
+          if (!modifierList.hasModifierProperty(PsiModifier.STATIC)
+                  && modifierList.hasModifierProperty(PsiModifier.FINAL)) {
+            processor.process(field);
+          }
+        }
+      }
     }
-    return filterCandidates(method, membersCandidate, module);
+
+    return filterCandidates(psiMember, membersCandidate, module);
   }
 
   private static boolean isAutowiredCandidate(PsiType psiType, PsiType candidateType) {
@@ -783,10 +803,10 @@ public final class AutowireUtil {
     return !effectivePsiType.equals(psiType) && effectivePsiType.isAssignableFrom(candidateType);
   }
 
-  public static Set<PsiModifierListOwner> filterCandidates(PsiMember method, Set<? extends PsiModifierListOwner> all, @Nullable Module module) {
-    SpringJamQualifier qualifier = getQualifier(method, getQualifiedAnnotation(method, module));
+  public static Set<PsiModifierListOwner> filterCandidates(PsiMember method, Set<PsiModifierListOwner> all, @Nullable Module module) {
+    InfraJamQualifier qualifier = getQualifier(method, getQualifiedAnnotation(method, module));
     return all.stream().filter(owner -> {
-      SpringJamQualifier candidateQualifier = getQualifier(owner);
+      InfraJamQualifier candidateQualifier = getQualifier(owner);
       if (candidateQualifier != null) {
         if (qualifier != null && qualifier.compareQualifiers(candidateQualifier, module)) {
           return true;
@@ -799,7 +819,7 @@ public final class AutowireUtil {
   }
 
   @Nullable
-  public static SpringJamQualifier getQualifier(@Nullable PsiModifierListOwner modifierListOwner) {
+  public static InfraJamQualifier getQualifier(@Nullable PsiModifierListOwner modifierListOwner) {
     if (modifierListOwner == null) {
       return null;
     }
@@ -807,17 +827,17 @@ public final class AutowireUtil {
   }
 
   @Nullable
-  public static SpringJamQualifier getQualifier(@Nullable PsiModifierListOwner modifierListOwner, @Nullable PsiAnnotation qualifiedAnnotation) {
+  public static InfraJamQualifier getQualifier(@Nullable PsiModifierListOwner modifierListOwner, @Nullable PsiAnnotation qualifiedAnnotation) {
     if (qualifiedAnnotation == null) {
       return null;
     }
-    return new SpringJamQualifier(qualifiedAnnotation, modifierListOwner);
+    return new InfraJamQualifier(qualifiedAnnotation, modifierListOwner);
   }
 
   private static Set<PsiType> getEffectiveTypes(PsiType type) {
-    Set<PsiType> types = new LinkedHashSet<>();
+    LinkedHashSet<PsiType> types = new LinkedHashSet<>();
     types.add(type);
-    types.addAll(SpringBeanCoreUtils.getFactoryBeanTypes(type, null));
+    types.addAll(BeanCoreUtils.getFactoryBeanTypes(type, null));
     return types;
   }
 
@@ -825,18 +845,18 @@ public final class AutowireUtil {
     if (module == null) {
       return Collections.emptySet();
     }
-    PsiClass autowiredPostProcessor = CommonUtils.findLibraryClass(module, InfraConstant.AUTOWIRED_ANNO_POST_PROCESSOR_CLASS);
+    PsiClass autowiredPostProcessor = InfraUtils.findLibraryClass(module, InfraConstant.AUTOWIRED_ANNO_POST_PROCESSOR_CLASS);
     if (autowiredPostProcessor == null) {
       return Collections.emptySet();
     }
     Set<String> annotations = new HashSet<>();
-    SpringModel springModel = SpringManager.getInstance(module.getProject()).getCombinedModel(module);
-    SpringModelSearchParameters.BeanClass searchParameters = SpringModelSearchParameters.byClass(autowiredPostProcessor).withInheritors();
-    for (SpringBeanPointer pointer : SpringModelSearchers.findBeans(springModel, searchParameters)) {
-      CommonSpringBean springBean = pointer.getSpringBean();
-      if (springBean instanceof SpringBean) {
-        addAutowiredAnnotationType(annotations, springBean);
-        addAutowiredAnnotationTypes(annotations, springBean);
+    InfraModel infraModel = InfraManager.from(module.getProject()).getCombinedModel(module);
+    ModelSearchParameters.BeanClass searchParameters = ModelSearchParameters.byClass(autowiredPostProcessor).withInheritors();
+    for (BeanPointer pointer : InfraModelSearchers.findBeans(infraModel, searchParameters)) {
+      CommonInfraBean infraBean = pointer.getBean();
+      if (infraBean instanceof InfraBean) {
+        addAutowiredAnnotationType(annotations, infraBean);
+        addAutowiredAnnotationTypes(annotations, infraBean);
       }
     }
     return annotations;
@@ -845,18 +865,20 @@ public final class AutowireUtil {
   private static boolean isUsingAutowiredPostProcessor(Module module) {
     GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
     Project project = module.getProject();
-    Collection<VirtualFile> springXmlCandidates = DomService.getInstance().getDomFileCandidates(Beans.class, scope);
-    if (springXmlCandidates.isEmpty()) {
+    var xmlCandidates = DomService.getInstance().getDomFileCandidates(Beans.class, scope);
+    if (xmlCandidates.isEmpty()) {
       return false;
     }
     String className = ClassUtil.extractClassName(InfraConstant.AUTOWIRED_ANNO_POST_PROCESSOR_CLASS);
-    CommonProcessors.FindFirstProcessor<PsiFile> processor = new CommonProcessors.FindFirstProcessor<>();
-    CacheManager.getInstance(project).processFilesWithWord(processor, className, (short) 255, GlobalSearchScope.filesWithLibrariesScope(project, springXmlCandidates), true);
+    var processor = new CommonProcessors.FindFirstProcessor<PsiFile>();
+    CacheManager.getInstance(project)
+            .processFilesWithWord(processor, className, UsageSearchContext.ANY,
+                    GlobalSearchScope.filesWithLibrariesScope(project, xmlCandidates), true);
     return processor.isFound();
   }
 
-  private static void addAutowiredAnnotationType(Set<? super String> annotations, CommonSpringBean springBean) {
-    SpringPropertyDefinition autowiredTypeProperty = SpringPropertyUtils.findPropertyByName(springBean, "autowiredAnnotationType");
+  private static void addAutowiredAnnotationType(Set<? super String> annotations, CommonInfraBean infraBean) {
+    InfraPropertyDefinition autowiredTypeProperty = InfraPropertyUtils.findPropertyByName(infraBean, "autowiredAnnotationType");
     if (autowiredTypeProperty != null) {
       String value = autowiredTypeProperty.getValueAsString();
       if (!StringUtil.isEmptyOrSpaces(value)) {
@@ -865,17 +887,17 @@ public final class AutowireUtil {
     }
   }
 
-  private static void addAutowiredAnnotationTypes(Set<? super String> annotations, CommonSpringBean springBean) {
-    SpringPropertyDefinition autowiredTypes = SpringPropertyUtils.findPropertyByName(springBean, "autowiredAnnotationTypes");
-    if (autowiredTypes instanceof SpringProperty springProperty) {
+  private static void addAutowiredAnnotationTypes(Set<? super String> annotations, CommonInfraBean infraBean) {
+    InfraPropertyDefinition autowiredTypes = InfraPropertyUtils.findPropertyByName(infraBean, "autowiredAnnotationTypes");
+    if (autowiredTypes instanceof InfraProperty springProperty) {
       addNotNullValues(annotations, springProperty.getList().getValues());
       addNotNullValues(annotations, springProperty.getSet().getValues());
       addNotNullValues(annotations, springProperty.getArray().getValues());
     }
   }
 
-  private static void addNotNullValues(Collection<? super String> annotations, Collection<? extends SpringValue> values) {
-    for (SpringValue value : values) {
+  private static void addNotNullValues(Collection<? super String> annotations, Collection<? extends InfraValue> values) {
+    for (InfraValue value : values) {
       String stringValue = value.getStringValue();
       if (!StringUtil.isEmptyOrSpaces(stringValue)) {
         annotations.add(stringValue);
@@ -884,16 +906,16 @@ public final class AutowireUtil {
   }
 
   @Nullable
-  public static CommonSpringModel getProcessingSpringModel(@Nullable PsiClass psiClass) {
+  public static CommonInfraModel getProcessingInfraModel(@Nullable PsiClass psiClass) {
     if (psiClass == null || psiClass.getQualifiedName() == null) {
       return null;
     }
     if (psiClass instanceof PsiAnonymousClass) {
-      return SpringModelUtils.getInstance().getModuleCombinedSpringModel(psiClass);
+      return InfraModelService.of().getModuleCombinedModel(psiClass);
     }
-    CommonSpringModel model = SpringModelUtils.getInstance().getPsiClassSpringModel(psiClass);
-    if (model instanceof CombinedSpringModel) {
-      model = filterClassRelatedModels((CombinedSpringModel) model, psiClass);
+    CommonInfraModel model = InfraModelService.of().getPsiClassModel(psiClass);
+    if (model instanceof CombinedInfraModel) {
+      model = filterClassRelatedModels((CombinedInfraModel) model, psiClass);
     }
     if (!isEmptyModel(model)) {
       return model;
@@ -901,32 +923,32 @@ public final class AutowireUtil {
     return null;
   }
 
-  private static CommonSpringModel filterClassRelatedModels(CombinedSpringModel model, PsiClass aClass) {
-    SpringFileSet fileSet;
-    Set<CommonSpringModel> models = new HashSet<>();
-    for (CommonSpringModel commonSpringModel : model.getUnderlyingModels()) {
-      if (SpringModelSearchers.doesBeanExist(commonSpringModel, SpringModelSearchParameters.byClass(aClass).withInheritors())) {
-        if ((commonSpringModel instanceof SpringModel) && (fileSet = ((SpringModel) commonSpringModel).getFileSet()) != null && fileSet.isAutodetected()) {
+  private static CommonInfraModel filterClassRelatedModels(CombinedInfraModel model, PsiClass aClass) {
+    InfraFileSet fileSet;
+    Set<CommonInfraModel> models = new HashSet<>();
+    for (CommonInfraModel infraModel : model.getUnderlyingModels()) {
+      if (InfraModelSearchers.doesBeanExist(infraModel, ModelSearchParameters.byClass(aClass).withInheritors())) {
+        if ((infraModel instanceof InfraModel) && (fileSet = ((InfraModel) infraModel).getFileSet()) != null && fileSet.isAutodetected()) {
           return model;
         }
-        models.add(commonSpringModel);
+        models.add(infraModel);
       }
     }
-    return new CombinedSpringModelImpl(models, model.getModule());
+    return new CombinedInfraModelImpl(models, model.getModule());
   }
 
-  private static boolean isEmptyModel(CommonSpringModel model) {
-    return model.equals(SpringModel.UNKNOWN) || ((model instanceof CombinedSpringModel) && ((CombinedSpringModel) model).getUnderlyingModels().isEmpty());
+  private static boolean isEmptyModel(CommonInfraModel model) {
+    return model.equals(InfraModel.UNKNOWN) || ((model instanceof CombinedInfraModel) && ((CombinedInfraModel) model).getUnderlyingModels().isEmpty());
   }
 
-  private static Set<SpringBeanPointer<?>> excludeOverridenDefaultBeans(Set<SpringBeanPointer<?>> pointers) {
+  private static Set<BeanPointer<?>> excludeOverridenDefaultBeans(Set<BeanPointer<?>> pointers) {
     if (pointers.size() == 1) {
       return pointers;
     }
-    Set<SpringBeanPointer<?>> beans = new LinkedHashSet<>();
-    SpringBeanPointer[] objects = pointers.toArray(new SpringBeanPointer[0]);
-    for (SpringBeanPointer pointer : objects) {
-      CommonSpringBean bean = pointer.getSpringBean();
+    Set<BeanPointer<?>> beans = new LinkedHashSet<>();
+    BeanPointer[] objects = pointers.toArray(new BeanPointer[0]);
+    for (BeanPointer pointer : objects) {
+      CommonInfraBean bean = pointer.getBean();
       if (!isOverridden(bean, objects)) {
         beans.add(pointer);
       }
@@ -934,11 +956,11 @@ public final class AutowireUtil {
     return beans;
   }
 
-  private static Set<SpringBeanPointer<?>> excludeTheSameIdentifyingElements(Set<? extends SpringBeanPointer<?>> pointers) {
-    Set<SpringBeanPointer<?>> filtered = new LinkedHashSet<>();
+  private static Set<BeanPointer<?>> excludeTheSameIdentifyingElements(Set<? extends BeanPointer<?>> pointers) {
+    Set<BeanPointer<?>> filtered = new LinkedHashSet<>();
     Set<PsiElement> identifyingElements = new HashSet<>();
-    for (SpringBeanPointer pointer : pointers) {
-      PsiElement element = pointer.getSpringBean().getIdentifyingPsiElement();
+    for (BeanPointer pointer : pointers) {
+      PsiElement element = pointer.getBean().getIdentifyingPsiElement();
       if (!identifyingElements.contains(element)) {
         filtered.add(pointer);
         ContainerUtil.addIfNotNull(identifyingElements, element);
@@ -947,26 +969,26 @@ public final class AutowireUtil {
     return filtered;
   }
 
-  private static Set<SpringBeanPointer<?>> excludeExplicitlyRedefined(Set<SpringBeanPointer<?>> pointers) {
+  private static Set<BeanPointer<?>> excludeExplicitlyRedefined(Set<BeanPointer<?>> pointers) {
     if (pointers.size() <= 1) {
       return pointers;
     }
     ExplicitRedefinitionAwareBeansCollector collector = new ExplicitRedefinitionAwareBeansCollector();
-    for (SpringBeanPointer pointer : pointers) {
+    for (BeanPointer pointer : pointers) {
       collector.process(pointer);
     }
-    return (Set<SpringBeanPointer<?>>) collector.getResult();
+    return (Set<BeanPointer<?>>) collector.getResult();
   }
 
-  private static Set<SpringBeanPointer<?>> filterByPriority(Set<SpringBeanPointer<?>> filtered, @Nullable Module module) {
+  private static Set<BeanPointer<?>> filterByPriority(Set<BeanPointer<?>> filtered, @Nullable Module module) {
     if (filtered.isEmpty()) {
       return filtered;
     }
     Long maxPriority = null;
-    MultiMap<Long, SpringBeanPointer<?>> byPriority = new MultiMap<>();
-    for (SpringBeanPointer<?> pointer : filtered) {
-      if (pointer instanceof JamSpringBeanPointer) {
-        JamPsiMemberSpringBean<?> psiMemberSpringBean = ((JamSpringBeanPointer) pointer).getSpringBean();
+    MultiMap<Long, BeanPointer<?>> byPriority = new MultiMap<>();
+    for (BeanPointer<?> pointer : filtered) {
+      if (pointer instanceof JamBeanPointer) {
+        JamPsiMemberInfraBean<?> psiMemberSpringBean = ((JamBeanPointer) pointer).getBean();
         PsiMember psiMember = psiMemberSpringBean.getPsiElement();
         PsiAnnotation priority = AnnotationUtil.findAnnotation(psiMember, getPriorityAnnotations(module));
         if (priority == null) {
@@ -1027,13 +1049,13 @@ public final class AutowireUtil {
     return null;
   }
 
-  private static boolean isOverridden(CommonSpringBean bean, SpringBeanPointer[] objects) {
-    if (bean instanceof SpringImplicitBeanMarker) {
+  private static boolean isOverridden(CommonInfraBean bean, BeanPointer[] objects) {
+    if (bean instanceof InfraImplicitBeanMarker) {
       String beanName = bean.getBeanName();
       PsiType beanType = bean.getBeanType();
       if (beanType != null && beanName != null) {
-        for (SpringBeanPointer pointer : objects) {
-          if (!bean.equals(pointer.getSpringBean()) && beanName.equals(pointer.getName())) {
+        for (BeanPointer pointer : objects) {
+          if (!bean.equals(pointer.getBean()) && beanName.equals(pointer.getName())) {
             for (PsiType psiType : pointer.getEffectiveBeanTypes()) {
               if (psiType.isAssignableFrom(beanType)) {
                 return true;
@@ -1058,10 +1080,10 @@ public final class AutowireUtil {
     return PsiUtil.substituteTypeParameter(psiClassType, "java.util.Optional", 0, false);
   }
 
-  public static Set<SpringBeanPointer<?>> getAutowiredBeansFor(PsiModifierListOwner injectionPointOwner, PsiType psiType, CommonSpringModel springModel) {
+  public static Set<BeanPointer<?>> getAutowiredBeansFor(PsiModifierListOwner injectionPointOwner, PsiType psiType, CommonInfraModel springModel) {
     PsiAnnotation resourceAnnotation = getResourceAnnotation(injectionPointOwner);
     if (resourceAnnotation != null && (injectionPointOwner instanceof PsiMember)) {
-      SpringBeanPointer<?> bean = getResourceAutowiredBean(injectionPointOwner, springModel, resourceAnnotation);
+      BeanPointer<?> bean = getResourceAutowiredBean(injectionPointOwner, springModel, resourceAnnotation);
       return bean != null ? Collections.singleton(bean) : Collections.emptySet();
     }
     PsiAnnotation qualifiedAnnotation = getEffectiveQualifiedAnnotation(injectionPointOwner);
@@ -1071,18 +1093,18 @@ public final class AutowireUtil {
     return getByTypeAutowiredBeans((PsiNameIdentifierOwner) injectionPointOwner, psiType, springModel);
   }
 
-  private static Set<SpringBeanPointer<?>> getByTypeAutowiredBeans(PsiNameIdentifierOwner psiNameIdentifierOwner, PsiType searchType, CommonSpringModel model) {
+  private static Set<BeanPointer<?>> getByTypeAutowiredBeans(PsiNameIdentifierOwner psiNameIdentifierOwner, PsiType searchType, CommonInfraModel model) {
     String primaryCandidateName = psiNameIdentifierOwner.getName();
-    Set<SpringBeanPointer<?>> iterableBeanPointers = getIterableBeanPointers(searchType, model);
+    Set<BeanPointer<?>> iterableBeanPointers = getIterableBeanPointers(searchType, model);
     return iterableBeanPointers.isEmpty() ? autowireByType(model, searchType, primaryCandidateName) : iterableBeanPointers;
   }
 
-  private static Set<SpringBeanPointer<?>> getQualifiedAutowiredBeans(PsiType type, PsiAnnotation annotation, CommonSpringModel model) {
+  private static Set<BeanPointer<?>> getQualifiedAutowiredBeans(PsiType type, PsiAnnotation annotation, CommonInfraModel model) {
     return filterPointersByAutowiredType(type, getQualifiedBeanPointers(annotation, model));
   }
 
   @Nullable
-  private static SpringBeanPointer<?> getResourceAutowiredBean(PsiModifierListOwner injectionPointOwner, CommonSpringModel springModel, PsiAnnotation resourceAnnotation) {
+  private static BeanPointer<?> getResourceAutowiredBean(PsiModifierListOwner injectionPointOwner, CommonInfraModel springModel, PsiAnnotation resourceAnnotation) {
     PsiAnnotationMemberValue attributeValue = resourceAnnotation.findDeclaredAttributeValue("name");
     if (attributeValue != null) {
       return getByNameAutowiredBean(attributeValue, springModel);
@@ -1091,8 +1113,8 @@ public final class AutowireUtil {
   }
 
   @Nullable
-  private static SpringBeanPointer<?> findBeanByImplicitInjectionPointName(PsiModifierListOwner injectionPointOwner, CommonSpringModel springModel) {
-    SpringBeanPointer<?> bean;
+  private static BeanPointer<?> findBeanByImplicitInjectionPointName(PsiModifierListOwner injectionPointOwner, CommonInfraModel springModel) {
+    BeanPointer<?> bean;
     String name = null;
     if (injectionPointOwner instanceof PsiMethod) {
       name = PropertyUtilBase.getPropertyNameBySetter((PsiMethod) injectionPointOwner);
@@ -1100,7 +1122,7 @@ public final class AutowireUtil {
     else if (injectionPointOwner instanceof PsiField) {
       name = ((PsiField) injectionPointOwner).getName();
     }
-    if (name != null && (bean = SpringModelSearchers.findBean(springModel, name)) != null) {
+    if (name != null && (bean = InfraModelSearchers.findBean(springModel, name)) != null) {
       return bean.getBasePointer();
     }
     return null;
@@ -1115,12 +1137,12 @@ public final class AutowireUtil {
   }
 
   @Nullable
-  private static SpringBeanPointer<?> getByNameAutowiredBean(PsiAnnotationMemberValue annotationMemberValue, CommonSpringModel model) {
+  private static BeanPointer<?> getByNameAutowiredBean(PsiAnnotationMemberValue annotationMemberValue, CommonInfraModel model) {
     for (PsiReference reference : annotationMemberValue.getReferences()) {
-      if (reference instanceof SpringBeanReference sbReference) {
+      if (reference instanceof InfraBeanReference sbReference) {
         String beanName = sbReference.getValue();
         if (StringUtil.isNotEmpty(beanName)) {
-          return SpringModelSearchers.findBean(model, beanName);
+          return InfraModelSearchers.findBean(model, beanName);
         }
       }
       else if (reference instanceof PsiReferenceExpression psiReferenceExpression) {
@@ -1129,7 +1151,7 @@ public final class AutowireUtil {
           PsiConstantEvaluationHelper helper = JavaPsiFacade.getInstance(resolve.getProject()).getConstantEvaluationHelper();
           Object o = helper.computeConstantExpression(psiField.getInitializer());
           if (o instanceof String) {
-            return SpringModelSearchers.findBean(model, (String) o);
+            return InfraModelSearchers.findBean(model, (String) o);
           }
         }
       }
@@ -1137,9 +1159,9 @@ public final class AutowireUtil {
     return null;
   }
 
-  public static Set<SpringBeanPointer<?>> filterPointersByAutowiredType(PsiType searchType, Set<? extends SpringBeanPointer<?>> beanPointers) {
-    Set<SpringBeanPointer<?>> autowiredPointers = new HashSet<>();
-    for (SpringBeanPointer bean : beanPointers) {
+  public static Set<BeanPointer<?>> filterPointersByAutowiredType(PsiType searchType, Set<? extends BeanPointer<?>> beanPointers) {
+    Set<BeanPointer<?>> autowiredPointers = new HashSet<>();
+    for (BeanPointer bean : beanPointers) {
       PsiType[] psiTypes = bean.getEffectiveBeanTypes();
       int length = psiTypes.length;
       int i = 0;
@@ -1159,11 +1181,11 @@ public final class AutowireUtil {
     return autowiredPointers;
   }
 
-  public static Set<SpringBeanPointer<?>> getQualifiedBeanPointers(PsiAnnotation qualifiedAnnotation, CommonSpringModel model) {
-    SpringBeanPointer<?> pointer;
-    Collection<SpringBeanPointer<?>> candidates = getQualifiedBeans(qualifiedAnnotation, model);
+  public static Set<BeanPointer<?>> getQualifiedBeanPointers(PsiAnnotation qualifiedAnnotation, CommonInfraModel model) {
+    BeanPointer<?> pointer;
+    Collection<BeanPointer<?>> candidates = getQualifiedBeans(qualifiedAnnotation, model);
     String name = getQualifiedBeanName(qualifiedAnnotation);
-    if (name != null && (pointer = SpringModelSearchers.findBean(model, name)) != null) {
+    if (name != null && (pointer = InfraModelSearchers.findBean(model, name)) != null) {
       candidates = new ArrayList<>(candidates);
       candidates.add(pointer.getBasePointer());
     }
@@ -1201,12 +1223,12 @@ public final class AutowireUtil {
   }
 
   private static boolean isObjectFactoryEffectiveType(PsiType psiType, PsiType aType) {
-    PsiType objectFactoryEffectiveType = SpringObjectFactoryEffectiveTypeProvider.getObjectFactoryEffectiveType(aType);
+    PsiType objectFactoryEffectiveType = ObjectFactoryEffectiveTypeProvider.getObjectFactoryEffectiveType(aType);
     return objectFactoryEffectiveType != null && psiType.isAssignableFrom(objectFactoryEffectiveType);
   }
 
-  public static Set<SpringBeanPointer<?>> getIterableBeanPointers(PsiType searchType, CommonSpringModel model) {
-    Set<SpringBeanPointer<?>> emptySet;
+  public static Set<BeanPointer<?>> getIterableBeanPointers(PsiType searchType, CommonInfraModel model) {
+    Set<BeanPointer<?>> emptySet;
     PsiType secondarySearchType = getIterableSearchType(searchType);
     if (secondarySearchType != null) {
       emptySet = autowireByType(model, secondarySearchType, null);
@@ -1226,7 +1248,7 @@ public final class AutowireUtil {
     if (isTypedMapWithStringKey(searchType)) {
       return PsiUtil.substituteTypeParameter(searchType, "java.util.Map", 1, false);
     }
-    return SpringObjectFactoryEffectiveTypeProvider.getObjectFactoryEffectiveType(searchType);
+    return ObjectFactoryEffectiveTypeProvider.getObjectFactoryEffectiveType(searchType);
   }
 
   @Nullable
@@ -1259,7 +1281,7 @@ public final class AutowireUtil {
 
   public static boolean isAutowiringRelevantClass(@Nullable PsiClass psiClass) {
     return psiClass != null && InfraLibraryUtil.hasLibrary(ModuleUtilCore.findModuleForPsiElement(psiClass))
-            && (CommonUtils.isBeanCandidateClass(psiClass) || SpringTestContextUtil.getInstance().isTestContextConfigurationClass(psiClass));
+            && (InfraUtils.isBeanCandidateClass(psiClass) || InfraTestContextUtil.of().isTestContextConfigurationClass(psiClass));
   }
 
   public static boolean isValueAnnoInjection(@Nullable PsiModifierListOwner modifierListOwner) {
@@ -1267,7 +1289,7 @@ public final class AutowireUtil {
   }
 
   public static boolean hasConditional(PsiMethod method) {
-    return JamService.getJamService(method.getProject()).getJamElement(SpringConditional.SPRING_CONDITIONAL_JAM_ELEMENT_KEY, method) != null;
+    return JamService.getJamService(method.getProject()).getJamElement(InfraConditional.SPRING_CONDITIONAL_JAM_ELEMENT_KEY, method) != null;
   }
 }
 

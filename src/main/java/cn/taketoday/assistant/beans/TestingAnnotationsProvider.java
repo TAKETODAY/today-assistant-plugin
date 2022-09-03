@@ -23,16 +23,17 @@ package cn.taketoday.assistant.beans;
 import com.intellij.codeInsight.MetaAnnotationUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiClass;
-import com.intellij.spring.model.jam.testContexts.SpringTestingAnnotationsProvider;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+
+import cn.taketoday.assistant.model.jam.testContexts.InfraTestingAnnotationsProvider;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 15:08
  */
-public class TestingAnnotationsProvider implements SpringTestingAnnotationsProvider {
+public class TestingAnnotationsProvider implements InfraTestingAnnotationsProvider {
 
   @Override
   public Collection<PsiClass> getTestingAnnotations(Module module) {

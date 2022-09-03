@@ -26,7 +26,6 @@ import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.model.jam.stereotype.SpringJamComponentScanArchetype;
 
 import cn.taketoday.assistant.AnnotationConstant;
 
@@ -34,7 +33,7 @@ import cn.taketoday.assistant.AnnotationConstant;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/21 16:25
  */
-public class ComponentScan extends SpringJamComponentScanArchetype {
+public class ComponentScan extends InfraJamComponentScan {
 
   private static final SemKey<ComponentScan> JAM_KEY = COMPONENT_SCAN_JAM_KEY.subKey("ComponentScan");
   public static final SemKey<ComponentScan> REPEATABLE_ANNO_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("ComponentScan");
@@ -54,7 +53,6 @@ public class ComponentScan extends SpringJamComponentScanArchetype {
   }
 
   @Override
-
   protected JamAnnotationMeta getAnnotationMeta() {
     return ANNOTATION_META;
   }

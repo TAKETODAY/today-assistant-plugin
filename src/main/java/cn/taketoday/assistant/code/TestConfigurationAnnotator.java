@@ -29,14 +29,6 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlFile;
-import com.intellij.spring.CommonSpringModel;
-import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.contexts.model.LocalModel;
-import com.intellij.spring.model.jam.testContexts.ContextConfiguration;
-import com.intellij.spring.model.jam.testContexts.SpringContextConfiguration;
-import com.intellij.spring.model.jam.testContexts.SpringContextHierarchy;
-import com.intellij.spring.model.jam.testContexts.SpringTestContextUtil;
-import com.intellij.spring.model.jam.testContexts.SpringTestingImplicitContextsProvider;
 import com.intellij.util.containers.ContainerUtil;
 
 import org.jetbrains.uast.UAnnotation;
@@ -51,10 +43,17 @@ import java.util.Set;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.CommonInfraModel;
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.context.model.LocalModel;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.model.jam.testContexts.ContextConfiguration;
+import cn.taketoday.assistant.model.jam.testContexts.InfraContextConfiguration;
+import cn.taketoday.assistant.model.jam.testContexts.InfraContextHierarchy;
+import cn.taketoday.assistant.model.jam.testContexts.InfraTestContextUtil;
+import cn.taketoday.assistant.model.jam.testContexts.TestingImplicitContextsProvider;
+import cn.taketoday.assistant.util.InfraUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -81,8 +80,8 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
   protected void annotateClass(Collection<? super RelatedItemLineMarkerInfo<?>> result, UClass uClass, PsiElement identifier) {
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
     if (psiClass != null) {
-      if (CommonUtils.isBeanCandidateClass(psiClass)) {
-        if (SpringTestContextUtil.getInstance().isTestContextConfigurationClass(psiClass)) {
+      if (InfraUtils.isBeanCandidateClass(psiClass)) {
+        if (InfraTestContextUtil.of().isTestContextConfigurationClass(psiClass)) {
           this.addTestConfigurationGutter(result, uClass);
         }
       }
@@ -98,9 +97,9 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
         this.annotateContextConfiguration(result, contextConfiguration, uClass);
       }
 
-      SpringContextHierarchy hierarchy = (SpringContextHierarchy) service.getJamElement(psiClass, new JamMemberMeta[] { SpringContextHierarchy.META });
+      InfraContextHierarchy hierarchy = (InfraContextHierarchy) service.getJamElement(psiClass, new JamMemberMeta[] { InfraContextHierarchy.META });
       if (hierarchy != null) {
-        for (SpringContextConfiguration configuration : hierarchy.getContextConfigurations()) {
+        for (InfraContextConfiguration configuration : hierarchy.getContextConfigurations()) {
           this.annotateContextConfiguration(result, configuration, uClass);
         }
       }
@@ -118,15 +117,15 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
         var toNavigate = new LinkedHashSet<PsiElement>();
         var javaContexts = new LinkedHashSet<PsiClass>();
 
-        SpringTestContextUtil.getInstance().discoverConfigFiles(contextConfiguration, xmlContexts, javaContexts, psiClass);
+        InfraTestContextUtil.of().discoverConfigFiles(contextConfiguration, xmlContexts, javaContexts, psiClass);
         toNavigate.addAll(xmlContexts);
         toNavigate.addAll(javaContexts);
         Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
         if (module != null) {
           Set<String> annotationActiveProfiles = ContainerUtil.newLinkedHashSet("_DEFAULT_TEST_PROFILE_NAME_");
 
-          for (SpringTestingImplicitContextsProvider provider : SpringTestingImplicitContextsProvider.EP_NAME.getExtensionList()) {
-            for (CommonSpringModel model : provider.getModels(module, contextConfiguration, annotationActiveProfiles)) {
+          for (TestingImplicitContextsProvider provider : TestingImplicitContextsProvider.EP_NAME.getExtensionList()) {
+            for (CommonInfraModel model : provider.getModels(module, contextConfiguration, annotationActiveProfiles)) {
               if (model instanceof LocalModel<?> localModel) {
                 toNavigate.add(localModel.getConfig());
               }
@@ -134,7 +133,7 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
           }
         }
 
-        GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(SpringApiIcons.Gutter.Spring);
+        GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(Icons.Gutter.Today);
         builder.setTargets(toNavigate).setPopupTitle(InfraBundle.message("app.context.to.navigate"))
                 .setTooltipText(InfraBundle.message("app.context.navigate.tooltip"));
         PsiElement identifier = UAnnotationKt.getNamePsiElement(UastContextKt.toUElement(annotation, UAnnotation.class));

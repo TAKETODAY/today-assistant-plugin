@@ -28,23 +28,22 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiClass;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.constants.SpringCorePresentationConstants;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
 import com.intellij.util.Function;
 
 import java.util.Collection;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.PresentationConstant;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
 
-@Presentation(typeName = SpringCorePresentationConstants.CONTROLLER)
+@Presentation(typeName = PresentationConstant.CONTROLLER)
 public class Controller extends InfraMetaStereotypeComponent {
   public static final SemKey<JamMemberMeta<PsiClass, Controller>> META_KEY = JamService.ALIASING_MEMBER_META_KEY.subKey("InfraControllerMeta");
-  public static final SemKey<Controller> JAM_KEY = JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("InfraController");
+  public static final SemKey<Controller> JAM_KEY = JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("InfraController");
   public static final JamClassMeta<Controller> META = new JamClassMeta<>(null, Controller.class, JAM_KEY);
 
-  private static final Function<Module, Collection<String>> ANNOTATIONS = module -> {
-    return getAnnotations(module, AnnotationConstant.CONTROLLER);
-  };
+  private static final Function<Module, Collection<String>> ANNOTATIONS
+          = module -> getAnnotations(module, AnnotationConstant.CONTROLLER);
 
   public Controller(PsiClass psiClass) {
     this(AnnotationConstant.CONTROLLER, psiClass);

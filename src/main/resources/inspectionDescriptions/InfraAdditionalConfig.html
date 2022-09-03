@@ -1,0 +1,38 @@
+<html>
+<body>
+<p>
+  Reports missing and deprecated properties, unresolved references, and invalid values
+  in the <code>additional-infra-configuration-metadata.json</code> configuration file.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  {
+    "properties": [
+      {
+        "name": "old.key",
+        "type": "com.Unknown", // Reports 'Cannot resolve class 'Unknown''
+        "description": "Description for old.key", // Reports 'Text should end with '.''
+        "deprecation": {
+          "replacement": "new.key", // Reports 'Cannot resolve configuration key reference 'new.key''
+          "reason": "Reason", // Reports 'Text should end with '.''
+          "level": "warning"
+         }
+      },
+      {
+        "name": "duplicate", // Reports 'Duplicate entry for 'duplicate''
+        "type": "java.lang.String"
+      },
+      {
+        "name": "duplicate", // Reports 'Duplicate entry for 'duplicate''
+        "type": "java.lang.String"
+      },
+      {
+        // Reports 'Missing required 'name''
+        "type": "java.lang.String"
+      }
+    ]
+  }
+</code></pre>
+<!-- tooltip end -->
+</body>
+</html>

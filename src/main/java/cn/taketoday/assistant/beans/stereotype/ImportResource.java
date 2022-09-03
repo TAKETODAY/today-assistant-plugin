@@ -21,6 +21,8 @@
 package cn.taketoday.assistant.beans.stereotype;
 
 import com.intellij.jam.JamCommonModelElement;
+import com.intellij.jam.JamElement;
+import com.intellij.jam.JamService;
 import com.intellij.jam.JamStringAttributeElement;
 import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamClassMeta;
@@ -35,7 +37,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementRef;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.semantic.SemKey;
-import com.intellij.spring.model.jam.testContexts.converters.ApplicationContextReferenceConverter;
 import com.intellij.util.Processor;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
@@ -43,13 +44,22 @@ import com.intellij.util.containers.ContainerUtil;
 import java.util.List;
 
 import cn.taketoday.assistant.AnnotationConstant;
+import cn.taketoday.assistant.model.jam.testContexts.converters.ApplicationContextReferenceConverter;
 
-public class ImportResource extends JamCommonModelElement<PsiClass> implements com.intellij.spring.model.jam.stereotype.ImportResource {
-  private static final SemKey<ImportResource> JAM_KEY = IMPORT_RESOURCE_JAM_KEY.subKey("ImportResource");
+public class ImportResource extends JamCommonModelElement<PsiClass> implements JamElement {
+  public static final String LOCATIONS_ATTR_NAME = "locations";
+  public static final String VALUE_ATTR_NAME = "value";
+
+  public static final SemKey<ImportResource> IMPORT_RESOURCE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("ImportResource");
+
+  private static final SemKey<ImportResource> JAM_KEY = IMPORT_RESOURCE_JAM_KEY.subKey("Import");
   public static final JamClassMeta<ImportResource> META = new JamClassMeta<>(null, ImportResource.class, JAM_KEY);
   private static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta(AnnotationConstant.CONTEXT_IMPORT_RESOURCE);
-  private static final JamStringAttributeMeta.Collection<List<XmlFile>> VALUE_ATTR_META = new JamStringAttributeMeta.Collection<>("value", new ApplicationContextReferenceConverter());
-  private static final JamStringAttributeMeta.Collection<List<XmlFile>> LOCATION_ATTR_META = new JamStringAttributeMeta.Collection<>("locations", new ApplicationContextReferenceConverter());
+
+  private static final JamStringAttributeMeta.Collection<List<XmlFile>> VALUE_ATTR_META
+          = new JamStringAttributeMeta.Collection<>(VALUE_ATTR_NAME, new ApplicationContextReferenceConverter());
+  private static final JamStringAttributeMeta.Collection<List<XmlFile>> LOCATION_ATTR_META
+          = new JamStringAttributeMeta.Collection<>(LOCATIONS_ATTR_NAME, new ApplicationContextReferenceConverter());
 
   static {
     META.addAnnotation(ANNO_META);
@@ -61,7 +71,6 @@ public class ImportResource extends JamCommonModelElement<PsiClass> implements c
     super(PsiElementRef.real(psiElement));
   }
 
-  @Override
   public List<XmlFile> getImportedResources(Module... contexts) {
     SmartList<XmlFile> smartList = new SmartList<>();
     Processor<Pair<List<XmlFile>, ? extends PsiElement>> collect = pair -> {

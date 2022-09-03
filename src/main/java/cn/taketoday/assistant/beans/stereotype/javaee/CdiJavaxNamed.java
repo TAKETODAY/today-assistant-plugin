@@ -24,20 +24,20 @@ import com.intellij.ide.presentation.Presentation;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.presentation.SpringCorePresentationConstants;
 
 import cn.taketoday.assistant.JavaeeConstant;
+import cn.taketoday.assistant.PresentationConstant;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/23 15:15
  */
-@Presentation(typeName = SpringCorePresentationConstants.NAMED)
+@Presentation(typeName = PresentationConstant.NAMED)
 public class CdiJavaxNamed extends InfraStereotypeElement {
   public static final JamClassMeta<CdiJavaxNamed> META = new JamClassMeta<>(null, CdiJavaxNamed.class,
-          JamPsiMemberSpringBean.PSI_MEMBER_SPRING_BEAN_JAM_KEY.subKey("CdiJavaxNamed"));
+          JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("CdiJavaxNamed"));
 
   static {
     addPomTargetProducer(META);

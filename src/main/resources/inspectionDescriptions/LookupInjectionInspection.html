@@ -1,0 +1,24 @@
+<html>
+<body>
+<p>Reports incorrect bean references in the <code>value</code> parameter of the
+<a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/beans/factory/annotation/Lookup.html">@Lookup</a>
+annotation.</p>
+
+<p><b>Example:</b></p>
+<pre><code>
+  @Component public class FooBean {...}
+  @Component public class OtherBean {...}
+
+  @Component public class MyComponent {
+  @Lookup("fooBean")
+  public FooBean fooBean() {...}
+
+  @Lookup("fooBean") // reports "Bean must be of 'OtherBean' type"
+  public OtherBean otherBean() {...}
+
+  @Lookup("unknown") // reports "Cannot resolve bean 'unknown'"
+  public OtherBean fooBean() {...}
+  }
+</code></pre>
+</body>
+</html>

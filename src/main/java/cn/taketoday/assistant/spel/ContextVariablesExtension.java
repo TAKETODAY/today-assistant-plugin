@@ -23,17 +23,16 @@ package cn.taketoday.assistant.spel;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiVariable;
-import com.intellij.spring.CommonSpringModel;
-import com.intellij.spring.el.SpringBeansAsElVariableUtil;
 import com.intellij.spring.el.contextProviders.SpringElContextsExtension;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.utils.SpringModelSearchers;
-import com.intellij.spring.model.utils.SpringModelUtils;
 import com.intellij.util.SmartList;
 
 import java.util.Collection;
 import java.util.List;
 
+import cn.taketoday.assistant.CommonInfraModel;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.utils.InfraModelSearchers;
+import cn.taketoday.assistant.model.utils.InfraModelService;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -45,18 +44,18 @@ final class ContextVariablesExtension extends SpringElContextsExtension {
   @Override
   public Collection<? extends PsiVariable> getContextVariables(PsiElement contextElement) {
     List<PsiVariable> variables = new SmartList<>();
-    SpringBeansAsElVariableUtil.addVariables(variables, getModel(contextElement));
+    InfraBeansAsElVariableUtil.addVariables(variables, getModel(contextElement));
     return variables;
   }
 
   @Nullable
   @Override
   public PsiVariable findContextVariable(PsiElement contextElement, String nameHint) {
-    SpringBeanPointer<?> bean = SpringModelSearchers.findBean(getModel(contextElement), nameHint);
-    return bean != null ? SpringBeansAsElVariableUtil.createVariable(bean, nameHint) : null;
+    BeanPointer<?> bean = InfraModelSearchers.findBean(getModel(contextElement), nameHint);
+    return bean != null ? InfraBeansAsElVariableUtil.createVariable(bean, nameHint) : null;
   }
 
-  private static CommonSpringModel getModel(PsiElement contextElement) {
-    return SpringModelUtils.getInstance().getSpringModel(contextElement);
+  private static CommonInfraModel getModel(PsiElement contextElement) {
+    return InfraModelService.of().getModel(contextElement);
   }
 }

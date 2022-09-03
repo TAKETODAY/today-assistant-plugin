@@ -47,11 +47,6 @@ import cn.taketoday.lang.Nullable;
 public class StrategiesClassesListJamConverter extends JamConverter<PsiClass> {
   protected final String myConfigKey;
 
-  @Nullable
-  public Object m530fromString(@Nullable String str, JamStringAttributeElement jamStringAttributeElement) {
-    return fromString(str, (JamStringAttributeElement<PsiClass>) jamStringAttributeElement);
-  }
-
   public StrategiesClassesListJamConverter(String configKey) {
     this.myConfigKey = configKey;
   }
@@ -72,21 +67,21 @@ public class StrategiesClassesListJamConverter extends JamConverter<PsiClass> {
   @Override
   public PsiReference[] createReferences(JamStringAttributeElement<PsiClass> context, PsiLanguageInjectionHost injectionHost) {
     return new PsiReference[] {
-            new SpringSpiClassReference(this.myConfigKey, injectionHost, context.getStringValue())
+            new ClassReference(this.myConfigKey, injectionHost, context.getStringValue())
     };
   }
 
-  public static class SpringSpiClassReference extends PsiReferenceBase<PsiElement> implements EmptyResolveMessageProvider {
+  public static class ClassReference extends PsiReferenceBase<PsiElement> implements EmptyResolveMessageProvider {
     private final String myConfigKey;
     private final String myText;
 
-    public SpringSpiClassReference(String configKey, PsiElement literal, String text) {
+    public ClassReference(String configKey, PsiElement literal, String text) {
       super(literal);
       this.myConfigKey = configKey;
       this.myText = text;
     }
 
-    public SpringSpiClassReference(String configKey, PsiElement element, TextRange rangeInElement, String text) {
+    public ClassReference(String configKey, PsiElement element, TextRange rangeInElement, String text) {
       super(element, rangeInElement);
       this.myConfigKey = configKey;
       this.myText = text;
@@ -97,7 +92,7 @@ public class StrategiesClassesListJamConverter extends JamConverter<PsiClass> {
       if (StringUtil.isEmptyOrSpaces(this.myText)) {
         return null;
       }
-      return (PsiElement) ContainerUtil.find(getRelevantClasses(getElement(), this.myConfigKey), psiClass -> {
+      return ContainerUtil.find(getRelevantClasses(getElement(), this.myConfigKey), psiClass -> {
         return this.myText.equals(psiClass.getQualifiedName());
       });
     }

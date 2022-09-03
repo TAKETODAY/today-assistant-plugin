@@ -21,6 +21,8 @@
 package cn.taketoday.assistant.listener;
 
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
+import javax.swing.JList;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -28,4 +30,6 @@ import javax.swing.JButton;
  */
 public class ProjectForm {
   private JButton button1;
+  private JEditorPane editorPane1;
+  private JList list1;
 }

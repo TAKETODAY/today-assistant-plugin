@@ -34,22 +34,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.InheritanceUtil;
-import com.intellij.semantic.SemService;
-import com.intellij.spring.CommonSpringModel;
-import com.intellij.spring.SpringApiIcons;
-import com.intellij.spring.contexts.model.LocalAnnotationModel;
-import com.intellij.spring.contexts.model.SpringModel;
-import com.intellij.spring.contexts.model.visitors.CommonSpringModelVisitorContext;
-import com.intellij.spring.contexts.model.visitors.SpringModelVisitors;
-import com.intellij.spring.gutter.SpringBeansPsiElementCellRenderer;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.jam.JamPsiMemberSpringBean;
-import com.intellij.spring.model.jam.JamSpringBeanPointer;
-import com.intellij.spring.model.jam.javaConfig.SpringJavaBean;
-import com.intellij.spring.model.jam.javaConfig.SpringOldJavaConfigurationUtil;
-import com.intellij.spring.model.jam.stereotype.SpringImport;
-import com.intellij.spring.model.utils.SpringModelUtils;
-import com.intellij.spring.model.xml.DomSpringBeanPointer;
 import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 
@@ -63,21 +47,33 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.CommonInfraModel;
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.JavaClassInfo;
+import cn.taketoday.assistant.beans.stereotype.ContextImport;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
+import cn.taketoday.assistant.context.model.InfraModel;
+import cn.taketoday.assistant.context.model.LocalAnnotationModel;
+import cn.taketoday.assistant.context.model.visitors.InfraModelVisitorContext;
+import cn.taketoday.assistant.context.model.visitors.InfraModelVisitors;
+import cn.taketoday.assistant.gutter.BeansPsiElementCellRenderer;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
+import cn.taketoday.assistant.impl.InfraAutoConfiguredModels;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.jam.JamBeanPointer;
+import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
+import cn.taketoday.assistant.model.jam.javaConfig.InfraJavaBean;
+import cn.taketoday.assistant.model.utils.InfraModelService;
+import cn.taketoday.assistant.model.xml.DomBeanPointer;
 import cn.taketoday.assistant.service.InfraJamService;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 20:26
  */
 public class BeanAnnotator extends AbstractInfraAnnotator {
-  public static final List<String> bootAnnotations = List.of(
-          "cn.taketoday.context.annotation.config.EnableAutoConfiguration"
-  );
 
   @Override
   public String getId() {
@@ -91,42 +87,43 @@ public class BeanAnnotator extends AbstractInfraAnnotator {
 
   @Override
   public Icon getIcon() {
-    return SpringApiIcons.SpringBean;
+    return Icons.SpringBean;
   }
 
   @Override
   protected void annotateClass(Collection<? super RelatedItemLineMarkerInfo<?>> result, UClass uClass, PsiElement identifier) {
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
-    if (psiClass == null || !CommonUtils.isBeanCandidateClass(psiClass)) {
+    if (psiClass == null || !InfraUtils.isBeanCandidateClass(psiClass)) {
       return;
     }
-    JavaClassInfo info1 = JavaClassInfo.getSpringJavaClassInfo(psiClass);
+    JavaClassInfo info1 = JavaClassInfo.from(psiClass);
     if (info1.isMappedDomBean()) {
       addSpringBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
-        List<DomSpringBeanPointer> domBeans = JavaClassInfo.getSpringJavaClassInfo(psiClass).getMappedDomBeans();
-        domBeans.sort(SpringBeanPointer.DISPLAY_COMPARATOR);
+        List<DomBeanPointer> domBeans = JavaClassInfo.from(psiClass).getMappedDomBeans();
+        domBeans.sort(BeanPointer.DISPLAY_COMPARATOR);
         return domBeans;
       }));
     }
-    else if (!info1.isStereotypeJavaBean() || AnnotationUtil.isAnnotated(psiClass, bootAnnotations, 8)) {
+    else if (!info1.isStereotypeJavaBean()
+            || AnnotationUtil.isAnnotated(psiClass, InfraAutoConfiguredModels.annotations, 8)) {
 
     }
     else {
       addJavaBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
         SmartList<CommonModelElement> smartList = new SmartList<>();
-        List<JamSpringBeanPointer> mappedBeans = JavaClassInfo.getSpringJavaClassInfo(psiClass).getStereotypeMappedBeans();
-        for (JamSpringBeanPointer mappedBean : mappedBeans) {
-          JamPsiMemberSpringBean<?> bean = mappedBean.getSpringBean();
-          if ((bean instanceof SpringJavaBean) || ((bean instanceof InfraStereotypeElement) && !psiClass.isEquivalentTo(bean.getPsiElement()))) {
+        List<JamBeanPointer> mappedBeans = JavaClassInfo.from(psiClass).getStereotypeMappedBeans();
+        for (JamBeanPointer mappedBean : mappedBeans) {
+          JamPsiMemberInfraBean<?> bean = mappedBean.getBean();
+          if ((bean instanceof InfraJavaBean) || ((bean instanceof InfraStereotypeElement) && !psiClass.isEquivalentTo(bean.getPsiElement()))) {
             smartList.add(bean);
           }
         }
-        CommonSpringModel model = SpringModelUtils.getInstance().getPsiClassSpringModel(psiClass);
+        CommonInfraModel model = InfraModelService.of().getPsiClassModel(psiClass);
         Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
-        ContainerUtil.addAllNotNull(smartList, InfraJamService.getInstance().findStereotypeConfigurationBeans(model, mappedBeans, module));
+        ContainerUtil.addAllNotNull(smartList, InfraJamService.of().findStereotypeConfigurationBeans(model, mappedBeans, module));
         ContainerUtil.addAllNotNull(smartList, getImportConfigurations(model, psiClass));
         return smartList;
-      }), SpringApiIcons.Gutter.SpringJavaBean);
+      }), Icons.Gutter.SpringJavaBean);
       PsiClassType classType = JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass);
       result.add(AutowiredAnnotator.getNavigateToAutowiredCandidatesBuilder(psiClass, classType)
               .createGroupLineMarkerInfo(identifier)
@@ -141,19 +138,10 @@ public class BeanAnnotator extends AbstractInfraAnnotator {
     if (method != null) {
       PsiClass psiClass = method.getContainingClass();
       if (psiClass != null) {
-        if (CommonUtils.isBeanCandidateClassInProject(psiClass)) {
-          JavaClassInfo info = JavaClassInfo.getSpringJavaClassInfo(psiClass);
-          List<SpringBeanPointer<?>> externalBeans = SpringOldJavaConfigurationUtil.findExternalBeans(method);
+        if (InfraUtils.isBeanCandidateClassInProject(psiClass)) {
+          JavaClassInfo info = JavaClassInfo.from(psiClass);
 
-          if (!externalBeans.isEmpty()) {
-            addSpringBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
-              List<SpringBeanPointer<?>> externalBeans2 = SpringOldJavaConfigurationUtil.findExternalBeans(method);
-              externalBeans2.sort(SpringBeanPointer.DISPLAY_COMPARATOR);
-              return externalBeans2;
-            }));
-          }
-
-          Collection<Pair<PsiElement, JavaClassInfo.SpringMethodType>> methodTypes = info.getMethodTypes(method);
+          Collection<Pair<PsiElement, JavaClassInfo.MethodType>> methodTypes = info.getMethodTypes(method);
           if (!methodTypes.isEmpty()) {
             addMethodTypesGutterIcon(result, method, methodTypes);
           }
@@ -165,22 +153,20 @@ public class BeanAnnotator extends AbstractInfraAnnotator {
 
   private static void addMethodTypesGutterIcon(
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiMethod psiMethod,
-          Collection<? extends Pair<PsiElement, JavaClassInfo.SpringMethodType>> targets) {
+          Collection<? extends Pair<PsiElement, JavaClassInfo.MethodType>> targets) {
     String tooltipText = InfraBundle.message("bean.methods.tooltip.navigate.declaration");
-    Icon icon = SpringApiIcons.Gutter.SpringBeanMethod;
+    Icon icon = Icons.Gutter.SpringBeanMethod;
     if (targets.size() == 1) {
-      JavaClassInfo.SpringMethodType methodType = targets.iterator().next().second;
+      JavaClassInfo.MethodType methodType = targets.iterator().next().second;
       tooltipText = InfraBundle.message("bean.method.tooltip.navigate.declaration", methodType.getName());
-      if (methodType == JavaClassInfo.SpringMethodType.FACTORY) {
-        icon = SpringApiIcons.Gutter.FactoryMethodBean;
+      if (methodType == JavaClassInfo.MethodType.FACTORY) {
+        icon = Icons.Gutter.FactoryMethodBean;
       }
     }
 
     GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(icon);
-    builder.setTargets(ContainerUtil.mapNotNull(targets, (pair) -> {
-              return (PsiElement) pair.getFirst();
-            }))
-            .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
+    builder.setTargets(ContainerUtil.mapNotNull(targets, pair -> pair.getFirst()))
+            .setCellRenderer(BeansPsiElementCellRenderer::new)
             .setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
             .setTooltipText(tooltipText);
 
@@ -191,30 +177,30 @@ public class BeanAnnotator extends AbstractInfraAnnotator {
 
   }
 
-  private static void addSpringBeanGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier, NotNullLazyValue<Collection<? extends SpringBeanPointer<?>>> targets) {
+  private static void addSpringBeanGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier, NotNullLazyValue<Collection<? extends BeanPointer<?>>> targets) {
     var builder = GutterIconBuilder.create(
-            SpringApiIcons.Gutter.SpringBean,
+            Icons.Gutter.SpringBean,
             NavigationGutterIconBuilderUtil.BEAN_POINTER_CONVERTOR,
             NavigationGutterIconBuilderUtil.AUTOWIRED_BEAN_POINTER_GOTO_PROVIDER
     );
     builder.setTargets(targets)
             .setEmptyPopupText(InfraBundle.message("gutter.navigate.no.matching.beans"))
             .setPopupTitle(InfraBundle.message("bean.class.navigate.choose.class.title"))
-            .setCellRenderer(SpringBeansPsiElementCellRenderer::new)
+            .setCellRenderer(BeansPsiElementCellRenderer::new)
             .setTooltipText(InfraBundle.message("bean.class.tooltip.navigate.declaration"));
     result.add(builder.createGroupLineMarkerInfo(psiIdentifier));
   }
 
-  private static List<CommonModelElement> getImportConfigurations(CommonSpringModel model, PsiClass psiClass) {
+  private static List<CommonModelElement> getImportConfigurations(CommonInfraModel model, PsiClass psiClass) {
     Module module = model.getModule();
     if (module == null) {
       return Collections.emptyList();
     }
     else {
       List<CommonModelElement> result = new SmartList<>();
-      if (model instanceof SpringModel) {
-        SpringModelVisitors.visitRecursionAwareRelatedModels(
-                model, CommonSpringModelVisitorContext.context(p -> true,
+      if (model instanceof InfraModel) {
+        InfraModelVisitors.visitRecursionAwareRelatedModels(
+                model, InfraModelVisitorContext.context(p -> true,
                         (m, p) -> {
                           if (m instanceof LocalAnnotationModel localAnnotationModel) {
                             PsiClass configClass = localAnnotationModel.getConfig();
@@ -235,10 +221,9 @@ public class BeanAnnotator extends AbstractInfraAnnotator {
   }
 
   private static CommonModelElement getImportConfiguration(PsiClass candidate, PsiClass importedPsiClass) {
-    SpringImport springImport = SemService.getSemService(candidate.getProject())
-            .getSemElement(SpringImport.IMPORT_JAM_KEY, candidate);
-    if (springImport != null && springImport.getImportedClasses().contains(importedPsiClass)) {
-      return springImport;
+    ContextImport contextImport = ContextImport.from(candidate);
+    if (contextImport != null && contextImport.getImportedClasses().contains(importedPsiClass)) {
+      return contextImport;
     }
     return null;
   }

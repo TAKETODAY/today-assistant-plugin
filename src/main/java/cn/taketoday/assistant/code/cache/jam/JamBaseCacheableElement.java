@@ -29,8 +29,6 @@ import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.semantic.SemKey;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.model.SpringBeanPointer;
-import com.intellij.spring.model.jam.converters.SpringBeanReferenceJamConverter;
 import com.intellij.util.containers.ContainerUtil;
 
 import java.util.LinkedHashSet;
@@ -39,6 +37,8 @@ import java.util.Set;
 
 import cn.taketoday.assistant.code.cache.CacheableConstant;
 import cn.taketoday.assistant.code.event.jam.EventListenerElement;
+import cn.taketoday.assistant.model.BeanPointer;
+import cn.taketoday.assistant.model.jam.converters.InfraBeanReferenceJamConverter;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -55,14 +55,14 @@ public abstract class JamBaseCacheableElement<T extends PsiMember & PsiNamedElem
   protected static final JamStringAttributeMeta.Collection<String> CACHE_NAMES_ATTR_META =
           JamAttributeMeta.collectionString(CACHE_NAMES_ATTR_NAME, new CacheableNameConverter());
 
-  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> KEY_GENERATOR_ATTR_META =
-          JamAttributeMeta.singleString("keyGenerator", new SpringBeanReferenceJamConverter(CacheableConstant.KEY_GENERATOR_CLASS));
+  protected static final JamStringAttributeMeta.Single<BeanPointer<?>> KEY_GENERATOR_ATTR_META =
+          JamAttributeMeta.singleString("keyGenerator", new InfraBeanReferenceJamConverter(CacheableConstant.KEY_GENERATOR_CLASS));
 
-  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> CACHE_MANAGER_ATTR_META =
-          JamAttributeMeta.singleString("cacheManager", new SpringBeanReferenceJamConverter(CacheableConstant.CACHE_MANAGER_CLASS));
+  protected static final JamStringAttributeMeta.Single<BeanPointer<?>> CACHE_MANAGER_ATTR_META =
+          JamAttributeMeta.singleString("cacheManager", new InfraBeanReferenceJamConverter(CacheableConstant.CACHE_MANAGER_CLASS));
 
-  protected static final JamStringAttributeMeta.Single<SpringBeanPointer<?>> CACHE_RESOLVER_ATTR_META =
-          JamAttributeMeta.singleString("cacheResolver", new SpringBeanReferenceJamConverter(CacheableConstant.CACHE_RESOLVER_CLASS));
+  protected static final JamStringAttributeMeta.Single<BeanPointer<?>> CACHE_RESOLVER_ATTR_META =
+          JamAttributeMeta.singleString("cacheResolver", new InfraBeanReferenceJamConverter(CacheableConstant.CACHE_RESOLVER_CLASS));
 
   public JamBaseCacheableElement(String annoName, T t) {
     super(t, annoName);
@@ -84,15 +84,15 @@ public abstract class JamBaseCacheableElement<T extends PsiMember & PsiNamedElem
     return CACHE_NAMES_ATTR_META.getJam(getPsiAnnotationRef());
   }
 
-  public JamStringAttributeElement<SpringBeanPointer<?>> getCacheManagerElement() {
+  public JamStringAttributeElement<BeanPointer<?>> getCacheManagerElement() {
     return CACHE_MANAGER_ATTR_META.getJam(getPsiAnnotationRef());
   }
 
-  public JamStringAttributeElement<SpringBeanPointer<?>> getCacheResolverElement() {
+  public JamStringAttributeElement<BeanPointer<?>> getCacheResolverElement() {
     return CACHE_RESOLVER_ATTR_META.getJam(getPsiAnnotationRef());
   }
 
-  public JamStringAttributeElement<SpringBeanPointer<?>> getKeyGeneratorElement() {
+  public JamStringAttributeElement<BeanPointer<?>> getKeyGeneratorElement() {
     return KEY_GENERATOR_ATTR_META.getJam(getPsiAnnotationRef());
   }
 

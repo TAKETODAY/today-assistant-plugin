@@ -49,7 +49,7 @@ import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.service.IconService;
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 
 public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarkerProvider {
   private static final NotNullFunction<IProperty, Collection<? extends PsiElement>> PROPERTY_CONVERTER = dom -> {
@@ -91,7 +91,7 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
       return;
     }
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
-    if (!CommonUtils.isBeanCandidateClass(psiClass) || (module = ModuleUtilCore.findModuleForPsiElement(psiClass)) == null) {
+    if (!InfraUtils.isBeanCandidateClass(psiClass) || (module = ModuleUtilCore.findModuleForPsiElement(psiClass)) == null) {
       return;
     }
     PsiManager psiManager = PsiManager.getInstance(module.getProject());

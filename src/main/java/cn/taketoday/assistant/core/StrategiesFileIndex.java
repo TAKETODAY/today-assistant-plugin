@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cn.taketoday.assistant.util.CommonUtils;
+import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 import kotlin.collections.CollectionsKt;
 import kotlin.jvm.internal.Intrinsics;
@@ -228,7 +228,7 @@ public class StrategiesFileIndex extends FileBasedIndexExtension<String, List<St
   }
 
   private static GlobalSearchScope adjustScope(Project project, GlobalSearchScope scope) {
-    return CommonUtils.getConfigFilesScope(project, scope);
+    return InfraUtils.getConfigFilesScope(project, scope);
   }
 
 }

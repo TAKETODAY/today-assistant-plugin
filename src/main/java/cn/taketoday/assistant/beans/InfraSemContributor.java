@@ -29,34 +29,6 @@ import com.intellij.psi.PsiMember;
 import com.intellij.semantic.SemContributor;
 import com.intellij.semantic.SemRegistrar;
 import com.intellij.semantic.SemService;
-import com.intellij.spring.model.extensions.myBatis.SpringMyBatisMapper;
-import com.intellij.spring.model.jam.SpringOrder;
-import com.intellij.spring.model.jam.contexts.CustomContextJavaBean;
-import com.intellij.spring.model.jam.dependsOn.SpringJamDependsOn;
-import com.intellij.spring.model.jam.javaConfig.ContextJavaBean;
-import com.intellij.spring.model.jam.lookup.SpringLookupInjection;
-import com.intellij.spring.model.jam.profile.CustomContextProfile;
-import com.intellij.spring.model.jam.profile.SpringJamProfile;
-import com.intellij.spring.model.jam.stereotype.SpringContextImport;
-import com.intellij.spring.model.jam.stereotype.SpringJamComponentScan;
-import com.intellij.spring.model.jam.stereotype.SpringJamComponentScans;
-import com.intellij.spring.model.jam.stereotype.SpringJamPropertySource;
-import com.intellij.spring.model.jam.stereotype.SpringPropertySources;
-import com.intellij.spring.model.jam.stereotype.javaee.SpringCdiJakartaNamed;
-import com.intellij.spring.model.jam.stereotype.javaee.SpringCdiJavaxNamed;
-import com.intellij.spring.model.jam.stereotype.javaee.SpringJakartaManagedBean;
-import com.intellij.spring.model.jam.stereotype.javaee.SpringJavaxManagedBean;
-import com.intellij.spring.model.jam.testContexts.SpringContextConfiguration;
-import com.intellij.spring.model.jam.testContexts.SpringContextHierarchy;
-import com.intellij.spring.model.jam.testContexts.SpringTransactionConfiguration;
-import com.intellij.spring.model.jam.testContexts.dirtiesContexts.SpringTestingDirtiesContext;
-import com.intellij.spring.model.jam.testContexts.jdbc.SpringTestingSql;
-import com.intellij.spring.model.jam.testContexts.jdbc.SpringTestingSqlConfig;
-import com.intellij.spring.model.jam.testContexts.jdbc.SpringTestingSqlGroup;
-import com.intellij.spring.model.jam.testContexts.profiles.SpringCustomActiveProfiles;
-import com.intellij.spring.model.jam.testContexts.profiles.SpringJamActiveProfiles;
-import com.intellij.spring.model.jam.testContexts.propertySources.SpringTestPropertySource;
-import com.intellij.spring.model.jam.transaction.SpringTransactionalComponent;
 
 import cn.taketoday.assistant.AliasForUtils;
 import cn.taketoday.assistant.AnnotationConstant;
@@ -64,13 +36,42 @@ import cn.taketoday.assistant.InfraAliasFor;
 import cn.taketoday.assistant.InfraConstant;
 import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.stereotype.Component;
+import cn.taketoday.assistant.beans.stereotype.ComponentScan;
+import cn.taketoday.assistant.beans.stereotype.ComponentScans;
 import cn.taketoday.assistant.beans.stereotype.Configuration;
+import cn.taketoday.assistant.beans.stereotype.ContextImport;
 import cn.taketoday.assistant.beans.stereotype.Controller;
 import cn.taketoday.assistant.beans.stereotype.ImportResource;
 import cn.taketoday.assistant.beans.stereotype.Repository;
 import cn.taketoday.assistant.beans.stereotype.Service;
+import cn.taketoday.assistant.beans.stereotype.javaee.CdiJakartaNamed;
+import cn.taketoday.assistant.beans.stereotype.javaee.CdiJavaxNamed;
+import cn.taketoday.assistant.beans.stereotype.javaee.JakartaManagedBean;
+import cn.taketoday.assistant.beans.stereotype.javaee.JavaxManagedBean;
 import cn.taketoday.assistant.code.event.jam.BeanEventListenerElement;
 import cn.taketoday.assistant.code.event.jam.JamEventListenerElement;
+import cn.taketoday.assistant.model.extensions.myBatis.InfraMyBatisMapper;
+import cn.taketoday.assistant.model.jam.SemContributorUtil;
+import cn.taketoday.assistant.model.jam.InfraOrder;
+import cn.taketoday.assistant.model.jam.contexts.CustomContextJavaBean;
+import cn.taketoday.assistant.model.jam.dependsOn.InfraJamDependsOn;
+import cn.taketoday.assistant.model.jam.javaConfig.ContextJavaBean;
+import cn.taketoday.assistant.model.jam.lookup.InfraLookupInjection;
+import cn.taketoday.assistant.model.jam.profile.CustomContextProfile;
+import cn.taketoday.assistant.model.jam.profile.InfraJamProfile;
+import cn.taketoday.assistant.model.jam.stereotype.JamPropertySource;
+import cn.taketoday.assistant.model.jam.stereotype.PropertySources;
+import cn.taketoday.assistant.model.jam.testContexts.InfraContextConfiguration;
+import cn.taketoday.assistant.model.jam.testContexts.InfraContextHierarchy;
+import cn.taketoday.assistant.model.jam.testContexts.TransactionConfiguration;
+import cn.taketoday.assistant.model.jam.testContexts.dirtiesContexts.InfraTestingDirtiesContext;
+import cn.taketoday.assistant.model.jam.testContexts.jdbc.InfraTestingSql;
+import cn.taketoday.assistant.model.jam.testContexts.jdbc.InfraTestingSqlConfig;
+import cn.taketoday.assistant.model.jam.testContexts.jdbc.InfraTestingSqlGroup;
+import cn.taketoday.assistant.model.jam.testContexts.profiles.InfraCustomActiveProfiles;
+import cn.taketoday.assistant.model.jam.testContexts.profiles.InfraJamActiveProfiles;
+import cn.taketoday.assistant.model.jam.testContexts.propertySources.TestPropertySource;
+import cn.taketoday.assistant.model.jam.transaction.TransactionalComponent;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -93,43 +94,46 @@ final class InfraSemContributor extends SemContributor {
     registerProfiles(registrar, semService);
     registerActiveProfiles(registrar, semService);
 
-    SpringJamDependsOn.META.register(registrar, PsiJavaPatterns.psiClass().withoutModifiers(new String[] { "private" }).withAnnotation(AnnotationConstant.DEPENDS_ON));
-    SpringCdiJavaxNamed.META.register(registrar, nonAnnoClass.withAnnotation(JavaeeConstant.JAVAX_NAMED));
-    SpringCdiJakartaNamed.META.register(registrar, nonAnnoClass.withAnnotation(JavaeeConstant.JAKARTA_NAMED));
+    InfraJamDependsOn.META.register(registrar, PsiJavaPatterns.psiClass().withoutModifiers(new String[] { "private" }).withAnnotation(AnnotationConstant.DEPENDS_ON));
+    CdiJavaxNamed.META.register(registrar, nonAnnoClass.withAnnotation(JavaeeConstant.JAVAX_NAMED));
+    CdiJakartaNamed.META.register(registrar, nonAnnoClass.withAnnotation(JavaeeConstant.JAKARTA_NAMED));
     registerContextJavaBeans(registrar, semService);
     registerEventListeners(registrar, semService);
 
     InfraAliasFor.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withModifiers(new String[] { "public" }).withAnnotation(AnnotationConstant.ALIAS_FOR));
 
-    SpringOrder.CLASS_META.register(registrar, classPattern.withAnnotation(AnnotationConstant.ORDER));
-    SpringOrder.FIELD_META.register(registrar, PsiJavaPatterns.psiField().withAnnotation(AnnotationConstant.ORDER));
-    SpringOrder.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().withAnnotation(AnnotationConstant.ORDER));
-    SpringContextImport.META.register(registrar, classPattern.withAnnotation(AnnotationConstant.CONTEXT_IMPORT));
+    InfraOrder.CLASS_META.register(registrar, classPattern.withAnnotation(AnnotationConstant.ORDER));
+    InfraOrder.FIELD_META.register(registrar, PsiJavaPatterns.psiField().withAnnotation(AnnotationConstant.ORDER));
+    InfraOrder.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().withAnnotation(AnnotationConstant.ORDER));
+    ContextImport.META.register(registrar, classPattern.withAnnotation(AnnotationConstant.CONTEXT_IMPORT));
     ImportResource.META.register(registrar, classPattern.withAnnotation(AnnotationConstant.CONTEXT_IMPORT_RESOURCE));
 
-    SpringJamComponentScan.META.register(registrar, classPattern.withAnnotation(AnnotationConstant.COMPONENT_SCAN));
-    registrar.registerSemElementProvider(SpringJamComponentScan.REPEATABLE_ANNO_JAM_KEY, PsiJavaPatterns.psiAnnotation().qName(AnnotationConstant.COMPONENT_SCAN), SpringJamComponentScan::new);
-    SpringJamComponentScans.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.COMPONENT_SCANS));
-    registrar.registerSemElementProvider(SpringJamPropertySource.REPEATABLE_ANNO_JAM_KEY, PsiJavaPatterns.psiAnnotation().qName(AnnotationConstant.PROPERTY_SOURCE), SpringJamPropertySource::new);
-    SpringPropertySources.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.PROPERTY_SOURCES));
-    SpringJamPropertySource.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.PROPERTY_SOURCE));
-    SpringContextConfiguration.META.register(registrar, classPattern.withAnnotation(AnnotationConstant.CONTEXT_CONFIGURATION));
-    SpringContextHierarchy.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.CONTEXT_HIERARCHY));
-    SpringTestPropertySource.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(AnnotationConstant.TEST_PROPERTY_SOURCE));
-    registrar.registerSemElementProvider(SpringTestingSql.REPEATABLE_ANNO_JAM_KEY, PsiJavaPatterns.psiAnnotation().qName(AnnotationConstant.TEST_SQL), SpringTestingSql::new);
-    SpringTestingSqlGroup.CLASS_META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TEST_SQL_GROUP));
-    SpringTestingSqlGroup.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withAnnotation(AnnotationConstant.TEST_SQL_GROUP));
-    SpringTestingSql.CLASS_META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TEST_SQL));
-    SpringTestingSql.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withAnnotation(AnnotationConstant.TEST_SQL));
-    SpringTestingDirtiesContext.CLASS_META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.DIRTIES_CONTEXT));
-    SpringTestingDirtiesContext.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withAnnotation(AnnotationConstant.DIRTIES_CONTEXT));
-    SpringTestingSqlConfig.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TEST_SQL_CONFIG));
-    SpringTransactionConfiguration.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TRANSACTION_CONFIGURATION));
-    SpringTransactionalComponent.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TRANSACTIONAL));
-    SpringJavaxManagedBean.META.register(registrar, nonAnnoClass.withAnnotation(JavaeeConstant.JAVAX_MANAGED_BEAN));
-    SpringJakartaManagedBean.META.register(registrar, nonAnnoClass.withAnnotation(JavaeeConstant.JAKARTA_MANAGED_BEAN));
-    SpringLookupInjection.META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withAnnotation(AnnotationConstant.LOOKUP_ANNOTATION));
-    SpringMyBatisMapper.META.register(registrar, classPattern.withAnnotation(SpringMyBatisMapper.MAPPER_ANNOTATION));
+    // ComponentScans
+    ComponentScan.META.register(registrar, classPattern.withAnnotation(AnnotationConstant.COMPONENT_SCAN));
+    registrar.registerSemElementProvider(
+            ComponentScan.REPEATABLE_ANNO_JAM_KEY, PsiJavaPatterns.psiAnnotation().qName(AnnotationConstant.COMPONENT_SCAN), ComponentScan::new);
+    ComponentScans.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.COMPONENT_SCANS));
+
+    registrar.registerSemElementProvider(JamPropertySource.REPEATABLE_ANNO_JAM_KEY, PsiJavaPatterns.psiAnnotation().qName(AnnotationConstant.PROPERTY_SOURCE), JamPropertySource::new);
+    PropertySources.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.PROPERTY_SOURCES));
+    JamPropertySource.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.PROPERTY_SOURCE));
+    InfraContextConfiguration.META.register(registrar, classPattern.withAnnotation(AnnotationConstant.CONTEXT_CONFIGURATION));
+    InfraContextHierarchy.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.CONTEXT_HIERARCHY));
+    TestPropertySource.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(AnnotationConstant.TEST_PROPERTY_SOURCE));
+    registrar.registerSemElementProvider(InfraTestingSql.REPEATABLE_ANNO_JAM_KEY, PsiJavaPatterns.psiAnnotation().qName(AnnotationConstant.TEST_SQL), InfraTestingSql::new);
+    InfraTestingSqlGroup.CLASS_META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TEST_SQL_GROUP));
+    InfraTestingSqlGroup.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withAnnotation(AnnotationConstant.TEST_SQL_GROUP));
+    InfraTestingSql.CLASS_META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TEST_SQL));
+    InfraTestingSql.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withAnnotation(AnnotationConstant.TEST_SQL));
+    InfraTestingDirtiesContext.CLASS_META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.DIRTIES_CONTEXT));
+    InfraTestingDirtiesContext.METHOD_META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withAnnotation(AnnotationConstant.DIRTIES_CONTEXT));
+    InfraTestingSqlConfig.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TEST_SQL_CONFIG));
+    TransactionConfiguration.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TRANSACTION_CONFIGURATION));
+    TransactionalComponent.META.register(registrar, nonAnnoClass.withAnnotation(AnnotationConstant.TRANSACTIONAL));
+    JavaxManagedBean.META.register(registrar, nonAnnoClass.withAnnotation(JavaeeConstant.JAVAX_MANAGED_BEAN));
+    JakartaManagedBean.META.register(registrar, nonAnnoClass.withAnnotation(JavaeeConstant.JAKARTA_MANAGED_BEAN));
+    InfraLookupInjection.META.register(registrar, PsiJavaPatterns.psiMethod().constructor(false).withAnnotation(AnnotationConstant.LOOKUP_ANNOTATION));
+    InfraMyBatisMapper.META.register(registrar, classPattern.withAnnotation(InfraMyBatisMapper.MAPPER_ANNOTATION));
   }
 
   private static void registerEventListeners(SemRegistrar registrar, SemService semService) {
@@ -143,22 +147,22 @@ final class InfraSemContributor extends SemContributor {
   }
 
   private static void registerProfiles(SemRegistrar registrar, SemService semService) {
-    SpringJamProfile.META.register(registrar, PsiJavaPatterns.psiClass().withoutModifiers(new String[] { "private" }).withAnnotation(AnnotationConstant.PROFILE));
+    InfraJamProfile.META.register(registrar, PsiJavaPatterns.psiClass().withoutModifiers(new String[] { "private" }).withAnnotation(AnnotationConstant.PROFILE));
     PsiMethodPattern methodPattern = PsiJavaPatterns.psiMethod().constructor(false).withModifiers("public");
-    SpringJamProfile.META.register(registrar, methodPattern.withAnnotation(AnnotationConstant.PROFILE));
+    InfraJamProfile.META.register(registrar, methodPattern.withAnnotation(AnnotationConstant.PROFILE));
     registerCustomProfiles(registrar, PsiJavaPatterns.psiClass().nonAnnotationType().withoutModifiers("private"), semService);
     registerCustomProfiles(registrar, methodPattern, semService);
   }
 
   private static void registerActiveProfiles(SemRegistrar registrar, SemService semService) {
-    SpringJamActiveProfiles.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(AnnotationConstant.ACTIVE_PROFILES));
+    InfraJamActiveProfiles.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(AnnotationConstant.ACTIVE_PROFILES));
     registerCustomActiveProfiles(registrar, PsiJavaPatterns.psiClass().nonAnnotationType().withoutModifiers("private"), semService);
   }
 
   private static void registerContextJavaBeans(SemRegistrar registrar, SemService semService) {
     PsiMethodPattern beanMethodPattern = PsiJavaPatterns.psiMethod().withoutModifiers("private").constructor(false);
-    ContextJavaBean.METHOD_META.register(registrar, beanMethodPattern.withAnnotation(AnnotationConstant.BEAN));
-    registerCustomContextJavaBean(registrar, beanMethodPattern.andNot(PsiJavaPatterns.psiMethod().withAnnotation(AnnotationConstant.BEAN)), semService);
+    ContextJavaBean.METHOD_META.register(registrar, beanMethodPattern.withAnnotation(AnnotationConstant.COMPONENT));
+    registerCustomContextJavaBean(registrar, beanMethodPattern.andNot(PsiJavaPatterns.psiMethod().withAnnotation(AnnotationConstant.COMPONENT)), semService);
   }
 
   private static void registerCustomProfiles(SemRegistrar registrar, ElementPattern<? extends PsiMember> pattern, SemService semService) {
@@ -166,28 +170,28 @@ final class InfraSemContributor extends SemContributor {
             SemContributorUtil.createFunction(CustomContextProfile.JAM_KEY, CustomContextProfile.class,
                     SemContributorUtil.getCustomMetaAnnotations(AnnotationConstant.PROFILE, true),
                     pair -> new CustomContextProfile(pair.first, pair.second), null,
-                    AliasForUtils.getAnnotationMetaProducer(SpringJamProfile.JAM_ANNO_META_KEY, SpringJamProfile.META)));
+                    AliasForUtils.getAnnotationMetaProducer(InfraJamProfile.JAM_ANNO_META_KEY, InfraJamProfile.META)));
   }
 
   private static void registerCustomActiveProfiles(SemRegistrar registrar, ElementPattern<? extends PsiMember> pattern, SemService semService) {
-    SemContributorUtil.registerMetaComponents(semService, registrar, pattern, SpringCustomActiveProfiles.META_KEY, SpringCustomActiveProfiles.JAM_KEY,
-            SemContributorUtil.createFunction(SpringCustomActiveProfiles.JAM_KEY, SpringCustomActiveProfiles.class,
+    SemContributorUtil.registerMetaComponents(semService, registrar, pattern, InfraCustomActiveProfiles.META_KEY, InfraCustomActiveProfiles.JAM_KEY,
+            SemContributorUtil.createFunction(InfraCustomActiveProfiles.JAM_KEY, InfraCustomActiveProfiles.class,
                     SemContributorUtil.getCustomMetaAnnotations(AnnotationConstant.ACTIVE_PROFILES, true),
-                    pair -> new SpringCustomActiveProfiles(pair.first, pair.second), null,
-                    AliasForUtils.getAnnotationMetaProducer(SpringCustomActiveProfiles.JAM_ANNO_META_KEY, SpringJamActiveProfiles.META)));
+                    pair -> new InfraCustomActiveProfiles(pair.first, pair.second), null,
+                    AliasForUtils.getAnnotationMetaProducer(InfraCustomActiveProfiles.JAM_ANNO_META_KEY, InfraJamActiveProfiles.META)));
   }
 
   private static void registerCustomContextJavaBean(SemRegistrar registrar, PsiMethodPattern pattern, SemService semService) {
     SemContributorUtil.registerMetaComponents(semService, registrar, pattern, CustomContextJavaBean.META_KEY, CustomContextJavaBean.JAM_KEY,
             SemContributorUtil.createFunction(CustomContextJavaBean.JAM_KEY, CustomContextJavaBean.class,
-                    SemContributorUtil.getCustomMetaAnnotations(AnnotationConstant.BEAN), pair -> new CustomContextJavaBean(pair.first, pair.second), null,
+                    SemContributorUtil.getCustomMetaAnnotations(AnnotationConstant.COMPONENT), pair -> new CustomContextJavaBean(pair.first, pair.second), null,
                     AliasForUtils.getAnnotationMetaProducer(CustomContextJavaBean.JAM_ANNO_META_KEY, ContextJavaBean.METHOD_META)));
   }
 
   private static void registerConfigurations(SemRegistrar registrar, SemService semService) {
     SemContributorUtil.registerMetaComponents(semService, registrar, PsiJavaPatterns.psiClass().nonAnnotationType().withoutModifiers("abstract"),
-            Configuration.META_KEY,
-            Configuration.JAM_KEY, SemContributorUtil.createFunction(Configuration.JAM_KEY, Configuration.class, Configuration.getAnnotations(),
+            Configuration.META_KEY, Configuration.JAM_KEY,
+            SemContributorUtil.createFunction(Configuration.JAM_KEY, Configuration.class, Configuration.getAnnotations(),
                     Configuration::new, SemContributorUtil.createStereotypeConsumer()));
 
   }
@@ -205,8 +209,10 @@ final class InfraSemContributor extends SemContributor {
   }
 
   private static void registerServices(SemRegistrar registrar, PsiClassPattern psiClassPattern, SemService semService) {
+
     SemContributorUtil.registerMetaComponents(semService, registrar, psiClassPattern, Service.META_KEY, Service.JAM_KEY,
             SemContributorUtil.createFunction(Service.JAM_KEY, Service.class, Service.getServiceAnnotations(), Service::new,
                     SemContributorUtil.createStereotypeConsumer()));
+
   }
 }

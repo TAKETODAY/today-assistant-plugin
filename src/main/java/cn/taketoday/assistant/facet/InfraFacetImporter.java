@@ -34,14 +34,16 @@ import org.jetbrains.idea.maven.project.MavenProjectsTree;
 import java.util.List;
 import java.util.Map;
 
+import cn.taketoday.assistant.app.run.maven.InfraMavenPostProcessorTask;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2022/8/20 01:19
  */
-public class InfraFacetImporter extends FacetImporter<TodayFacet, TodayFacetConfiguration, TodayFacetType> {
+public class InfraFacetImporter extends FacetImporter<InfraFacet, InfraFacetConfiguration, InfraFacetType> {
 
   public InfraFacetImporter() {
-    super("dummy", "dummy", FacetType.findInstance(TodayFacetType.class));
+    super("dummy", "dummy", FacetType.findInstance(InfraFacetType.class));
   }
 
   @Override
@@ -62,17 +64,17 @@ public class InfraFacetImporter extends FacetImporter<TodayFacet, TodayFacetConf
   }
 
   @Override
-  protected void setupFacet(TodayFacet facet, MavenProject mavenProject) {
+  protected void setupFacet(InfraFacet facet, MavenProject mavenProject) {
     System.out.println("setupFacet: " + "facet: " + facet + " mavenProject: " + mavenProject);
 
   }
 
   @Override
   protected void reimportFacet(IdeModifiableModelsProvider modelsProvider,
-          Module module, MavenRootModelAdapter rootModel, TodayFacet facet,
+          Module module, MavenRootModelAdapter rootModel, InfraFacet facet,
           MavenProjectsTree mavenTree, MavenProject mavenProject, MavenProjectChanges changes,
           Map<MavenProject, String> mavenProjectToModuleName, List<MavenProjectsProcessorTask> postTasks) {
-
+    postTasks.add(new InfraMavenPostProcessorTask(module));
   }
 
 }

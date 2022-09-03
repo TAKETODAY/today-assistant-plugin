@@ -1,0 +1,45 @@
+<html>
+<body>
+<p>Reports inconsistent tags and attributes on injection points in XML application contexts.</p>
+
+<ul>
+  <li><code>&lt;property&gt;</code> and <code>&lt;constructor-arg&gt;</code> must specify a <code>ref</code>, <code>value</code>, or a sub-element</li>
+  <li><code>&lt;property&gt;</code> and <code>&lt;constructor-arg&gt;</code> cannot contain more than one sub-element</li>
+  <li><code>&lt;ref&gt;</code> can contain either a <code>bean</code> attribute, a <code>local</code> attribute, or a <code>parent</code> attribute</li>
+  <li><code>&lt;ref&gt;</code> must specify a bean</li>
+  <li><code>&lt;idref&gt;</code> can contain either a <code>bean</code> attribute or a <code>local</code> attribute</li>
+  <li><code>&lt;idref&gt;</code> must specify a bean</li>
+  <li><code>&lt;map&gt;</code> must specify a key</li>
+  <li><code>&lt;idref&gt;</code> can contain either a <code>key</code> attribute, a <code>key-ref</code> attribute, or a <code>&lt;key&gt;</code> sub-element</li>
+</ul>
+
+<p><b>Example:</b></p>
+<pre><code>
+  &lt;beans&gt;
+
+  <em>&lt;!-- 1.  Property is only allowed to contain either "ref" attribute OR "value" attribute OR sub-element --&gt;</em>
+  &lt;bean class="MyClass"&gt;
+    &lt;property name="bean" ref="myBean" value="foo"/&gt;
+    // Property is only allowed to contain either "ref" attribute OR "value" attribute OR sub-element
+  &lt;/bean&gt;
+
+  <em>&lt;!--  2.  Property must not contain more than one sub-element --&gt;</em>
+  &lt;bean class="MyFactory"&gt;
+    &lt;property name="bean"&gt;
+    &lt;ref&gt;bean&lt;/ref&gt; // Property must not contain more than one sub-element
+     &lt;value&gt;foo&lt;/value&gt; // Property must not contain more than one sub-element
+     &lt;/property&gt;
+  &lt;/bean&gt;
+
+  <em>&lt;!-- 3. Map entry must specify a key  --&gt;</em>
+  &lt;bean class="MyBean"&gt;
+     &lt;property name="map"&gt;
+        &lt;map&gt;
+           &lt;entry value="foo"/&gt;  // Map entry must specify a key
+        &lt;/map&gt;
+     &lt;/property&gt;
+  &lt;/bean&gt;
+  &lt;/beans&gt;
+</code></pre>
+</body>
+</html>

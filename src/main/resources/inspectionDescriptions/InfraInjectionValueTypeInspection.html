@@ -1,0 +1,33 @@
+<html>
+<body>
+<p>Reports invalid injection point types (properties and constructor arguments).</p>
+
+<p>The following injection point types are allowed: <code>ref</code>, <code>idref</code>, any collection type, inner beans, and so on.</p>
+
+<p><b>Example:</b></p>
+
+<pre><code>
+  public class InjectionValueTypes{
+  public List&lt;MyBean&gt; setListBeans() {...}
+    public MyBean setMyBean() {...}
+    }
+  }
+  &lt;beans&gt;
+    &lt;bean class="MyBean" id="myBean"/&gt;
+    &lt;bean class="ErrTypeBean" id="errTypeBean"/&gt;
+    &lt;bean class="InjectionValueTypes" id="kt"&gt;
+      &lt;property name="myBean" ref="errTypeBean"/&gt;
+      // reports "Property of 'MyBean' type cannot be injected by 'ErrTypeBean'
+      &lt;property name="listBeans"&gt;
+        &lt;list&gt;
+          &lt;idref local="myBean"/&gt;
+          &lt;ref bean="myBean"/&gt;
+          &lt;ref bean="errTypeBean"/&gt; // reports "Cannot be added in collection of 'MyBean' type"
+          &lt;bean class="ErrTypeBean"/&gt; // reports "Bean must be of 'MyBean' type"
+        &lt;/list&gt;
+      &lt;/property&gt;
+    &lt;/bean&gt;
+  &lt;/beans&gt;
+</code></pre>
+</body>
+</html>
