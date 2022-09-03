@@ -50,9 +50,9 @@ import javax.swing.JTree;
 
 import cn.taketoday.assistant.CommonInfraModel;
 import cn.taketoday.assistant.Icons;
-import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.utils.BeanCoreUtils;
 import cn.taketoday.assistant.model.utils.InfraModelService;
+import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.xml.beans.InfraBean;
 import cn.taketoday.assistant.model.xml.beans.InfraProperty;
 import cn.taketoday.lang.Nullable;

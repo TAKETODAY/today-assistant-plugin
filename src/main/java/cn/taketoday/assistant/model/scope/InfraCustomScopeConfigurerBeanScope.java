@@ -53,8 +53,8 @@ public class InfraCustomScopeConfigurerBeanScope extends InfraCustomBeanScope {
     ModelSearchParameters.BeanClass searchParameters = ModelSearchParameters.byClass(scopeClass);
     for (InfraModel model : models) {
       List<BeanPointer<?>> springBeans = InfraModelSearchers.findBeans(model, searchParameters);
-      for (DomBeanPointer springBean : ContainerUtil.findAll(springBeans, DomBeanPointer.class)) {
-        InfraPropertyDefinition property = InfraPropertyUtils.findPropertyByName(springBean.getBean(), CUSTOM_SCOPES_PROPERTY_NAME);
+      for (DomBeanPointer infraBean : ContainerUtil.findAll(springBeans, DomBeanPointer.class)) {
+        InfraPropertyDefinition property = InfraPropertyUtils.findPropertyByName(infraBean.getBean(), CUSTOM_SCOPES_PROPERTY_NAME);
         if (property instanceof InfraProperty) {
           for (InfraEntry springEntry : ((InfraProperty) property).getMap().getEntries()) {
             String keyValue = springEntry.getKeyAttr().getStringValue();

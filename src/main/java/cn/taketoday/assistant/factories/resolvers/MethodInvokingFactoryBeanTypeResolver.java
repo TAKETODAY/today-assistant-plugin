@@ -48,14 +48,14 @@ public class MethodInvokingFactoryBeanTypeResolver extends AbstractProxiedTypeRe
   @Override
 
   public Set<PsiType> getObjectType(@Nullable CommonInfraBean context) {
-    InfraBean springBean;
+    InfraBean infraBean;
     InfraPropertyDefinition targetMethod;
     Module module;
     PsiClass psiClass;
     if ((context instanceof InfraBean)
-            && (targetMethod = InfraPropertyUtils.findPropertyByName((springBean = (InfraBean) context), "targetMethod")) != null) {
+            && (targetMethod = InfraPropertyUtils.findPropertyByName((infraBean = (InfraBean) context), "targetMethod")) != null) {
       String methodName = targetMethod.getValueAsString();
-      if (StringUtil.isNotEmpty(methodName) && (module = context.getModule()) != null && (psiClass = getMethodInvokingPsiClass(null, module.getProject(), springBean)) != null) {
+      if (StringUtil.isNotEmpty(methodName) && (module = context.getModule()) != null && (psiClass = getMethodInvokingPsiClass(null, module.getProject(), infraBean)) != null) {
         PsiMethod[] methodsByName = psiClass.findMethodsByName(methodName, true);
         if (0 < methodsByName.length) {
           PsiMethod method = methodsByName[0];
@@ -67,9 +67,9 @@ public class MethodInvokingFactoryBeanTypeResolver extends AbstractProxiedTypeRe
   }
 
   @Nullable
-  public static PsiClass getMethodInvokingPsiClass(@Nullable GlobalSearchScope scope, Project project, InfraBean springBean) {
+  public static PsiClass getMethodInvokingPsiClass(@Nullable GlobalSearchScope scope, Project project, InfraBean infraBean) {
     String className;
-    InfraPropertyDefinition targetObjectProperty = InfraPropertyUtils.findPropertyByName(springBean, "targetObject");
+    InfraPropertyDefinition targetObjectProperty = InfraPropertyUtils.findPropertyByName(infraBean, "targetObject");
     if (targetObjectProperty != null) {
       BeanPointer<?> beanPointer = targetObjectProperty.getRefValue();
       if (beanPointer != null) {
@@ -88,7 +88,7 @@ public class MethodInvokingFactoryBeanTypeResolver extends AbstractProxiedTypeRe
         }
       }
     }
-    InfraPropertyDefinition targetClassProperty = InfraPropertyUtils.findPropertyByName(springBean, "targetClass");
+    InfraPropertyDefinition targetClassProperty = InfraPropertyUtils.findPropertyByName(infraBean, "targetClass");
     if (targetClassProperty == null || (className = targetClassProperty.getValueAsString()) == null) {
       return null;
     }

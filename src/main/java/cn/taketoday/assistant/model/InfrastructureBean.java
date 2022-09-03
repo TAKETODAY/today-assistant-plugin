@@ -22,7 +22,7 @@ package cn.taketoday.assistant.model;
 /**
  * Implement to mark your bean as "infrastructure bean".
  * <p/>
- * "Infrastructure beans" are usually Spring context setup-related beans, e.g. {@code <component-scan>}.
+ * "Infrastructure beans" are usually Infra context setup-related beans, e.g. {@code <component-scan>}.
  * Such beans receive a special icon and can be filtered in various places in UI.
  */
 public interface InfrastructureBean {

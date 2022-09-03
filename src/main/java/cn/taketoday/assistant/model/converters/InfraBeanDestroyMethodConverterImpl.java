@@ -44,9 +44,9 @@ public class InfraBeanDestroyMethodConverterImpl extends InfraBeanDestroyMethodC
 
   @Override
   public PsiClass getPsiClass(ConvertContext context) {
-    LifecycleBean springBean = context.getInvocationElement().getParentOfType(LifecycleBean.class, false);
-    if (springBean instanceof DomInfraBean) {
-      return PsiTypesUtil.getPsiClass(((DomInfraBean) springBean).getBeanType());
+    LifecycleBean infraBean = context.getInvocationElement().getParentOfType(LifecycleBean.class, false);
+    if (infraBean instanceof DomInfraBean) {
+      return PsiTypesUtil.getPsiClass(((DomInfraBean) infraBean).getBeanType());
     }
     return null;
   }

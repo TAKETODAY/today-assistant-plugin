@@ -26,8 +26,8 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindowManager;
 
-import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraAppBundle;
+import cn.taketoday.assistant.InfraLibraryUtil;
 
 public class WebMvcViewSelectInTarget implements SelectInTarget {
   public String toString() {

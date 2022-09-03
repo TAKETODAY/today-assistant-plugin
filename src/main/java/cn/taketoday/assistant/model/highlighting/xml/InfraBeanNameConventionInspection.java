@@ -39,23 +39,23 @@ import static cn.taketoday.assistant.InfraBundle.message;
 public final class InfraBeanNameConventionInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
-    GenericAttributeValue<String> springBeanId = springBean.getId();
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+    GenericAttributeValue<String> springBeanId = infraBean.getId();
     if (!DomUtil.hasXml(springBeanId)) {
       return;
     }
     String beanId = springBeanId.getStringValue();
-    if (acceptBean(springBean, beanId)) {
+    if (acceptBean(infraBean, beanId)) {
       checkName(springBeanId, beanId, holder);
     }
   }
 
-  private static boolean acceptBean(InfraBean springBean, String beanId) {
+  private static boolean acceptBean(InfraBean infraBean, String beanId) {
     return !StringUtil.isEmpty(beanId)
             && !hasSymbols(beanId, ".")
             && !hasSymbols(beanId, "-")
-            && (!FieldRetrievingFactoryBeanConverterImpl.isFieldRetrievingFactoryBean(springBean)
-            || !FieldRetrievingFactoryBeanConverterImpl.isResolved(springBean.getManager().getProject(), beanId));
+            && (!FieldRetrievingFactoryBeanConverterImpl.isFieldRetrievingFactoryBean(infraBean)
+            || !FieldRetrievingFactoryBeanConverterImpl.isResolved(infraBean.getManager().getProject(), beanId));
   }
 
   private static boolean hasSymbols(String beanId, String smb) {

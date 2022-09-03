@@ -38,8 +38,8 @@ import java.util.List;
 import javax.swing.Icon;
 
 import cn.taketoday.assistant.InfraBundle;
-import cn.taketoday.assistant.LocalModelFactory;
 import cn.taketoday.assistant.InfraModelVisitorUtils;
+import cn.taketoday.assistant.LocalModelFactory;
 import cn.taketoday.assistant.context.model.LocalXmlModel;
 import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.CommonInfraBean;
@@ -82,14 +82,14 @@ public class InfraModelTreeElement implements StructureViewTreeElement, ItemPres
     }
     List<StructureViewTreeElement> treeElements = new ArrayList<>();
     for (BeanPointer pointer : InfraModelVisitorUtils.getAllDomBeans(springModel)) {
-      CommonInfraBean springBean = pointer.getBean();
-      if (pointer.isValid() && springBean.isValid() && (springBean instanceof DomInfraBean)) {
-        if (springBean instanceof CustomBeanWrapper customBeanWrapper) {
+      CommonInfraBean infraBean = pointer.getBean();
+      if (pointer.isValid() && infraBean.isValid() && (infraBean instanceof DomInfraBean)) {
+        if (infraBean instanceof CustomBeanWrapper customBeanWrapper) {
           if (customBeanWrapper.isDummy()) {
             treeElements.add(new XmlTagTreeElement(customBeanWrapper.getXmlTag()));
           }
         }
-        treeElements.add(new InfraBeanTreeElement((DomInfraBean) springBean, this.myNavigationProvider, this.myShowBeanStructure));
+        treeElements.add(new InfraBeanTreeElement((DomInfraBean) infraBean, this.myNavigationProvider, this.myShowBeanStructure));
       }
     }
     return treeElements.toArray(TreeElement.EMPTY_ARRAY);

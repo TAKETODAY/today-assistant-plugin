@@ -54,8 +54,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraAppBundle;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.beans.stereotype.Configuration;
 import cn.taketoday.assistant.beans.stereotype.InfraJamModel;
 import cn.taketoday.assistant.dom.InfraDomUtils;

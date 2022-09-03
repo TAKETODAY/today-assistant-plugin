@@ -63,7 +63,7 @@ public abstract class AbstractBeanNamespaceDescriptor<T extends PsiElement> exte
 
   protected abstract BeanAttributeDescriptor createAttributeDescriptor(String str, T t, String str2);
 
-  protected abstract Map<String, T> getAttributes(InfraBean springBean);
+  protected abstract Map<String, T> getAttributes(InfraBean infraBean);
 
   public XmlAttributeDescriptor getAttribute(String localName, String namespace, XmlTag context) {
     if (getNamespace().equals(namespace)) {
@@ -124,11 +124,11 @@ public abstract class AbstractBeanNamespaceDescriptor<T extends PsiElement> exte
   }
 
   private XmlAttributeDescriptor[] getAttributeDescriptors(XmlTag tag) {
-    InfraBean springBean = getSpringBean(tag);
-    if (springBean == null) {
+    InfraBean infraBean = getSpringBean(tag);
+    if (infraBean == null) {
       return XmlAttributeDescriptor.EMPTY;
     }
-    Map<String, T> properties = getAttributesWithoutRecursion(springBean);
+    Map<String, T> properties = getAttributesWithoutRecursion(infraBean);
     if (properties.isEmpty()) {
       return XmlAttributeDescriptor.EMPTY;
     }
@@ -144,11 +144,11 @@ public abstract class AbstractBeanNamespaceDescriptor<T extends PsiElement> exte
     return result.toArray(XmlAttributeDescriptor.EMPTY);
   }
 
-  private Map<String, T> getAttributesWithoutRecursion(InfraBean springBean) {
+  private Map<String, T> getAttributesWithoutRecursion(InfraBean infraBean) {
 
-    PsiElement identifyingPsiElement = springBean.getIdentifyingPsiElement();
+    PsiElement identifyingPsiElement = infraBean.getIdentifyingPsiElement();
     if (identifyingPsiElement != null && identifyingPsiElement.isValid()) {
-      Map<String, T> map = RecursionManager.doPreventingRecursion(identifyingPsiElement, false, () -> this.getAttributes(springBean));
+      Map<String, T> map = RecursionManager.doPreventingRecursion(identifyingPsiElement, false, () -> this.getAttributes(infraBean));
       return map != null ? map : Collections.emptyMap();
     }
     else {

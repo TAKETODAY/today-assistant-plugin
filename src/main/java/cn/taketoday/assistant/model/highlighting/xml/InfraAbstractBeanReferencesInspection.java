@@ -47,8 +47,8 @@ import cn.taketoday.lang.Nullable;
 public final class InfraAbstractBeanReferencesInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
-    for (InfraValueHolderDefinition property : InfraPropertyUtils.getValueHolders(springBean)) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+    for (InfraValueHolderDefinition property : InfraPropertyUtils.getValueHolders(infraBean)) {
       checkAbstractBeanReferences(property, holder);
     }
   }
@@ -81,8 +81,8 @@ public final class InfraAbstractBeanReferencesInspection extends InfraBeanInspec
     }
   }
 
-  private static void checkNotAbstract(DomElement annotated, @Nullable BeanPointer<?> springBean, DomElementAnnotationHolder holder) {
-    if (springBean != null && springBean.isAbstract()) {
+  private static void checkNotAbstract(DomElement annotated, @Nullable BeanPointer<?> infraBean, DomElementAnnotationHolder holder) {
+    if (infraBean != null && infraBean.isAbstract()) {
       holder.createProblem(annotated, InfraBundle.message("bean.referenced.by.abstract.bean"));
     }
   }

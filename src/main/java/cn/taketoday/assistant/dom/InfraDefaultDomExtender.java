@@ -57,8 +57,15 @@ import cn.taketoday.assistant.model.xml.util.UtilMap;
 import cn.taketoday.assistant.model.xml.util.UtilProperties;
 import cn.taketoday.assistant.model.xml.util.UtilSet;
 
-import static cn.taketoday.assistant.InfraConstant.*;
-import static cn.taketoday.assistant.dom.CustomNamespaceRegistrar.*;
+import static cn.taketoday.assistant.InfraConstant.CACHE_NAMESPACE_KEY;
+import static cn.taketoday.assistant.InfraConstant.CONTEXT_NAMESPACE_KEY;
+import static cn.taketoday.assistant.InfraConstant.JDBC_NAMESPACE_KEY;
+import static cn.taketoday.assistant.InfraConstant.JEE_NAMESPACE_KEY;
+import static cn.taketoday.assistant.InfraConstant.LANG_NAMESPACE_KEY;
+import static cn.taketoday.assistant.InfraConstant.TASK_NAMESPACE_KEY;
+import static cn.taketoday.assistant.InfraConstant.TX_NAMESPACE_KEY;
+import static cn.taketoday.assistant.InfraConstant.UTIL_NAMESPACE_KEY;
+import static cn.taketoday.assistant.dom.CustomNamespaceRegistrar.create;
 
 public final class InfraDefaultDomExtender {
 

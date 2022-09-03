@@ -68,7 +68,7 @@ public class ChooseTemplatesForm implements Disposable {
     jPanel2.putClientProperty("BorderFactoryClass", "com.intellij.ui.IdeBorderFactory$PlainSmallWithIndent");
     jPanel.add(jPanel2, new GridConstraints(0, 0, 1, 1, 0, 3, 3, 3, null, null, null));
     jPanel2.setBorder(IdeBorderFactory.PlainSmallWithIndent.createTitledBorder(BorderFactory.createEtchedBorder(),
-            DynamicBundle.getBundle("messages/InfraBundle", ChooseTemplatesForm.class).getString("spring.choose.bean.templates.dialog.beans"), 0, 0, null, null));
+            DynamicBundle.getBundle("messages/InfraBundle", ChooseTemplatesForm.class).getString("choose.bean.templates.dialog.beans"), 0, 0, null, null));
     JPanel jPanel3 = new JPanel();
     this.myLibsPanel = jPanel3;
     jPanel3.setLayout(new BorderLayout(0, 0));

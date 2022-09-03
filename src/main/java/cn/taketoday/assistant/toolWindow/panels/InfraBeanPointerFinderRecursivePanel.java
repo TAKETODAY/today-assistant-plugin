@@ -54,8 +54,8 @@ import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.InfraImplicitBeanMarker;
 import cn.taketoday.assistant.model.InfrastructureBean;
 import cn.taketoday.assistant.profiles.ChangeActiveProfilesAction;
-import cn.taketoday.assistant.toolWindow.WebBeanPointerPanelBase;
 import cn.taketoday.assistant.toolWindow.InfraBeansViewSettings;
+import cn.taketoday.assistant.toolWindow.WebBeanPointerPanelBase;
 import cn.taketoday.lang.Nullable;
 
 public final class InfraBeanPointerFinderRecursivePanel extends WebBeanPointerPanelBase {
@@ -70,7 +70,7 @@ public final class InfraBeanPointerFinderRecursivePanel extends WebBeanPointerPa
 
     void update(FinderRecursivePanel finderRecursivePanel);
 
-    Object getData(FinderRecursivePanel finderRecursivePanel,  String str);
+    Object getData(FinderRecursivePanel finderRecursivePanel, String str);
   }
 
   public InfraBeanPointerFinderRecursivePanel(Project project, @Nullable String groupId, NullableFactory<CommonInfraModel> modelFactory) {
@@ -133,7 +133,7 @@ public final class InfraBeanPointerFinderRecursivePanel extends WebBeanPointerPa
 
   @Override
   @Nullable
-  public Object getData( String dataId) {
+  public Object getData(String dataId) {
     Object data = super.getData(dataId);
     if (data != null) {
       return data;

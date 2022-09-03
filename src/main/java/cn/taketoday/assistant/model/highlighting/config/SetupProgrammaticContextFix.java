@@ -35,9 +35,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 
 import java.util.Set;
 
+import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.facet.InfraFileSetService;
-import cn.taketoday.assistant.facet.InfraFacet;
 
 import static cn.taketoday.assistant.InfraBundle.message;
 

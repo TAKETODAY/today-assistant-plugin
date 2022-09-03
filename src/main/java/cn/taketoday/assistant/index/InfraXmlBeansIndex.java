@@ -174,12 +174,12 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
       return true;
     }
     String psiClassFqn = Objects.requireNonNull(psiClass.getQualifiedName());
-    boolean byBeanClass = processSpringBeanPointer(Pair.create(InfraBeanIndexType.BEAN_CLASS, psiClassFqn), params, processor);
+    boolean byBeanClass = processBeanPointer(Pair.create(InfraBeanIndexType.BEAN_CLASS, psiClassFqn), params, processor);
     if (!byBeanClass) {
       return false;
     }
     SmartList<BeanPointer<?>> smartList = new SmartList<>();
-    processSpringBeanPointer(InfraBeanIndexType.BEAN_TYPE_PROVIDER.key(), params, new CommonProcessors.CollectProcessor<>(smartList));
+    processBeanPointer(InfraBeanIndexType.BEAN_TYPE_PROVIDER.key(), params, new CommonProcessors.CollectProcessor<>(smartList));
     if (smartList.isEmpty()) {
       return true;
     }
@@ -193,12 +193,12 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
 
   public static boolean processBeansByName(BeanSearchParameters.BeanName params, Processor<? super BeanPointer<?>> processor) {
     String beanName = params.getBeanName();
-    boolean processByName = processSpringBeanPointer(Pair.create(InfraBeanIndexType.BEAN_NAME, beanName), params, processor);
+    boolean processByName = processBeanPointer(Pair.create(InfraBeanIndexType.BEAN_NAME, beanName), params, processor);
     if (!processByName) {
       return false;
     }
     SmartList<BeanPointer<?>> smartList = new SmartList<>();
-    processSpringBeanPointer(InfraBeanIndexType.BEAN_NAME_PROVIDER.key(), params, new CommonProcessors.CollectProcessor<>(smartList));
+    processBeanPointer(InfraBeanIndexType.BEAN_NAME_PROVIDER.key(), params, new CommonProcessors.CollectProcessor<>(smartList));
     if (smartList.isEmpty()) {
       return true;
     }
@@ -211,24 +211,24 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
   }
 
   public static boolean processComponentScans(BeanSearchParameters.BeanName params, Processor<? super BeanPointer<?>> processor) {
-    return processSpringBeanPointer(InfraBeanIndexType.COMPONENT_SCAN.key(), params, processor);
+    return processBeanPointer(InfraBeanIndexType.COMPONENT_SCAN.key(), params, processor);
   }
 
   public static boolean processFactoryBeans(BeanSearchParameters params, Processor<? super BeanPointer<?>> processor) {
-    return processSpringBeanPointer(InfraBeanIndexType.FACTORY_BEAN.key(), params, processor);
+    return processBeanPointer(InfraBeanIndexType.FACTORY_BEAN.key(), params, processor);
   }
 
   public static boolean processFactoryBeanClasses(BeanSearchParameters params, Processor<? super BeanPointer<?>> processor) {
-    return processSpringBeanPointer(InfraBeanIndexType.FACTORY_BEAN_CLASS.key(), params, processor);
+    return processBeanPointer(InfraBeanIndexType.FACTORY_BEAN_CLASS.key(), params, processor);
   }
 
   public static boolean processFactoryMethods(BeanSearchParameters params, Processor<? super BeanPointer<?>> processor) {
-    return processSpringBeanPointer(InfraBeanIndexType.FACTORY_METHOD.key(), params, processor);
+    return processBeanPointer(InfraBeanIndexType.FACTORY_METHOD.key(), params, processor);
   }
 
   public static boolean processAbstractBeans(BeanSearchParameters params, Processor<? super BeanPointer<?>> processor) {
     SmartList<BeanPointer<?>> smartList = new SmartList<>();
-    processSpringBeanPointer(InfraBeanIndexType.ABSTRACT_BEAN.key(), params, new CommonProcessors.CollectProcessor<>(smartList));
+    processBeanPointer(InfraBeanIndexType.ABSTRACT_BEAN.key(), params, new CommonProcessors.CollectProcessor<>(smartList));
     return ContainerUtil.process(smartList, processor);
   }
 
@@ -263,7 +263,7 @@ public class InfraXmlBeansIndex extends FileBasedIndexExtension<Pair<InfraBeanIn
     return processDomElements(params.getProject(), results, domElementProcessor);
   }
 
-  private static boolean processSpringBeanPointer(Pair<InfraBeanIndexType, String> key, BeanSearchParameters params,
+  private static boolean processBeanPointer(Pair<InfraBeanIndexType, String> key, BeanSearchParameters params,
           final Processor<? super BeanPointer<?>> processor) {
     MultiMap<VirtualFile, TIntArrayList> results = getResults(key, params);
     if (results.isEmpty()) {

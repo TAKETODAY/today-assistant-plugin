@@ -53,11 +53,11 @@ public class DomBeanPointerImpl extends BaseBeanPointer<DomInfraBean> implements
   private CachedValue<PsiClass> myClassCachedValue;
   private WeakReference<DomInfraBean> myCachedValue;
 
-  public DomBeanPointerImpl(DomInfraBean springBean) {
-    super(springBean.getBeanName(), springBean.getManager().getProject());
+  public DomBeanPointerImpl(DomInfraBean infraBean) {
+    super(infraBean.getBeanName(), infraBean.getManager().getProject());
     ProgressManager.checkCanceled();
-    this.myCachedValue = new PatchedWeakReference<>(springBean);
-    this.myPointer = DomService.getInstance().createAnchor(springBean);
+    this.myCachedValue = new PatchedWeakReference<>(infraBean);
+    this.myPointer = DomService.getInstance().createAnchor(infraBean);
   }
 
   @Override

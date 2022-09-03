@@ -55,17 +55,17 @@ public abstract class MethodInvokingFactoryBean extends InfraBeanGenerateProvide
     super(text, null);
   }
 
-  protected void runTemplate(Editor editor, PsiFile file, InfraBean springBean, Map<String, String> predefinedVars) {
-    super.runTemplate(editor, file, springBean, predefinedVars);
-    ((DomTemplateRunnerImpl) DomTemplateRunner.getInstance(file.getProject())).runTemplate(springBean, editor, this.getTemplate(springBean), predefinedVars);
+  protected void runTemplate(Editor editor, PsiFile file, InfraBean infraBean, Map<String, String> predefinedVars) {
+    super.runTemplate(editor, file, infraBean, predefinedVars);
+    ((DomTemplateRunnerImpl) DomTemplateRunner.getInstance(file.getProject())).runTemplate(infraBean, editor, this.getTemplate(infraBean), predefinedVars);
   }
 
-  protected Template getTemplate(InfraBean springBean) {
-    TemplateManager manager = TemplateManager.getInstance(springBean.getManager().getProject());
+  protected Template getTemplate(InfraBean infraBean) {
+    TemplateManager manager = TemplateManager.getInstance(infraBean.getManager().getProject());
     Template template = manager.createTemplate("", "");
     template.setToReformat(true);
     Expression completeExpression = new MacroCallNode(MacroFactory.createMacro("complete"));
-    Expression targetMethodExpression = getTargetMethodExpression(springBean);
+    Expression targetMethodExpression = getTargetMethodExpression(infraBean);
     template.addTextSegment("<");
     template.addVariableSegment("NS_PREFIX");
     template.addTextSegment("bean id=\"");
@@ -88,8 +88,8 @@ public abstract class MethodInvokingFactoryBean extends InfraBeanGenerateProvide
 
   protected abstract String getClassName();
 
-  private static Expression getTargetMethodExpression(InfraBean springBean) {
-    final InfraBean copy = springBean.createStableCopy();
+  private static Expression getTargetMethodExpression(InfraBean infraBean) {
+    final InfraBean copy = infraBean.createStableCopy();
     return new Expression() {
       public Result calculateResult(ExpressionContext context) {
         return new TextResult("");
@@ -115,8 +115,8 @@ public abstract class MethodInvokingFactoryBean extends InfraBeanGenerateProvide
     };
   }
 
-  private static @Nullable PsiClass getTargetObjectPsiClass(InfraBean springBean) {
-    InfraPropertyDefinition property = InfraPropertyUtils.findPropertyByName(springBean, "targetObject");
+  private static @Nullable PsiClass getTargetObjectPsiClass(InfraBean infraBean) {
+    InfraPropertyDefinition property = InfraPropertyUtils.findPropertyByName(infraBean, "targetObject");
     if (property == null) {
       return null;
     }

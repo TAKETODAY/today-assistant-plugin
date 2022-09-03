@@ -33,7 +33,7 @@ public class InfraBeanGenerateProvider extends BasicDomGenerateProvider<InfraBea
 
   @Override
   @Nullable
-  protected DomElement getElementToNavigate(final InfraBean springBean) {
+  protected DomElement getElementToNavigate(final InfraBean infraBean) {
     return null;
   }
 }

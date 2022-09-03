@@ -169,17 +169,17 @@ public abstract class ConstructorArgImpl extends InfraInjectionImpl implements C
     if (type != null) {
       return Collections.singletonList(type);
     }
-    InfraBean springBean = (InfraBean) getParent();
+    InfraBean infraBean = (InfraBean) getParent();
     GenericAttributeValue<Integer> index = getIndex();
     if (index.getValue() != null) {
-      Set<PsiParameter> resolvedParameters = ConstructorArgIndexConverterImpl.multiResolve(index, springBean);
+      Set<PsiParameter> resolvedParameters = ConstructorArgIndexConverterImpl.multiResolve(index, infraBean);
       if (resolvedParameters.size() > 0) {
         return ContainerUtil.map(resolvedParameters, PsiParameter::getType);
       }
-      PsiParameter parameter = ConstructorArgIndexConverterImpl.resolve(index, springBean);
+      PsiParameter parameter = ConstructorArgIndexConverterImpl.resolve(index, infraBean);
       return parameter == null ? Collections.emptyList() : Collections.singletonList(parameter.getType());
     }
-    ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
+    ResolvedConstructorArgs resolvedArgs = infraBean.getResolvedConstructorArgs();
     String nameAttr = getNameAttr().getStringValue();
     if (nameAttr != null && resolvedArgs.getResolvedMethod() == null) {
       List<PsiType> types = new ArrayList<>();

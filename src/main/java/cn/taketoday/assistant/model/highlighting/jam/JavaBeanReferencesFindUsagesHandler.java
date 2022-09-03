@@ -42,9 +42,9 @@ public class JavaBeanReferencesFindUsagesHandler extends FindUsagesHandler {
   private final CommonInfraBean infraBean;
   private final BeanPointer<?> pointer;
 
-  public JavaBeanReferencesFindUsagesHandler(CommonInfraBean springBean) {
-    super(springBean.getIdentifyingPsiElement());
-    this.infraBean = springBean;
+  public JavaBeanReferencesFindUsagesHandler(CommonInfraBean infraBean) {
+    super(infraBean.getIdentifyingPsiElement());
+    this.infraBean = infraBean;
     this.pointer = InfraBeanService.of().createBeanPointer(this.infraBean);
   }
 

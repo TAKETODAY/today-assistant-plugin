@@ -80,11 +80,11 @@ import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.CommonInfraBean;
 import cn.taketoday.assistant.model.ModelSearchParameters;
 import cn.taketoday.assistant.model.highlighting.xml.InfraConstructorArgResolveUtil;
+import cn.taketoday.assistant.model.utils.BeanCoreUtils;
 import cn.taketoday.assistant.model.utils.InfraBeanUtils;
 import cn.taketoday.assistant.model.utils.InfraModelSearchers;
-import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
-import cn.taketoday.assistant.model.utils.BeanCoreUtils;
 import cn.taketoday.assistant.model.utils.InfraModelService;
+import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.xml.DomInfraBean;
 import cn.taketoday.assistant.model.xml.beans.Beans;
 import cn.taketoday.assistant.model.xml.beans.ConstructorArg;
@@ -101,8 +101,8 @@ import static cn.taketoday.assistant.InfraBundle.messagePointer;
 
 public final class GenerateBeanDependenciesUtil {
 
-  public static boolean acceptBean(InfraBean springBean, boolean isSetterDependency) {
-    return !getCandidates(springBean, isSetterDependency).isEmpty();
+  public static boolean acceptBean(InfraBean infraBean, boolean isSetterDependency) {
+    return !getCandidates(infraBean, isSetterDependency).isEmpty();
   }
 
   public static boolean acceptPsiClass(PsiClass psiClass, boolean isSetterDependency) {
@@ -117,10 +117,10 @@ public final class GenerateBeanDependenciesUtil {
       List<BeanPointer<?>> list = InfraModelSearchers.findBeans(model, ModelSearchParameters.byClass(psiClass));
       if (list.size() > 0) {
         for (BeanPointer pointer : list) {
-          CommonInfraBean springBean = pointer.getBean();
-          if ((springBean instanceof InfraBean) && acceptBean((InfraBean) springBean, isSetterDependency)) {
-            if (ensureFileWritable((InfraBean) springBean)) {
-              return generateDependenciesFor((InfraBean) springBean, isSetterDependency);
+          CommonInfraBean infraBean = pointer.getBean();
+          if ((infraBean instanceof InfraBean) && acceptBean((InfraBean) infraBean, isSetterDependency)) {
+            if (ensureFileWritable((InfraBean) infraBean)) {
+              return generateDependenciesFor((InfraBean) infraBean, isSetterDependency);
             }
             return new ArrayList<>();
           }
@@ -157,11 +157,11 @@ public final class GenerateBeanDependenciesUtil {
     return WriteCommandAction.writeCommandAction(psiClass.getProject())
             .withName(message("model.actions.generate.beans"))
             .compute(() -> {
-              InfraBean springBean = parentBeans.addBean();
-              springBean.getClazz().setStringValue(psiClass.getQualifiedName());
-              String[] strings = BeanCoreUtils.suggestBeanNames(springBean);
-              springBean.getId().setStringValue(strings.length > 0 ? strings[0] : "");
-              return springBean;
+              InfraBean infraBean = parentBeans.addBean();
+              infraBean.getClazz().setStringValue(psiClass.getQualifiedName());
+              String[] strings = BeanCoreUtils.suggestBeanNames(infraBean);
+              infraBean.getId().setStringValue(strings.length > 0 ? strings[0] : "");
+              return infraBean;
             });
   }
 
@@ -180,29 +180,29 @@ public final class GenerateBeanDependenciesUtil {
     return true;
   }
 
-  public static List<Pair<InfraInjection, InfraGenerateTemplatesHolder>> generateDependenciesFor(@Nullable InfraBean springBean,
+  public static List<Pair<InfraInjection, InfraGenerateTemplatesHolder>> generateDependenciesFor(@Nullable InfraBean infraBean,
           boolean isSetterDependency) {
-    if (springBean == null || PsiTypesUtil.getPsiClass(springBean.getBeanType()) == null) {
+    if (infraBean == null || PsiTypesUtil.getPsiClass(infraBean.getBeanType()) == null) {
       return Collections.emptyList();
     }
-    Project project = springBean.getManager().getProject();
-    List<BeanPointer<?>> dependencies = chooseDependentBeans(getCandidates(springBean, isSetterDependency), project, isSetterDependency);
-    return generateDependencies(springBean, dependencies, isSetterDependency);
+    Project project = infraBean.getManager().getProject();
+    List<BeanPointer<?>> dependencies = chooseDependentBeans(getCandidates(infraBean, isSetterDependency), project, isSetterDependency);
+    return generateDependencies(infraBean, dependencies, isSetterDependency);
   }
 
-  public static List<Pair<InfraInjection, InfraGenerateTemplatesHolder>> generateDependencies(InfraBean springBean,
+  public static List<Pair<InfraInjection, InfraGenerateTemplatesHolder>> generateDependencies(InfraBean infraBean,
           List<? extends BeanPointer<?>> dependencies, boolean isSetterDependency) {
-    Module module = springBean.getModule();
+    Module module = infraBean.getModule();
     return module == null ? Collections.emptyList() : WriteCommandAction.writeCommandAction(module.getProject()).compute(() -> {
       Pair<InfraInjection, InfraGenerateTemplatesHolder> createConstructorArg;
       List<Pair<InfraInjection, InfraGenerateTemplatesHolder>> springInjections = new ArrayList<>();
-      CommonInfraModel model = InfraModelService.of().getModelByBean(springBean);
+      CommonInfraModel model = InfraModelService.of().getModelByBean(infraBean);
       for (BeanPointer<?> dependency : dependencies) {
         if (isSetterDependency) {
-          createConstructorArg = createDependency(springBean, dependency, model);
+          createConstructorArg = createDependency(infraBean, dependency, model);
         }
         else {
-          createConstructorArg = createConstructorArg(springBean, dependency, model);
+          createConstructorArg = createConstructorArg(infraBean, dependency, model);
         }
         Pair<InfraInjection, InfraGenerateTemplatesHolder> pair = createConstructorArg;
         if (pair != null) {
@@ -257,19 +257,19 @@ public final class GenerateBeanDependenciesUtil {
     return ContainerUtil.map2Array(pointer.getEffectiveBeanTypes(), PsiClass.class, PsiTypesUtil::getPsiClass);
   }
 
-  public static Set<InfraBeanClassMember> getCandidates(InfraBean springBean, boolean setterDependency) {
-    PsiClass springBeanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+  public static Set<InfraBeanClassMember> getCandidates(InfraBean infraBean, boolean setterDependency) {
+    PsiClass springBeanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     if (springBeanClass == null) {
       return Collections.emptySet();
     }
     Set<InfraBeanClassMember> beanClassMembers = new HashSet<>();
-    CommonInfraModel model = InfraModelService.of().getModel(springBean);
+    CommonInfraModel model = InfraModelService.of().getModel(infraBean);
     Collection<BeanPointer<?>> allBeans = model.getAllCommonBeans();
     for (BeanPointer<?> pointer : allBeans) {
-      if (!pointer.isReferenceTo(springBean)) {
+      if (!pointer.isReferenceTo(infraBean)) {
         PsiClass[] dependentBeanClasses = getEffectiveBeanClasses(pointer);
-        if (canBeReferenced(pointer, allBeans) && dependentBeanClasses.length > 0 && !hasDependency(springBean, pointer, setterDependency) && ((setterDependency && !isCompiledElementWithoutSetter(
-                springBeanClass, dependentBeanClasses)) || (!setterDependency && !isCompiledElementWithoutProperConstructor(springBean, model, PsiTypesUtil.getPsiClass(springBean.getBeanType()),
+        if (canBeReferenced(pointer, allBeans) && dependentBeanClasses.length > 0 && !hasDependency(infraBean, pointer, setterDependency) && ((setterDependency && !isCompiledElementWithoutSetter(
+                springBeanClass, dependentBeanClasses)) || (!setterDependency && !isCompiledElementWithoutProperConstructor(infraBean, model, PsiTypesUtil.getPsiClass(infraBean.getBeanType()),
                 dependentBeanClasses)))) {
           beanClassMembers.add(new InfraBeanClassMember(pointer));
         }
@@ -295,13 +295,13 @@ public final class GenerateBeanDependenciesUtil {
     return beanClassMembers;
   }
 
-  private static boolean isCompiledElementWithoutProperConstructor(@Nullable InfraBean springBean, CommonInfraModel model, PsiClass springBeanClass, PsiClass[] beanClasses) {
+  private static boolean isCompiledElementWithoutProperConstructor(@Nullable InfraBean infraBean, CommonInfraModel model, PsiClass springBeanClass, PsiClass[] beanClasses) {
     if (!(springBeanClass instanceof PsiCompiledElement) && !(springBeanClass.getOriginalElement() instanceof PsiCompiledElement)) {
       return false;
     }
-    if (springBean != null) {
+    if (infraBean != null) {
       for (PsiClass beanClass : beanClasses) {
-        if (getCompiledElementCandidateConstructor(springBean, springBeanClass, beanClass) != null) {
+        if (getCompiledElementCandidateConstructor(infraBean, springBeanClass, beanClass) != null) {
           return false;
         }
       }
@@ -407,10 +407,10 @@ public final class GenerateBeanDependenciesUtil {
     return getConstructorDependencies(currentBean).contains(candidateBean);
   }
 
-  public static List<BeanPointer<?>> getSetterDependencies(CommonInfraBean springBean) {
+  public static List<BeanPointer<?>> getSetterDependencies(CommonInfraBean infraBean) {
     List<BeanPointer<?>> dependencies = new ArrayList<>();
-    if (springBean instanceof DomInfraBean) {
-      for (InfraPropertyDefinition property : InfraPropertyUtils.getProperties(springBean)) {
+    if (infraBean instanceof DomInfraBean) {
+      for (InfraPropertyDefinition property : InfraPropertyUtils.getProperties(infraBean)) {
         if (property instanceof InfraValueHolder) {
           dependencies.addAll(InfraPropertyUtils.getInfraValueHolderDependencies(property));
         }
@@ -419,10 +419,10 @@ public final class GenerateBeanDependenciesUtil {
     return dependencies;
   }
 
-  public static List<BeanPointer<?>> getConstructorDependencies(CommonInfraBean springBean) {
-    if (springBean instanceof InfraBean) {
+  public static List<BeanPointer<?>> getConstructorDependencies(CommonInfraBean infraBean) {
+    if (infraBean instanceof InfraBean) {
       List<BeanPointer<?>> dependencies = new ArrayList<>();
-      for (ConstructorArg arg : ((InfraBean) springBean).getConstructorArgs()) {
+      for (ConstructorArg arg : ((InfraBean) infraBean).getConstructorArgs()) {
         dependencies.addAll(InfraPropertyUtils.getInfraValueHolderDependencies(arg));
       }
       return dependencies;
@@ -534,25 +534,25 @@ public final class GenerateBeanDependenciesUtil {
     return null;
   }
 
-  private static PsiMethod createConstructor(InfraBean springBean) {
+  private static PsiMethod createConstructor(InfraBean infraBean) {
     PsiClass instantiationClass = null;
     PsiMethod instantiationMethod = null;
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     assert beanClass != null;
     try {
       PsiElementFactory elementFactory = JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory();
-      if (isInstantiatedByFactory(springBean)) {
-        BeanPointer<?> beanPointer = springBean.getFactoryBean().getValue();
+      if (isInstantiatedByFactory(infraBean)) {
+        BeanPointer<?> beanPointer = infraBean.getFactoryBean().getValue();
         if (beanPointer != null) {
           instantiationClass = beanPointer.getBeanClass();
-          String methodName = getInstantiationMethodName(instantiationClass, springBean);
+          String methodName = getInstantiationMethodName(instantiationClass, infraBean);
           String methodText = "public " + beanClass.getName() + " " + methodName + "() { return null; }";
           instantiationMethod = elementFactory.createMethodFromText(methodText, null);
         }
       }
-      else if (isInstantiatedByFactoryMethod(springBean)) {
+      else if (isInstantiatedByFactoryMethod(infraBean)) {
         instantiationClass = beanClass;
-        String methodName2 = getInstantiationMethodName(instantiationClass, springBean);
+        String methodName2 = getInstantiationMethodName(instantiationClass, infraBean);
         String methodText2 = "public static " + beanClass.getName() + " " + methodName2 + "() { return null; }";
         instantiationMethod = elementFactory.createMethodFromText(methodText2, null);
       }
@@ -560,7 +560,7 @@ public final class GenerateBeanDependenciesUtil {
         instantiationClass = beanClass;
         instantiationMethod = elementFactory.createConstructor();
       }
-      List<PsiParameter> parameters = InfraConstructorArgResolveUtil.suggestParamsForConstructorArgs(springBean);
+      List<PsiParameter> parameters = InfraConstructorArgResolveUtil.suggestParamsForConstructorArgs(infraBean);
       assert instantiationMethod != null;
       for (PsiParameter parameter : parameters) {
         instantiationMethod.getParameterList().add(parameter);
@@ -572,12 +572,12 @@ public final class GenerateBeanDependenciesUtil {
     }
   }
 
-  private static String getInstantiationMethodName(PsiClass factoryBeanClass, InfraBean springBean) {
-    String methodName = springBean.getFactoryMethod().getStringValue();
+  private static String getInstantiationMethodName(PsiClass factoryBeanClass, InfraBean infraBean) {
+    String methodName = infraBean.getFactoryMethod().getStringValue();
     if (!StringUtil.isEmptyOrSpaces(methodName)) {
       return methodName;
     }
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     String methodName2 = "create" + beanClass.getName();
     int i = 0;
     while (factoryBeanClass.findMethodsByName(methodName2, true).length > 0) {
@@ -587,12 +587,12 @@ public final class GenerateBeanDependenciesUtil {
     return methodName2;
   }
 
-  private static boolean isInstantiatedByFactoryMethod(InfraBean springBean) {
-    return DomUtil.hasXml(springBean.getFactoryMethod());
+  private static boolean isInstantiatedByFactoryMethod(InfraBean infraBean) {
+    return DomUtil.hasXml(infraBean.getFactoryMethod());
   }
 
-  private static boolean isInstantiatedByFactory(InfraBean springBean) {
-    return DomUtil.hasXml(springBean.getFactoryBean());
+  private static boolean isInstantiatedByFactory(InfraBean infraBean) {
+    return DomUtil.hasXml(infraBean.getFactoryBean());
   }
 
   private static void addConstructorParameter(PsiClass currentBeanClass, PsiClass candidateBeanClass, PsiMethod constructor) {

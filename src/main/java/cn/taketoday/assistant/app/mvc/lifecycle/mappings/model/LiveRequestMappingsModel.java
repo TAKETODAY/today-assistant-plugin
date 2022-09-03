@@ -25,9 +25,8 @@ import com.intellij.psi.PsiMethod;
 import java.util.List;
 
 public interface LiveRequestMappingsModel {
-    
-    List<cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMapping> getRequestMappings();
 
-    
-    List<LiveRequestMapping> getRequestMappingsByMethod( PsiMethod psiMethod);
+  List<cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMapping> getRequestMappings();
+
+  List<LiveRequestMapping> getRequestMappingsByMethod(PsiMethod psiMethod);
 }

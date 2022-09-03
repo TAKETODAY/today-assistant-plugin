@@ -51,14 +51,14 @@ import cn.taketoday.lang.Nullable;
 public final class BeanInstantiationInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
     String message;
-    PsiClass psiClass = springBean.getClazz().getValue();
-    if (psiClass != null && !springBean.isAbstract() && psiClass.hasModifierProperty("abstract")) {
-      boolean factory = DomUtil.hasXml(springBean.getFactoryMethod());
-      boolean lookup = hasLookupMethods(springBean) || hasAnnotatedLookupMethods(psiClass);
-      if (!factory && !lookup && !isJavaConfigBean(springBean)) {
-        GenericAttributeValue<PsiClass> clazz = springBean.getClazz();
+    PsiClass psiClass = infraBean.getClazz().getValue();
+    if (psiClass != null && !infraBean.isAbstract() && psiClass.hasModifierProperty("abstract")) {
+      boolean factory = DomUtil.hasXml(infraBean.getFactoryMethod());
+      boolean lookup = hasLookupMethods(infraBean) || hasAnnotatedLookupMethods(psiClass);
+      if (!factory && !lookup && !isJavaConfigBean(infraBean)) {
+        GenericAttributeValue<PsiClass> clazz = infraBean.getClazz();
         HighlightSeverity highlightSeverity = HighlightSeverity.WARNING;
         if (psiClass.isInterface()) {
           message = InfraBundle.message("interface.not.allowed");
@@ -66,25 +66,25 @@ public final class BeanInstantiationInspection extends InfraBeanInspectionBase {
         else {
           message = InfraBundle.message("abstract.class.not.allowed");
         }
-        holder.createProblem(clazz, highlightSeverity, message, new MarkAbstractFix(springBean.getAbstract()));
+        holder.createProblem(clazz, highlightSeverity, message, new MarkAbstractFix(infraBean.getAbstract()));
       }
     }
   }
 
-  private static boolean hasLookupMethods(InfraBean springBean) {
-    return hasLookupMethods(springBean, new HashSet<>());
+  private static boolean hasLookupMethods(InfraBean infraBean) {
+    return hasLookupMethods(infraBean, new HashSet<>());
   }
 
-  private static boolean hasLookupMethods(InfraBean springBean, Set<InfraBean> visited) {
+  private static boolean hasLookupMethods(InfraBean infraBean, Set<InfraBean> visited) {
     BeanPointer<?> parent;
-    if (visited.contains(springBean)) {
+    if (visited.contains(infraBean)) {
       return false;
     }
-    if (springBean.getLookupMethods().size() > 0) {
+    if (infraBean.getLookupMethods().size() > 0) {
       return true;
     }
-    visited.add(springBean);
-    GenericAttributeValue<BeanPointer<?>> parentBeanValue = springBean.getParentBean();
+    visited.add(infraBean);
+    GenericAttributeValue<BeanPointer<?>> parentBeanValue = infraBean.getParentBean();
     if (DomUtil.hasXml(parentBeanValue) && (parent = parentBeanValue.getValue()) != null) {
       CommonInfraBean bean = parent.getBean();
       if (bean instanceof InfraBean) {
@@ -104,10 +104,10 @@ public final class BeanInstantiationInspection extends InfraBeanInspectionBase {
     return false;
   }
 
-  private static boolean isJavaConfigBean(InfraBean springBean) {
+  private static boolean isJavaConfigBean(InfraBean infraBean) {
     Module module;
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
-    if (DomUtil.hasXml(springBean) && beanClass != null && (module = springBean.getModule()) != null) {
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
+    if (DomUtil.hasXml(infraBean) && beanClass != null && (module = infraBean.getModule()) != null) {
       for (InfraJavaConfiguration javaConfiguration : InfraOldJavaConfigurationUtil.getJavaConfigurations(module)) {
         if (beanClass.equals(javaConfiguration.getPsiClass())) {
           return true;

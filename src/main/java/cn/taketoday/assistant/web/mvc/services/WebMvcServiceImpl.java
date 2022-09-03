@@ -173,10 +173,10 @@ public class WebMvcServiceImpl extends WebMvcService {
   }
 
   public static StreamEx<ViewResolver> getViewResolvers(CommonInfraModel model, BeanPointer<?> pointer, ViewResolverFactory... forFactories) {
-    CommonInfraBean springBean = pointer.getBean();
-    return StreamEx.ofNullable(PsiTypesUtil.getPsiClass(springBean.getBeanType(true))).flatMap(beanClass -> {
+    CommonInfraBean infraBean = pointer.getBean();
+    return StreamEx.ofNullable(PsiTypesUtil.getPsiClass(infraBean.getBeanType(true))).flatMap(beanClass -> {
       return StreamEx.of(forFactories).flatCollection(factory -> {
-        return factory.createResolvers(springBean, beanClass, model);
+        return factory.createResolvers(infraBean, beanClass, model);
       });
     });
   }

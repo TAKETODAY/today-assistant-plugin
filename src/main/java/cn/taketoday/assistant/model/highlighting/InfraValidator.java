@@ -61,7 +61,7 @@ public class InfraValidator extends InspectionValidator {
   }
 
   public Class<? extends LocalInspectionTool>[] getInspectionToolClasses(CompileContext context) {
-    return InfraInspectionsRegistry.getInstance().getSpringInspectionClasses();
+    return InfraInspectionsRegistry.getInstance().getInfraInspectionClasses();
   }
 
   public boolean isAvailableOnScope(CompileScope scope) {

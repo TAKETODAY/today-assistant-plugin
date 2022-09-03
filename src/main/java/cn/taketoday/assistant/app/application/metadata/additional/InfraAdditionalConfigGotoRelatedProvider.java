@@ -35,8 +35,8 @@ import com.intellij.util.containers.ContainerUtil;
 import java.util.Collections;
 import java.util.List;
 
-import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraAppBundle;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.app.InfraConfigurationFileService;
 import cn.taketoday.assistant.util.InfraUtils;
 

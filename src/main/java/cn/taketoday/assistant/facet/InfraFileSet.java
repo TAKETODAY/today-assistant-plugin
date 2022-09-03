@@ -134,19 +134,19 @@ public abstract class InfraFileSet implements Disposable {
     return sets;
   }
 
-  public void setDependencies(List<InfraFileSet> springFileSets) {
+  public void setDependencies(List<InfraFileSet> infraFileSets) {
     this.data.getDependencies().clear();
-    for (InfraFileSet dependency : springFileSets) {
+    for (InfraFileSet dependency : infraFileSets) {
       addDependency(dependency);
     }
   }
 
-  public void addDependency(InfraFileSet springFileSet) {
-    this.data.addDependency(getDependencyIdFor(springFileSet));
+  public void addDependency(InfraFileSet fileSet) {
+    this.data.addDependency(getDependencyIdFor(fileSet));
   }
 
-  public void removeDependency(InfraFileSet springFileSet) {
-    this.data.getDependencies().remove(getDependencyIdFor(springFileSet));
+  public void removeDependency(InfraFileSet fileSet) {
+    this.data.getDependencies().remove(getDependencyIdFor(fileSet));
   }
 
   private String getDependencyIdFor(InfraFileSet other) {
@@ -158,8 +158,7 @@ public abstract class InfraFileSet implements Disposable {
   }
 
   public Set<VirtualFilePointer> getXmlFiles() {
-    Set<VirtualFilePointer> configFiles = getConfigFiles(StdFileTypes.XML);
-    return configFiles;
+    return getConfigFiles(StdFileTypes.XML);
   }
 
   public Set<VirtualFilePointer> getCodeConfigurationFiles() {

@@ -32,7 +32,6 @@ import com.intellij.semantic.SemService;
 import cn.taketoday.assistant.AliasForUtils;
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.app.InfraClassesConstants;
-import cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.Conditional;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnBean;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnClass;
@@ -56,7 +55,29 @@ import cn.taketoday.assistant.model.config.properties.EnableConfigurationPropert
 import cn.taketoday.assistant.model.config.properties.NestedConfigurationProperty;
 import cn.taketoday.assistant.model.jam.SemContributorUtil;
 
-import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.*;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.AUTO_CONFIGURE_AFTER;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.AUTO_CONFIGURE_BEFORE;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.AUTO_CONFIGURE_ORDER;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_BEAN;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_CLASS;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_ENABLED_HEALTH_INDICATOR;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_ENABLED_HEALTH_INDICATOR_SB2;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_ENABLED_INFO_CONTRIBUTOR;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_ENABLED_INFO_CONTRIBUTOR_SB2;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_ENABLED_RESOURCE_CHAIN;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_EXPRESSION;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_MANAGEMENT_PORT;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_MISSING_BEAN;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_MISSING_CLASS;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_NOT_WEB_APPLICATION;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_PROPERTY;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_REPOSITORY_TYPE;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_RESOURCE;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_SINGLE_CANDIDATE;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_WEB_APPLICATION;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.ENABLE_AUTO_CONFIGURATION;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.IMPORT_AUTO_CONFIGURATION;
+import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.INFRA_APPLICATION;
 
 final class InfraAutoconfigureSemContributor extends SemContributor {
 

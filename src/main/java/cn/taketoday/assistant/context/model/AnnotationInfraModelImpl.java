@@ -22,6 +22,7 @@ package cn.taketoday.assistant.context.model;
 
 import com.intellij.jam.JamService;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NotNullLazyValue;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
@@ -59,7 +60,7 @@ public class AnnotationInfraModelImpl extends AnnotationInfraModel {
 
   @Override
   public Set<CommonInfraModel> getRelatedModels(boolean checkActiveProfiles) {
-    var localAnnotationModels = getLocalAnnotationSpringModels(checkActiveProfiles);
+    var localAnnotationModels = getLocalAnnotationModels(checkActiveProfiles);
     var simpleBeans = new LinkedHashSet<PsiClass>();
     var models = new LinkedHashSet<CommonInfraModel>(localAnnotationModels);
     for (SmartPsiElementPointer<? extends PsiClass> psiElementPointer : this.configClasses) {
@@ -80,19 +81,23 @@ public class AnnotationInfraModelImpl extends AnnotationInfraModel {
   }
 
   private Set<PsiPackage> getComponentScanPackages() {
-    InfraFileSet set = getFileSet();
-    if (!(set instanceof ComponentScannedApplicationContext)) {
-      return Collections.emptySet();
+    InfraFileSet fileSet = getFileSet();
+    if (fileSet instanceof ComponentScannedApplicationContext scannedCtx) {
+      Module module = getModule();
+      if (module != null) {
+        Project project = module.getProject();
+        Set<PsiPackage> packages = new LinkedHashSet<>();
+        for (String pkg : scannedCtx.getComponentScanPackages()) {
+          PsiPackage psiPackage = JavaPsiFacade.getInstance(project).findPackage(pkg);
+          ContainerUtil.addIfNotNull(packages, psiPackage);
+        }
+        return packages;
+      }
     }
-    Set<PsiPackage> packages = new LinkedHashSet<>();
-    for (String pkg : ((ComponentScannedApplicationContext) set).getComponentScanPackages()) {
-      PsiPackage psiPackage = JavaPsiFacade.getInstance(getModule().getProject()).findPackage(pkg);
-      ContainerUtil.addIfNotNull(packages, psiPackage);
-    }
-    return packages;
+    return Collections.emptySet();
   }
 
-  private Set<LocalAnnotationModel> getLocalAnnotationSpringModels(boolean checkActiveProfiles) {
+  private Set<LocalAnnotationModel> getLocalAnnotationModels(boolean checkActiveProfiles) {
     JamPsiClassInfraBean springConfiguration;
     Set<String> activeProfiles = getActiveProfiles();
     Set<LocalAnnotationModel> models = new LinkedHashSet<>();

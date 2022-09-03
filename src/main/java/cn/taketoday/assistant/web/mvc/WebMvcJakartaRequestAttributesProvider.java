@@ -25,6 +25,7 @@ import com.intellij.javaee.web.WebCommonClassNames;
 public final class WebMvcJakartaRequestAttributesProvider extends WebMvcRequestAttributesProvider {
 
   public static final WebMvcJakartaRequestAttributesProvider INSTANCE = new WebMvcJakartaRequestAttributesProvider();
+
   private WebMvcJakartaRequestAttributesProvider() {
     super(WebCommonClassNames.SERVLET_REQUEST.jakarta());
   }

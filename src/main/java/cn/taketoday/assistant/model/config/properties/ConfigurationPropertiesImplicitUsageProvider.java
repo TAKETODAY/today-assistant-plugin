@@ -34,7 +34,7 @@ import cn.taketoday.assistant.util.InfraUtils;
 
 public class ConfigurationPropertiesImplicitUsageProvider implements ImplicitUsageProvider {
 
-  public boolean isImplicitUsage( PsiElement element) {
+  public boolean isImplicitUsage(PsiElement element) {
     if (element instanceof PsiMethod) {
       return isGetterOrSetterInConfigurationPropertiesClass((PsiMethod) element);
     }
@@ -56,11 +56,11 @@ public class ConfigurationPropertiesImplicitUsageProvider implements ImplicitUsa
               && AnnotationUtil.findAnnotation(psiMethod, true, InfraClassesConstants.CONSTRUCTOR_BINDING) != null;
   }
 
-  public boolean isImplicitRead( PsiElement element) {
+  public boolean isImplicitRead(PsiElement element) {
     return false;
   }
 
-  public boolean isImplicitWrite( PsiElement element) {
+  public boolean isImplicitWrite(PsiElement element) {
     return false;
   }
 }

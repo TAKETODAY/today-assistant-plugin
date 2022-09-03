@@ -43,9 +43,9 @@ import java.util.Set;
 import javax.swing.JComponent;
 
 import cn.taketoday.assistant.InfraManager;
+import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.facet.InfraFileSetService;
-import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.model.utils.ProfileUtils;
 import cn.taketoday.lang.Nullable;
 

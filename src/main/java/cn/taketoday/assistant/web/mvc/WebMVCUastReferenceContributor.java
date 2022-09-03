@@ -34,8 +34,8 @@ import com.intellij.psi.UastReferenceRegistrar;
 import com.intellij.util.Function;
 
 import cn.taketoday.assistant.InfraLibraryUtil;
-import cn.taketoday.assistant.web.mvc.client.exchange.InfraExchangeUrlPathSpecification;
 import cn.taketoday.assistant.web.mvc.client.exchange.InfraExchangeConstant;
+import cn.taketoday.assistant.web.mvc.client.exchange.InfraExchangeUrlPathSpecification;
 import cn.taketoday.assistant.web.mvc.model.WebMvcUrlResolverKt;
 import cn.taketoday.assistant.web.mvc.model.jam.RequestMapping;
 import cn.taketoday.assistant.web.mvc.model.xml.CorsHeadersVariantsConverter;

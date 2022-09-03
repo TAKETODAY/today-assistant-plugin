@@ -37,9 +37,9 @@ public final class JamBeanPointerImpl extends BaseBeanPointer<JamPsiMemberInfraB
 
   private final JamPsiMemberInfraBean mySpringBean;
 
-  public JamBeanPointerImpl(JamPsiMemberInfraBean springBean) {
-    super(null, springBean.getPsiElement().getProject());
-    this.mySpringBean = springBean;
+  public JamBeanPointerImpl(JamPsiMemberInfraBean infraBean) {
+    super(null, infraBean.getPsiElement().getProject());
+    this.mySpringBean = infraBean;
   }
 
   @Override
@@ -56,9 +56,9 @@ public final class JamBeanPointerImpl extends BaseBeanPointer<JamPsiMemberInfraB
 
   @Nullable
   public PsiElement getPsiElement() {
-    JamPsiMemberInfraBean springBean = getBean();
-    if (springBean.isValid()) {
-      return springBean.getIdentifyingPsiElement();
+    JamPsiMemberInfraBean infraBean = getBean();
+    if (infraBean.isValid()) {
+      return infraBean.getIdentifyingPsiElement();
     }
     return null;
   }

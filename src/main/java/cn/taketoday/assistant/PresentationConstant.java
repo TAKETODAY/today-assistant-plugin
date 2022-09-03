@@ -29,10 +29,10 @@ public interface PresentationConstant {
   String ACTIVE_PROFILES = "@ActiveProfiles";
   String PROFILE = "@Profile";
   String DEPENDS_ON = "@DependsOn";
-  String SPRING_BEAN = "Infra Bean";
-  String SPRING_PROPERTY = "Infra Property";
-  String SPRING_CONSTANT = "Infra Constant";
-  String SPRING_PROFILE = "Infra Profile";
+  String INFRA_BEAN = "Infra Bean";
+  String INFRA_PROPERTY = "Infra Property";
+  String INFRA_CONSTANT = "Infra Constant";
+  String INFRA_PROFILE = "Infra Profile";
   String CACHE = "Cache";
 
   String NAMED = "@Named";
@@ -40,7 +40,7 @@ public interface PresentationConstant {
   String COMPONENT_SCAN = "Component Scan";
   String TASK_EXECUTOR = "Infra Task Executor";
   String TASK_SCHEDULER = "Infra Task Scheduler";
-  String SPRING_LIST = "Infra List";
-  String SPRING_MAP = "Infra Map";
-  String SPRING_SET = "Infra Set";
+  String INFRA_LIST = "Infra List";
+  String INFRA_MAP = "Infra Map";
+  String INFRA_SET = "Infra Set";
 }

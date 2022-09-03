@@ -52,20 +52,20 @@ import cn.taketoday.lang.Nullable;
 public class InfraBeanDocumentationProvider extends AbstractDocumentationProvider {
 
   public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
-    CommonInfraBean springBean = InfraBeanPomTargetUtils.getBean(element);
-    if (springBean != null && springBean.isValid()) {
+    CommonInfraBean infraBean = InfraBeanPomTargetUtils.getBean(element);
+    if (infraBean != null && infraBean.isValid()) {
       StringBuilder sb = new StringBuilder("<div class='definition'><pre>");
-      sb.append(getSpringBeanTypeName(springBean));
-      String beanName = InfraPresentationProvider.getBeanName(springBean);
+      sb.append(getSpringBeanTypeName(infraBean));
+      String beanName = InfraPresentationProvider.getBeanName(infraBean);
       sb.append(" <b>").append(StringUtil.escapeXmlEntities(beanName)).append("</b>");
-      PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+      PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
       if (beanClass != null) {
         sb.append("<br>");
         PsiClassType beanClassType = PsiTypesUtil.getClassType(beanClass);
         JavaDocInfoGeneratorFactory.create(beanClass.getProject(), null).generateType(sb, beanClassType, beanClass, true);
       }
 
-      VirtualFile file = springBean.getContainingFile().getVirtualFile();
+      VirtualFile file = infraBean.getContainingFile().getVirtualFile();
       if (file != null) {
         sb.append("<br>");
         sb.append(ProjectUtil.calcRelativeToProjectPath(file, element.getProject()));
@@ -73,14 +73,14 @@ public class InfraBeanDocumentationProvider extends AbstractDocumentationProvide
 
       sb.append("</pre></div>");
       sb.append("<div class='content'>");
-      if (springBean instanceof Description description) {
+      if (infraBean instanceof Description description) {
         String documentation = description.getDescription().getValue();
         if (StringUtil.isNotEmpty(documentation)) {
           sb.append(documentation);
           sb.append("<br><br>");
         }
       }
-      else if (springBean instanceof JamPsiMemberInfraBean<?> jamPsiMemberSpringBean) {
+      else if (infraBean instanceof JamPsiMemberInfraBean<?> jamPsiMemberSpringBean) {
         PsiAnnotation description = AnnotationUtil.findAnnotation(jamPsiMemberSpringBean.getPsiElement(), true,
                 "cn.taketoday.context.annotation.Description");
         if (description != null) {
@@ -91,18 +91,18 @@ public class InfraBeanDocumentationProvider extends AbstractDocumentationProvide
 
       sb.append("</div>");
       sb.append("<table class='sections'>");
-      String[] aliases = springBean.getAliases();
+      String[] aliases = infraBean.getAliases();
       if (aliases.length > 0) {
         appendSection(sb, InfraBundle.message("aliases"), StringUtil.join(aliases, ", "));
       }
 
-      InfraProfile profile = springBean.getProfile();
+      InfraProfile profile = infraBean.getProfile();
       if (profile != InfraProfile.DEFAULT) {
         appendSection(sb, InfraBundle.message("profile"), StringUtil.join(profile.getExpressions(), ", "));
       }
 
-      if (springBean instanceof ScopedElement) {
-        GenericAttributeValue<BeanScope> scope = ((ScopedElement) springBean).getScope();
+      if (infraBean instanceof ScopedElement) {
+        GenericAttributeValue<BeanScope> scope = ((ScopedElement) infraBean).getScope();
         if (DomUtil.hasXml(scope)) {
           appendSection(sb, InfraBundle.message("scope"), scope.getStringValue());
         }
@@ -128,12 +128,12 @@ public class InfraBeanDocumentationProvider extends AbstractDocumentationProvide
 
   @Nullable
   private static String getQuickNavigateInfoInner(PsiElement element) {
-    CommonInfraBean springBean = InfraBeanPomTargetUtils.getBean(element);
-    if (springBean != null && springBean.isValid()) {
-      String beanName = InfraPresentationProvider.getBeanName(springBean);
-      PsiFile containingFile = springBean.getContainingFile();
-      StringBuilder sb = (new StringBuilder(getSpringBeanTypeName(springBean))).append(" ").append(beanName).append(" [").append(containingFile.getName()).append("]");
-      PsiClass psiClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+    CommonInfraBean infraBean = InfraBeanPomTargetUtils.getBean(element);
+    if (infraBean != null && infraBean.isValid()) {
+      String beanName = InfraPresentationProvider.getBeanName(infraBean);
+      PsiFile containingFile = infraBean.getContainingFile();
+      StringBuilder sb = (new StringBuilder(getSpringBeanTypeName(infraBean))).append(" ").append(beanName).append(" [").append(containingFile.getName()).append("]");
+      PsiClass psiClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
       if (psiClass != null) {
         sb.append("\n ").append(psiClass.getQualifiedName());
       }
@@ -145,10 +145,10 @@ public class InfraBeanDocumentationProvider extends AbstractDocumentationProvide
     }
   }
 
-  private static String getSpringBeanTypeName(CommonInfraBean springBean) {
-    PsiElement identifyingPsiElement = springBean.getIdentifyingPsiElement();
+  private static String getSpringBeanTypeName(CommonInfraBean infraBean) {
+    PsiElement identifyingPsiElement = infraBean.getIdentifyingPsiElement();
 
-    assert identifyingPsiElement != null : springBean;
+    assert identifyingPsiElement != null : infraBean;
 
     return ElementDescriptionUtil.getElementDescription(identifyingPsiElement, UsageViewTypeLocation.INSTANCE);
   }

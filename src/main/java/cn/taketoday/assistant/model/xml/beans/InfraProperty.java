@@ -37,10 +37,10 @@ import java.util.List;
 import cn.taketoday.assistant.InfraConstant;
 import cn.taketoday.assistant.model.converters.BeanPropertyConverter;
 
-import static cn.taketoday.assistant.PresentationConstant.SPRING_PROPERTY;
+import static cn.taketoday.assistant.PresentationConstant.INFRA_PROPERTY;
 
 @Namespace(InfraConstant.BEANS_NAMESPACE_KEY)
-@Presentation(typeName = SPRING_PROPERTY, icon = "cn.taketoday.assistant.Icons.SpringProperty")
+@Presentation(typeName = INFRA_PROPERTY, icon = "cn.taketoday.assistant.Icons.SpringProperty")
 public interface InfraProperty extends InfraInjection, InfraPropertyDefinition {
 
   /**

@@ -53,13 +53,13 @@ public class InfraBeansGroupingRule extends SingleParentUsageGroupingRule {
   @Nullable
   protected UsageGroup getParentGroupFor(Usage usage, UsageTarget[] targets) {
     DomElement domElement;
-    DomInfraBean springBean;
+    DomInfraBean infraBean;
     if (usage instanceof PsiElementUsage) {
       PsiElement psiElement = ((PsiElementUsage) usage).getElement();
       PsiFile containingFile = psiElement.getContainingFile();
       if ((containingFile instanceof XmlFile xmlFile) && InfraDomUtils.isInfraXml(xmlFile) && (domElement = DomUtil.getDomElement(
-              psiElement)) != null && (springBean = domElement.getParentOfType(DomInfraBean.class, false)) != null) {
-        return new BeansUsageGroup(springBean);
+              psiElement)) != null && (infraBean = domElement.getParentOfType(DomInfraBean.class, false)) != null) {
+        return new BeansUsageGroup(infraBean);
       }
       return null;
     }

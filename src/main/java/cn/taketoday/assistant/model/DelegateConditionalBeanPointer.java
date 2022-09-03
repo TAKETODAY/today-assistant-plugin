@@ -71,8 +71,8 @@ public final class DelegateConditionalBeanPointer implements JamBeanPointer, Con
   }
 
   @Override
-  public boolean isReferenceTo(@Nullable CommonInfraBean springBean) {
-    return myDelegate.isReferenceTo(springBean);
+  public boolean isReferenceTo(@Nullable CommonInfraBean infraBean) {
+    return myDelegate.isReferenceTo(infraBean);
   }
 
   @Override

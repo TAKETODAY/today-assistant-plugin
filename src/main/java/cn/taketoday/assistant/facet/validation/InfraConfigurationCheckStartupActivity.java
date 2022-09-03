@@ -47,9 +47,9 @@ import java.util.Collection;
 import java.util.Objects;
 
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.facet.InfraFrameworkDetector;
-import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.settings.InfraGeneralSettings;
 import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;

@@ -75,9 +75,9 @@ public class ConstructorArgNameConverterImpl extends ConstructorArgNameConverter
 
   private static Collection<PsiParameter> getAllConstructorParams(ConvertContext context) {
     Map<String, PsiParameter> params = new HashMap<>();
-    InfraBean springBean = context.getInvocationElement().getParentOfType(InfraBean.class, false);
-    if (springBean != null) {
-      List<PsiMethod> psiMethods = springBean.getInstantiationMethods();
+    InfraBean infraBean = context.getInvocationElement().getParentOfType(InfraBean.class, false);
+    if (infraBean != null) {
+      List<PsiMethod> psiMethods = infraBean.getInstantiationMethods();
       for (PsiMethod psiMethod : psiMethods) {
         for (PsiParameter parameter : psiMethod.getParameterList().getParameters()) {
           params.put(parameter.getName(), parameter);

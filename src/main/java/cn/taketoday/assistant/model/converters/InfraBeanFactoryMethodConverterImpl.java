@@ -71,14 +71,14 @@ public class InfraBeanFactoryMethodConverterImpl extends InfraBeanFactoryMethodC
   @Override
   @Nullable
   public PsiClass getPsiClass(ConvertContext context) {
-    InfraBean springBean = getSpringBean(context);
-    return getFactoryClass(springBean);
+    InfraBean infraBean = getSpringBean(context);
+    return getFactoryClass(infraBean);
   }
 
   @Override
   protected MethodAccepter getMethodAccepter(ConvertContext context, boolean forCompletion) {
-    InfraBean springBean = getSpringBean(context);
-    boolean fromFactoryBean = springBean.getFactoryBean().getValue() != null;
+    InfraBean infraBean = getSpringBean(context);
+    boolean fromFactoryBean = infraBean.getFactoryBean().getValue() != null;
     return new MethodAccepter() {
 
       @Override
@@ -90,7 +90,7 @@ public class InfraBeanFactoryMethodConverterImpl extends InfraBeanFactoryMethodC
         assert psiClass != null;
         String containingClass = psiClass.getQualifiedName();
         return (!forCompletion || containingClass == null || !"java.lang.Object".equals(containingClass)) && FactoryBeansManager.of()
-                .isValidFactoryMethod(psiMethod, fromFactoryBean) && (forCompletion || parametersResolved(springBean, psiMethod));
+                .isValidFactoryMethod(psiMethod, fromFactoryBean) && (forCompletion || parametersResolved(infraBean, psiMethod));
       }
     };
   }
@@ -105,16 +105,16 @@ public class InfraBeanFactoryMethodConverterImpl extends InfraBeanFactoryMethodC
             () -> InfraConstructorArgResolveUtil.findMatchingMethods(bean))) != null && resolvedMethods.contains(method);
   }
 
-  public static List<PsiMethod> getFactoryMethodCandidates(InfraBean springBean, String methodName) {
-    PsiClass factoryClass = getFactoryClass(springBean);
+  public static List<PsiMethod> getFactoryMethodCandidates(InfraBean infraBean, String methodName) {
+    PsiClass factoryClass = getFactoryClass(infraBean);
     SmartList<PsiMethod> smartList = new SmartList<>();
     if (factoryClass != null) {
       if (ASPECT_OF_METHOD_NAME.equals(methodName)) {
-        smartList.add(createAspectOfLightMethod(springBean.getPsiManager()));
+        smartList.add(createAspectOfLightMethod(infraBean.getPsiManager()));
       }
       PsiMethod[] methods = MethodResolveProcessor.findMethod(factoryClass, methodName);
       if (methods.length > 0) {
-        boolean fromFactoryBean = springBean.getFactoryBean().getValue() != null;
+        boolean fromFactoryBean = infraBean.getFactoryBean().getValue() != null;
         for (PsiMethod method : methods) {
           if (FactoryBeansManager.of().isValidFactoryMethod(method, fromFactoryBean)) {
             smartList.add(method);
@@ -130,26 +130,26 @@ public class InfraBeanFactoryMethodConverterImpl extends InfraBeanFactoryMethodC
   }
 
   @Nullable
-  public static PsiClass getFactoryClass(InfraBean springBean) {
+  public static PsiClass getFactoryClass(InfraBean infraBean) {
     BeanPointer<?> factoryBeanPointer;
     PsiClass beanClass = null;
-    if (!DomUtil.hasXml(springBean.getFactoryBean())) {
-      beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType(false));
+    if (!DomUtil.hasXml(infraBean.getFactoryBean())) {
+      beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType(false));
     }
     else {
-      String beanPointerStringValue = springBean.getFactoryBean().getRawText();
+      String beanPointerStringValue = infraBean.getFactoryBean().getRawText();
       if (StringUtil.isEmptyOrSpaces(beanPointerStringValue) || PlaceholderUtils.getInstance()
-              .isDefaultPlaceholder(beanPointerStringValue) || (factoryBeanPointer = springBean.getFactoryBean().getValue()) == null) {
+              .isDefaultPlaceholder(beanPointerStringValue) || (factoryBeanPointer = infraBean.getFactoryBean().getValue()) == null) {
         return null;
       }
       CommonInfraBean factoryBean = factoryBeanPointer.getBean();
-      if (!factoryBean.equals(springBean)) {
+      if (!factoryBean.equals(infraBean)) {
         beanClass = RecursionManager.doPreventingRecursion(
                 factoryBean, true, () -> PsiTypesUtil.getPsiClass(factoryBean.getBeanType(true)));
       }
     }
     if (beanClass != null && FactoryBeansManager.of().isFactoryBeanClass(beanClass)) {
-      PsiType[] types = FactoryBeansManager.of().getObjectTypes(PsiTypesUtil.getClassType(beanClass), springBean);
+      PsiType[] types = FactoryBeansManager.of().getObjectTypes(PsiTypesUtil.getClassType(beanClass), infraBean);
       for (PsiType type : types) {
         PsiClass aClass = PsiTypesUtil.getPsiClass(type);
         if (aClass != null) {
@@ -162,29 +162,29 @@ public class InfraBeanFactoryMethodConverterImpl extends InfraBeanFactoryMethodC
 
   @Override
   public LocalQuickFix[] getQuickFixes(ConvertContext context) {
-    InfraBean springBean;
+    InfraBean infraBean;
     PsiClass psiClass;
     GenericDomValue<?> element = (GenericDomValue<?>) context.getInvocationElement();
     String elementName = element.getStringValue();
     return (elementName == null || elementName.length() == 0 || (psiClass = getFactoryMethodClass(
-            (springBean = getSpringBean(context)))) == null || (psiClass instanceof PsiCompiledElement)) ? LocalQuickFix.EMPTY_ARRAY : new LocalQuickFix[] { getCreateNewMethodQuickFix(springBean,
+            (infraBean = getSpringBean(context)))) == null || (psiClass instanceof PsiCompiledElement)) ? LocalQuickFix.EMPTY_ARRAY : new LocalQuickFix[] { getCreateNewMethodQuickFix(infraBean,
             psiClass, elementName) };
   }
 
   @Nullable
-  private static PsiClass getFactoryMethodClass(InfraBean springBean) {
-    BeanPointer<?> factoryBeanPointer = springBean.getFactoryBean().getValue();
+  private static PsiClass getFactoryMethodClass(InfraBean infraBean) {
+    BeanPointer<?> factoryBeanPointer = infraBean.getFactoryBean().getValue();
     if (factoryBeanPointer != null) {
       return PsiTypesUtil.getPsiClass(factoryBeanPointer.getBean().getBeanType(false));
     }
-    return PsiTypesUtil.getPsiClass(springBean.getBeanType(false));
+    return PsiTypesUtil.getPsiClass(infraBean.getBeanType(false));
   }
 
-  private static LocalQuickFix getCreateNewMethodQuickFix(InfraBean springBean, PsiClass beanClass, String elementName) {
+  private static LocalQuickFix getCreateNewMethodQuickFix(InfraBean infraBean, PsiClass beanClass, String elementName) {
     return new LocalQuickFix() {
 
       public String getName() {
-        return message("model.create.factory.method.quickfix.message", getSignature(springBean, elementName));
+        return message("model.create.factory.method.quickfix.message", getSignature(infraBean, elementName));
       }
 
       public String getFamilyName() {
@@ -194,7 +194,7 @@ public class InfraBeanFactoryMethodConverterImpl extends InfraBeanFactoryMethodC
       public void applyFix(Project project, ProblemDescriptor descriptor) {
         try {
           PsiElementFactory elementFactory = JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory();
-          String signature = getSignature(springBean, elementName) + "{ return null; }";
+          String signature = getSignature(infraBean, elementName) + "{ return null; }";
           PsiMethod method = elementFactory.createMethodFromText(signature, null);
           beanClass.add(method);
         }
@@ -205,10 +205,10 @@ public class InfraBeanFactoryMethodConverterImpl extends InfraBeanFactoryMethodC
     };
   }
 
-  private static String getSignature(InfraBean springBean, String elementName) {
-    boolean isStatic = springBean.getFactoryBean().getValue() == null;
-    String params = InfraConstructorArgResolveUtil.suggestParamsForConstructorArgsAsString(springBean);
-    PsiClass psiClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+  private static String getSignature(InfraBean infraBean, String elementName) {
+    boolean isStatic = infraBean.getFactoryBean().getValue() == null;
+    String params = InfraConstructorArgResolveUtil.suggestParamsForConstructorArgsAsString(infraBean);
+    PsiClass psiClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     String returnType = psiClass == null ? "java.lang.String" : psiClass.getQualifiedName();
     return "public " + (isStatic ? "static" : "") + " " + returnType + " " + elementName + " (" + params + ")";
   }

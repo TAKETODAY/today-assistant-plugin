@@ -34,18 +34,18 @@ import cn.taketoday.lang.Nullable;
 public final class BeanAttributesInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
     InfraDomInspectionUtils utils = new InfraDomInspectionUtils(holder);
-    if (!utils.onlyOneOf(springBean, springBean.getClazz(), springBean.getFactoryBean())) {
-      utils.ifExistsOtherRequired(springBean, springBean.getFactoryBean(), springBean.getFactoryMethod());
+    if (!utils.onlyOneOf(infraBean, infraBean.getClazz(), infraBean.getFactoryBean())) {
+      utils.ifExistsOtherRequired(infraBean, infraBean.getFactoryBean(), infraBean.getFactoryMethod());
     }
-    utils.attributeWithDefaultSuperfluous(springBean.getAbstract(), Boolean.FALSE);
-    utils.attributeWithDefaultSuperfluous(springBean.getSingleton(), Boolean.TRUE);
-    utils.attributeWithDefaultSuperfluous(springBean.getScope(), BeanScope.SINGLETON_SCOPE);
-    if (springBean.getParent() instanceof InfraValueHolder) {
-      utils.attributeSuperfluous(springBean.getId());
-      utils.attributeSuperfluous(springBean.getName());
-      utils.attributeSuperfluous(springBean.getScope());
+    utils.attributeWithDefaultSuperfluous(infraBean.getAbstract(), Boolean.FALSE);
+    utils.attributeWithDefaultSuperfluous(infraBean.getSingleton(), Boolean.TRUE);
+    utils.attributeWithDefaultSuperfluous(infraBean.getScope(), BeanScope.SINGLETON_SCOPE);
+    if (infraBean.getParent() instanceof InfraValueHolder) {
+      utils.attributeSuperfluous(infraBean.getId());
+      utils.attributeSuperfluous(infraBean.getName());
+      utils.attributeSuperfluous(infraBean.getScope());
     }
   }
 }

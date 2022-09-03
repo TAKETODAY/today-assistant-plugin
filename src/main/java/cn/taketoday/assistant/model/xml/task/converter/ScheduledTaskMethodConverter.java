@@ -36,8 +36,8 @@ public class ScheduledTaskMethodConverter extends InfraBeanMethodConverter {
   @Nullable
   public PsiClass getPsiClass(ConvertContext context) {
     BeanPointer<?> beanPointer;
-    ScheduledTask springBean = DomUtil.getParentOfType(context.getInvocationElement(), ScheduledTask.class, false);
-    if (springBean != null && (beanPointer = springBean.getRef().getValue()) != null) {
+    ScheduledTask infraBean = DomUtil.getParentOfType(context.getInvocationElement(), ScheduledTask.class, false);
+    if (infraBean != null && (beanPointer = infraBean.getRef().getValue()) != null) {
       PsiType[] types = beanPointer.getEffectiveBeanTypes();
       if (types.length != 1) {
         return null;

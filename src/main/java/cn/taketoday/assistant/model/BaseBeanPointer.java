@@ -93,12 +93,12 @@ public abstract class BaseBeanPointer<T extends CommonInfraBean> implements Bean
   }
 
   @Override
-  public boolean isReferenceTo(@Nullable CommonInfraBean springBean) {
-    if (springBean == null) {
+  public boolean isReferenceTo(@Nullable CommonInfraBean infraBean) {
+    if (infraBean == null) {
       return false;
     }
-    PsiFile file = springBean.getContainingFile();
-    return Objects.equals(file, getContainingFile()) && springBean.equals(getBean());
+    PsiFile file = infraBean.getContainingFile();
+    return Objects.equals(file, getContainingFile()) && infraBean.equals(getBean());
   }
 
   @Override

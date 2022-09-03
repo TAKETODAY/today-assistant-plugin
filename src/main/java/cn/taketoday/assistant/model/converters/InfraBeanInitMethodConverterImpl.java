@@ -36,9 +36,9 @@ public class InfraBeanInitMethodConverterImpl extends InfraBeanInitMethodConvert
 
   @Override
   public PsiClass getPsiClass(ConvertContext context) {
-    LifecycleBean springBean = (LifecycleBean) context.getInvocationElement().getParentOfType(LifecycleBean.class, false);
-    if (springBean instanceof DomInfraBean) {
-      return PsiTypesUtil.getPsiClass(((DomInfraBean) springBean).getBeanType());
+    LifecycleBean infraBean = (LifecycleBean) context.getInvocationElement().getParentOfType(LifecycleBean.class, false);
+    if (infraBean instanceof DomInfraBean) {
+      return PsiTypesUtil.getPsiClass(((DomInfraBean) infraBean).getBeanType());
     }
     return null;
   }

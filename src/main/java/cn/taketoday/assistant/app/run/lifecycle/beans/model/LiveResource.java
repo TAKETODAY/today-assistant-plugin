@@ -35,35 +35,29 @@ import javax.swing.Icon;
 import cn.taketoday.lang.Nullable;
 
 public interface LiveResource {
-  
-  
+
   String getDescription();
 
-  
   LiveContext getContext();
 
-  
   List<LiveBean> getBeans();
 
   boolean hasDescription();
 
-  
-  
   String getDisplayName();
 
   @Nullable
-  Navigatable findResourceNavigatable( Project project, @Nullable Module module, @Nullable PsiElement psiElement,  GlobalSearchScope globalSearchScope);
+  Navigatable findResourceNavigatable(Project project, @Nullable Module module, @Nullable PsiElement psiElement, GlobalSearchScope globalSearchScope);
 
   @Nullable
-  PsiElement findResourceElement( Project project, @Nullable Module module, @Nullable PsiElement psiElement,  GlobalSearchScope globalSearchScope);
+  PsiElement findResourceElement(Project project, @Nullable Module module, @Nullable PsiElement psiElement, GlobalSearchScope globalSearchScope);
 
-  
   String getResourcePath();
 
   @Nullable
   Icon getIcon();
 
-  boolean matchesXmlConfig( XmlFile xmlFile);
+  boolean matchesXmlConfig(XmlFile xmlFile);
 
-  boolean matchesClass( PsiClass psiClass, boolean z);
+  boolean matchesClass(PsiClass psiClass, boolean z);
 }

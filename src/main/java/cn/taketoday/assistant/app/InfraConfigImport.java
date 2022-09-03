@@ -23,7 +23,7 @@ package cn.taketoday.assistant.app;
 import com.intellij.openapi.vfs.VirtualFile;
 
 public interface InfraConfigImport {
-   VirtualFile getVirtualFile();
+  VirtualFile getVirtualFile();
 
   int getDocumentId();
 }

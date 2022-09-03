@@ -33,7 +33,7 @@ import cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionalO
 public interface ConditionalOnJamElement extends InfraConditional {
 
   SemKey<ConditionalOnJamElement> CONDITIONAL_JAM_ELEMENT_KEY =
-          InfraConditional.SPRING_CONDITIONAL_JAM_ELEMENT_KEY.subKey("ConditionalOnJamElement");
+          InfraConditional.CONDITIONAL_JAM_ELEMENT_KEY.subKey("ConditionalOnJamElement");
 
   ConditionOutcome matches(ConditionalOnEvaluationContext context);
 

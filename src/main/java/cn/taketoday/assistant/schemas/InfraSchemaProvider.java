@@ -68,7 +68,7 @@ public class InfraSchemaProvider extends XmlSchemaProvider {
   private static final CachedValueProvider.Result<Map<String, VirtualFile>> EMPTY_MAP_RESULT;
   private static final Set<String> SKIP_NAMESPACE_URLS;
 
-  public XmlFile getSchema( String url, @Nullable Module module, PsiFile baseFile) {
+  public XmlFile getSchema(String url, @Nullable Module module, PsiFile baseFile) {
     if (SKIP_NAMESPACE_URLS.contains(url)) {
       return null;
     }
@@ -155,7 +155,7 @@ public class InfraSchemaProvider extends XmlSchemaProvider {
     return null;
   }
 
-  public String getDefaultPrefix( String namespace, XmlFile context) {
+  public String getDefaultPrefix(String namespace, XmlFile context) {
 
     if (!InfraDomUtils.isInfraXml(context)) {
       return null;
@@ -166,7 +166,7 @@ public class InfraSchemaProvider extends XmlSchemaProvider {
     }
   }
 
-  public Set<String> getLocations( String namespace, XmlFile context) {
+  public Set<String> getLocations(String namespace, XmlFile context) {
     Module module = ModuleUtilCore.findModuleForPsiElement(context);
     if (module == null) {
       return null;

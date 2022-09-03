@@ -55,8 +55,8 @@ import cn.taketoday.assistant.model.utils.search.BeanSearchParameters;
 import cn.taketoday.assistant.model.xml.CustomBean;
 import cn.taketoday.assistant.model.xml.CustomBeanPsiElement;
 import cn.taketoday.assistant.model.xml.CustomBeanWrapper;
-import cn.taketoday.assistant.model.xml.DomInfraBean;
 import cn.taketoday.assistant.model.xml.DomBeanContainer;
+import cn.taketoday.assistant.model.xml.DomInfraBean;
 import cn.taketoday.assistant.model.xml.beans.InfraBean;
 import cn.taketoday.lang.Nullable;
 

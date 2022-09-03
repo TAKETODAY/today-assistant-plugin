@@ -71,26 +71,26 @@ import cn.taketoday.lang.Nullable;
 public final class InfraConstructorArgInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     if (beanClass != null) {
-      checkConstructorArgType(springBean, holder);
+      checkConstructorArgType(infraBean, holder);
     }
-    checkConstructorResolve(springBean, holder, beanClass);
-    checkConstructorArgIndexes(springBean, holder);
+    checkConstructorResolve(infraBean, holder, beanClass);
+    checkConstructorArgIndexes(infraBean, holder);
   }
 
-  private static void checkConstructorResolve(InfraBean springBean, DomElementAnnotationHolder holder, @Nullable PsiClass beanClass) {
+  private static void checkConstructorResolve(InfraBean infraBean, DomElementAnnotationHolder holder, @Nullable PsiClass beanClass) {
     String message;
     DomElement genericAttributeValue;
-    if (springBean.isAbstract()) {
+    if (infraBean.isAbstract()) {
       return;
     }
-    boolean instantiatedByFactory = isInstantiatedByFactory(springBean);
+    boolean instantiatedByFactory = isInstantiatedByFactory(infraBean);
     if (!instantiatedByFactory && beanClass == null) {
       return;
     }
-    ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
+    ResolvedConstructorArgs resolvedArgs = infraBean.getResolvedConstructorArgs();
     if (!resolvedArgs.isResolved()) {
       if (instantiatedByFactory) {
         message = InfraBundle.message("cannot.find.factory.method.with.parameters.count");
@@ -99,23 +99,23 @@ public final class InfraConstructorArgInspection extends InfraBeanInspectionBase
         message = InfraBundle.message("cannot.find.bean.constructor.with.parameters.count", beanClass.getName());
       }
       String basicMessage = message;
-      ResolvedConstructorArgsMessageBuilder messageBuilder = new ResolvedConstructorArgsMessageBuilder(basicMessage, getConstructors(instantiatedByFactory, beanClass, springBean), resolvedArgs);
+      ResolvedConstructorArgsMessageBuilder messageBuilder = new ResolvedConstructorArgsMessageBuilder(basicMessage, getConstructors(instantiatedByFactory, beanClass, infraBean), resolvedArgs);
       String message2 = messageBuilder.getMessage();
-      if (!instantiatedByFactory && DomUtil.hasXml(springBean.getClazz())) {
-        genericAttributeValue = springBean.getClazz();
+      if (!instantiatedByFactory && DomUtil.hasXml(infraBean.getClazz())) {
+        genericAttributeValue = infraBean.getClazz();
       }
-      else if (instantiatedByFactory && DomUtil.hasXml(springBean.getFactoryMethod())) {
-        genericAttributeValue = springBean.getFactoryMethod();
+      else if (instantiatedByFactory && DomUtil.hasXml(infraBean.getFactoryMethod())) {
+        genericAttributeValue = infraBean.getFactoryMethod();
       }
       else {
-        genericAttributeValue = springBean;
+        genericAttributeValue = infraBean;
       }
       List<LocalQuickFix> fixes = new ArrayList<>();
-      InfraBean stableCopy = springBean.createStableCopy();
+      InfraBean stableCopy = infraBean.createStableCopy();
       if (!instantiatedByFactory && !(beanClass instanceof PsiCompiledElement)) {
         fixes.addAll(createConstructorFixes(stableCopy, beanClass));
       }
-      fixes.addAll(getConstructorArgsQuickFixes(stableCopy, springBean.getInstantiationMethods()));
+      fixes.addAll(getConstructorArgsQuickFixes(stableCopy, infraBean.getInstantiationMethods()));
       holder.createProblem(genericAttributeValue, HighlightSeverity.ERROR, message2, fixes.toArray(LocalQuickFix.EMPTY_ARRAY));
     }
   }
@@ -134,14 +134,14 @@ public final class InfraConstructorArgInspection extends InfraBeanInspectionBase
     return PsiMethod.EMPTY_ARRAY;
   }
 
-  private static boolean isInstantiatedByFactory(InfraBean springBean) {
-    return DomUtil.hasXml(springBean.getFactoryMethod());
+  private static boolean isInstantiatedByFactory(InfraBean infraBean) {
+    return DomUtil.hasXml(infraBean.getFactoryMethod());
   }
 
-  private static void checkConstructorArgType(InfraBean springBean, DomElementAnnotationHolder holder) {
-    List<ConstructorArg> list = springBean.getConstructorArgs();
+  private static void checkConstructorArgType(InfraBean infraBean, DomElementAnnotationHolder holder) {
+    List<ConstructorArg> list = infraBean.getConstructorArgs();
     if (!list.isEmpty()) {
-      List<PsiMethod> instantiationMethods = springBean.getInstantiationMethods();
+      List<PsiMethod> instantiationMethods = infraBean.getInstantiationMethods();
       Iterator<ConstructorArg> var4 = list.iterator();
 
       while (true) {
@@ -212,9 +212,9 @@ public final class InfraConstructorArgInspection extends InfraBeanInspectionBase
     }
   }
 
-  private static void checkConstructorArgIndexes(InfraBean springBean, DomElementAnnotationHolder holder) {
+  private static void checkConstructorArgIndexes(InfraBean infraBean, DomElementAnnotationHolder holder) {
     ConstructorArg previous;
-    List<ConstructorArg> list = springBean.getConstructorArgs();
+    List<ConstructorArg> list = infraBean.getConstructorArgs();
     if (list.isEmpty()) {
       return;
     }
@@ -237,25 +237,25 @@ public final class InfraConstructorArgInspection extends InfraBeanInspectionBase
     holder.createProblem(arg.getIndex(), message);
   }
 
-  private static List<LocalQuickFix> createConstructorFixes(InfraBean springBean, PsiClass beanClass) {
-    return IntentionWrapper.wrapToQuickFixes(createConstructorActions(springBean, beanClass), beanClass.getContainingFile());
+  private static List<LocalQuickFix> createConstructorFixes(InfraBean infraBean, PsiClass beanClass) {
+    return IntentionWrapper.wrapToQuickFixes(createConstructorActions(infraBean, beanClass), beanClass.getContainingFile());
   }
 
-  private static List<IntentionAction> createConstructorActions(InfraBean springBean, PsiClass beanClass) {
-    Project project = springBean.getManager().getProject();
-    List<Pair<String, PsiType>> params = InfraConstructorArgResolveUtil.suggestConstructorParamsForBean(springBean);
+  private static List<IntentionAction> createConstructorActions(InfraBean infraBean, PsiClass beanClass) {
+    Project project = infraBean.getManager().getProject();
+    List<Pair<String, PsiType>> params = InfraConstructorArgResolveUtil.suggestConstructorParamsForBean(infraBean);
     CreateConstructorRequest request = MethodRequestsKt.constructorRequest(project, params);
     return JvmElementActionFactories.createConstructorActions(beanClass, request);
   }
 
-  private static List<LocalQuickFix> getConstructorArgsQuickFixes(InfraBean springBean, List<PsiMethod> ctors) {
-    if (!springBean.getConstructorArgs().isEmpty() || !springBean.getCNamespaceConstructorArgDefinitions().isEmpty()) {
+  private static List<LocalQuickFix> getConstructorArgsQuickFixes(InfraBean infraBean, List<PsiMethod> ctors) {
+    if (!infraBean.getConstructorArgs().isEmpty() || !infraBean.getCNamespaceConstructorArgDefinitions().isEmpty()) {
       return Collections.emptyList();
     }
     List<LocalQuickFix> quickFixes = new ArrayList<>();
     for (PsiMethod ctor : ctors) {
       if (ctor.getParameterList().getParametersCount() > 0) {
-        quickFixes.add(new AddConstructorArgQuickFix(ctor, springBean));
+        quickFixes.add(new AddConstructorArgQuickFix(ctor, infraBean));
       }
     }
     return quickFixes;
@@ -266,9 +266,9 @@ public final class InfraConstructorArgInspection extends InfraBeanInspectionBase
     private final String myMethodName;
     private final SmartPsiElementPointer<PsiMethod> myCtorPointer;
 
-    public AddConstructorArgQuickFix(PsiMethod ctor, InfraBean springBean) {
+    public AddConstructorArgQuickFix(PsiMethod ctor, InfraBean infraBean) {
       this.myCtorPointer = SmartPointerManager.getInstance(ctor.getProject()).createSmartPsiElementPointer(ctor);
-      this.mySpringBean = springBean;
+      this.mySpringBean = infraBean;
       this.myMethodName = PsiFormatUtil.formatMethod(ctor, PsiSubstitutor.EMPTY, 257, 2);
     }
 

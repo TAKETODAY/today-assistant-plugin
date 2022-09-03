@@ -50,7 +50,7 @@ public class StringLiteralPsiClassConverter extends JamConverter<PsiClass> {
     return null;
   }
 
-  public PsiReference[] createReferences( JamStringAttributeElement<PsiClass> context,  PsiLanguageInjectionHost injectionHost) {
+  public PsiReference[] createReferences(JamStringAttributeElement<PsiClass> context, PsiLanguageInjectionHost injectionHost) {
     String stringValue = context.getStringValue();
     if (stringValue == null) {
       return PsiReference.EMPTY_ARRAY;

@@ -48,7 +48,6 @@ import com.intellij.util.SmartList;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import cn.taketoday.assistant.util.JamAnnotationTypeUtil;

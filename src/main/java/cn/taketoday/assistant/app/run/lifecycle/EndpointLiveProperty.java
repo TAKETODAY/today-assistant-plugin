@@ -110,7 +110,7 @@ class EndpointLiveProperty<T> extends AsyncApplicationLiveProperty<T> {
       InfraActuatorConnector actuatorConnector = new InfraActuatorConnector(getServiceUrl(), endpointDomain, mbeanName);
       try {
         try {
-          T parseData = this.myEndpoint.parseData(actuatorConnector.getData( this.myEndpoint.getOperationName() ));
+          T parseData = this.myEndpoint.parseData(actuatorConnector.getData(this.myEndpoint.getOperationName()));
           actuatorConnector.close();
           return parseData;
         }

@@ -45,8 +45,8 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 
 import cn.taketoday.assistant.Icons;
-import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraAppBundle;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMapping;
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMappingsModel;
 import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;

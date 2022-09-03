@@ -44,11 +44,11 @@ import cn.taketoday.assistant.InfraPresentationProvider;
 import cn.taketoday.assistant.PresentationConstant;
 import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.ResolvedConstructorArgs;
-import cn.taketoday.assistant.model.converters.InfraBeanResolveConverter;
 import cn.taketoday.assistant.model.converters.InfraBeanClassConverter;
 import cn.taketoday.assistant.model.converters.InfraBeanFactoryMethodConverter;
 import cn.taketoday.assistant.model.converters.InfraBeanListConverter;
 import cn.taketoday.assistant.model.converters.InfraBeanNamesConverter;
+import cn.taketoday.assistant.model.converters.InfraBeanResolveConverter;
 import cn.taketoday.assistant.model.values.PlaceholderUtils;
 import cn.taketoday.assistant.model.xml.BeanType;
 import cn.taketoday.assistant.model.xml.BeanTypeProvider;
@@ -56,7 +56,7 @@ import cn.taketoday.assistant.model.xml.DomInfraBean;
 import cn.taketoday.lang.Nullable;
 
 @Namespace(InfraConstant.BEANS_NAMESPACE_KEY)
-@Presentation(typeName = PresentationConstant.SPRING_BEAN, provider = InfraPresentationProvider.class)
+@Presentation(typeName = PresentationConstant.INFRA_BEAN, provider = InfraPresentationProvider.class)
 @BeanType(provider = InfraBean.BeanBeanTypeProvider.class)
 public interface InfraBean extends DomInfraBean, LifecycleBean, ScopedElement, Description {
 
@@ -69,8 +69,8 @@ public interface InfraBean extends DomInfraBean, LifecycleBean, ScopedElement, D
 
     @Nullable
     @Override
-    public String getBeanType(InfraBean springBean) {
-      GenericAttributeValue<PsiClass> clazzAttribute = springBean.getClazz();
+    public String getBeanType(InfraBean infraBean) {
+      GenericAttributeValue<PsiClass> clazzAttribute = infraBean.getClazz();
       String rawText = clazzAttribute.getRawText();
       return PlaceholderUtils.getInstance().isDefaultPlaceholder(rawText) ? clazzAttribute.getStringValue() : rawText;
     }

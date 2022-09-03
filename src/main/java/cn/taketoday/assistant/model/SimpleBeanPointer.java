@@ -29,54 +29,54 @@ import cn.taketoday.lang.Nullable;
 
 public final class SimpleBeanPointer<T extends CommonInfraBean> extends BaseBeanPointer<T> {
 
-  private final T mySpringBean;
+  private final T infraBean;
 
-  public SimpleBeanPointer(T springBean) {
-    super(springBean.getBeanName(), springBean.getPsiManager().getProject());
-    this.mySpringBean = springBean;
+  public SimpleBeanPointer(T infraBean) {
+    super(infraBean.getBeanName(), infraBean.getPsiManager().getProject());
+    this.infraBean = infraBean;
   }
 
   @Override
   public T getBean() {
-    return mySpringBean;
+    return infraBean;
   }
 
   @Nullable
   public PsiElement getPsiElement() {
-    T springBean = mySpringBean;
-    if (springBean.isValid()) {
-      return springBean.getIdentifyingPsiElement();
+    T infraBean = this.infraBean;
+    if (infraBean.isValid()) {
+      return infraBean.getIdentifyingPsiElement();
     }
     return null;
   }
 
   @Override
   public boolean equals(Object o) {
-    return this == o || ((o instanceof SimpleBeanPointer) && this.mySpringBean.equals(((SimpleBeanPointer) o).mySpringBean));
+    return this == o || ((o instanceof SimpleBeanPointer) && this.infraBean.equals(((SimpleBeanPointer) o).infraBean));
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    return (31 * result) + this.mySpringBean.hashCode();
+    return (31 * result) + this.infraBean.hashCode();
   }
 
   @Override
   @Nullable
   public PsiClass getBeanClass() {
     if (isValid()) {
-      return PsiTypesUtil.getPsiClass(mySpringBean.getBeanType());
+      return PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     }
     return null;
   }
 
   @Override
   public PsiFile getContainingFile() {
-    return mySpringBean.getContainingFile();
+    return infraBean.getContainingFile();
   }
 
   @Override
   public boolean isValid() {
-    return mySpringBean.isValid();
+    return infraBean.isValid();
   }
 }

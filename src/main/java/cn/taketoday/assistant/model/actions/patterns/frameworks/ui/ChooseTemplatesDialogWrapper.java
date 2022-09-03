@@ -41,7 +41,7 @@ public class ChooseTemplatesDialogWrapper extends DialogWrapper {
     this.myTemplatesForm = new cn.taketoday.assistant.model.actions.patterns.frameworks.ui.ChooseTemplatesForm(infos, libInfo);
     this.myTemplatesForm.getLibrariesValidationComponent().addValidityListener(isValid -> ChooseTemplatesDialogWrapper.this.setOKActionEnabled(isValid));
     setOKActionEnabled(this.myTemplatesForm.getLibrariesValidationComponent().isValid());
-    setTitle(InfraBundle.message("spring.choose.bean.templates.dialog.title", frameworkTitle));
+    setTitle(InfraBundle.message("choose.bean.templates.dialog.title", frameworkTitle));
     init();
   }
 

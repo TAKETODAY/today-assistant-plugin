@@ -36,8 +36,8 @@ import cn.taketoday.assistant.model.xml.beans.InfraBean;
 class PNamespaceDescriptor extends AbstractBeanNamespaceDescriptor<PsiMethod> {
 
   @Override
-  protected Map<String, PsiMethod> getAttributes(InfraBean springBean) {
-    PsiClass beanClass = ((AbstractDomInfraBean) springBean).getBeanClass(new HashSet<>(), true);
+  protected Map<String, PsiMethod> getAttributes(InfraBean infraBean) {
+    PsiClass beanClass = ((AbstractDomInfraBean) infraBean).getBeanClass(new HashSet<>(), true);
     return beanClass == null ? Collections.emptyMap() : PropertyUtilBase.getAllProperties(beanClass, true, false);
   }
 

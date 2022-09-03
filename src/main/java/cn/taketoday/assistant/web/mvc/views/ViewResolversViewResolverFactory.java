@@ -74,22 +74,22 @@ public class ViewResolversViewResolverFactory extends ViewResolverFactory {
   private static List<ViewResolver> determineViewResolvers(ViewResolvers viewResolvers, CommonInfraModel model) {
     PsiClass psiClass;
     SmartList<ViewResolver> smartList = new SmartList<>();
-    for (DomElement springBean : DomUtil.getDefinedChildren(viewResolvers, true, false)) {
-      if (!(springBean instanceof ViewResolverContentNegotiation)) {
-        ViewResolver resolver = createBuiltinResolver(springBean, model);
+    for (DomElement infraBean : DomUtil.getDefinedChildren(viewResolvers, true, false)) {
+      if (!(infraBean instanceof ViewResolverContentNegotiation)) {
+        ViewResolver resolver = createBuiltinResolver(infraBean, model);
         if (resolver != null) {
           smartList.add(resolver);
         }
         else {
-          if (springBean instanceof InfraBean bean) {
+          if (infraBean instanceof InfraBean bean) {
             psiClass = PsiTypesUtil.getPsiClass(bean.getBeanType());
           }
-          else if (springBean instanceof InfraRef ref) {
+          else if (infraBean instanceof InfraRef ref) {
             BeanPointer<?> beanPointer = ref.getBean().getValue();
             psiClass = beanPointer != null ? beanPointer.getBeanClass() : null;
           }
-          else if (springBean instanceof ViewResolverTiles) {
-            psiClass = DomJavaUtil.findClass(InfraMvcConstant.TILES_3_VIEW_RESOLVER_CLASS, springBean);
+          else if (infraBean instanceof ViewResolverTiles) {
+            psiClass = DomJavaUtil.findClass(InfraMvcConstant.TILES_3_VIEW_RESOLVER_CLASS, infraBean);
           }
           else {
             psiClass = null;

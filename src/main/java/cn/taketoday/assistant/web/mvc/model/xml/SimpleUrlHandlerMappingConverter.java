@@ -54,13 +54,13 @@ public class SimpleUrlHandlerMappingConverter extends InfraBeanResolveConverterF
   public boolean value(Pair<PsiType, GenericDomValue> pair) {
     Prop prop;
     InfraProperty springProperty;
-    DomInfraBean springBean;
+    DomInfraBean infraBean;
     PsiClass psiClass;
     GenericDomValue genericDomValue = pair.getSecond();
     return (!(genericDomValue instanceof GenericAttributeValue)) && (prop = DomUtil.getParentOfType(genericDomValue, Prop.class,
             false)) != null && (springProperty = DomUtil.getParentOfType(prop, InfraProperty.class, false)) != null && "mappings".equals(
-            springProperty.getName().getStringValue()) && (springBean = DomUtil.getParentOfType(springProperty, DomInfraBean.class,
-            false)) != null && (psiClass = PsiTypesUtil.getPsiClass(springBean.getBeanType())) != null && InfraMvcConstant.SIMPLE_URL_HANDLER_MAPPING.equals(
+            springProperty.getName().getStringValue()) && (infraBean = DomUtil.getParentOfType(springProperty, DomInfraBean.class,
+            false)) != null && (psiClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType())) != null && InfraMvcConstant.SIMPLE_URL_HANDLER_MAPPING.equals(
             psiClass.getQualifiedName());
   }
 }

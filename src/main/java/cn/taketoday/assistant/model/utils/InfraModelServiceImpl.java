@@ -52,8 +52,8 @@ import java.util.Set;
 
 import cn.taketoday.assistant.CommonInfraModel;
 import cn.taketoday.assistant.InfraManager;
-import cn.taketoday.assistant.LocalModelFactory;
 import cn.taketoday.assistant.InfraModelVisitorUtils;
+import cn.taketoday.assistant.LocalModelFactory;
 import cn.taketoday.assistant.context.model.CombinedInfraModel;
 import cn.taketoday.assistant.context.model.CombinedInfraModelImpl;
 import cn.taketoday.assistant.context.model.InfraModel;
@@ -170,15 +170,15 @@ public class InfraModelServiceImpl extends InfraModelService {
   }
 
   @Override
-  public CommonInfraModel getModelByBean(@Nullable CommonInfraBean springBean) {
-    if (springBean == null) {
+  public CommonInfraModel getModelByBean(@Nullable CommonInfraBean infraBean) {
+    if (infraBean == null) {
       return InfraModel.UNKNOWN;
     }
-    else if (springBean instanceof InfraModelElement) {
-      return getModel((InfraModelElement) springBean);
+    else if (infraBean instanceof InfraModelElement) {
+      return getModel((InfraModelElement) infraBean);
     }
     else {
-      Module module = springBean.getModule();
+      Module module = infraBean.getModule();
       if (module != null) {
         return InfraManager.from(module.getProject()).getCombinedModel(module);
       }

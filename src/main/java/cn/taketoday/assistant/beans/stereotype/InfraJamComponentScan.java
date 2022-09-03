@@ -42,8 +42,8 @@ import java.util.Set;
 
 import cn.taketoday.assistant.model.jam.converters.PackageJamConverter;
 import cn.taketoday.assistant.model.jam.stereotype.AbstractComponentScan;
-import cn.taketoday.assistant.model.jam.stereotype.FilterType;
 import cn.taketoday.assistant.model.jam.stereotype.ComponentScanFilter;
+import cn.taketoday.assistant.model.jam.stereotype.FilterType;
 import cn.taketoday.assistant.model.jam.utils.filters.ExcludeAnnotationsFilter;
 import cn.taketoday.assistant.model.jam.utils.filters.ExcludeAssignableFilter;
 import cn.taketoday.assistant.model.jam.utils.filters.IncludeAnnotationsFilter;

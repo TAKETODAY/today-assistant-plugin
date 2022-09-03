@@ -50,8 +50,8 @@ import cn.taketoday.assistant.model.ResolvedConstructorArgs;
 import cn.taketoday.assistant.model.converters.InfraBeanFactoryMethodConverterImpl;
 import cn.taketoday.assistant.model.highlighting.xml.InfraConstructorArgResolveUtil;
 import cn.taketoday.assistant.model.jam.qualifiers.InfraJamQualifier;
-import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.utils.BeanCoreUtils;
+import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.xml.AbstractDomInfraBean;
 import cn.taketoday.assistant.model.xml.DomInfraBeanImpl;
 import cn.taketoday.assistant.model.xml.beans.Autowire;
@@ -192,8 +192,8 @@ public abstract class InfraBeanImpl extends DomInfraBeanImpl implements InfraBea
   @Override
   public InfraPropertyDefinition getProperty(String name) {
     Ref<InfraPropertyDefinition> ref = new Ref<>();
-    BeanCoreUtils.visitParents(this, false, springBean -> {
-      List<InfraPropertyDefinition> properties = InfraPropertyUtils.getProperties(springBean);
+    BeanCoreUtils.visitParents(this, false, infraBean -> {
+      List<InfraPropertyDefinition> properties = InfraPropertyUtils.getProperties(infraBean);
       for (InfraPropertyDefinition property : properties) {
         if (name.equals(property.getPropertyName())) {
           ref.set(property);

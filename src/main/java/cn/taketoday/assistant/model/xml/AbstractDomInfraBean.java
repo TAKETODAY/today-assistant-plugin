@@ -88,14 +88,14 @@ public abstract class AbstractDomInfraBean implements CommonInfraBean {
   @Override
   @Nullable
   public final PsiType getBeanType() {
-    final PsiClass beanClass = getBeanClass(null, true);
+    PsiClass beanClass = getBeanClass(null, true);
     return beanClass != null ? PsiTypesUtil.getClassType(beanClass) : null;
   }
 
   @Override
   @Nullable
   public PsiType getBeanType(boolean considerFactories) {
-    final PsiClass beanClass = getBeanClass(null, considerFactories);
+    PsiClass beanClass = getBeanClass(null, considerFactories);
     return beanClass != null ? PsiTypesUtil.getClassType(beanClass) : null;
   }
 
@@ -114,7 +114,7 @@ public abstract class AbstractDomInfraBean implements CommonInfraBean {
 
     if (considerFactories) {
       if (myFactoriesClassCachedValue == null) {
-        final Project project = getContainingFile().getProject();
+        Project project = getContainingFile().getProject();
         myFactoriesClassCachedValue = CachedValuesManager.getManager(project)
                 .createCachedValue(() -> {
                   PsiClass beanClass = calculateFactoriesBeanClass(this);
@@ -129,7 +129,7 @@ public abstract class AbstractDomInfraBean implements CommonInfraBean {
 
   public PsiClass getClassAttributeValue() {
     if (myClassCachedValue == null) {
-      final Project project = getContainingFile().getProject();
+      Project project = getContainingFile().getProject();
       myClassCachedValue = CachedValuesManager.getManager(project)
               .createCachedValue(() -> {
                 PsiClass beanClass = calculateBeanClass(this);
@@ -140,33 +140,33 @@ public abstract class AbstractDomInfraBean implements CommonInfraBean {
   }
 
   @Nullable
-  private static PsiClass calculateFactoriesBeanClass(AbstractDomInfraBean springBean) {
-    final GenericValue<PsiMethod> value = springBean.getFactoryMethod();
-    final PsiMethod factoryMethod = value == null ? null : value.getValue();
+  private static PsiClass calculateFactoriesBeanClass(AbstractDomInfraBean infraBean) {
+    GenericValue<PsiMethod> value = infraBean.getFactoryMethod();
+    PsiMethod factoryMethod = value == null ? null : value.getValue();
     if (factoryMethod == null) {
-      return calculateBeanClass(springBean);
+      return calculateBeanClass(infraBean);
     }
 
-    final GenericValue<BeanPointer<?>> factoryBean = springBean.getFactoryBean();
+    GenericValue<BeanPointer<?>> factoryBean = infraBean.getFactoryBean();
     if (!FactoryBeansManager.of()
             .isValidFactoryMethod(factoryMethod, factoryBean != null && factoryBean.getValue() != null)) {
-      return calculateBeanClass(springBean);
+      return calculateBeanClass(infraBean);
     }
 
     for (CustomFactoryMethodTypeHandler typeHandler : CustomFactoryMethodTypeHandler.EP_NAME.getExtensions()) {
-      PsiType factoryMethodType = typeHandler.getFactoryMethodType(factoryMethod, springBean);
+      PsiType factoryMethodType = typeHandler.getFactoryMethodType(factoryMethod, infraBean);
       if (factoryMethodType instanceof PsiClassType)
         return ((PsiClassType) factoryMethodType).resolve();
     }
 
-    final PsiType returnType = factoryMethod.getReturnType();
+    PsiType returnType = factoryMethod.getReturnType();
     if (returnType instanceof PsiClassType) {
       PsiTypeParameter[] typeParameters = factoryMethod.getTypeParameters();
       PsiClass resolve = ((PsiClassType) returnType).resolve();
       if (resolve == null)
         return null;
 
-      if (!(springBean instanceof InfraBean))
+      if (!(infraBean instanceof InfraBean))
         return resolve;
 
       for (PsiTypeParameter typeParameter : typeParameters) {
@@ -175,17 +175,17 @@ public abstract class AbstractDomInfraBean implements CommonInfraBean {
           String text = "java.lang.Class<" + typeParameter.getName() + ">";
           PsiParameter[] parameters = factoryMethod.getParameterList().getParameters();
           for (int i = 0, length = parameters.length; i < length; i++) {
-            final PsiParameter psiParameter = parameters[i];
+            PsiParameter psiParameter = parameters[i];
             PsiType type = psiParameter.getType();
             if (type.getCanonicalText().equals(text)) {
               ConstructorArgumentValues values = new ConstructorArgumentValues();
-              values.init((InfraBean) springBean);
+              values.init((InfraBean) infraBean);
               ConstructorArgDefinition definition = values.resolve(i, psiParameter, null);
               if (definition != null) {
-                final GenericDomValue<?> valueElement = definition.getValueElement();
+                GenericDomValue<?> valueElement = definition.getValueElement();
                 String rawText = valueElement == null ? null : valueElement.getRawText();
                 if (rawText != null) {
-                  return DomJavaUtil.findClass(rawText, springBean.getContainingFile(), springBean.getModule(), null);
+                  return DomJavaUtil.findClass(rawText, infraBean.getContainingFile(), infraBean.getModule(), null);
                 }
               }
             }
@@ -196,18 +196,18 @@ public abstract class AbstractDomInfraBean implements CommonInfraBean {
       return resolve;
     }
 
-    return calculateBeanClass(springBean);
+    return calculateBeanClass(infraBean);
   }
 
   @Nullable
-  private static PsiClass calculateBeanClass(AbstractDomInfraBean springBean) {
-    String className = springBean.getClassName();
+  private static PsiClass calculateBeanClass(AbstractDomInfraBean infraBean) {
+    String className = infraBean.getClassName();
     if (className == null) {
       return null;
     }
 
-    final PsiFile containingFile = springBean.getContainingFile();
-    final GlobalSearchScope scope = ClassValueConverter.getScope(containingFile.getProject(), springBean.getModule(), containingFile);
+    PsiFile containingFile = infraBean.getContainingFile();
+    GlobalSearchScope scope = ClassValueConverter.getScope(containingFile.getProject(), infraBean.getModule(), containingFile);
     return DomJavaUtil.findClass(className.trim(), containingFile, null, scope);
   }
 
@@ -219,10 +219,10 @@ public abstract class AbstractDomInfraBean implements CommonInfraBean {
 
   @Override
   public InfraProfile getProfile() {
-    final Beans beans = getBeansParent();
+    Beans beans = getBeansParent();
 
     if (beans != null) {
-      final InfraDomProfile profile = beans.getProfile();
+      InfraDomProfile profile = beans.getProfile();
 
       if (DomUtil.hasXml(profile))
         return profile;

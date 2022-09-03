@@ -52,10 +52,10 @@ import cn.taketoday.assistant.context.model.InfraModel;
 import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.CommonInfraBean;
 import cn.taketoday.assistant.model.converters.InfraBeanResolveConverter;
+import cn.taketoday.assistant.model.utils.BeanCoreUtils;
 import cn.taketoday.assistant.model.utils.InfraBeanUtils;
 import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.utils.PsiTypeUtil;
-import cn.taketoday.assistant.model.utils.BeanCoreUtils;
 import cn.taketoday.assistant.model.xml.CustomBean;
 import cn.taketoday.assistant.model.xml.DomInfraBean;
 import cn.taketoday.assistant.model.xml.beans.Beans;
@@ -201,8 +201,8 @@ public class InfraInjectionValueTypeInspection extends DomInfraBeanInspectionBas
       }
     }
     if (type instanceof PsiClassType) {
-      for (InfraBean springBean : collection.getBeans()) {
-        checkBeanClass(springBean, Collections.singletonList(type), springBean, holder);
+      for (InfraBean infraBean : collection.getBeans()) {
+        checkBeanClass(infraBean, Collections.singletonList(type), infraBean, holder);
       }
     }
   }
@@ -228,8 +228,8 @@ public class InfraInjectionValueTypeInspection extends DomInfraBeanInspectionBas
     InfraBeanUtils.of().processChildBeans(elementsHolder, false, findFirstProcessor);
     if (findFirstProcessor.isFound()) {
       CommonInfraBean bean = findFirstProcessor.getFoundValue();
-      DomInfraBean springBean = bean instanceof CustomBean ? ((CustomBean) bean).getWrapper() : (DomInfraBean) bean;
-      checkBeanClass(bean, injectionTypes, springBean, holder);
+      DomInfraBean infraBean = bean instanceof CustomBean ? ((CustomBean) bean).getWrapper() : (DomInfraBean) bean;
+      checkBeanClass(bean, injectionTypes, infraBean, holder);
     }
   }
 
@@ -239,29 +239,29 @@ public class InfraInjectionValueTypeInspection extends DomInfraBeanInspectionBas
     }
   }
 
-  protected void checkBeanClass(@Nullable CommonInfraBean springBean, List<PsiType> psiTypes, DomElement annotatedElement, DomElementAnnotationHolder holder) {
-    if (springBean == null || !springBean.isValid()) {
+  protected void checkBeanClass(@Nullable CommonInfraBean infraBean, List<PsiType> psiTypes, DomElement annotatedElement, DomElementAnnotationHolder holder) {
+    if (infraBean == null || !infraBean.isValid()) {
       return;
     }
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
-    if (beanClass != null && !processEffectiveClassTypes(springBean, psiTypes, annotatedElement, holder)) {
-      processSpringBeanResolveConverterRequiredTypes(springBean, annotatedElement, holder);
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
+    if (beanClass != null && !processEffectiveClassTypes(infraBean, psiTypes, annotatedElement, holder)) {
+      processSpringBeanResolveConverterRequiredTypes(infraBean, annotatedElement, holder);
     }
   }
 
-  private static void processSpringBeanResolveConverterRequiredTypes(CommonInfraBean springBean, DomElement annotatedElement, DomElementAnnotationHolder holder) {
+  private static void processSpringBeanResolveConverterRequiredTypes(CommonInfraBean infraBean, DomElement annotatedElement, DomElementAnnotationHolder holder) {
     if (annotatedElement instanceof GenericDomValue genericDomValue) {
       Converter valueConverter = genericDomValue.getConverter();
       if (valueConverter instanceof InfraBeanResolveConverter converter) {
         List<PsiClassType> requiredClasses = converter.getRequiredClasses(ConvertContextFactory.createConvertContext(genericDomValue));
-        processEffectiveClassTypes(springBean, requiredClasses, annotatedElement, holder);
+        processEffectiveClassTypes(infraBean, requiredClasses, annotatedElement, holder);
       }
     }
   }
 
-  private static boolean processEffectiveClassTypes(CommonInfraBean springBean, List<? extends PsiType> psiTypes, DomElement annotatedElement, DomElementAnnotationHolder holder) {
+  private static boolean processEffectiveClassTypes(CommonInfraBean infraBean, List<? extends PsiType> psiTypes, DomElement annotatedElement, DomElementAnnotationHolder holder) {
     List<PsiType> convertToEffectiveTypes = convertToEffectiveTypes(psiTypes, annotatedElement.getManager().getProject());
-    if (convertToEffectiveTypes.size() != 0 && !BeanCoreUtils.isEffectiveClassType(convertToEffectiveTypes, springBean)) {
+    if (convertToEffectiveTypes.size() != 0 && !BeanCoreUtils.isEffectiveClassType(convertToEffectiveTypes, infraBean)) {
       String key = convertToEffectiveTypes.size() == 1 ? "bean.must.be.of.type" : "bean.must.be.one.of.these.types";
       String message = InfraBundle.message(key, typesToString(new ArrayList(convertToEffectiveTypes)));
       holder.createProblem(annotatedElement, message);
@@ -327,8 +327,8 @@ public class InfraInjectionValueTypeInspection extends DomInfraBeanInspectionBas
   }
 
   @Override
-  protected void checkBean(DomInfraBean springBean, Beans beans, DomElementAnnotationHolder holder, InfraModel infraModel) {
-    for (InfraValueHolderDefinition definition : InfraPropertyUtils.getValueHolders(springBean)) {
+  protected void checkBean(DomInfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, InfraModel infraModel) {
+    for (InfraValueHolderDefinition definition : InfraPropertyUtils.getValueHolders(infraBean)) {
       List<PsiType> propertyTypes = ContainerUtil.skipNulls(TypeHolderUtil.getRequiredTypes(definition));
       checkSpringInjectionRefAttr(holder, propertyTypes, definition.getRefElement());
       if (definition instanceof InfraElementsHolder) {

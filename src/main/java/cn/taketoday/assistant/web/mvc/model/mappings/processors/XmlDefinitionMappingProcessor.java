@@ -86,8 +86,8 @@ public final class XmlDefinitionMappingProcessor {
 
   private static boolean processSimpleMapping(Processor<? super UrlMappingElement> processor, BeanPointer<?> mapping) {
     PsiElement mappingPsiElement;
-    CommonInfraBean springBean = mapping.getBean();
-    if (springBean instanceof InfraBean bean) {
+    CommonInfraBean infraBean = mapping.getBean();
+    if (infraBean instanceof InfraBean bean) {
       InfraPropertyDefinition beanProperty = bean.getProperty("urlMap");
       if (beanProperty instanceof InfraProperty property) {
         for (InfraEntry entry : property.getMap().getEntries()) {
@@ -191,9 +191,9 @@ public final class XmlDefinitionMappingProcessor {
     if (psiElement instanceof PomTargetPsiElement pomTargetPsiElement) {
       PomTarget target = pomTargetPsiElement.getTarget();
       if (target instanceof BeanPsiTarget beanPsiTarget) {
-        CommonInfraBean springBean = beanPsiTarget.getInfraBean();
+        CommonInfraBean infraBean = beanPsiTarget.getInfraBean();
         PsiElement navigationElement = psiElement.getNavigationElement();
-        if (springBean instanceof ViewControllerBase viewController) {
+        if (infraBean instanceof ViewControllerBase viewController) {
           String path = viewController.getPath().getStringValue();
           return path == null || processor.process(new BeanPointerUrlMappingBaseElement(path, navigationElement, beanPointer));
         }

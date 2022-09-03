@@ -78,9 +78,9 @@ public final class RequiredAnnotationInspection extends AbstractInfraJavaInspect
     List<DomBeanPointer> list = info.getMappedDomBeans();
     List<InfraBean> beans = new ArrayList<>(list.size());
     for (DomBeanPointer pointer : list) {
-      DomInfraBean springBean = pointer.getBean();
-      if ((springBean instanceof InfraBean) && !((InfraBean) springBean).isAbstract()) {
-        beans.add((InfraBean) springBean);
+      DomInfraBean infraBean = pointer.getBean();
+      if ((infraBean instanceof InfraBean) && !((InfraBean) infraBean).isAbstract()) {
+        beans.add((InfraBean) infraBean);
       }
     }
     if (beans.isEmpty()) {

@@ -37,12 +37,12 @@ import cn.taketoday.lang.Nullable;
 public final class FactoryMethodInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel model) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel model) {
     PsiMethod factoryMethod;
-    GenericAttributeValue<PsiMethod> factoryMethodAttribute = springBean.getFactoryMethod();
+    GenericAttributeValue<PsiMethod> factoryMethodAttribute = infraBean.getFactoryMethod();
     if (DomUtil.hasXml(factoryMethodAttribute) && (factoryMethod = factoryMethodAttribute.getValue()) != null) {
       boolean isStatic = factoryMethod.hasModifierProperty("static");
-      BeanPointer<?> factoryBean = springBean.getFactoryBean().getValue();
+      BeanPointer<?> factoryBean = infraBean.getFactoryBean().getValue();
       if (!isStatic && factoryBean == null) {
         holder.createProblem(factoryMethodAttribute, InfraBundle.message("method.must.be.static", factoryMethod.getName()));
       }

@@ -55,8 +55,8 @@ import java.util.List;
 
 import cn.taketoday.assistant.CommonInfraModel;
 import cn.taketoday.assistant.InfraManager;
-import cn.taketoday.assistant.InfraPresentationProvider;
 import cn.taketoday.assistant.InfraModelVisitorUtils;
+import cn.taketoday.assistant.InfraPresentationProvider;
 import cn.taketoday.assistant.context.model.InfraModel;
 import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.CommonInfraBean;
@@ -108,9 +108,9 @@ public final class InfraConverterUtil {
       if (originalElement != tag) {
         final DomElement domElement = DomManager.getDomManager(tag.getProject()).getDomElement(originalElement);
         if (domElement != null) {
-          final DomInfraBean springBean = domElement.getParentOfType(DomInfraBean.class, false);
-          if (springBean != null) {
-            return springBean;
+          final DomInfraBean infraBean = domElement.getParentOfType(DomInfraBean.class, false);
+          if (infraBean != null) {
+            return infraBean;
           }
         }
       }

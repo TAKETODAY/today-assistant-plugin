@@ -27,7 +27,7 @@ import com.intellij.psi.PsiElement;
 
 @Presentation(typeName = InfraValueHintPsiElement.VALUE_HINT)
 public class InfraValueHintPsiElement extends ValueHintPsiElement {
-  
+
   static final String VALUE_HINT = "Value Hint";
 
   public InfraValueHintPsiElement(PsiElement parent, MetaConfigKey.ValueHint valueHint) {

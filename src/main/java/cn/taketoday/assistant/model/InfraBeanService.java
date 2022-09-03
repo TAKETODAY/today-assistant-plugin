@@ -81,7 +81,7 @@ public class InfraBeanService {
     }
     else {
       if (infraBean instanceof CustomBean) {
-        return CustomBeanPointer.createCustomSpringBeanPointer((CustomBean) infraBean);
+        return CustomBeanPointer.createCustomBeanPointer((CustomBean) infraBean);
       }
       else if (infraBean instanceof InfraImplicitBeanWithDefinition) {
         return new SimpleBeanPointer<>(infraBean);

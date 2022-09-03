@@ -42,7 +42,7 @@ public interface LiveBeansPanelContent {
 
   void update(UserDataHolder userDataHolder);
 
-  Object getData(UserDataHolder userDataHolder,   String str);
+  Object getData(UserDataHolder userDataHolder, String str);
 
   DefaultActionGroup createToolbarActions(UserDataHolder userDataHolder);
 }

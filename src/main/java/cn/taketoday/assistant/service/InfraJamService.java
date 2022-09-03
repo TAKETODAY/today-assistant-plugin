@@ -109,17 +109,17 @@ public class InfraJamService {
     Map<InfraBean, Set<CommonInfraBean>> ac = new LinkedHashMap<>();
     for (BeanPointer appConfig : InfraModelVisitorUtils.getAnnotationConfigApplicationContexts(model)) {
       CommonInfraBean commonInfraBean = appConfig.getBean();
-      if (commonInfraBean instanceof InfraBean springBean) {
-        ac.put(springBean, getAnnotationAppContextBeans(module, springBean));
+      if (commonInfraBean instanceof InfraBean infraBean) {
+        ac.put(infraBean, getAnnotationAppContextBeans(module, infraBean));
       }
     }
     return ac;
   }
 
-  private static Set<CommonInfraBean> getAnnotationAppContextBeans(Module module, InfraBean springBean) {
-    return CachedValuesManager.getManager(module.getProject()).getCachedValue(springBean, ANNOTATION_CONFIG_APPLICATION_CONTEXT_CACHE, () -> {
+  private static Set<CommonInfraBean> getAnnotationAppContextBeans(Module module, InfraBean infraBean) {
+    return CachedValuesManager.getManager(module.getProject()).getCachedValue(infraBean, ANNOTATION_CONFIG_APPLICATION_CONTEXT_CACHE, () -> {
       Set<CommonInfraBean> set = new LinkedHashSet<>();
-      Set<ConstructorArg> allConstructorArgs = springBean.getAllConstructorArgs();
+      Set<ConstructorArg> allConstructorArgs = infraBean.getAllConstructorArgs();
       if (allConstructorArgs.size() == 1) {
         set.addAll(getAnnotatedStereotypes(allConstructorArgs.iterator().next(), module));
       }
@@ -347,9 +347,9 @@ public class InfraJamService {
     }
     List<AbstractComponentScan> elements = service.getSemElements(AbstractComponentScan.COMPONENT_SCAN_JAM_KEY, psiClass);
     smartList.addAll(ContainerUtil.filter(elements, Objects::isNull));
-    ComponentScans springJamComponentScans = ComponentScans.META.getJamElement(psiClass);
-    if (springJamComponentScans != null) {
-      smartList.addAll(springJamComponentScans.getComponentScans());
+    ComponentScans infraJamComponentScans = ComponentScans.META.getJamElement(psiClass);
+    if (infraJamComponentScans != null) {
+      smartList.addAll(infraJamComponentScans.getComponentScans());
     }
     return smartList;
   }

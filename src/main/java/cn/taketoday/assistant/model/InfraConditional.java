@@ -24,6 +24,6 @@ import com.intellij.jam.JamService;
 import com.intellij.semantic.SemKey;
 
 public interface InfraConditional extends JamElement {
-  SemKey<InfraConditional> SPRING_CONDITIONAL_JAM_ELEMENT_KEY =
+  SemKey<InfraConditional> CONDITIONAL_JAM_ELEMENT_KEY =
           JamService.JAM_ELEMENT_KEY.subKey("ConditionalJamElement");
 }

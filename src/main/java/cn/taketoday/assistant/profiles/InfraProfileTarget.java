@@ -34,9 +34,9 @@ import java.util.Objects;
 
 import cn.taketoday.lang.Nullable;
 
-import static cn.taketoday.assistant.PresentationConstant.SPRING_PROFILE;
+import static cn.taketoday.assistant.PresentationConstant.INFRA_PROFILE;
 
-@Presentation(typeName = SPRING_PROFILE)
+@Presentation(typeName = INFRA_PROFILE)
 public class InfraProfileTarget implements PomRenameableTarget<Object> {
   private String name;
   private final int nameOffset;

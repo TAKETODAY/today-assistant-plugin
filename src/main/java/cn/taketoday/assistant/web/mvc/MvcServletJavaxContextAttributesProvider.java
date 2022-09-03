@@ -22,7 +22,6 @@ package cn.taketoday.assistant.web.mvc;
 
 import com.intellij.javaee.web.WebCommonClassNames;
 
-
 public final class MvcServletJavaxContextAttributesProvider extends MvcServletContextAttributesProvider {
 
   public static final MvcServletJavaxContextAttributesProvider INSTANCE = new MvcServletJavaxContextAttributesProvider();

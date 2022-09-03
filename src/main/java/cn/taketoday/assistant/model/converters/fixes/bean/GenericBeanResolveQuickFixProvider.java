@@ -76,11 +76,11 @@ class GenericBeanResolveQuickFixProvider implements BeanResolveQuickFixProvider 
       if (!FileModificationService.getInstance().preparePsiElementForWrite(this.beans.getXmlElement())) {
         return;
       }
-      InfraBean springBean = this.beans.addBean();
-      springBean.setName(elementName);
+      InfraBean infraBean = this.beans.addBean();
+      infraBean.setName(elementName);
       DomElement parent = value.getParent();
       if ((parent instanceof InfraInjection) && (classType = TypeHolderUtil.getRequiredClassType((InfraInjection) parent)) != null && (psiClass = classType.resolve()) != null) {
-        GenericAttributeValue<PsiClass> clazzAttribute = springBean.getClazz();
+        GenericAttributeValue<PsiClass> clazzAttribute = infraBean.getClazz();
         if (psiClass.isInterface()) {
           clazzAttribute.setStringValue("");
           PsiNavigateUtil.navigate(clazzAttribute.getXmlAttributeValue());

@@ -35,7 +35,7 @@ import cn.taketoday.assistant.model.xml.beans.InfraBean;
 import cn.taketoday.lang.Nullable;
 
 /**
- * Lightweight reference to Spring bean.
+ * Lightweight reference to Infra bean.
  *
  * @author peter
  * @see InfraBeanService#createBeanPointer(CommonInfraBean)
@@ -67,7 +67,7 @@ public interface BeanPointer<T extends CommonInfraBean> extends PsiElementPointe
 
   boolean isValid();
 
-  boolean isReferenceTo(@Nullable CommonInfraBean springBean);
+  boolean isReferenceTo(@Nullable CommonInfraBean infraBean);
 
   BeanPointer<?> derive(String name);
 

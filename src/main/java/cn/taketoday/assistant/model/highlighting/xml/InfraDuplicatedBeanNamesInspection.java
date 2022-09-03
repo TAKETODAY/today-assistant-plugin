@@ -119,8 +119,8 @@ public final class InfraDuplicatedBeanNamesInspection extends InfraBeanInspectio
         holder.createProblem(beanId, HighlightSeverity.ERROR, InfraBundle.message("bean.duplicate.bean.name"), fixes);
       }
     }
-    if (bean instanceof InfraBean springBean) {
-      GenericAttributeValue<List<String>> name = springBean.getName();
+    if (bean instanceof InfraBean infraBean) {
+      GenericAttributeValue<List<String>> name = infraBean.getName();
       String value = name.getStringValue();
       if (value != null) {
         StringTokenizer tokenizer = new StringTokenizer(value, InfraUtils.INFRA_DELIMITERS);

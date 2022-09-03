@@ -54,8 +54,8 @@ public final class DerivedBeanPointer implements BeanPointer<CommonInfraBean> {
   }
 
   @Override
-  public boolean isReferenceTo(@Nullable CommonInfraBean springBean) {
-    return this.basePointer.isReferenceTo(springBean);
+  public boolean isReferenceTo(@Nullable CommonInfraBean infraBean) {
+    return this.basePointer.isReferenceTo(infraBean);
   }
 
   @Override

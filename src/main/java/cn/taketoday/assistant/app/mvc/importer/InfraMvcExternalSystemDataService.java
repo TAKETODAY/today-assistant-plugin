@@ -54,7 +54,7 @@ import cn.taketoday.lang.Nullable;
 public class InfraMvcExternalSystemDataService extends AbstractProjectDataService<LibraryDependencyData, Module> {
   private static final Key<Set<WebFacet>> NEW_FACETS = Key.create("NEW_FACETS");
 
-  public com.intellij.openapi.externalSystem.model. Key<LibraryDependencyData> getTargetDataKey() {
+  public com.intellij.openapi.externalSystem.model.Key<LibraryDependencyData> getTargetDataKey() {
     return ProjectKeys.LIBRARY_DEPENDENCY;
   }
 

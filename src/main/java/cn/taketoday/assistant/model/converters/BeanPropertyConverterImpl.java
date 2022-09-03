@@ -81,19 +81,19 @@ public class BeanPropertyConverterImpl extends BeanPropertyConverter {
     if (element == null) {
       return new PropertyReference[0];
     }
-    CommonInfraBean springBean = InfraConverterUtil.getCurrentBeanCustomAware(context);
-    assert springBean != null;
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
-    if (isAbstractBeanTemplate(springBean, beanClass, context)) {
+    CommonInfraBean infraBean = InfraConverterUtil.getCurrentBeanCustomAware(context);
+    assert infraBean != null;
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
+    if (isAbstractBeanTemplate(infraBean, beanClass, context)) {
       return new PropertyReference[0];
     }
-    return new PropertyReferenceSet(element, beanClass, genericDomValue, context, springBean).m402getPsiReferences();
+    return new PropertyReferenceSet(element, beanClass, genericDomValue, context, infraBean).m402getPsiReferences();
   }
 
-  public boolean isAbstractBeanTemplate(CommonInfraBean springBean, @Nullable PsiClass beanClass, ConvertContext context) {
+  public boolean isAbstractBeanTemplate(CommonInfraBean infraBean, @Nullable PsiClass beanClass, ConvertContext context) {
     InfraModel model;
-    boolean isAbstractBeanWithNoClass = beanClass == null && (springBean instanceof InfraBean) && ((InfraBean) springBean).isAbstract();
+    boolean isAbstractBeanWithNoClass = beanClass == null && (infraBean instanceof InfraBean) && ((InfraBean) infraBean).isAbstract();
     return isAbstractBeanWithNoClass && (model = InfraConverterUtil.getSpringModel(context)) != null && InfraModelVisitorUtils.getDescendants(model,
-            InfraBeanService.of().createBeanPointer(springBean)).size() == 1;
+            InfraBeanService.of().createBeanPointer(infraBean)).size() == 1;
   }
 }

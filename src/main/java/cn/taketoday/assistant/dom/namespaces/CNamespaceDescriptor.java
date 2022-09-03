@@ -33,13 +33,13 @@ import cn.taketoday.assistant.model.xml.beans.InfraBean;
 class CNamespaceDescriptor extends AbstractBeanNamespaceDescriptor<PsiParameter> {
 
   @Override
-  protected Map<String, PsiParameter> getAttributes(InfraBean springBean) {
-    return getBeanConstructorParams(springBean);
+  protected Map<String, PsiParameter> getAttributes(InfraBean infraBean) {
+    return getBeanConstructorParams(infraBean);
   }
 
-  private static Map<String, PsiParameter> getBeanConstructorParams(InfraBean springBean) {
+  private static Map<String, PsiParameter> getBeanConstructorParams(InfraBean infraBean) {
     Map<String, PsiParameter> map = new HashMap<>();
-    for (PsiMethod constructor : springBean.getInstantiationMethods()) {
+    for (PsiMethod constructor : infraBean.getInstantiationMethods()) {
       int idx = 0;
       for (PsiParameter psiParameter : constructor.getParameterList().getParameters()) {
         map.put(psiParameter.getName(), psiParameter);

@@ -73,7 +73,7 @@ public final class InactiveProfileHighlightingInspection extends DomElementsInsp
 
   public ProblemDescriptor createProblem(InspectionManager manager, Beans beans, InfraModel infraModel) {
     return manager.createProblemDescriptor(beans.getXmlTag(),
-            message("SpringInactiveProfilesHighlightingPass.inactive.profile"), true,
+            message("InactiveProfilesHighlightingPass.inactive.profile"), true,
             getFixes(beans.getProfile().getExpressions(),
                     infraModel.getFileSet()), ProblemHighlightType.LIKE_UNUSED_SYMBOL);
   }
@@ -104,11 +104,11 @@ public final class InactiveProfileHighlightingInspection extends DomElementsInsp
     }
 
     public String getName() {
-      return message("ActivateSpringProfileIntentionAction.activate.profile", this.myProfileName);
+      return message("ActivateProfileIntentionAction.activate.profile", this.myProfileName);
     }
 
     public String getFamilyName() {
-      return message("ActivateSpringProfileIntentionAction.activate.profile.family.name");
+      return message("ActivateProfileIntentionAction.activate.profile.family.name");
     }
 
     public boolean startInWriteAction() {
@@ -133,11 +133,11 @@ public final class InactiveProfileHighlightingInspection extends DomElementsInsp
     }
 
     public String getName() {
-      return message("ActivateSpringProfileIntentionAction.deactivate.profile", this.myProfileName);
+      return message("ActivateProfileIntentionAction.deactivate.profile", this.myProfileName);
     }
 
     public String getFamilyName() {
-      return message("ActivateSpringProfileIntentionAction.deactivate.profile.family.name");
+      return message("ActivateProfileIntentionAction.deactivate.profile.family.name");
     }
 
     public boolean startInWriteAction() {

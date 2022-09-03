@@ -73,7 +73,7 @@ import cn.taketoday.assistant.model.jam.transaction.TransactionalComponentInspec
  */
 public class InfraInspectionsRegistryImpl extends InfraInspectionsRegistry {
 
-  public Class<? extends LocalInspectionTool>[] getSpringInspectionClasses() {
+  public Class<? extends LocalInspectionTool>[] getInfraInspectionClasses() {
     Class[] allInspectionClasses = getInspectionClasses();
     InfraInspectionsRegistry.Contributor[] var2 = Contributor.EP_NAME.getExtensions();
 
@@ -84,11 +84,11 @@ public class InfraInspectionsRegistryImpl extends InfraInspectionsRegistry {
     return allInspectionClasses;
   }
 
-  public Class<? extends LocalInspectionTool>[] getTestSpringInspectionClasses() {
+  public Class<? extends LocalInspectionTool>[] getTestInfraInspectionClasses() {
     return getInspectionClasses();
   }
 
-  public Class<? extends LocalInspectionTool> getTestSpringModelInspectionClass() {
+  public Class<? extends LocalInspectionTool> getTestInfraModelInspectionClass() {
     return InfraXmlModelInspection.class;
   }
 

@@ -44,7 +44,7 @@ public class ResourceItemsConverter extends JamConverter<Collection<PsiFileSyste
     return ResourcesUtil.of().getResourceItems(createReferences(context, host), Conditions.alwaysTrue());
   }
 
-  public PsiReference[] createReferences( JamStringAttributeElement<Collection<PsiFileSystemItem>> context,  PsiLanguageInjectionHost injectionHost) {
+  public PsiReference[] createReferences(JamStringAttributeElement<Collection<PsiFileSystemItem>> context, PsiLanguageInjectionHost injectionHost) {
     String s = context.getStringValue();
     if (s == null) {
       return PsiReference.EMPTY_ARRAY;

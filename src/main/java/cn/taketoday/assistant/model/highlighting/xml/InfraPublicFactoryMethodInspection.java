@@ -36,9 +36,9 @@ import cn.taketoday.lang.Nullable;
 public final class InfraPublicFactoryMethodInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel model) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel model) {
     PsiMethod factoryMethod;
-    GenericAttributeValue<PsiMethod> springBeanFactoryMethod = springBean.getFactoryMethod();
+    GenericAttributeValue<PsiMethod> springBeanFactoryMethod = infraBean.getFactoryMethod();
     if (DomUtil.hasXml(springBeanFactoryMethod) && (factoryMethod = springBeanFactoryMethod.getValue()) != null && !factoryMethod.hasModifierProperty("public")) {
       holder.createProblem(springBeanFactoryMethod, HighlightSeverity.WARNING, InfraBundle.message("method.must.be.public", factoryMethod.getName()));
     }

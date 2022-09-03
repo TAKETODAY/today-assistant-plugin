@@ -25,12 +25,11 @@ import java.util.List;
 import cn.taketoday.lang.Nullable;
 
 public interface LiveDispatcherServlet {
-    
-    String getName();
 
-    
-    List<String> getServletMappings();
+  String getName();
 
-    @Nullable
-    String getServletMappingPath();
+  List<String> getServletMappings();
+
+  @Nullable
+  String getServletMappingPath();
 }

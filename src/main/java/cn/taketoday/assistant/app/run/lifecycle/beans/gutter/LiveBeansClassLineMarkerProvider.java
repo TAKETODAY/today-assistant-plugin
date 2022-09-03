@@ -156,8 +156,8 @@ final class LiveBeansClassLineMarkerProvider extends RelatedItemLineMarkerProvid
     if (!InfraUtils.isBeanCandidateClass(psiClass)) {
       return;
     }
-    JamPsiMemberInfraBean springBean = JamService.getJamService(psiClass.getProject()).getJamElement(JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY, psiClass);
-    if ((springBean instanceof InfraStereotypeElement)
+    JamPsiMemberInfraBean infraBean = JamService.getJamService(psiClass.getProject()).getJamElement(JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY, psiClass);
+    if ((infraBean instanceof InfraStereotypeElement)
             || (stereotypeElement = findCustomStereotype(psiClass)) == null
             || !stereotypeElement.isValid()
             || (beanName = stereotypeElement.getBeanName()) == null) {

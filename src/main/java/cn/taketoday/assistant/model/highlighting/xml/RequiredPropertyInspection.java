@@ -53,18 +53,18 @@ import cn.taketoday.lang.Nullable;
 public final class RequiredPropertyInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(final InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(final InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
     PsiClass psiClass;
-    if (springBean.isAbstract() || springModel == null || (psiClass = PsiTypesUtil.getPsiClass(springBean.getBeanType())) == null) {
+    if (infraBean.isAbstract() || springModel == null || (psiClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType())) == null) {
       return;
     }
     Map<String, PsiMethod> properties = PropertyUtilBase.getAllProperties(psiClass, true, false);
-    List<InfraPropertyDefinition> definedProperties = springBean.getAllProperties();
+    List<InfraPropertyDefinition> definedProperties = infraBean.getAllProperties();
     SmartList smartList = new SmartList();
     final SmartList smartList2 = new SmartList();
     for (Map.Entry<String, PsiMethod> entry : properties.entrySet()) {
       if (AnnotationUtil.isAnnotated(entry.getValue(), AnnotationConstant.REQUIRED, 0) && !isDefined(definedProperties,
-              entry.getKey()) && !AutowireUtil.isAutowired(springBean, springModel, entry.getValue())) {
+              entry.getKey()) && !AutowireUtil.isAutowired(infraBean, springModel, entry.getValue())) {
         smartList.add(entry.getKey());
         smartList2.add(entry.getValue());
       }
@@ -72,7 +72,7 @@ public final class RequiredPropertyInspection extends InfraBeanInspectionBase {
     if (smartList.isEmpty()) {
       return;
     }
-    holder.createProblem(DomUtil.hasXml(springBean.getClazz()) ? springBean.getClazz() : springBean, HighlightSeverity.ERROR,
+    holder.createProblem(DomUtil.hasXml(infraBean.getClazz()) ? infraBean.getClazz() : infraBean, HighlightSeverity.ERROR,
             InfraBundle.message("required.properties.missed", StringUtil.join(smartList, ",")), new LocalQuickFix() {
 
               public String getFamilyName() {
@@ -82,7 +82,7 @@ public final class RequiredPropertyInspection extends InfraBeanInspectionBase {
 
               public void applyFix(Project project, ProblemDescriptor descriptor) {
                 Editor editor = InfraTemplateBuilder.getEditor(descriptor);
-                InfraPropertiesGenerateProvider.doGenerate(editor, springBean, project, (PsiMethod[]) smartList2.toArray(PsiMethod.EMPTY_ARRAY));
+                InfraPropertiesGenerateProvider.doGenerate(editor, infraBean, project, (PsiMethod[]) smartList2.toArray(PsiMethod.EMPTY_ARRAY));
               }
             });
   }

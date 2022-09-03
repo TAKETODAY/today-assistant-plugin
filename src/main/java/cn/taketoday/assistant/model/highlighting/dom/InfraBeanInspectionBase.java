@@ -63,7 +63,7 @@ public abstract class InfraBeanInspectionBase extends DomElementsInspection<Bean
     };
   }
 
-  protected void checkBean(InfraBean springBean,
+  protected void checkBean(InfraBean infraBean,
           Beans beans,
           DomElementAnnotationHolder holder,
           @Nullable CommonInfraModel springModel) {

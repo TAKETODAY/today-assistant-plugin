@@ -44,7 +44,7 @@ import cn.taketoday.assistant.dom.InfraDomUtils;
 public enum AddFileType {
 
   PROPERTIES(InfraBundle.messagePointer("facet.context.properties.files"), PropertiesFileType.INSTANCE.getIcon()),
-  SPRING_XML(InfraBundle.messagePointer("facet.context.xml.files"), Icons.SpringConfig),
+  Infra_XML(InfraBundle.messagePointer("facet.context.xml.files"), Icons.SpringConfig),
   CODE(InfraBundle.messagePointer("facet.context.code.files"), Icons.SpringJavaConfig),
   OTHER(InfraBundle.messagePointer("facet.context.other.files"), AllIcons.FileTypes.Any_type);
 
@@ -77,7 +77,7 @@ public enum AddFileType {
         return psiFile instanceof PsiClassOwner;
       };
     }
-    else if (this == SPRING_XML) {
+    else if (this == Infra_XML) {
       PsiManager psiManager2 = PsiManager.getInstance(project);
       return file3 -> {
         if (!FileTypeRegistry.getInstance().isFileOfType(file3, XmlFileType.INSTANCE)) {

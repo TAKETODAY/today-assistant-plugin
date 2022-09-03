@@ -45,9 +45,9 @@ import cn.taketoday.assistant.model.xml.BeanTypeProvider;
 import cn.taketoday.assistant.model.xml.DomInfraBean;
 import cn.taketoday.lang.Nullable;
 
-import static cn.taketoday.assistant.PresentationConstant.SPRING_CONSTANT;
+import static cn.taketoday.assistant.PresentationConstant.INFRA_CONSTANT;
 
-@Presentation(typeName = SPRING_CONSTANT)
+@Presentation(typeName = INFRA_CONSTANT)
 @BeanType(provider = InfraConstant.InfraConstantBeanTypeProvider.class)
 public interface InfraConstant extends InfraUtilElement, DomInfraBean {
 

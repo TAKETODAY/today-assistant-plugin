@@ -46,8 +46,8 @@ import java.util.Set;
 
 import cn.taketoday.assistant.model.BeanPsiTarget;
 import cn.taketoday.assistant.model.CommonInfraBean;
-import cn.taketoday.assistant.model.utils.InfraBeanUtils;
 import cn.taketoday.assistant.model.utils.BeanCoreUtils;
+import cn.taketoday.assistant.model.utils.InfraBeanUtils;
 import cn.taketoday.assistant.model.xml.DomInfraBean;
 import cn.taketoday.assistant.model.xml.beans.CollectionElements;
 import cn.taketoday.assistant.model.xml.beans.InfraBean;

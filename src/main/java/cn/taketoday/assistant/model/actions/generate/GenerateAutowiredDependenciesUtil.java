@@ -67,8 +67,8 @@ import cn.taketoday.assistant.CommonInfraModel;
 import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.InfraQualifier;
 import cn.taketoday.assistant.model.ModelSearchParameters;
-import cn.taketoday.assistant.model.utils.InfraModelSearchers;
 import cn.taketoday.assistant.model.utils.BeanCoreUtils;
+import cn.taketoday.assistant.model.utils.InfraModelSearchers;
 import cn.taketoday.lang.Nullable;
 
 public final class GenerateAutowiredDependenciesUtil {

@@ -35,7 +35,7 @@ import cn.taketoday.assistant.model.xml.beans.ScopedElement;
 import cn.taketoday.lang.Nullable;
 
 @BeanType(InfraConstant.MAP_FACTORY_BEAN)
-@Presentation(typeName = PresentationConstant.SPRING_MAP)
+@Presentation(typeName = PresentationConstant.INFRA_MAP)
 public interface UtilMap extends DomInfraBean, InfraUtilElement, ScopedElement, InfraMap {
   @ExtendClass({ "java.util.Map" })
   GenericAttributeValue<PsiClass> getMapClass();

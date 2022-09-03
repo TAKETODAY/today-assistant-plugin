@@ -35,8 +35,8 @@ public class GenerateDomElementActionGroup extends DefaultActionGroup {
 
   public GenerateDomElementActionGroup() {
     add(createGenerateBeanAction());
-    add(new GenerateDomElementAction(new InfraBeanGenerateProvider(message("bean.instantiation.by.factory"), "spring-bean-with-factory-bean"), Icons.SpringBean));
-    add(new GenerateDomElementAction(new InfraBeanGenerateProvider(message("bean.instantiation.using.factory.method"), "spring-bean-with-factory-method"), Icons.SpringBean));
+    add(new GenerateDomElementAction(new InfraBeanGenerateProvider(message("bean.instantiation.by.factory"), "infra-bean-with-factory-bean"), Icons.SpringBean));
+    add(new GenerateDomElementAction(new InfraBeanGenerateProvider(message("bean.instantiation.using.factory.method"), "infra-bean-with-factory-method"), Icons.SpringBean));
     add(Separator.getInstance());
     add(new GenerateBeanBodyAction(new InfraPropertiesGenerateProvider()) {
       protected boolean startInWriteAction() {
@@ -57,6 +57,6 @@ public class GenerateDomElementActionGroup extends DefaultActionGroup {
   }
 
   public static GenerateDomElementAction createGenerateBeanAction() {
-    return new GenerateDomElementAction(new InfraBeanGenerateProvider(message("infra.bean"), "spring-bean"), Icons.SpringBean);
+    return new GenerateDomElementAction(new InfraBeanGenerateProvider(message("infra.bean"), "infra-bean"), Icons.SpringBean);
   }
 }

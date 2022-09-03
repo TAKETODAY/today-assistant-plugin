@@ -32,8 +32,8 @@ public final class BeanDomPointerImpl extends DomBeanPointerImpl {
   private volatile Boolean myAbstract;
   private volatile Ref<BeanPointer<?>> myParent;
 
-  public BeanDomPointerImpl(InfraBean springBean) {
-    super(springBean);
+  public BeanDomPointerImpl(InfraBean infraBean) {
+    super(infraBean);
   }
 
   @Override

@@ -57,7 +57,7 @@ public abstract class DomInfraBeanInspectionBase extends DomElementsInspection<B
     consumer.consume(domFileElement.getRootElement());
   }
 
-  protected void checkBean(DomInfraBean springBean, Beans beans,
+  protected void checkBean(DomInfraBean infraBean, Beans beans,
           DomElementAnnotationHolder holder, InfraModel infraModel) {
   }
 }

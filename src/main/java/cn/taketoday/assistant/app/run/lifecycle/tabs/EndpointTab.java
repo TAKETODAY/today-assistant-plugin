@@ -50,8 +50,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 
-import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraAppBundle;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationConfigurationException;

@@ -37,20 +37,20 @@ import static cn.taketoday.assistant.InfraBundle.message;
 public class InfraPomTargetDescriptionProvider extends PomDescriptionProvider {
 
   public String getElementDescription(PomTarget element, ElementDescriptionLocation location) {
-    CommonInfraBean springBean = InfraBeanPomTargetUtils.getBean(element);
-    if (springBean == null) {
+    CommonInfraBean infraBean = InfraBeanPomTargetUtils.getBean(element);
+    if (infraBean == null) {
       return null;
     }
     if (location == UsageViewTypeLocation.INSTANCE) {
-      return getSpringBeanTypeName(springBean);
+      return getSpringBeanTypeName(infraBean);
     }
     if (location == UsageViewNodeTextLocation.INSTANCE || location == HighlightUsagesDescriptionLocation.INSTANCE) {
-      return getSpringBeanTypeName(springBean) + " " + springBean.getBeanName();
+      return getSpringBeanTypeName(infraBean) + " " + infraBean.getBeanName();
     }
     return null;
   }
 
-  private static String getSpringBeanTypeName(CommonInfraBean springBean) {
-    return StringUtil.notNullize(TypePresentationService.getService().getTypeName(springBean), message("infra.bean"));
+  private static String getSpringBeanTypeName(CommonInfraBean infraBean) {
+    return StringUtil.notNullize(TypePresentationService.getService().getTypeName(infraBean), message("infra.bean"));
   }
 }

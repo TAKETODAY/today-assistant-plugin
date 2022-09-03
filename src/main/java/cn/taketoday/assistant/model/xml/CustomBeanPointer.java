@@ -62,7 +62,7 @@ public final class CustomBeanPointer extends BaseBeanPointer {
     return beans.size() > this.myIndex;
   }
 
-  public static CustomBeanPointer createCustomSpringBeanPointer(CustomBean bean) {
+  public static CustomBeanPointer createCustomBeanPointer(CustomBean bean) {
     CustomBeanWrapper wrapper = bean.getWrapper();
     List<CustomBean> allBeans = wrapper.getCustomBeans();
     int index = allBeans.indexOf(bean);

@@ -104,8 +104,8 @@ public class InfraDefaultInitDestroyRefConverterImpl extends InfraDefaultInitDes
   private static Set<PsiMethod> getMethods(@Nullable Beans beans, Function<PsiClass, Collection<PsiMethod>> fun) {
     Set<PsiMethod> methods = new HashSet<>();
     if (beans != null) {
-      for (InfraBean springBean : beans.getBeans()) {
-        PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+      for (InfraBean infraBean : beans.getBeans()) {
+        PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
         if (beanClass != null) {
           methods.addAll(fun.fun(beanClass));
         }

@@ -35,8 +35,8 @@ import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.model.highlighting.jam.AbstractInfraJavaInspection;
 import cn.taketoday.assistant.model.jam.testContexts.dirtiesContexts.ClassMode;
 import cn.taketoday.assistant.model.jam.testContexts.dirtiesContexts.HierarchyMode;
-import cn.taketoday.assistant.model.jam.testContexts.dirtiesContexts.MethodMode;
 import cn.taketoday.assistant.model.jam.testContexts.dirtiesContexts.InfraTestingDirtiesContext;
+import cn.taketoday.assistant.model.jam.testContexts.dirtiesContexts.MethodMode;
 import cn.taketoday.lang.Nullable;
 
 public final class TestingDirtiesContextInspection extends AbstractInfraJavaInspection {

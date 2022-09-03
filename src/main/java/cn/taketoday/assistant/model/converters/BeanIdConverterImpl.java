@@ -74,13 +74,13 @@ public class BeanIdConverterImpl extends BeanIdConverter {
     }
   }
 
-  private static List<String> suggestUnusedBeanNames(@Nullable DomInfraBean springBean) {
-    if (springBean == null) {
+  private static List<String> suggestUnusedBeanNames(@Nullable DomInfraBean infraBean) {
+    if (infraBean == null) {
       return Collections.emptyList();
     }
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     PsiClassType classType = beanClass == null ? null : PsiTypesUtil.getClassType(beanClass);
-    Collection<BeanPointer<?>> list = InfraModelService.of().getModel(springBean).getAllCommonBeans();
+    Collection<BeanPointer<?>> list = InfraModelService.of().getModel(infraBean).getAllCommonBeans();
     List<String> unusedReferences = new ArrayList<>();
     for (BeanPointer pointer : list) {
       CommonInfraBean bean = pointer.getBean();
@@ -118,21 +118,21 @@ public class BeanIdConverterImpl extends BeanIdConverter {
     }
 
     public PsiElement resolve() {
-      DomInfraBean springBean = getDomSpringBean();
-      if (springBean == null) {
+      DomInfraBean infraBean = getDomSpringBean();
+      if (infraBean == null) {
         return null;
       }
-      DomTarget target = DomTarget.getTarget(springBean);
+      DomTarget target = DomTarget.getTarget(infraBean);
       if (target != null) {
         return PomService.convertToPsi(target);
       }
-      return InfraBeanService.of().createBeanPointer(springBean).getPsiElement();
+      return InfraBeanService.of().createBeanPointer(infraBean).getPsiElement();
     }
 
     public Object[] getVariants() {
-      DomInfraBean springBean = getDomSpringBean();
-      List<String> names = BeanIdConverterImpl.suggestUnusedBeanNames(springBean);
-      ContainerUtil.addAll(names, BeanCoreUtils.suggestBeanNames(springBean));
+      DomInfraBean infraBean = getDomSpringBean();
+      List<String> names = BeanIdConverterImpl.suggestUnusedBeanNames(infraBean);
+      ContainerUtil.addAll(names, BeanCoreUtils.suggestBeanNames(infraBean));
       return ArrayUtilRt.toStringArray(names);
     }
 

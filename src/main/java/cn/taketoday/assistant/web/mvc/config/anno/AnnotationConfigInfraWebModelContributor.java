@@ -36,8 +36,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraAppBundle;
+import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.facet.InfraAutodetectedFileSet;
 import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.service.InfraModelProvider;

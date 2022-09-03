@@ -33,7 +33,7 @@ import cn.taketoday.assistant.model.xml.beans.ScopedElement;
 import cn.taketoday.assistant.model.xml.beans.TypeHolder;
 
 @BeanType(UtilList.CLASS_NAME)
-@Presentation(typeName = PresentationConstant.SPRING_LIST)
+@Presentation(typeName = PresentationConstant.INFRA_LIST)
 public interface UtilList extends DomInfraBean, InfraUtilElement, ListOrSet, ScopedElement, TypeHolder {
   public static final String CLASS_NAME = "cn.taketoday.beans.factory.config.ListFactoryBean";
 

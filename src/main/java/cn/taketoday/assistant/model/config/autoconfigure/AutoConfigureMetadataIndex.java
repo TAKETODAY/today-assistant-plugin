@@ -58,7 +58,7 @@ public final class AutoConfigureMetadataIndex
         extends FileBasedIndexExtension<String, AutoConfigureMetadataIndex.AutoConfigureMetadata> {
   private static final ID<String, AutoConfigureMetadata> NAME = ID.create("infra.autoConfigureMetadataIndex");
 
-  public static final String SPRING_AUTOCONFIGURE_METADATA_PROPERTIES_FILENAME = "spring-autoconfigure-metadata.properties";
+  public static final String INFRA_AUTOCONFIGURE_METADATA_PROPERTIES_FILENAME = "infra-autoconfigure-metadata.properties";
 
   @Nullable
   public static AutoConfigureMetadata findMetadata(PsiClass autoConfigClass) {
@@ -178,7 +178,7 @@ public final class AutoConfigureMetadataIndex
     return new FileBasedIndex.InputFilter() {
       @Override
       public boolean acceptInput(VirtualFile file) {
-        return Comparing.equal(file.getNameSequence(), AutoConfigureMetadataIndex.SPRING_AUTOCONFIGURE_METADATA_PROPERTIES_FILENAME);
+        return Comparing.equal(file.getNameSequence(), INFRA_AUTOCONFIGURE_METADATA_PROPERTIES_FILENAME);
       }
     };
   }

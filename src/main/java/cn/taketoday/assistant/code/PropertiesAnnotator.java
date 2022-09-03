@@ -57,8 +57,8 @@ import javax.swing.Icon;
 
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
-import cn.taketoday.assistant.JavaClassInfo;
 import cn.taketoday.assistant.InfraModelVisitorUtils;
+import cn.taketoday.assistant.JavaClassInfo;
 import cn.taketoday.assistant.gutter.BeansPsiElementCellRenderer;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.model.utils.InfraModelService;
@@ -124,7 +124,7 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
         if (info.isMappedDomBean() || info.isStereotypeJavaBean()) {
           return;
         }
-        annotatePsiClassSpringPropertyValues(
+        annotatePsiClassPropertyValues(
                 result, psiClass, identifier,
                 InfraModelVisitorUtils.getConfigFiles(InfraModelService.of().getModel(psiClass)));
       }
@@ -148,18 +148,18 @@ public final class PropertiesAnnotator extends AbstractInfraAnnotator {
     }
   }
 
-  private static void annotatePsiClassSpringPropertyValues(
+  private static void annotatePsiClassPropertyValues(
           Collection<? super RelatedItemLineMarkerInfo<?>> result,
           PsiClass psiClass, PsiElement identifier, Set<? extends PsiFile> xmlConfigFiles) {
     if (!DumbService.isDumb(psiClass.getProject()) && !xmlConfigFiles.isEmpty()) {
       List<InfraProperty> values = Collections.synchronizedList(new ArrayList());
-      List<VirtualFile> springFiles = ContainerUtil.mapNotNull(xmlConfigFiles, psiFile -> {
+      List<VirtualFile> infraFiles = ContainerUtil.mapNotNull(xmlConfigFiles, psiFile -> {
         if (psiFile instanceof XmlFile) {
           return psiFile.getVirtualFile();
         }
         return null;
       });
-      ReferencesSearch.search(psiClass, GlobalSearchScope.filesScope(psiClass.getProject(), springFiles)).forEach(psiReference -> {
+      ReferencesSearch.search(psiClass, GlobalSearchScope.filesScope(psiClass.getProject(), infraFiles)).forEach(psiReference -> {
         DomElement domElement;
         InfraProperty value;
         PsiElement element = psiReference.getElement();

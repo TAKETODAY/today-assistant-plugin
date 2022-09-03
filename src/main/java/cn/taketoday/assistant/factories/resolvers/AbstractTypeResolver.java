@@ -47,15 +47,15 @@ import java.util.List;
 import java.util.Set;
 
 import cn.taketoday.assistant.CommonInfraModel;
-import cn.taketoday.assistant.factories.ObjectTypeResolver;
 import cn.taketoday.assistant.factories.FactoryBeansManager;
+import cn.taketoday.assistant.factories.ObjectTypeResolver;
 import cn.taketoday.assistant.model.BeanEffectiveTypeProvider;
 import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.CommonInfraBean;
 import cn.taketoday.assistant.model.jam.javaConfig.InfraJavaBean;
 import cn.taketoday.assistant.model.utils.InfraModelSearchers;
-import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.utils.InfraModelService;
+import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.xml.beans.InfraBean;
 import cn.taketoday.assistant.model.xml.beans.InfraProperty;
 import cn.taketoday.assistant.model.xml.beans.InfraPropertyDefinition;

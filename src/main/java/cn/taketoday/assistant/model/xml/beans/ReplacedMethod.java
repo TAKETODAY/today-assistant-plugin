@@ -31,8 +31,8 @@ import com.intellij.util.xml.GenericAttributeValue;
 import java.util.List;
 
 import cn.taketoday.assistant.model.BeanPointer;
-import cn.taketoday.assistant.model.converters.InfraBeanResolveConverter;
 import cn.taketoday.assistant.model.converters.InfraBeanReplacedMethodConverter;
+import cn.taketoday.assistant.model.converters.InfraBeanResolveConverter;
 import cn.taketoday.assistant.model.xml.RequiredBeanType;
 
 /**

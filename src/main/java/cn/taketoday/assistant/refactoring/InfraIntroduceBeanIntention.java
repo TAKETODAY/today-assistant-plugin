@@ -75,13 +75,13 @@ public class InfraIntroduceBeanIntention implements IntentionAction {
     moveToTheTopLevel(project, editor, bean);
   }
 
-  public static void moveToTheTopLevel(Project project, Editor editor, DomInfraBean springBean) {
-    if (springBean == null) {
+  public static void moveToTheTopLevel(Project project, Editor editor, DomInfraBean infraBean) {
+    if (infraBean == null) {
       return;
     }
-    DomInfraBean topLevelBean = BeanCoreUtils.getTopLevelBean(springBean);
+    DomInfraBean topLevelBean = BeanCoreUtils.getTopLevelBean(infraBean);
     DomInfraBean newBean = DomUtil.addElementAfter(topLevelBean);
-    newBean.copyFrom(springBean);
+    newBean.copyFrom(infraBean);
     String id = newBean.getId().getValue();
     if (id == null) {
       try {
@@ -99,7 +99,7 @@ public class InfraIntroduceBeanIntention implements IntentionAction {
         LOG.error(e);
       }
     }
-    DomElement holder = springBean.getParent();
+    DomElement holder = infraBean.getParent();
     if (holder instanceof InfraValueHolder) {
       ((InfraValueHolder) holder).getRefAttr().setStringValue(id == null ? "" : id);
     }
@@ -111,7 +111,7 @@ public class InfraIntroduceBeanIntention implements IntentionAction {
       LOG.error("Unexpected parent type: " + holder);
       return;
     }
-    springBean.undefine();
+    infraBean.undefine();
     holder.getXmlTag().collapseIfEmpty();
     if (id != null) {
       return;

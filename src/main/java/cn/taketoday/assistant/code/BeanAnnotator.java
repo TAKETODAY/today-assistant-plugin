@@ -98,7 +98,7 @@ public class BeanAnnotator extends AbstractInfraAnnotator {
     }
     JavaClassInfo info1 = JavaClassInfo.from(psiClass);
     if (info1.isMappedDomBean()) {
-      addSpringBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
+      addBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
         List<DomBeanPointer> domBeans = JavaClassInfo.from(psiClass).getMappedDomBeans();
         domBeans.sort(BeanPointer.DISPLAY_COMPARATOR);
         return domBeans;
@@ -177,7 +177,7 @@ public class BeanAnnotator extends AbstractInfraAnnotator {
 
   }
 
-  private static void addSpringBeanGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier, NotNullLazyValue<Collection<? extends BeanPointer<?>>> targets) {
+  private static void addBeanGutterIcon(Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement psiIdentifier, NotNullLazyValue<Collection<? extends BeanPointer<?>>> targets) {
     var builder = GutterIconBuilder.create(
             Icons.Gutter.SpringBean,
             NavigationGutterIconBuilderUtil.BEAN_POINTER_CONVERTOR,

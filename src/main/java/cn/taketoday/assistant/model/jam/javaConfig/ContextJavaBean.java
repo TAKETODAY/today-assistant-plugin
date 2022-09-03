@@ -26,7 +26,6 @@ import com.intellij.jam.JamSimpleReferenceConverter;
 import com.intellij.jam.JamStringAttributeElement;
 import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamAttributeMeta;
-import com.intellij.jam.reflect.JamBooleanAttributeMeta;
 import com.intellij.jam.reflect.JamMethodMeta;
 import com.intellij.jam.reflect.JamStringAttributeMeta;
 import com.intellij.pom.PomNamedTarget;

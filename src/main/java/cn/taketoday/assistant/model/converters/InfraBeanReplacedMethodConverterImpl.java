@@ -32,9 +32,9 @@ public class InfraBeanReplacedMethodConverterImpl extends InfraBeanReplacedMetho
   @Override
   @Nullable
   public PsiClass getPsiClass(ConvertContext context) {
-    InfraBean springBean = context.getInvocationElement().getParentOfType(InfraBean.class, false);
-    if (springBean != null) {
-      return PsiTypesUtil.getPsiClass(springBean.getBeanType());
+    InfraBean infraBean = context.getInvocationElement().getParentOfType(InfraBean.class, false);
+    if (infraBean != null) {
+      return PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     }
     return null;
   }

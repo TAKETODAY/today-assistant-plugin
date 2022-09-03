@@ -30,8 +30,8 @@ import com.intellij.util.xml.GenericDomValue;
 
 import cn.taketoday.assistant.InfraConstant;
 import cn.taketoday.assistant.factories.resolvers.MethodInvokingFactoryBeanTypeResolver;
-import cn.taketoday.assistant.model.converters.InfraConverterUtil;
 import cn.taketoday.assistant.model.converters.InfraBeanMethodConverter;
+import cn.taketoday.assistant.model.converters.InfraConverterUtil;
 import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.xml.beans.InfraBean;
 import cn.taketoday.lang.Nullable;
@@ -40,9 +40,9 @@ public class MethodInvokingJobDetailFactoryBeanConverter extends InfraBeanMethod
   @Override
   @Nullable
   public PsiClass getPsiClass(ConvertContext context) {
-    InfraBean springBean = (InfraBean) InfraConverterUtil.getCurrentBean(context);
-    if (springBean != null) {
-      return MethodInvokingFactoryBeanTypeResolver.getMethodInvokingPsiClass(context.getSearchScope(), context.getProject(), springBean);
+    InfraBean infraBean = (InfraBean) InfraConverterUtil.getCurrentBean(context);
+    if (infraBean != null) {
+      return MethodInvokingFactoryBeanTypeResolver.getMethodInvokingPsiClass(context.getSearchScope(), context.getProject(), infraBean);
     }
     return null;
   }

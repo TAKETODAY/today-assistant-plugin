@@ -71,9 +71,9 @@ public class FrameworkSupportTemplatesRunnerImpl extends FrameworkSupportTemplat
     XmlTag tag;
     DomInfraBean bean = BeanCoreUtils.getBeanForCurrentCaretPosition(editor, xmlFile);
     if (bean != null) {
-      DomInfraBean springBean = BeanCoreUtils.getTopLevelBean(bean);
-      if (springBean.getXmlTag() != null) {
-        TextRange range = springBean.getXmlTag().getTextRange();
+      DomInfraBean infraBean = BeanCoreUtils.getTopLevelBean(bean);
+      if (infraBean.getXmlTag() != null) {
+        TextRange range = infraBean.getXmlTag().getTextRange();
         int offset = range.getEndOffset();
         editor.getCaretModel().moveToOffset(offset);
         editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);

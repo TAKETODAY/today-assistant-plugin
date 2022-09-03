@@ -43,9 +43,9 @@ import java.util.function.Supplier;
 
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.dom.InfraDomUtils;
+import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.facet.InfraFileSetService;
-import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.model.actions.generate.GenerateBeanDependenciesUtil;
 import cn.taketoday.lang.Nullable;
 

@@ -59,10 +59,10 @@ import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.InfraManager;
 import cn.taketoday.assistant.InfraModelVisitorUtils;
 import cn.taketoday.assistant.context.model.InfraModel;
+import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.facet.InfraFileSetService;
 import cn.taketoday.assistant.facet.InfraFrameworkDetector;
-import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.facet.searchers.CodeConfigSearcher;
 import cn.taketoday.assistant.facet.searchers.XmlConfigSearcher;
 import cn.taketoday.assistant.model.ModelSearchParameters;
@@ -150,7 +150,7 @@ public class InfraUnmappedConfigurationFilesCollector {
     for (Map.Entry<Module, Collection<PsiFile>> entry : this.myNotConfiguredStorage.entrySet()) {
       entry.getValue().removeAll(filesUsedInSpringModels);
     }
-    LOG.debug("=== processed implicit spring model");
+    LOG.debug("=== processed implicit infra model");
     Collection<?> filesUsedImplicitlyAsStereotype = getFilesUsedImplicitlyAsStereotype(indicator, this.myNotConfiguredStorage);
     for (Map.Entry<Module, Collection<PsiFile>> entry2 : this.myNotConfiguredStorage.entrySet()) {
       entry2.getValue().removeAll(filesUsedImplicitlyAsStereotype);
@@ -202,7 +202,7 @@ public class InfraUnmappedConfigurationFilesCollector {
     indicator.setFraction(0.0d);
     int i = 0;
     int moduleCount = notConfigured.size();
-    LOG.debug("=== implicit spring model  modules #" + moduleCount + " total files #" + allNotConfiguredFiles.size());
+    LOG.debug("=== implicit infra model  modules #" + moduleCount + " total files #" + allNotConfiguredFiles.size());
     InfraManager infraManager = InfraManager.from(this.myProject);
     int moduleIdx = 0;
     Set<PsiFile> found = new HashSet<>();

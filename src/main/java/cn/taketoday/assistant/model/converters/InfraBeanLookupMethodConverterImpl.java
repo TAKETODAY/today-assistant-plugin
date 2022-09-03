@@ -45,9 +45,9 @@ public class InfraBeanLookupMethodConverterImpl extends InfraBeanLookupMethodCon
   @Override
   @Nullable
   public PsiClass getPsiClass(ConvertContext context) {
-    InfraBean springBean = context.getInvocationElement().getParentOfType(InfraBean.class, false);
-    if (springBean != null) {
-      return PsiTypesUtil.getPsiClass(springBean.getBeanType());
+    InfraBean infraBean = context.getInvocationElement().getParentOfType(InfraBean.class, false);
+    if (infraBean != null) {
+      return PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     }
     return null;
   }
@@ -79,11 +79,11 @@ public class InfraBeanLookupMethodConverterImpl extends InfraBeanLookupMethodCon
 
   @Override
   public LocalQuickFix[] getQuickFixes(ConvertContext context) {
-    DomInfraBean springBean;
+    DomInfraBean infraBean;
     PsiType[] validReturnTypes = getValidReturnTypes(context);
-    if (validReturnTypes.length != 0 && (springBean = InfraConverterUtil.getCurrentBean(context)) != null) {
+    if (validReturnTypes.length != 0 && (infraBean = InfraConverterUtil.getCurrentBean(context)) != null) {
       GenericDomValue element = (GenericDomValue) context.getInvocationElement();
-      PsiClass psiClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+      PsiClass psiClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
       String elementName = element.getStringValue();
       if (psiClass == null || elementName == null || StringUtil.isEmpty(elementName)) {
         return LocalQuickFix.EMPTY_ARRAY;

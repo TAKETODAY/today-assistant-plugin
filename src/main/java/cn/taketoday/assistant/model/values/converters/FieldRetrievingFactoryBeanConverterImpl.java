@@ -69,9 +69,9 @@ public class FieldRetrievingFactoryBeanConverterImpl extends FieldRetrievingFact
     return isFieldRetrievingFactoryBean(InfraConverterUtil.getCurrentBean(element));
   }
 
-  public static boolean isFieldRetrievingFactoryBean(@Nullable CommonInfraBean springBean) {
+  public static boolean isFieldRetrievingFactoryBean(@Nullable CommonInfraBean infraBean) {
     PsiClass beanClass;
-    return springBean != null && (beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType())) != null && FIELD_RETRIEVING_FACTORY_BEAN_CLASS.equals(beanClass.getQualifiedName());
+    return infraBean != null && (beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType())) != null && FIELD_RETRIEVING_FACTORY_BEAN_CLASS.equals(beanClass.getQualifiedName());
   }
 
   public static boolean isResolved(Project project, String field) {

@@ -88,11 +88,11 @@ public abstract class InfraInspectionsRegistry {
    *
    * @return Inspections.
    */
-  public abstract Class<? extends LocalInspectionTool>[] getSpringInspectionClasses();
+  public abstract Class<? extends LocalInspectionTool>[] getInfraInspectionClasses();
 
   @TestOnly
-  public abstract Class<? extends LocalInspectionTool>[] getTestSpringInspectionClasses();
+  public abstract Class<? extends LocalInspectionTool>[] getTestInfraInspectionClasses();
 
   @TestOnly
-  public abstract Class<? extends LocalInspectionTool> getTestSpringModelInspectionClass();
+  public abstract Class<? extends LocalInspectionTool> getTestInfraModelInspectionClass();
 }

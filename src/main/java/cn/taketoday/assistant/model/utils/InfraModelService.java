@@ -47,7 +47,7 @@ public abstract class InfraModelService {
 
   public abstract CommonInfraModel getModuleCombinedModel(PsiElement element);
 
-  public abstract CommonInfraModel getModelByBean(@Nullable CommonInfraBean springBean);
+  public abstract CommonInfraModel getModelByBean(@Nullable CommonInfraBean infraBean);
 
   /**
    * Determines if given configuration file is used in test context

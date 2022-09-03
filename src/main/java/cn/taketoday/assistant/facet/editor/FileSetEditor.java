@@ -80,10 +80,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import cn.taketoday.assistant.InfraBundle;
+import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.facet.InfraFileSetImpl;
 import cn.taketoday.assistant.facet.InfraFileSetService;
-import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.lang.Nullable;
 
 public class FileSetEditor extends DialogWrapper {

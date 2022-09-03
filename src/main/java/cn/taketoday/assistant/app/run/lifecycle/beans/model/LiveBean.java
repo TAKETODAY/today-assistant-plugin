@@ -55,10 +55,8 @@ public interface LiveBean {
 
   boolean isInnerBean();
 
-  
   String getName();
 
-  
   String getClassName();
 
   @Nullable

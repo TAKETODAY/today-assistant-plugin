@@ -24,11 +24,9 @@ import com.intellij.ide.presentation.Presentation;
 import com.intellij.jam.JamService;
 import com.intellij.jam.reflect.JamClassMeta;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.util.Pair;
 import com.intellij.patterns.PsiClassPattern;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementRef;
 import com.intellij.semantic.SemRegistrar;
 import com.intellij.util.Function;
 

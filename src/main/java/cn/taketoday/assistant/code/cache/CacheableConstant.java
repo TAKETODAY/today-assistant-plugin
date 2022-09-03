@@ -37,7 +37,6 @@ public interface CacheableConstant {
   String ROOT_OBJECT_CLASS = "cn.taketoday.cache.interceptor.CacheExpressionRootObject";
   String CACHE_CLASSNAME = "cn.taketoday.cache.Cache";
   String CAFFEINE_CLASSNAME = "com.github.benmanes.caffeine.cache.Caffeine";
-  String SPRING_EMBEDDED_CACHE_MANAGER = "org.infinispan.spring.provider.SpringEmbeddedCacheManager";
   String JCACHE_CACHE_MANAGER = "cn.taketoday.cache.jcache.JCacheCacheManager";
   String REDIS_CACHE_MANAGER = "cn.taketoday.data.redis.cache.RedisCacheManager";
 }

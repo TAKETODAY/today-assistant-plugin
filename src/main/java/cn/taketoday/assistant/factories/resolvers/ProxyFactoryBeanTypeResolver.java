@@ -55,22 +55,22 @@ public class ProxyFactoryBeanTypeResolver extends AbstractProxiedTypeResolver {
 
   @Override
   public Set<PsiType> getObjectType(@Nullable CommonInfraBean context) {
-    if (context instanceof InfraBean springBean) {
-      PsiType type = getTargetType(springBean);
-      if (type != null && isCglibExplicitlyEnabled(springBean)) {
+    if (context instanceof InfraBean infraBean) {
+      PsiType type = getTargetType(infraBean);
+      if (type != null && isCglibExplicitlyEnabled(infraBean)) {
         return Collections.singleton(type);
       }
-      Set<String> proxyInterfaceNames = getTypesFromClassArrayProperty(springBean, PROXY_INTERFACES_PROPERTY_NAME);
+      Set<String> proxyInterfaceNames = getTypesFromClassArrayProperty(infraBean, PROXY_INTERFACES_PROPERTY_NAME);
       if (!proxyInterfaceNames.isEmpty()) {
         return BeanCoreUtils.convertToNonNullTypes(proxyInterfaceNames, context);
       }
-      Set<String> interfaceNames = getTypesFromClassArrayProperty(springBean, INTERFACES_PROPERTY_NAME);
+      Set<String> interfaceNames = getTypesFromClassArrayProperty(infraBean, INTERFACES_PROPERTY_NAME);
       if (!interfaceNames.isEmpty()) {
         return BeanCoreUtils.convertToNonNullTypes(interfaceNames, context);
       }
       else if (type != null) {
         Set<String> targetInterfaceNames = getAllInterfaceNames(type);
-        if (!targetInterfaceNames.isEmpty() && isAutodetectInterfacesEnabled(springBean)) {
+        if (!targetInterfaceNames.isEmpty() && isAutodetectInterfacesEnabled(infraBean)) {
           return BeanCoreUtils.convertToNonNullTypes(targetInterfaceNames, context);
         }
         return Collections.singleton(type);

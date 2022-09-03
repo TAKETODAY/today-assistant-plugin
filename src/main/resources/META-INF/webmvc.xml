@@ -95,15 +95,15 @@
     <dom.implementation interfaceClass="cn.taketoday.assistant.web.mvc.model.xml.ViewResolvers" implementationClass="cn.taketoday.assistant.model.xml.DomInfraBeanImpl"/>
 
     <localInspection language="UAST" shortName="InfraMVCViewInspection" key="mvc.inspection.view.reference"
-        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Spring"
+        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Today,Infra"
         enabledByDefault="true" level="WARNING"
         implementationClass="cn.taketoday.assistant.web.mvc.views.InfraMVCViewInspection"/>
     <localInspection language="UAST" shortName="InfraMVCPathVariableInspection" key="mvc.inspection.path.variable"
-        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Spring"
+        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Today,Infra"
         enabledByDefault="true" level="WARNING"
         implementationClass="cn.taketoday.assistant.web.mvc.pathVariables.MVCPathVariableInspection"/>
     <localInspection language="JAVA" key="mvc.inspection.init.binder"
-        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Spring"
+        bundle="messages.InfraAppBundle" groupKey="mvc.inspection.group.name" groupPath="Today,Infra"
         enabledByDefault="true" level="ERROR"
         implementationClass="cn.taketoday.assistant.web.mvc.model.jam.InfraMVCInitBinderInspection"/>
 
@@ -118,15 +118,11 @@
 
     <psi.referenceContributor language="UAST" implementation="cn.taketoday.assistant.web.mvc.model.WebUrlPathReferenceContributor"/>
 
-    <dependencySupport kind="java" coordinate="org.springframework:spring-webmvc" displayName="Spring MVC"/>
+    <dependencySupport kind="java" coordinate="cn.taketoday:today-web" displayName="Web MVC"/>
 
     <codeInsight.blockingMethodChecker implementation="cn.taketoday.assistant.web.mvc.client.rest.RestTemplateBlockingMethodChecker"/>
 
-    <registryKey key="spring.urlpath.completion.smart" defaultValue="true"
-        description="Enables modules ordering based on statistics for UrlPath reference completion in Spring"/>
-
     <languageInjectionContributor language="UAST" implementationClass="cn.taketoday.assistant.web.mvc.client.WebTestClientBodyLanguageInjector"/>
-
 
     <statistics.counterUsagesCollector groupId="infra.mvc.usages" version="2"/>
 

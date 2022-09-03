@@ -94,26 +94,26 @@ public final class XmlAutowireExplicitlyInspection extends InfraBeanInspectionBa
   }
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel model) {
-    if (isAutowireCandidate(springBean)) {
-      addAutowireEscapeWarning(springBean, holder);
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel model) {
+    if (isAutowireCandidate(infraBean)) {
+      addAutowireEscapeWarning(infraBean, holder);
     }
   }
 
-  private static boolean isAutowireCandidate(InfraBean springBean) {
-    DefaultableBoolean autoWireCandidate = springBean.getAutowireCandidate().getValue();
+  private static boolean isAutowireCandidate(InfraBean infraBean) {
+    DefaultableBoolean autoWireCandidate = infraBean.getAutowireCandidate().getValue();
     return autoWireCandidate == null || autoWireCandidate.getBooleanValue();
   }
 
-  private static void addAutowireEscapeWarning(InfraBean springBean, DomElementAnnotationHolder holder) {
-    Autowire autowire = springBean.getAutowire().getValue();
+  private static void addAutowireEscapeWarning(InfraBean infraBean, DomElementAnnotationHolder holder) {
+    Autowire autowire = infraBean.getAutowire().getValue();
     if (autowire != null && Autowire.NO != autowire) {
-      holder.createProblem(springBean.getAutowire(), HighlightSeverity.WARNING, InfraBundle.message("bean.use.autowire"),
-              createEscapeAutowireQuickFixes(springBean.createStableCopy(), autowire));
+      holder.createProblem(infraBean.getAutowire(), HighlightSeverity.WARNING, InfraBundle.message("bean.use.autowire"),
+              createEscapeAutowireQuickFixes(infraBean.createStableCopy(), autowire));
     }
   }
 
-  private static LocalQuickFix createEscapeAutowireQuickFixes(InfraBean springBean, Autowire autowire) {
+  private static LocalQuickFix createEscapeAutowireQuickFixes(InfraBean infraBean, Autowire autowire) {
     return new LocalQuickFix() {
 
       public String getFamilyName() {
@@ -121,69 +121,69 @@ public final class XmlAutowireExplicitlyInspection extends InfraBeanInspectionBa
       }
 
       public void applyFix(Project project, ProblemDescriptor descriptor) {
-        if (!springBean.isValid()) {
+        if (!infraBean.isValid()) {
           return;
         }
         WriteCommandAction.Builder writeCommandAction
-                = WriteCommandAction.writeCommandAction(springBean.getManager().getProject(), DomUtil.getFile(springBean));
+                = WriteCommandAction.writeCommandAction(infraBean.getManager().getProject(), DomUtil.getFile(infraBean));
         writeCommandAction.run(() -> {
-          escapeAutowire(autowire.getValue(), springBean);
+          escapeAutowire(autowire.getValue(), infraBean);
         });
       }
     };
   }
 
-  public static void escapeAutowire(String autowire, InfraBean springBean) {
-    CommonInfraModel model = InfraModelService.of().getModel(springBean);
+  public static void escapeAutowire(String autowire, InfraBean infraBean) {
+    CommonInfraModel model = InfraModelService.of().getModel(infraBean);
     if (autowire.equals(Autowire.BY_TYPE.getValue())) {
-      escapeByTypeAutowire(springBean, model);
+      escapeByTypeAutowire(infraBean, model);
     }
     else if (autowire.equals(Autowire.BY_NAME.getValue())) {
-      escapeByNameAutowire(springBean);
+      escapeByNameAutowire(infraBean);
     }
     else if (autowire.equals(Autowire.CONSTRUCTOR.getValue())) {
-      escapeConstructorAutowire(springBean, model);
+      escapeConstructorAutowire(infraBean, model);
     }
     else if (autowire.equals(Autowire.AUTODETECT.getValue())) {
-      if (InfraConstructorArgResolveUtil.hasEmptyConstructor(springBean) && !InfraConstructorArgResolveUtil.isInstantiatedByFactory(springBean)) {
-        escapeByTypeAutowire(springBean, model);
+      if (InfraConstructorArgResolveUtil.hasEmptyConstructor(infraBean) && !InfraConstructorArgResolveUtil.isInstantiatedByFactory(infraBean)) {
+        escapeByTypeAutowire(infraBean, model);
       }
       else {
-        escapeConstructorAutowire(springBean, model);
+        escapeConstructorAutowire(infraBean, model);
       }
     }
   }
 
-  private static void escapeConstructorAutowire(InfraBean springBean, CommonInfraModel model) {
-    Map<PsiType, Collection<BeanPointer<?>>> map = AutowireUtil.getConstructorAutowiredProperties(springBean, model);
+  private static void escapeConstructorAutowire(InfraBean infraBean, CommonInfraModel model) {
+    Map<PsiType, Collection<BeanPointer<?>>> map = AutowireUtil.getConstructorAutowiredProperties(infraBean, model);
     for (PsiType psiType : map.keySet()) {
-      ConstructorArg arg = springBean.addConstructorArg();
+      ConstructorArg arg = infraBean.addConstructorArg();
       arg.getType().setStringValue(psiType.getCanonicalText());
       arg.getRefAttr().setStringValue(chooseReferencedBeanName(map.get(psiType)));
     }
-    springBean.getAutowire().undefine();
+    infraBean.getAutowire().undefine();
   }
 
-  private static void escapeByNameAutowire(InfraBean springBean) {
-    Map<PsiMethod, BeanPointer<?>> autowiredProperties = AutowireUtil.getByNameAutowiredProperties(springBean);
+  private static void escapeByNameAutowire(InfraBean infraBean) {
+    Map<PsiMethod, BeanPointer<?>> autowiredProperties = AutowireUtil.getByNameAutowiredProperties(infraBean);
     for (PsiMethod psiMethod : autowiredProperties.keySet()) {
-      InfraProperty springProperty = springBean.addProperty();
+      InfraProperty springProperty = infraBean.addProperty();
       BeanPointer<?> autowiredBean = autowiredProperties.get(psiMethod);
       String refBeanName = (autowiredBean == null || autowiredBean.getName() == null) ? "" : autowiredBean.getName();
       springProperty.getName().setStringValue(PropertyUtilBase.getPropertyNameBySetter(psiMethod));
       springProperty.getRefAttr().setStringValue(refBeanName);
     }
-    springBean.getAutowire().undefine();
+    infraBean.getAutowire().undefine();
   }
 
-  private static void escapeByTypeAutowire(InfraBean springBean, CommonInfraModel model) {
-    Map<PsiMethod, Collection<BeanPointer<?>>> autowiredProperties = AutowireUtil.getByTypeAutowiredProperties(springBean, model);
+  private static void escapeByTypeAutowire(InfraBean infraBean, CommonInfraModel model) {
+    Map<PsiMethod, Collection<BeanPointer<?>>> autowiredProperties = AutowireUtil.getByTypeAutowiredProperties(infraBean, model);
     for (PsiMethod psiMethod : autowiredProperties.keySet()) {
-      InfraProperty springProperty = springBean.addProperty();
+      InfraProperty springProperty = infraBean.addProperty();
       springProperty.getName().setStringValue(PropertyUtilBase.getPropertyNameBySetter(psiMethod));
       springProperty.getRefAttr().setStringValue(chooseReferencedBeanName(autowiredProperties.get(psiMethod)));
     }
-    springBean.getAutowire().undefine();
+    infraBean.getAutowire().undefine();
   }
 
   private static String chooseReferencedBeanName(Collection<BeanPointer<?>> autowiredBeans) {

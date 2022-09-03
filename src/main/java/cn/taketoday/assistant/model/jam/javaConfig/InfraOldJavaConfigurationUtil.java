@@ -69,10 +69,10 @@ public final class InfraOldJavaConfigurationUtil {
       boolean hasJavaConfigBean = InfraModelSearchers.doesBeanExist(model, ModelSearchParameters.byClass(psiClass));
       if (hasJavaConfigBean) {
         String externalBeanName = psiMethod.getName();
-        for (BeanPointer springBean : InfraModelVisitorUtils.getAllDomBeans(model)) {
-          String beanName = springBean.getName();
-          if (externalBeanName.equals(beanName) || Arrays.asList(springBean.getAliases()).contains(externalBeanName)) {
-            extBeans.add(springBean);
+        for (BeanPointer infraBean : InfraModelVisitorUtils.getAllDomBeans(model)) {
+          String beanName = infraBean.getName();
+          if (externalBeanName.equals(beanName) || Arrays.asList(infraBean.getAliases()).contains(externalBeanName)) {
+            extBeans.add(infraBean);
           }
         }
       }

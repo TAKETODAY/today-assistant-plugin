@@ -40,10 +40,10 @@ public class ScopedProxyFactoryBeanTypeResolver extends AbstractProxiedTypeResol
   @Override
 
   public Set<PsiType> getObjectType(@Nullable CommonInfraBean context) {
-    InfraBean springBean;
+    InfraBean infraBean;
     PsiClassType type;
-    if ((context instanceof InfraBean) && (type = getTargetType((springBean = (InfraBean) context))) != null) {
-      if (isBooleanPropertySetAndFalse(springBean, "proxyTargetClass")) {
+    if ((context instanceof InfraBean) && (type = getTargetType((infraBean = (InfraBean) context))) != null) {
+      if (isBooleanPropertySetAndFalse(infraBean, "proxyTargetClass")) {
         Set<String> targetInterfaceNames = getAllInterfaceNames(type);
         if (!targetInterfaceNames.isEmpty()) {
           return BeanCoreUtils.convertToNonNullTypes(targetInterfaceNames, context);

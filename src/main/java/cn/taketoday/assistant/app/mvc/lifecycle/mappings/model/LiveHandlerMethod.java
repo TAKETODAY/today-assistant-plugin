@@ -30,26 +30,22 @@ import java.util.List;
 import cn.taketoday.lang.Nullable;
 
 public interface LiveHandlerMethod {
-    
-    String getRawMethod();
 
-    
-    String getClassName();
+  String getRawMethod();
 
-    
-    String getMethodName();
+  String getClassName();
 
-    
-    List<String> getParameters();
+  String getMethodName();
 
-    
-    String getDisplayName();
+  List<String> getParameters();
 
-    @Nullable
-    PsiClass findContainingClass(Project project, GlobalSearchScope globalSearchScope);
+  String getDisplayName();
 
-    @Nullable
-    PsiMethod findMethod(Project project, GlobalSearchScope globalSearchScope);
+  @Nullable
+  PsiClass findContainingClass(Project project, GlobalSearchScope globalSearchScope);
 
-    boolean matches( PsiMethod psiMethod);
+  @Nullable
+  PsiMethod findMethod(Project project, GlobalSearchScope globalSearchScope);
+
+  boolean matches(PsiMethod psiMethod);
 }

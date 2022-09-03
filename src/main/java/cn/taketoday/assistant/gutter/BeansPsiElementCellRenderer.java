@@ -130,8 +130,8 @@ public final class BeansPsiElementCellRenderer extends DefaultPsiElementCellRend
     }
     else if (psiElement instanceof PsiAnnotation) {
       PsiMember member = PsiTreeUtil.getParentOfType(psiElement, PsiMember.class);
-      CommonInfraBean springBean = member == null ? null : getJamBean(member);
-      if (springBean != null) {
+      CommonInfraBean infraBean = member == null ? null : getJamBean(member);
+      if (infraBean != null) {
         return Icons.SpringJavaBean;
       }
     }

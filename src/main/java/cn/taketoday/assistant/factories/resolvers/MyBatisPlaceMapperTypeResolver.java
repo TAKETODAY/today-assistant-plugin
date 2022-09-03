@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import cn.taketoday.assistant.model.CommonInfraBean;
-import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.utils.BeanCoreUtils;
+import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
 import cn.taketoday.assistant.model.xml.beans.InfraBean;
 import cn.taketoday.assistant.model.xml.beans.InfraPropertyDefinition;
 import cn.taketoday.lang.Nullable;

@@ -243,22 +243,22 @@ public final class BeanCoreUtils {
     return null;
   }
 
-  public static String[] suggestBeanNames(@Nullable CommonInfraBean springBean) {
-    if (springBean == null) {
+  public static String[] suggestBeanNames(@Nullable CommonInfraBean infraBean) {
+    if (infraBean == null) {
       return ArrayUtilRt.EMPTY_STRING_ARRAY;
     }
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     if (beanClass == null) {
       return ArrayUtilRt.EMPTY_STRING_ARRAY;
     }
     JavaCodeStyleManager codeStyleManager = JavaCodeStyleManager.getInstance(beanClass.getProject());
     Set<String> initialNames = new LinkedHashSet<>();
-    PsiType[] productClasses = InfraBeanService.of().getEffectiveBeanTypes(springBean);
+    PsiType[] productClasses = InfraBeanService.of().getEffectiveBeanTypes(infraBean);
     for (PsiType productType : productClasses) {
       Set<String> suggestions = getSanitizedBeanNameSuggestions(codeStyleManager, productType);
       initialNames.addAll(suggestions);
     }
-    CommonInfraModel model = InfraModelService.of().getModelByBean(springBean);
+    CommonInfraModel model = InfraModelService.of().getModelByBean(infraBean);
     List<String> uniqueNames = new ArrayList<>();
     for (String name : initialNames) {
       String suggestedName = name;
@@ -342,10 +342,10 @@ public final class BeanCoreUtils {
     return true;
   }
 
-  public static <T extends GenericDomValue<?>> T getMergedValue(InfraBean springBean, T value) {
+  public static <T extends GenericDomValue<?>> T getMergedValue(InfraBean infraBean, T value) {
     AbstractDomChildrenDescription description = value.getChildDescription();
     Ref<GenericDomValue<?>> ref = new Ref<>(value);
-    visitParents(springBean, false, parentBean -> {
+    visitParents(infraBean, false, parentBean -> {
       List<? extends DomElement> list = description.getValues(parentBean);
       if (list.size() == 1) {
         GenericDomValue genericDomValue = (GenericDomValue) list.get(0);
@@ -360,9 +360,9 @@ public final class BeanCoreUtils {
     return (T) ref.get();
   }
 
-  public static <T extends DomElement> Set<T> getMergedSet(InfraBean springBean, Function<? super InfraBean, ? extends Collection<T>> getter) {
+  public static <T extends DomElement> Set<T> getMergedSet(InfraBean infraBean, Function<? super InfraBean, ? extends Collection<T>> getter) {
     Set<T> set = new LinkedHashSet<>();
-    visitParents(springBean, false, parentSpringBean -> {
+    visitParents(infraBean, false, parentSpringBean -> {
       set.addAll(getter.fun(parentSpringBean));
       return true;
     });

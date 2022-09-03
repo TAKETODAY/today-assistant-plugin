@@ -25,16 +25,13 @@ import java.util.List;
 import cn.taketoday.lang.Nullable;
 
 public interface LiveContext {
-  
-  
+
   String getName();
 
   @Nullable
   LiveContext getParent();
 
-  
   List<LiveResource> getResources();
 
-  
   List<LiveBean> getBeans();
 }

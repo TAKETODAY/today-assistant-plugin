@@ -41,12 +41,12 @@ import cn.taketoday.assistant.web.mvc.client.exchange.DeleteExchange;
 import cn.taketoday.assistant.web.mvc.client.exchange.GetExchange;
 import cn.taketoday.assistant.web.mvc.client.exchange.HeadExchange;
 import cn.taketoday.assistant.web.mvc.client.exchange.HttpExchange;
+import cn.taketoday.assistant.web.mvc.client.exchange.InfraExchangeClient;
+import cn.taketoday.assistant.web.mvc.client.exchange.InfraExchangeConstant;
 import cn.taketoday.assistant.web.mvc.client.exchange.OptionsExchange;
 import cn.taketoday.assistant.web.mvc.client.exchange.PatchExchange;
 import cn.taketoday.assistant.web.mvc.client.exchange.PostExchange;
 import cn.taketoday.assistant.web.mvc.client.exchange.PutExchange;
-import cn.taketoday.assistant.web.mvc.client.exchange.InfraExchangeClient;
-import cn.taketoday.assistant.web.mvc.client.exchange.InfraExchangeConstant;
 import cn.taketoday.assistant.web.mvc.model.WebMvcUrlResolverKt;
 
 final class InfraMVCSemContributor extends SemContributor {

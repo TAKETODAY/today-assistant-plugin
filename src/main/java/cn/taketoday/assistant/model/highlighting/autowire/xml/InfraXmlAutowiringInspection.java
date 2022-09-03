@@ -59,33 +59,33 @@ import cn.taketoday.lang.Nullable;
 public final class InfraXmlAutowiringInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean springBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel model) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel model) {
     DefaultableBoolean autoWireCandidate;
     if (model == null) {
       return;
     }
-    GenericAttributeValue<DefaultableBoolean> autowireCandidateAttribute = springBean.getAutowireCandidate();
+    GenericAttributeValue<DefaultableBoolean> autowireCandidateAttribute = infraBean.getAutowireCandidate();
     if (DomUtil.hasXml(autowireCandidateAttribute) && (autoWireCandidate = autowireCandidateAttribute.getValue()) != null && !autoWireCandidate.getBooleanValue()) {
       return;
     }
-    checkAutowiring(springBean, model, holder);
+    checkAutowiring(infraBean, model, holder);
   }
 
-  private static void checkAutowiring(InfraBean springBean, CommonInfraModel model, DomElementAnnotationHolder holder) {
-    Autowire autowire = springBean.getBeanAutowire();
+  private static void checkAutowiring(InfraBean infraBean, CommonInfraModel model, DomElementAnnotationHolder holder) {
+    Autowire autowire = infraBean.getBeanAutowire();
     if (autowire.equals(Autowire.BY_TYPE)) {
-      checkByTypeAutowire(springBean, model, holder);
+      checkByTypeAutowire(infraBean, model, holder);
     }
     else if (autowire.equals(Autowire.CONSTRUCTOR)) {
-      checkByConstructorAutowire(springBean, holder);
+      checkByConstructorAutowire(infraBean, holder);
     }
   }
 
-  private static void checkByConstructorAutowire(InfraBean springBean, DomElementAnnotationHolder holder) {
-    if (PsiTypesUtil.getPsiClass(springBean.getBeanType()) == null) {
+  private static void checkByConstructorAutowire(InfraBean infraBean, DomElementAnnotationHolder holder) {
+    if (PsiTypesUtil.getPsiClass(infraBean.getBeanType()) == null) {
       return;
     }
-    ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
+    ResolvedConstructorArgs resolvedArgs = infraBean.getResolvedConstructorArgs();
     if (resolvedArgs.isResolved()) {
       return;
     }
@@ -94,13 +94,13 @@ public final class InfraXmlAutowiringInspection extends InfraBeanInspectionBase 
       if (autowiredParams != null && autowiredParams.size() > 0) {
         Set<Map.Entry<PsiParameter, Collection<BeanPointer<?>>>> entries = autowiredParams.entrySet();
         for (Map.Entry<PsiParameter, Collection<BeanPointer<?>>> entry : entries) {
-          checkAutowire(springBean, holder, checkedMethod, entry.getKey(), entry.getValue());
+          checkAutowire(infraBean, holder, checkedMethod, entry.getKey(), entry.getValue());
         }
       }
     }
   }
 
-  private static void checkAutowire(InfraBean springBean, DomElementAnnotationHolder holder, PsiMethod checkedMethod, PsiParameter psiParameter, Collection<BeanPointer<?>> springBeans) {
+  private static void checkAutowire(InfraBean infraBean, DomElementAnnotationHolder holder, PsiMethod checkedMethod, PsiParameter psiParameter, Collection<BeanPointer<?>> springBeans) {
     DomElement genericAttributeValue;
     PsiType psiType = psiParameter.getType();
     if (springBeans != null && springBeans.size() > 1 && !PsiTypeUtil.getInstance(psiParameter.getProject()).isCollectionType(psiType) && !(psiType instanceof PsiArrayType)) {
@@ -110,32 +110,32 @@ public final class InfraXmlAutowiringInspection extends InfraBeanInspectionBase 
       }
       String methodName = PsiFormatUtil.formatMethod(checkedMethod, PsiSubstitutor.EMPTY, 257, 2);
       String message = InfraBundle.message("bean.autowiring.by.type", psiType.getPresentableText(), StringUtil.join(beanNames, ","), methodName);
-      if (DomUtil.hasXml(springBean.getClazz())) {
-        genericAttributeValue = springBean.getClazz();
+      if (DomUtil.hasXml(infraBean.getClazz())) {
+        genericAttributeValue = infraBean.getClazz();
       }
-      else if (DomUtil.hasXml(springBean.getFactoryMethod())) {
-        genericAttributeValue = springBean.getFactoryMethod();
+      else if (DomUtil.hasXml(infraBean.getFactoryMethod())) {
+        genericAttributeValue = infraBean.getFactoryMethod();
       }
       else {
-        genericAttributeValue = springBean;
+        genericAttributeValue = infraBean;
       }
       holder.createProblem(genericAttributeValue, message);
     }
   }
 
-  private static void checkByTypeAutowire(InfraBean springBean, CommonInfraModel model, DomElementAnnotationHolder holder) {
-    PsiClass beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType());
+  private static void checkByTypeAutowire(InfraBean infraBean, CommonInfraModel model, DomElementAnnotationHolder holder) {
+    PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     if (beanClass == null) {
       return;
     }
     for (PsiMethod psiMethod : PropertyUtilBase.getAllProperties(beanClass, true, false, true).values()) {
       if (PropertyUtilBase.isSimplePropertySetter(psiMethod)) {
-        checkByType(springBean, model, holder, psiMethod.getParameterList().getParameters()[0].getType(), psiMethod);
+        checkByType(infraBean, model, holder, psiMethod.getParameterList().getParameters()[0].getType(), psiMethod);
       }
     }
   }
 
-  private static void checkByType(InfraBean springBean, CommonInfraModel model, DomElementAnnotationHolder holder, PsiType psiType, PsiMethod psiMethod) {
+  private static void checkByType(InfraBean infraBean, CommonInfraModel model, DomElementAnnotationHolder holder, PsiType psiType, PsiMethod psiMethod) {
     Collection<BeanPointer<?>> autowireByType;
     PsiAnnotation qualifiedAnnotation = AutowireUtil.getQualifiedAnnotation(psiMethod);
     if (qualifiedAnnotation != null) {
@@ -148,7 +148,7 @@ public final class InfraXmlAutowiringInspection extends InfraBeanInspectionBase 
     if (beans.size() > 1) {
       List<String> properties = new ArrayList<>();
       String propertyName = PropertyUtilBase.getPropertyNameBySetter(psiMethod);
-      if (AutowireUtil.isPropertyNotDefined(springBean, propertyName)) {
+      if (AutowireUtil.isPropertyNotDefined(infraBean, propertyName)) {
         properties.add(propertyName);
       }
       if (properties.size() > 0) {
@@ -157,7 +157,7 @@ public final class InfraXmlAutowiringInspection extends InfraBeanInspectionBase 
           beanNames.add(InfraPresentationProvider.getBeanName(pointer));
         }
         String message = InfraBundle.message("bean.autowiring.by.type", psiType.getPresentableText(), StringUtil.join(beanNames, ","), StringUtil.join(properties, ","));
-        holder.createProblem(springBean, message);
+        holder.createProblem(infraBean, message);
       }
     }
   }

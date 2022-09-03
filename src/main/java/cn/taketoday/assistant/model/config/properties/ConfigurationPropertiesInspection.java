@@ -59,9 +59,9 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import cn.taketoday.assistant.CommonInfraModel;
+import cn.taketoday.assistant.InfraAppBundle;
 import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraManager;
-import cn.taketoday.assistant.InfraAppBundle;
 import cn.taketoday.assistant.app.InfraClassesConstants;
 import cn.taketoday.assistant.app.application.metadata.InfraConfigKetPathBeanPropertyResolver;
 import cn.taketoday.assistant.code.AbstractInfraLocalInspection;

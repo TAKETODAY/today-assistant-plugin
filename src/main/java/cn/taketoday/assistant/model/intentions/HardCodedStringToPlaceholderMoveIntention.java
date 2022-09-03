@@ -135,8 +135,8 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
     return text;
   }
 
-  private static boolean isAvailable(GenericDomValue<?> valueElement, @Nullable InfraBean springBean) {
-    if (valueElement == null || springBean == null) {
+  private static boolean isAvailable(GenericDomValue<?> valueElement, @Nullable InfraBean infraBean) {
+    if (valueElement == null || infraBean == null) {
       return false;
     }
     String s = valueElement.getStringValue();
@@ -145,13 +145,13 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
     }
     Set<BeanPointer<?>> placeholderConfigurerBeans = getPlaceholderConfigurerBeans(valueElement);
     return placeholderConfigurerBeans.size() > 0 && (!(valueElement instanceof InfraValue) || !DomUtil.hasXml(((InfraValue) valueElement).getType())) && !PlaceholderUtils.getInstance()
-            .isPlaceholder(s, new ArrayList(placeholderConfigurerBeans)) && !isExcludedProperties(springBean, valueElement);
+            .isPlaceholder(s, new ArrayList(placeholderConfigurerBeans)) && !isExcludedProperties(infraBean, valueElement);
   }
 
-  private static boolean isExcludedProperties(@Nullable InfraBean springBean, GenericDomValue valueHolder) {
+  private static boolean isExcludedProperties(@Nullable InfraBean infraBean, GenericDomValue valueHolder) {
     PsiClass beanClass;
     InfraProperty springProperty;
-    if (springBean != null && (beanClass = PsiTypesUtil.getPsiClass(springBean.getBeanType())) != null && myExcludedProperties.get(
+    if (infraBean != null && (beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType())) != null && myExcludedProperties.get(
             beanClass.getQualifiedName()) != null && (springProperty = valueHolder.getParentOfType(InfraProperty.class, false)) != null) {
       return myExcludedProperties.get(beanClass.getQualifiedName()).contains(springProperty.getName().getStringValue());
     }

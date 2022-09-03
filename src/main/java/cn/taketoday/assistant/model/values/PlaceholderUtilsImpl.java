@@ -78,8 +78,8 @@ import java.util.Set;
 import cn.taketoday.assistant.InfraConstant;
 import cn.taketoday.assistant.LocalModelFactory;
 import cn.taketoday.assistant.context.model.LocalXmlModel;
-import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.facet.InfraFacet;
+import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.CommonInfraBean;
 import cn.taketoday.assistant.model.utils.InfraPropertyUtils;
@@ -276,14 +276,14 @@ public class PlaceholderUtilsImpl extends PlaceholderUtils {
   }
 
   @Nullable
-  private static GenericDomValue<String> getLocationDomElementValue(CommonInfraBean springBean) {
+  private static GenericDomValue<String> getLocationDomElementValue(CommonInfraBean infraBean) {
     PsiClass psiClass;
     InfraPropertyDefinition location;
-    if (springBean instanceof UtilProperties utilProperties) {
+    if (infraBean instanceof UtilProperties utilProperties) {
       return utilProperties.getLocation();
     }
-    else if ((springBean instanceof InfraBean) && (psiClass = PsiTypesUtil.getPsiClass(springBean.getBeanType())) != null && InfraConstant.PROPERTIES_FACTORY_BEAN.equals(
-            psiClass.getQualifiedName()) && (location = InfraPropertyUtils.findPropertyByName(springBean, LOCATION_PROPERTY_NAME)) != null) {
+    else if ((infraBean instanceof InfraBean) && (psiClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType())) != null && InfraConstant.PROPERTIES_FACTORY_BEAN.equals(
+            psiClass.getQualifiedName()) && (location = InfraPropertyUtils.findPropertyByName(infraBean, LOCATION_PROPERTY_NAME)) != null) {
       return (GenericDomValue<String>) location.getValueElement();
     }
     else {
@@ -699,9 +699,9 @@ public class PlaceholderUtilsImpl extends PlaceholderUtils {
           for (BeanPointer<?> beanPointer : configurers) {
             BeanPointer<?> configurer = beanPointer;
             if (configFile.equals(configurer.getContainingFile())) {
-              CommonInfraBean springBean = configurer.getBean();
-              if (springBean instanceof DomInfraBean) {
-                set.add(this.getPlaceholderPrefixAndSuffixInner((DomInfraBean) springBean));
+              CommonInfraBean infraBean = configurer.getBean();
+              if (infraBean instanceof DomInfraBean) {
+                set.add(this.getPlaceholderPrefixAndSuffixInner((DomInfraBean) infraBean));
               }
             }
           }
