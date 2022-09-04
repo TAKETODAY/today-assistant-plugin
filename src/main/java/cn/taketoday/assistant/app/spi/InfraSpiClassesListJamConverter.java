@@ -48,10 +48,10 @@ public final class InfraSpiClassesListJamConverter extends StrategiesClassesList
     this.importKey = importKey;
   }
 
-  public PsiReference[] createReferences(JamStringAttributeElement<PsiClass> jamStringAttributeElement, PsiLanguageInjectionHost injectionHost) {
+  public PsiReference[] createReferences(JamStringAttributeElement<PsiClass> attributeElement, PsiLanguageInjectionHost injectionHost) {
     return new PsiReference[] {
             new InfraSpiClassReference(myConfigKey, importKey,
-                    injectionHost, null, jamStringAttributeElement.getStringValue())
+                    injectionHost, null, attributeElement.getStringValue())
     };
   }
 
@@ -91,7 +91,7 @@ public final class InfraSpiClassesListJamConverter extends StrategiesClassesList
           }
 
           List<PsiClass> result = StrategiesManager.from(module).getClassesListValue(isInTest, configKey);
-          List<PsiClass> imports = InfraImportsManager.getInstance(module).getClasses(isInTest, this.importKey);
+          List<PsiClass> imports = InfraImportsManager.from(module).getClasses(isInTest, this.importKey);
           return ContainerUtil.concat(result, imports);
         }
       }

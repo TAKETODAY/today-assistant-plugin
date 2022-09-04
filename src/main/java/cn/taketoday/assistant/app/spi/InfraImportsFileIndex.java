@@ -34,7 +34,7 @@ import com.intellij.psi.search.PackageScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.spi.psi.SPIClassProviderReferenceElement;
 import com.intellij.spi.psi.SPIFile;
-import com.intellij.util.CommonProcessors;
+import com.intellij.util.CommonProcessors.CollectUniquesProcessor;
 import com.intellij.util.PairProcessor;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.DefaultFileTypeSpecificInputFilter;
@@ -52,36 +52,33 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import cn.taketoday.lang.Nullable;
 import kotlin.collections.CollectionsKt;
-import kotlin.jvm.internal.Intrinsics;
 import kotlin.text.StringsKt;
 
 public final class InfraImportsFileIndex extends FileBasedIndexExtension<String, List<? extends String>> {
   private static final ID<String, List<String>> NAME = ID.create("infrastructure.importsFileIndex");
 
   public static List<PsiClass> getClasses(Project project, GlobalSearchScope scope, String key) {
-    GlobalSearchScope resolveScope;
     GlobalSearchScope adjustedScope = adjustScope(project, scope);
     if (adjustedScope != null) {
       HashMap<VirtualFile, List<String>> vfToValues = new HashMap<>();
-      FileBasedIndex.getInstance().processValues(NAME, key, null, new FileBasedIndex.ValueProcessor<>() {
-        public boolean process(VirtualFile file, List<String> list) {
-          vfToValues.put(file, list);
-          return true;
-        }
+      FileBasedIndex.getInstance().processValues(NAME, key, null, (file, list) -> {
+        vfToValues.put(file, list);
+        return true;
       }, adjustedScope);
       PsiManager psiManager = PsiManager.getInstance(project);
       JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(project);
       ArrayList<PsiClass> ret = new ArrayList<>();
+
       for (Map.Entry<VirtualFile, List<String>> valueKey : vfToValues.entrySet()) {
         VirtualFile key2 = valueKey.getKey();
         List<String> value = valueKey.getValue();
         PsiFile findFile = psiManager.findFile(key2);
-        if (findFile == null || (resolveScope = findFile.getResolveScope()) == null) {
-        }
-        else {
+        if (findFile != null) {
+          GlobalSearchScope resolveScope = findFile.getResolveScope();
           for (String fqn : value) {
             PsiClass findClass = javaPsiFacade.findClass(fqn, resolveScope);
             if (findClass != null) {
@@ -95,32 +92,30 @@ public final class InfraImportsFileIndex extends FileBasedIndexExtension<String,
     return CollectionsKt.emptyList();
   }
 
-  public static boolean processValues(Project project, GlobalSearchScope scope, @Nullable String valueHint, PairProcessor<PsiElement, PsiClass> pairProcessor) {
-    PsiClass findClass;
+  public static boolean processValues(Project project, GlobalSearchScope scope,
+          @Nullable String valueHint, PairProcessor<PsiElement, PsiClass> pairProcessor) {
+
     GlobalSearchScope adjustedScope = adjustScope(project, scope);
     if (adjustedScope != null) {
-      var collectUniquesProcessor = new CommonProcessors.CollectUniquesProcessor<String>();
-      FileBasedIndex.getInstance().processAllKeys(NAME, collectUniquesProcessor, adjustedScope, null);
+      var collector = new CollectUniquesProcessor<String>();
+      FileBasedIndex.getInstance().processAllKeys(NAME, collector, adjustedScope, null);
+
       PsiManager psiManager = PsiManager.getInstance(project);
       JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(project);
       List<String> valueHintValueList = Collections.singletonList(valueHint);
-      for (String key : collectUniquesProcessor.getResults()) {
-        HashMap<VirtualFile, List<String>> vfToValues = new HashMap<>();
-        FileBasedIndex.getInstance().processValues(NAME, key, null, new FileBasedIndex.ValueProcessor<>() {
-          public boolean process(VirtualFile file, List<String> list) {
-            if (valueHint == null) {
-              vfToValues.put(file, list);
-              return true;
-            }
-            else if (list.contains(valueHint)) {
-              vfToValues.put(file, valueHintValueList);
-              return true;
-            }
-            else {
-              return true;
-            }
+      for (String key : collector.getResults()) {
+        var vfToValues = new HashMap<VirtualFile, List<String>>();
+
+        FileBasedIndex.getInstance().processValues(NAME, key, null, (VirtualFile file, List<String> list) -> {
+          if (valueHint == null) {
+            vfToValues.put(file, list);
           }
+          else if (list.contains(valueHint)) {
+            vfToValues.put(file, valueHintValueList);
+          }
+          return true;
         }, adjustedScope);
+
         for (Map.Entry<VirtualFile, List<String>> entry : vfToValues.entrySet()) {
           PsiElement findFile = psiManager.findFile(entry.getKey());
           if (findFile != null) {
@@ -128,7 +123,9 @@ public final class InfraImportsFileIndex extends FileBasedIndexExtension<String,
             var values = PsiTreeUtil.findChildrenOfType(findFile, SPIClassProviderReferenceElement.class);
             for (SPIClassProviderReferenceElement value : values) {
               String fqn = value.getText();
-              if (Intrinsics.areEqual(fqn, valueHint) && (findClass = javaPsiFacade.findClass(fqn, resolveScope)) != null) {
+              PsiClass findClass;
+              if (Objects.equals(fqn, valueHint)
+                      && (findClass = javaPsiFacade.findClass(fqn, resolveScope)) != null) {
                 if (!pairProcessor.process(value, findClass)) {
                   return false;
                 }
@@ -149,7 +146,7 @@ public final class InfraImportsFileIndex extends FileBasedIndexExtension<String,
       GlobalSearchScope packageScope = PackageScope.packageScope(metaInfPackage, false);
       return scope.intersectWith(packageScope);
     }
-    return null;
+    return scope;
   }
 
   public ID getName() {

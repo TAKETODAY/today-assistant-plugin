@@ -46,7 +46,7 @@ public class AutoConfigClassCollector {
     if (module.isDisposed()) {
       return Collections.emptyList();
     }
-    List<PsiClass> allAutoConfigurationClasses = InfraImportsManager.getInstance(module).getAutoConfigurationClasses(false);
+    List<PsiClass> allAutoConfigurationClasses = InfraImportsManager.from(module).getAutoConfigurationClasses(false);
     List<PsiClass> excludedViaAnnotation = enableAutoConfiguration == null ? Collections.emptyList() : enableAutoConfiguration.getExcludes();
     allAutoConfigurationClasses.removeAll(excludedViaAnnotation);
     excludeByConfigProperty(context, allAutoConfigurationClasses);
@@ -79,7 +79,7 @@ public class AutoConfigClassCollector {
     }
     List<PsiClass> classes = importAutoConfiguration.getClasses();
     if (classes.isEmpty() && (fqn = importAutoConfiguration.getSourceFqn()) != null) {
-      classes = InfraImportsManager.getInstance(module).getClasses(false, fqn);
+      classes = InfraImportsManager.from(module).getClasses(false, fqn);
     }
     List<PsiClass> excludedViaAnnotation = importAutoConfiguration.getExcludes();
     classes.removeAll(excludedViaAnnotation);

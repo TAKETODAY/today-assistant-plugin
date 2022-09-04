@@ -69,7 +69,7 @@ public final class InfraImportsFileType extends LanguageFileType implements File
   }
 
   public Icon getIcon() {
-    IconService springSpiIconService = IconService.getInstance();
+    IconService springSpiIconService = IconService.of();
     return springSpiIconService.getFileIcon();
   }
 

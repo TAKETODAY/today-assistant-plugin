@@ -32,7 +32,7 @@ import cn.taketoday.lang.Nullable;
 
 public abstract class InfraImportsManager {
 
-  public static InfraImportsManager getInstance(Module module) {
+  public static InfraImportsManager from(Module module) {
     return module.getService(InfraImportsManager.class);
   }
 
@@ -53,7 +53,8 @@ public abstract class InfraImportsManager {
    * @param valueHint Only process properties containing given text (class FQN) as value or `null` to process all properties.
    * @return Processing result.
    */
-  public abstract boolean processValues(boolean includeTests, @Nullable String valueHint, PairProcessor<PsiElement, PsiClass> processor);
+  public abstract boolean processValues(boolean includeTests,
+          @Nullable String valueHint, PairProcessor<PsiElement, PsiClass> processor);
 
   public abstract List<PsiClass> getAutoConfigurationClasses(boolean includeTests);
 

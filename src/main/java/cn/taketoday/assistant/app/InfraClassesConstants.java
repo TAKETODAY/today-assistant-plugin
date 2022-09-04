@@ -22,15 +22,14 @@ package cn.taketoday.assistant.app;
 
 public interface InfraClassesConstants {
   String APPLICATION = "cn.taketoday.framework.Application";
-  String APPLICATION_BUILDER = "cn.taketoday.framework.ApplicationBuilder";
+  String APPLICATION_BUILDER = "cn.taketoday.framework.builder.ApplicationBuilder";
   String APPLICATION_ARGUMENTS = "cn.taketoday.framework.ApplicationArguments";
   String CONFIGURATION_PROPERTIES = "cn.taketoday.context.properties.ConfigurationProperties";
   String NESTED_CONFIGURATION_PROPERTY = "cn.taketoday.context.properties.NestedConfigurationProperty";
   String ENABLE_CONFIGURATION_PROPERTIES = "cn.taketoday.context.properties.EnableConfigurationProperties";
   String CONFIGURATION_PROPERTIES_SCAN = "cn.taketoday.context.properties.ConfigurationPropertiesScan";
   String CONFIGURATION_METADATA_ANNOTATION_PROCESSOR = "cn.taketoday.framework.configurationprocessor.ConfigurationMetadataAnnotationProcessor";
-  String RANDOM_VALUE_PROPERTY_SOURCE = "cn.taketoday.framework.context.config.RandomValuePropertySource";
-  String RANDOM_VALUE_PROPERTY_SOURCE_SB2 = "cn.taketoday.framework.env.RandomValuePropertySource";
+  String RANDOM_VALUE_PROPERTY_SOURCE = "cn.taketoday.framework.env.RandomValuePropertySource";
   String DATA_SIZE_UNIT = "cn.taketoday.format.annotation.DataSizeUnit";
   String REMOTE_SPRING_APPLICATION = "cn.taketoday.framework.devtools.RemoteSpringApplication";
   String CONSTRUCTOR_BINDING = "cn.taketoday.context.properties.ConstructorBinding";

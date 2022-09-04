@@ -57,7 +57,7 @@ public class StrategiesManager {
   }
 
   public boolean processClassesListValues(boolean includeTests, @Nullable String valueHint, PairProcessor<IProperty, PsiClass> processor) {
-    return StrategiesFileIndex.processValues(this.myModule.getProject(), this.getScope(includeTests), valueHint, processor);
+    return StrategiesFileIndex.processValues(myModule.getProject(), getScope(includeTests), valueHint, processor);
   }
 
   private GlobalSearchScope getScope(boolean includeTests) {

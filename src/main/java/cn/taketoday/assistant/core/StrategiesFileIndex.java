@@ -62,7 +62,7 @@ import kotlin.jvm.internal.Intrinsics;
  */
 public class StrategiesFileIndex extends FileBasedIndexExtension<String, List<String>> {
 
-  private static final ID<String, List<String>> NAME = ID.create("today.StrategiesFileIndex");
+  private static final ID<String, List<String>> NAME = ID.create("infrastructure.StrategiesFileIndex");
 
   @Override
   public ID<String, List<String>> getName() {
@@ -191,7 +191,6 @@ public class StrategiesFileIndex extends FileBasedIndexExtension<String, List<St
         FileBasedIndex.getInstance().processValues(NAME, key, null,
                 (file, value) -> {
                   if (valueHint == null) {
-                    Intrinsics.checkNotNullExpressionValue(value, "value");
                     map.put(file, value);
                   }
                   else if (value.contains(valueHint)) {

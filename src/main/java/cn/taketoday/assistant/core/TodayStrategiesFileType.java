@@ -80,7 +80,7 @@ public class TodayStrategiesFileType extends LanguageFileType implements FileTyp
 
   @Override
   public Icon getIcon() {
-    return IconService.getInstance().getFileIcon();
+    return IconService.of().getFileIcon();
   }
 
   @Override

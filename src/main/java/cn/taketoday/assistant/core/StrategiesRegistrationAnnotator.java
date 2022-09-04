@@ -70,7 +70,7 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
   }
 
   public Icon getIcon() {
-    return IconService.getInstance().getFileIcon();
+    return IconService.of().getFileIcon();
   }
 
   public void collectNavigationMarkers(List<? extends PsiElement> elements, Collection<? super RelatedItemLineMarkerInfo<?>> result, boolean forNavigation) {
@@ -91,16 +91,20 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
       return;
     }
     PsiClass psiClass = UElementKt.getAsJavaPsiElement(uClass, PsiClass.class);
-    if (!InfraUtils.isBeanCandidateClass(psiClass) || (module = ModuleUtilCore.findModuleForPsiElement(psiClass)) == null) {
+    if (!InfraUtils.isBeanCandidateClass(psiClass)
+            || (module = ModuleUtilCore.findModuleForPsiElement(psiClass)) == null) {
       return;
     }
     PsiManager psiManager = PsiManager.getInstance(module.getProject());
-    PairProcessor<IProperty, PsiClass> findFirstProcessor = (property, aClass) -> !psiManager.areElementsEquivalent(psiClass, aClass);
+    PairProcessor<IProperty, PsiClass> findFirstProcessor = (property, aClass)
+            -> !psiManager.areElementsEquivalent(psiClass, aClass);
+
     String clazzName = uClass.getQualifiedName();
-    boolean foundEntry = StrategiesManager.from(module).processClassesListValues(false, clazzName, findFirstProcessor);
+    boolean foundEntry = StrategiesManager.from(module)
+            .processClassesListValues(false, clazzName, findFirstProcessor);
     if (!foundEntry) {
-      var builder = GutterIconBuilder.create(IconService.getInstance().getGutterIcon(), PROPERTY_CONVERTER, PROPERTY_RELATED_CONVERTER);
-      builder.setTargets((IProperty) NotNullLazyValue.lazy(() -> {
+      var builder = GutterIconBuilder.create(IconService.of().getGutterIcon(), PROPERTY_CONVERTER, PROPERTY_RELATED_CONVERTER);
+      builder.setTargets(NotNullLazyValue.lazy(() -> {
                 SmartList<IProperty> smartList = new SmartList<>();
                 PairProcessor<IProperty, PsiClass> processor = (property2, aClass2) -> {
                   if (psiManager.areElementsEquivalent(psiClass, aClass2)) {
@@ -111,7 +115,8 @@ public final class StrategiesRegistrationAnnotator extends RelatedItemLineMarker
                 };
                 StrategiesManager.from(module).processClassesListValues(false, clazzName, processor);
                 return smartList;
-              })).setPopupTitle(InfraBundle.message("StrategiesRegistrationAnnotator.choose.registration"))
+              }))
+              .setPopupTitle(InfraBundle.message("StrategiesRegistrationAnnotator.choose.registration"))
               .setTooltipText(InfraBundle.message("StrategiesRegistrationAnnotator.tooltip"));
       result.add(builder.createRelatedMergeableLineMarkerInfo(nameIdentifier));
     }

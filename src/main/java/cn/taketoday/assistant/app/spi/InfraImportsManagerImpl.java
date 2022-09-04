@@ -41,15 +41,14 @@ public final class InfraImportsManagerImpl extends InfraImportsManager {
   }
 
   @Override
-
   public List<PsiClass> getClasses(boolean includeTests, String key) {
-    Project project = this.module.getProject();
+    Project project = module.getProject();
     return InfraImportsFileIndex.getClasses(project, getScope(includeTests), key);
   }
 
   @Override
   public boolean processValues(boolean includeTests, @Nullable String valueHint, PairProcessor<PsiElement, PsiClass> pairProcessor) {
-    Project project = this.module.getProject();
+    Project project = module.getProject();
     return InfraImportsFileIndex.processValues(project, getScope(includeTests), valueHint, pairProcessor);
   }
 
@@ -60,14 +59,13 @@ public final class InfraImportsManagerImpl extends InfraImportsManager {
 
   @Override
   public List<PsiClass> getAutoConfigurationClasses(GlobalSearchScope scope) {
-    List<PsiClass> result = StrategiesManager.from(this.module)
-            .getClassesListValue(InfraConfigConstant.ENABLE_AUTO_CONFIGURATION, scope);
-    Project project = this.module.getProject();
+    List<PsiClass> result = StrategiesManager.from(module).getClassesListValue(InfraConfigConstant.ENABLE_AUTO_CONFIGURATION, scope);
+    Project project = module.getProject();
     result.addAll(InfraImportsFileIndex.getClasses(project, scope, InfraConfigConstant.AUTO_CONFIGURATION));
     return result;
   }
 
   private GlobalSearchScope getScope(boolean includeTests) {
-    return GlobalSearchScope.moduleRuntimeScope(this.module, includeTests);
+    return GlobalSearchScope.moduleRuntimeScope(module, includeTests);
   }
 }

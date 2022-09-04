@@ -42,7 +42,7 @@ public class IconService {
   private static final NotNullLazyValue<Icon> GUTTER_ICON = NotNullLazyValue.lazy(() ->
           new LayeredIcon(Icons.Gutter.Today, AllIcons.Actions.New));
 
-  public static IconService getInstance() {
+  public static IconService of() {
     return ApplicationManager.getApplication().getService(IconService.class);
   }
 

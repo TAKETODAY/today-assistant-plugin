@@ -37,11 +37,11 @@ public class InfraApplicationConfigFileNameContributor extends InfraModelConfigF
 
   InfraApplicationConfigFileNameContributor() {
     super(new InfraModelConfigFileNameContributor.CustomSettingDescriptor(CONFIG_NAME_CUSTOM_SETTING_ID,
-                    message("boot.config.files.name.setting", CONFIG_FILE_KEY), CONFIG_NAME_DEFAULT),
+                    message("app.config.files.name.setting", CONFIG_FILE_KEY), CONFIG_NAME_DEFAULT),
             new InfraModelConfigFileNameContributor.CustomSettingDescriptor(CONFIG_CUSTOM_FILES_ID,
-                    message("boot.custom.config.files.locations"), ""),
+                    message("app.custom.config.files.locations"), ""),
             new InfraModelConfigFileNameContributor.CustomizationPresentation(CONFIG_FILE_KEY,
-                    message("boot.config.files.section.title")), Icons.TodayApp);
+                    message("app.config.files.section.title")), Icons.TodayApp);
   }
 
   public boolean accept(InfraFileSet fileSet) {

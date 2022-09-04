@@ -25,7 +25,7 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.navigation.GotoRelatedItem;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.util.NotNullLazyValue;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
@@ -40,7 +40,7 @@ import org.jetbrains.uast.UastContextKt;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Set;
 
 import javax.swing.Icon;
 
@@ -52,6 +52,7 @@ import cn.taketoday.lang.NonNull;
 import kotlin.collections.SetsKt;
 
 import static cn.taketoday.assistant.InfraAppBundle.message;
+import static com.intellij.openapi.util.NotNullLazyValue.lazy;
 
 public final class InfraImportsRegistrationLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
@@ -59,7 +60,7 @@ public final class InfraImportsRegistrationLineMarkerProvider extends RelatedIte
     @NonNull
     @Override
     public Collection<PsiElement> fun(PsiElement dom) {
-      return SetsKt.setOf(dom);
+      return Set.of(dom);
     }
   };
 
@@ -72,32 +73,39 @@ public final class InfraImportsRegistrationLineMarkerProvider extends RelatedIte
             }
           };
 
+  @Override
   public String getId() {
     return "InfraImportsRegistrationLineMarkerProvider";
   }
 
+  @Override
   public String getName() {
     return message("infra.imports.registration");
   }
 
+  @Override
   public Icon getIcon() {
-    IconService springSpiIconService = IconService.getInstance();
-    return springSpiIconService.getFileIcon();
+    IconService spiIconService = IconService.of();
+    return spiIconService.getFileIcon();
   }
 
+  @Override
   public void collectNavigationMarkers(List<? extends PsiElement> list, Collection<? super RelatedItemLineMarkerInfo<?>> collection, boolean forNavigation) {
     PsiElement psiElement = ContainerUtil.getFirstItem(list);
-    if (psiElement == null || !InfraLibraryUtil.hasFrameworkLibrary(psiElement.getProject())) {
-      return;
+    if (psiElement != null) {
+      Project project = psiElement.getProject();
+      if (InfraLibraryUtil.hasLibrary(project)
+              && InfraLibraryUtil.hasFrameworkLibrary(project)) {
+        super.collectNavigationMarkers(list, collection, forNavigation);
+      }
     }
-    super.collectNavigationMarkers(list, collection, forNavigation);
   }
 
+  @Override
   protected void collectNavigationMarkers(PsiElement element, Collection<? super RelatedItemLineMarkerInfo<?>> collection) {
     UClass uElement;
     PsiElement nameIdentifier;
-    if (!InfraLibraryUtil.hasLibrary(element.getProject())
-            || (uElement = UastContextKt.toUElement(element, UClass.class)) == null
+    if ((uElement = UastContextKt.toUElement(element, UClass.class)) == null
             || (nameIdentifier = UElementKt.getSourcePsiElement(uElement.getUastAnchor())) == null) {
       return;
     }
@@ -118,33 +126,30 @@ public final class InfraImportsRegistrationLineMarkerProvider extends RelatedIte
     };
 
     String clazzName = uElement.getQualifiedName();
-    boolean foundEntry = InfraImportsManager.getInstance(module).processValues(false, clazzName, findFirstProcessor);
-    if (!foundEntry) {
-      IconService iconService = IconService.getInstance();
-      var builder = GutterIconBuilder.create(
-              iconService.getGutterIcon(), CONVERTER, RELATED_ITEM_PROVIDER);
-      builder.setTargets(NotNullLazyValue.lazy(
-                      (Supplier<Collection<PsiElement>>) () -> {
-                        var mappedConfigKeys = new SmartList<PsiElement>();
-
-                        var processor = new PairProcessor<PsiElement, PsiClass>() {
-                          public boolean process(PsiElement psiElement1, PsiClass aClass) {
-                            if (psiManager.areElementsEquivalent(psiElement1, aClass)) {
-                              mappedConfigKeys.add(psiElement1);
-                              return true;
-                            }
-                            return true;
-                          }
-                        };
-                        InfraImportsManager.getInstance(module).processValues(false, clazzName, processor);
-                        return mappedConfigKeys;
-                      }
-
-              ))
-              .setPopupTitle(message("infra.imports.registration.title"))
-              .setTooltipText(message("infra.imports.registration.tooltip"));
-
-      collection.add(builder.createRelatedMergeableLineMarkerInfo(nameIdentifier));
+    boolean foundEntry = InfraImportsManager.from(module)
+            .processValues(false, clazzName, findFirstProcessor);
+    if (foundEntry) {
+      return;
     }
+
+    IconService iconService = IconService.of();
+    var builder = GutterIconBuilder.create(
+            iconService.getGutterIcon(), CONVERTER, RELATED_ITEM_PROVIDER);
+    builder.setTargets(lazy(() -> {
+                      var mappedConfigKeys = new SmartList<PsiElement>();
+                      PairProcessor<PsiElement, PsiClass> processor = (ele, psiClass) -> {
+                        if (psiManager.areElementsEquivalent(psiElement, psiClass)) {
+                          mappedConfigKeys.add(ele);
+                        }
+                        return true;
+                      };
+                      InfraImportsManager.from(module).processValues(false, clazzName, processor);
+                      return mappedConfigKeys;
+                    }
+            ))
+            .setPopupTitle(message("infra.imports.registration.title"))
+            .setTooltipText(message("infra.imports.registration.tooltip"));
+
+    collection.add(builder.createRelatedMergeableLineMarkerInfo(nameIdentifier));
   }
 }

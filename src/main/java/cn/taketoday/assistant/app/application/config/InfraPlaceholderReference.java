@@ -135,7 +135,7 @@ public class InfraPlaceholderReference extends PsiReferenceBase.Poly<PsiElement>
   }
 
   private String getRandomClassName() {
-    return InfraClassesConstants.RANDOM_VALUE_PROPERTY_SOURCE_SB2;
+    return InfraClassesConstants.RANDOM_VALUE_PROPERTY_SOURCE;
   }
 
   private Module getModule() {

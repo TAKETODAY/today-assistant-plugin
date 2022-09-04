@@ -45,7 +45,7 @@ public class InfraAutoConfigureConfigSearcherScopeModifier extends ConfigSearche
     if (!InfraLibraryUtil.hasFrameworkLibrary(module)) {
       return originalScope;
     }
-    List<PsiClass> autoConfigs = InfraImportsManager.getInstance(module).getAutoConfigurationClasses(true);
+    List<PsiClass> autoConfigs = InfraImportsManager.from(module).getAutoConfigurationClasses(true);
     if (autoConfigs.isEmpty()) {
       return originalScope;
     }
