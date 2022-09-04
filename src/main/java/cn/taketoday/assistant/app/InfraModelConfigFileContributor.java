@@ -80,6 +80,10 @@ public abstract class InfraModelConfigFileContributor {
     this.fileType = fileType;
   }
 
+  public static InfraModelConfigFileContributor[] array() {
+    return EP_NAME.getExtensions();
+  }
+
   public FileType getFileType() {
     return fileType;
   }

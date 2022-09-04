@@ -33,6 +33,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileMoveEvent;
 import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import com.intellij.openapi.vfs.impl.BulkVirtualFileListenerAdapter;
+import com.intellij.util.SmartList;
 import com.intellij.util.messages.MessageBusConnection;
 
 import java.util.ArrayList;
@@ -43,9 +44,9 @@ import cn.taketoday.assistant.app.application.metadata.InfraMetadataConstant;
 import kotlin.jvm.internal.Intrinsics;
 
 @Service({ Service.Level.PROJECT })
-public final class InfraBootConfigFileModificationTracker extends SimpleModificationTracker implements Disposable {
+public final class InfraConfigFileModificationTracker extends SimpleModificationTracker implements Disposable {
 
-  public InfraBootConfigFileModificationTracker(Project project) {
+  public InfraConfigFileModificationTracker(Project project) {
     MessageBusConnection connection = project.getMessageBus().connect(this);
 
     connection.subscribe(
@@ -60,14 +61,13 @@ public final class InfraBootConfigFileModificationTracker extends SimpleModifica
   private static final class MyVirtualFileListener implements VirtualFileListener {
     private final List<FileType> fileTypes;
     private final ProjectFileIndex fileIndex;
-    final InfraBootConfigFileModificationTracker tracker;
+    final InfraConfigFileModificationTracker tracker;
 
-    public MyVirtualFileListener(InfraBootConfigFileModificationTracker tracker, Project project) {
+    public MyVirtualFileListener(InfraConfigFileModificationTracker tracker, Project project) {
       this.tracker = tracker;
       this.fileIndex = ProjectFileIndex.getInstance(project);
-      var extensionList = InfraModelConfigFileContributor.EP_NAME.getExtensionList();
-      ArrayList<FileType> fileTypes = new ArrayList<>(Math.max(extensionList.size(), 10));
-      for (InfraModelConfigFileContributor it : extensionList) {
+      SmartList<FileType> fileTypes = new SmartList<>();
+      for (InfraModelConfigFileContributor it : InfraModelConfigFileContributor.array()) {
         fileTypes.add(it.getFileType());
       }
       this.fileTypes = fileTypes;

@@ -30,7 +30,7 @@ import cn.taketoday.assistant.facet.beans.CustomSetting;
 import static cn.taketoday.assistant.InfraBundle.message;
 
 public class InfraApplicationConfigFileNameContributor extends InfraModelConfigFileNameContributor {
-  public static final Key<CustomSetting.STRING> CONFIG_NAME_CUSTOM_SETTING_ID = Key.create("infra_app_infra__config_name");
+  public static final Key<CustomSetting.STRING> CONFIG_NAME_CUSTOM_SETTING_ID = Key.create("infra_app_infra_config_name");
   public static final Key<CustomSetting.STRING> CONFIG_CUSTOM_FILES_ID = Key.create("infra_app_infra_config_custom_files");
   private static final String CONFIG_NAME_DEFAULT = "application";
   private static final String CONFIG_FILE_KEY = "app.config.name";
@@ -42,7 +42,7 @@ public class InfraApplicationConfigFileNameContributor extends InfraModelConfigF
   }
 
   public boolean accept(InfraFileSet fileSet) {
-    return fileSet.isAutodetected() && fileSet.getId().startsWith("infra_app_");
+    return fileSet.isAutodetected() && fileSet.getId().startsWith("today_infrastructure_");
   }
 
   public boolean accept(Module module) {

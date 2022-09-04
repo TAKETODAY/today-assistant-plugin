@@ -284,7 +284,7 @@ class InfraCustomizationDialog extends DialogWrapper {
       return results;
     }
     GlobalSearchScope searchScope = GlobalSearchScopesCore.directoriesScope(this.myModule.getProject(), false, directories.toArray(VirtualFile.EMPTY_ARRAY));
-    for (InfraModelConfigFileContributor contributor2 : InfraModelConfigFileContributor.EP_NAME.getExtensions()) {
+    for (InfraModelConfigFileContributor contributor2 : InfraModelConfigFileContributor.array()) {
       FileType fileType = contributor2.getFileType();
       Collection<VirtualFile> allFiles = FileTypeIndex.getFiles(fileType, searchScope);
       for (VirtualFile file : allFiles) {
@@ -300,7 +300,7 @@ class InfraCustomizationDialog extends DialogWrapper {
   }
 
   private void addCustomFiles() {
-    Set<FileType> configFileFiletypes = ContainerUtil.map2Set(InfraModelConfigFileContributor.EP_NAME.getExtensions(), InfraModelConfigFileContributor::getFileType);
+    Set<FileType> configFileFiletypes = ContainerUtil.map2Set(InfraModelConfigFileContributor.array(), InfraModelConfigFileContributor::getFileType);
     List<VirtualFile> configFiles = InfraConfigurationFileService.of().findConfigFiles(this.myModule, false, contributor2 -> {
       return !contributor2.equals(this.myFileNameContributor) && contributor2.accept(this.myModule);
     });
@@ -355,7 +355,7 @@ class InfraCustomizationDialog extends DialogWrapper {
     String defaultConfigName = getConfigFileNameSetting().getDefaultValue();
     this.foundConfigFilesByName = false;
     SmartList<ConfigFileSearcher> smartList = new SmartList<>();
-    for (InfraModelConfigFileContributor contributor : InfraModelConfigFileContributor.EP_NAME.getExtensions()) {
+    for (InfraModelConfigFileContributor contributor : InfraModelConfigFileContributor.array()) {
       ConfigFileSearcher searcher = new ConfigFileSearcher(this.myModule, this.myModule.getProject()) {
 
         public Set<PsiFile> search(@Nullable Module module, Project project) {

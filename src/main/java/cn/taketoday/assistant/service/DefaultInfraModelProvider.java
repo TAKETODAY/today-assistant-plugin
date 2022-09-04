@@ -97,11 +97,12 @@ public class DefaultInfraModelProvider implements InfraModelProvider {
   }
 
   private static InfraAutodetectedFileSet getApplicationFileSet(PsiClass applicationClass, InfraFacet facet) {
-
     InfraApplicationFileSet fileSet = new InfraApplicationFileSet(applicationClass, facet);
-    List<VirtualFile> configFiles = InfraConfigurationFileService.of().findConfigFiles(facet.getModule(), false, (contributor) -> {
-      return contributor.accept(fileSet);
-    });
+
+    List<VirtualFile> configFiles = InfraConfigurationFileService.of()
+            .findConfigFiles(facet.getModule(), false, contributor -> {
+              return contributor.accept(fileSet);
+            });
 
     for (VirtualFile configFile : configFiles) {
       fileSet.addFile(configFile);

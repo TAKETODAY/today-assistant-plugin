@@ -77,9 +77,9 @@ public abstract class InfraModelConfigFileNameContributor {
     return myFileIcon;
   }
 
-  public abstract boolean accept(InfraFileSet var1);
+  public abstract boolean accept(InfraFileSet fileSet);
 
-  public abstract boolean accept(Module var1);
+  public abstract boolean accept(Module module);
 
   public String getInfraConfigName(Module module) {
     InfraFacet facet = getRelevantFacet(module);

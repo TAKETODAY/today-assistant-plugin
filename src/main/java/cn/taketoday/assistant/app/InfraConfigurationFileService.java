@@ -61,7 +61,7 @@ import cn.taketoday.assistant.app.application.metadata.InfraApplicationMetaConfi
 import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.model.config.ConfigurationValueResult;
 import cn.taketoday.assistant.model.config.ConfigurationValueSearchParams;
-import cn.taketoday.assistant.model.config.InfraBootConfigFileModificationTracker;
+import cn.taketoday.assistant.model.config.InfraConfigFileModificationTracker;
 import cn.taketoday.assistant.model.config.InfraConfigFileDetector;
 import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
@@ -127,7 +127,7 @@ public class InfraConfigurationFileService {
 
   public List<VirtualFile> findConfigFiles(Module module, boolean includeTestScope, Condition<? super InfraModelConfigFileNameContributor> filter) {
 
-    List<VirtualFile> result = new SmartList<>();
+    SmartList<VirtualFile> result = new SmartList<>();
     InfraModelConfigFileNameContributor[] extensions = InfraModelConfigFileNameContributor.EP_NAME.getExtensions();
     for (InfraModelConfigFileNameContributor fileNameContributor : extensions) {
       if (filter.value(fileNameContributor)) {
@@ -145,17 +145,17 @@ public class InfraConfigurationFileService {
   }
 
   private static List<VirtualFile> findConfigFiles(Module module, boolean includeTestScope, InfraModelConfigFileNameContributor fileNameContributor) {
-    return (CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
+    return CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
       Map<Pair<InfraModelConfigFileNameContributor, Boolean>, List<VirtualFile>> map = FactoryMap.create((key) -> {
         return doFindConfigFile(module, key.second, key.first);
       });
       return Result.create(map, getConfigFilesDependencies(module));
-    })).get(Pair.create(fileNameContributor, includeTestScope));
+    }).get(Pair.create(fileNameContributor, includeTestScope));
   }
 
   private static List<Object> getConfigFilesDependencies(Module module) {
     List<Object> dependencies = ContainerUtil.newArrayList(
-            module.getProject().getService(InfraBootConfigFileModificationTracker.class),
+            module.getProject().getService(InfraConfigFileModificationTracker.class),
             FacetFinder.getInstance(module.getProject()).getAllFacetsOfTypeModificationTracker(InfraFacet.FACET_TYPE_ID),
             ProjectRootManager.getInstance(module.getProject())
     );
@@ -170,16 +170,15 @@ public class InfraConfigurationFileService {
   private static List<VirtualFile> doFindConfigFile(Module module, boolean includeTestScope, InfraModelConfigFileNameContributor fileNameContributor) {
 
     List<VirtualFile> result = new SmartList<>();
-    List<FileType> fileTypes = ContainerUtil.map(InfraModelConfigFileContributor.EP_NAME.getExtensions(),
-            InfraModelConfigFileContributor::getFileType);
-    String springConfigName = fileNameContributor.getInfraConfigName(module);
+    List<FileType> fileTypes = ContainerUtil.map(InfraModelConfigFileContributor.array(), InfraModelConfigFileContributor::getFileType);
+    String configName = fileNameContributor.getInfraConfigName(module);
     List<VirtualFile> profileConfigFiles = new SmartList<>();
     List<VirtualFile> baseNameConfigFiles = new SmartList<>();
     List<VirtualFile> directories = InfraModelConfigFileContributor.getConfigFileDirectories(module, includeTestScope);
 
     for (VirtualFile directory : directories) {
       for (FileType fileType : fileTypes) {
-        Pair<List<VirtualFile>, List<VirtualFile>> allConfigs = InfraModelConfigFileContributor.findConfigFiles(module, directory, fileType, springConfigName);
+        Pair<List<VirtualFile>, List<VirtualFile>> allConfigs = InfraModelConfigFileContributor.findConfigFiles(module, directory, fileType, configName);
         profileConfigFiles.addAll(allConfigs.first);
         baseNameConfigFiles.addAll(allConfigs.second);
       }
@@ -228,14 +227,14 @@ public class InfraConfigurationFileService {
         MetaConfigKey configImportKey = getInfraConfigImportKey(module);
         List<InfraConfigImport> imports = configImportKey == null ? Collections.emptyList() : doGetImports(module, psiFile, contributor, configImportKey);
         if (!imports.isEmpty()) {
-          List<FileType> fileTypes = ContainerUtil.map(InfraModelConfigFileContributor.EP_NAME.getExtensions(),
+          List<FileType> fileTypes = ContainerUtil.map(InfraModelConfigFileContributor.array(),
                   InfraModelConfigFileContributor::getFileType);
           imports = ContainerUtil.filter(imports, (configImport) -> {
             return fileTypes.contains(configImport.getVirtualFile().getFileType());
           });
         }
 
-        return Result.create(imports, psiFile, module.getProject().getService(InfraBootConfigFileModificationTracker.class), ProjectRootManager.getInstance(module.getProject()));
+        return Result.create(imports, psiFile, module.getProject().getService(InfraConfigFileModificationTracker.class), ProjectRootManager.getInstance(module.getProject()));
       });
     }
   }
