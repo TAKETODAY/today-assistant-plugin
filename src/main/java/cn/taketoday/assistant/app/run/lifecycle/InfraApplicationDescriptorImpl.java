@@ -48,16 +48,12 @@ class InfraApplicationDescriptorImpl implements InfraApplicationDescriptor {
   }
 
   @Override
-
   public String getExecutorId() {
-    String str = this.myExecutorId;
-    return str;
+    return this.myExecutorId;
   }
 
   @Override
-
   public Module getModule() {
-    Module module = this.myModule;
-    return module;
+    return this.myModule;
   }
 }

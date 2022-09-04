@@ -42,6 +42,10 @@ public interface Icons {
 
   Icon WebOverlay = load("icons/mvc/WebOverlay.svg", 349113568, 0);
 
+  Icon SpringBootEndpoint = load("icons/SpringBootEndpoint.svg", 1090109842, 0);
+
+  Icon SpringBootHealth = load("icons/SpringBootHealth.svg", 1173159626, 0);
+
   private static Icon load(String path) {
     return IconLoader.getIcon(path, Icons.class);
   }
@@ -59,6 +63,8 @@ public interface Icons {
 
   interface Gutter {
     Icon Today = load("icons/gutter/today.svg");
+
+    Icon LiveBean = load("icons/gutter/liveBean.svg", 1322096946, 2);
 
     /** 12x12 */
     Icon FactoryMethodBean = load("icons/gutter/factoryMethodBean.svg", 1828459504, 0);

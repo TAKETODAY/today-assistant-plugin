@@ -70,10 +70,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraManager;
 import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
-import cn.taketoday.assistant.app.run.InfraRunIcons;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManager;
 import cn.taketoday.assistant.app.run.lifecycle.beans.BeansEndpoint;
@@ -399,7 +399,7 @@ final class LiveBeansNavigationHandler implements GutterIconNavigationHandler<Ps
       return;
     }
     LiveBeansNavigationHandler navigationHandler = new LiveBeansNavigationHandler(smartList);
-    var createBuilder = GutterIconBuilder.CustomNavigationHandlerBuilder.createBuilder(InfraRunIcons.Gutter.LiveBean,
+    var createBuilder = GutterIconBuilder.CustomNavigationHandlerBuilder.createBuilder(Icons.Gutter.LiveBean,
             navigationHandler.getLiveMarkerInfoTooltipText(), navigationHandler, GOTO_RELATED_ITEMS_PROVIDER);
     createBuilder.setTargets(NotNullLazyValue.createConstantValue(smartList));
     result.add(createBuilder.createRelatedMergeableLineMarkerInfo(nameIdentifier));

@@ -49,7 +49,6 @@ import com.intellij.execution.target.java.JavaLanguageRuntimeConfiguration;
 import com.intellij.execution.target.java.JavaLanguageRuntimeType;
 import com.intellij.execution.util.JavaParametersUtil;
 import com.intellij.execution.util.ProgramParametersUtil;
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.SettingsEditorGroup;
@@ -73,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.app.InfraApplicationService;
 import cn.taketoday.assistant.app.run.editor.ApplicationRunConfigurationEditor;
 import cn.taketoday.assistant.app.run.editor.ApplicationRunConfigurationFragmentedEditor;
@@ -174,6 +174,7 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     }
   }
 
+  @Override
   public RunProfileState getState(Executor executor, ExecutionEnvironment environment) {
     InfraCommandLineState infraCommandLineState = new InfraCommandLineState(this, environment);
     JavaRunConfigurationModule module = getConfigurationModule();
@@ -181,6 +182,7 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     return infraCommandLineState;
   }
 
+  @Override
   public RefactoringElementListener getRefactoringElementListener(PsiElement element) {
     RefactoringElementListener listener = RefactoringListeners.getClassOrPackageListener(element, new RefactoringListeners.SingleClassConfigurationAccessor(this));
     if (listener != null) {
@@ -197,6 +199,7 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     return null;
   }
 
+  @Override
   public void setMainClass(PsiClass psiClass) {
     Module originalModule = getConfigurationModule().getModule();
     setMainClassName(JavaExecutionUtil.getRuntimeQualifiedName(psiClass));
@@ -207,7 +210,8 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
   @Override
   @Nullable
   public PsiClass getMainClass() {
-    return InfraApplicationService.of().findMainClassCandidate(getConfigurationModule().findClass(getInfraMainClass()));
+    return InfraApplicationService.of().findMainClassCandidate(
+            getConfigurationModule().findClass(getInfraMainClass()));
   }
 
   public void setMainClassName(String qualifiedName) {
@@ -225,10 +229,12 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     return null;
   }
 
+  @Override
   public void setWorkingDirectory(@Nullable String value) {
     getOptions().setWorkingDirectory(ExternalizablePath.urlValue(value));
   }
 
+  @Override
   public String getWorkingDirectory() {
     return ExternalizablePath.localPathValue(getOptions().getWorkingDirectory());
   }
@@ -331,29 +337,34 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     getOptions().setFrameDeactivationUpdatePolicy(updatePolicy == null ? null : updatePolicy.getId());
   }
 
+  @Override
   @Nullable
   public ShortenCommandLine getShortenCommandLine() {
     return getOptions().getShortenCommandLine();
   }
 
+  @Override
   public void setShortenCommandLine(@Nullable ShortenCommandLine mode) {
     getOptions().setShortenCommandLine(mode);
   }
 
+  @Override
   public void createAdditionalTabComponents(AdditionalTabComponentManager manager, ProcessHandler startedProcess) {
-    if (InfraApplicationLifecycleManager.from(getProject()).isLifecycleManagementEnabled(startedProcess) && (manager instanceof LogConsoleManagerBase)) {
+    if (InfraApplicationLifecycleManager.from(getProject()).isLifecycleManagementEnabled(startedProcess)
+            && manager instanceof LogConsoleManagerBase logConsoleMgr) {
       InfraApplicationRunConfiguration clone = (InfraApplicationRunConfiguration) clone();
       ApplicationEndpointsTab tab = new ApplicationEndpointsTab(clone, startedProcess);
-      Content content = ((LogConsoleManagerBase) manager).addAdditionalTabComponent(tab, message("infra.application.endpoints.tab.title"),
-              InfraRunIcons.SpringBootEndpoint, false);
+      Content content = logConsoleMgr.addAdditionalTabComponent(
+              tab, message("infra.application.endpoints.tab.title"), Icons.SpringBootEndpoint, false);
       ContentManager contentManager = content.getManager();
       if (contentManager == null) {
         return;
       }
       ContentManagerListener listener = new ContentManagerListener() {
-
+        @Override
         public void selectionChanged(ContentManagerEvent event) {
-          if (event.getContent() == content && event.getOperation() == ContentManagerEvent.ContentOperation.add) {
+          if (event.getContent() == content && event.getOperation()
+                  == ContentManagerEvent.ContentOperation.add) {
             tab.setSelected();
           }
         }
@@ -363,20 +374,24 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     }
   }
 
+  @Override
   public boolean canRunOn(TargetEnvironmentConfiguration target) {
     return target.getRuntimes().findByType(JavaLanguageRuntimeConfiguration.class) != null;
   }
 
+  @Override
   @Nullable
   public LanguageRuntimeType<?> getDefaultLanguageRuntimeType() {
     return LanguageRuntimeType.EXTENSION_NAME.findExtension(JavaLanguageRuntimeType.class);
   }
 
+  @Override
   @Nullable
   public String getDefaultTargetName() {
     return getOptions().getRemoteTarget();
   }
 
+  @Override
   public void setDefaultTargetName(@Nullable String targetName) {
     getOptions().setRemoteTarget(targetName);
   }
@@ -392,6 +407,7 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
     return null;
   }
 
+  @Override
   public InfraApplicationRunConfigurationOptions getOptions() {
     return (InfraApplicationRunConfigurationOptions) super.getOptions();
   }
@@ -403,15 +419,16 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
       this.profile = profile;
     }
 
-    public void elementMoved(PsiElement newElement) {
-    }
+    @Override
+    public void elementMoved(PsiElement newElement) { }
 
+    @Override
     public void elementRenamed(PsiElement newElement) {
       String newName = getProfileName(newElement);
       if (StringUtil.isEmptyOrSpaces(newName)) {
         return;
       }
-      String profiles = InfraApplicationRunConfiguration.this.getActiveProfiles();
+      String profiles = getActiveProfiles();
       StringBuilder result = new StringBuilder();
       int i = 0;
       while (true) {

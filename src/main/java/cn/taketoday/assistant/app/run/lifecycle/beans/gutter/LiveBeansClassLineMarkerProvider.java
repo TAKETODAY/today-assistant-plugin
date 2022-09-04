@@ -43,9 +43,9 @@ import java.util.function.Predicate;
 
 import javax.swing.Icon;
 
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraAppBundle;
 import cn.taketoday.assistant.JavaClassInfo;
-import cn.taketoday.assistant.app.run.InfraRunIcons;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveBean;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveResource;
 import cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement;
@@ -68,7 +68,7 @@ final class LiveBeansClassLineMarkerProvider extends RelatedItemLineMarkerProvid
   }
 
   public Icon getIcon() {
-    return InfraRunIcons.Gutter.LiveBean;
+    return Icons.Gutter.LiveBean;
   }
 
   public void collectNavigationMarkers(List<? extends PsiElement> elements, Collection<? super RelatedItemLineMarkerInfo<?>> result, boolean forNavigation) {

@@ -33,7 +33,6 @@ import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraLibraryUtil;
 
 public final class InfraApplicationConfigurationType implements ConfigurationType {
-
   private static final String ID = "InfraApplicationConfigurationType";
 
   public static InfraApplicationConfigurationType of() {

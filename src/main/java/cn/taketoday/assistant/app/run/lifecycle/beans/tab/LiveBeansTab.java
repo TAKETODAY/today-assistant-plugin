@@ -128,7 +128,7 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
 
         public void setSelected(AnActionEvent e, boolean state) {
           mySettings.setDiagramMode(state);
-          InfraEndpointsTabSettings.getInstance(getProject()).fireSettingsChanged(BEANS_MODE);
+          InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_MODE);
         }
       });
       actions.add(Separator.getInstance());
@@ -143,7 +143,7 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
 
       public void setSelected(AnActionEvent e, boolean state) {
         mySettings.setShowLibraryBeans(state);
-        InfraEndpointsTabSettings.getInstance(getProject()).fireSettingsChanged(BEANS_CONTENT);
+        InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_CONTENT);
       }
     });
     actions.add(Separator.getInstance());
@@ -155,7 +155,7 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
 
       public void setSelected(AnActionEvent e, boolean state) {
         mySettings.setShowContexts(state);
-        InfraEndpointsTabSettings.getInstance(getProject()).fireSettingsChanged(BEANS_FULL);
+        InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_FULL);
       }
     });
     actions.add(new LiveBeansPanelToggleAction(InfraBundle.message("beans.view.show.configuration.files"), null, cn.taketoday.assistant.Icons.SpringConfig) {
@@ -166,7 +166,7 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
 
       public void setSelected(AnActionEvent e, boolean state) {
         mySettings.setShowFiles(state);
-        InfraEndpointsTabSettings.getInstance(getProject()).fireSettingsChanged(BEANS_FULL);
+        InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_FULL);
       }
     });
     actions.add(Separator.getInstance());
@@ -178,7 +178,7 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
 
       public void setSelected(AnActionEvent e, boolean state) {
         mySettings.setShowDoc(state);
-        InfraEndpointsTabSettings.getInstance(getProject()).fireSettingsChanged(BEANS_UPDATE_DETAILS);
+        InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_UPDATE_DETAILS);
       }
     });
     if (LiveBeansPanelContent.EP_NAME.getExtensions().length != 0) {
@@ -190,7 +190,7 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
 
         public void setSelected(AnActionEvent e, boolean state) {
           mySettings.setShowLiveBeansGraph(state);
-          InfraEndpointsTabSettings.getInstance(getProject()).fireSettingsChanged(BEANS_UPDATE_DETAILS);
+          InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_UPDATE_DETAILS);
         }
       });
     }

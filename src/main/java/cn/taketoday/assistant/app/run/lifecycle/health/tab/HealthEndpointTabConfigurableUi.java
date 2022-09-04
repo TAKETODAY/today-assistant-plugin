@@ -158,7 +158,7 @@ class HealthEndpointTabConfigurableUi implements ConfigurableUi<HealthEndpointTa
     settings.setCheckHealth(this.myHealthCheckEnabled.isSelected());
     settings.setHealthCheckDelay(getHealthCheckDelay());
     if (isModified) {
-      InfraEndpointsTabSettings endpointsTabSettings = InfraEndpointsTabSettings.getInstance(this.myProject);
+      InfraEndpointsTabSettings endpointsTabSettings = InfraEndpointsTabSettings.from(this.myProject);
       endpointsTabSettings.fireSettingsChanged("HEALTH_CHECK");
     }
   }

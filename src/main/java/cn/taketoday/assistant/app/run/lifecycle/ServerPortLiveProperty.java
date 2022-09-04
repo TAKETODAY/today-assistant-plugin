@@ -67,11 +67,10 @@ class ServerPortLiveProperty extends AsyncApplicationLiveProperty<Integer> {
           Thread.sleep(SERVER_PORT_RETRY_INTERVAL);
         }
         catch (InterruptedException e2) {
-          Integer num2 = DEFAULT_VALUE;
           if (connector != null) {
             connector.close();
           }
-          return num2;
+          return DEFAULT_VALUE;
         }
       }
       catch (Throwable th) {

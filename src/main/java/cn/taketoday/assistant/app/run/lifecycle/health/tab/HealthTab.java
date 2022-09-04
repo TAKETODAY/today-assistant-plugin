@@ -53,9 +53,9 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
+import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraAppBundle;
 import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
-import cn.taketoday.assistant.app.run.InfraRunIcons;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.LiveProperty;
@@ -126,7 +126,7 @@ public class HealthTab extends EndpointTab<Map> {
   @Override
 
   public Icon getIcon() {
-    Icon icon = InfraRunIcons.SpringBootHealth;
+    Icon icon = Icons.SpringBootHealth;
     return icon;
   }
 

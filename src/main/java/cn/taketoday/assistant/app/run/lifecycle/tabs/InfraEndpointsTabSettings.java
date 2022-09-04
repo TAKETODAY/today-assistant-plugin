@@ -27,7 +27,7 @@ import cn.taketoday.lang.Nullable;
 public interface InfraEndpointsTabSettings {
   Topic<Listener> TOPIC = new Topic<>("today-infrastructure Actuator tab settings", Listener.class);
 
-  static InfraEndpointsTabSettings getInstance(Project project) {
+  static InfraEndpointsTabSettings from(Project project) {
     return project.getService(InfraEndpointsTabSettings.class);
   }
 

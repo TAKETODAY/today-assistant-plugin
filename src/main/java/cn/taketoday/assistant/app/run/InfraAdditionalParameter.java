@@ -26,40 +26,40 @@ import java.util.Objects;
 
 @Tag("param")
 public class InfraAdditionalParameter {
-  private boolean myEnabled;
-  private String myName;
-  private String myValue;
+  private String name;
+  private String value;
+  private boolean enabled;
 
   public InfraAdditionalParameter() { }
 
   public InfraAdditionalParameter(boolean enabled, String name, String value) {
-    this.myEnabled = enabled;
-    this.myName = name;
-    this.myValue = value;
+    this.name = name;
+    this.value = value;
+    this.enabled = enabled;
   }
 
   public boolean isEnabled() {
-    return this.myEnabled;
+    return this.enabled;
   }
 
   public void setEnabled(boolean enabled) {
-    this.myEnabled = enabled;
+    this.enabled = enabled;
   }
 
   public String getName() {
-    return this.myName;
+    return this.name;
   }
 
   public void setName(String name) {
-    this.myName = name;
+    this.name = name;
   }
 
   public String getValue() {
-    return this.myValue;
+    return this.value;
   }
 
   public void setValue(String value) {
-    this.myValue = value;
+    this.value = value;
   }
 
   public boolean equals(Object obj) {
@@ -69,13 +69,13 @@ public class InfraAdditionalParameter {
     if (!(obj instanceof InfraAdditionalParameter second)) {
       return false;
     }
-    return this.myEnabled == second.myEnabled
-            && Objects.equals(this.myName, second.myName)
-            && Objects.equals(this.myValue, second.myValue);
+    return this.enabled == second.enabled
+            && Objects.equals(this.name, second.name)
+            && Objects.equals(this.value, second.value);
   }
 
   public int hashCode() {
-    int result = this.myEnabled ? 1 : 0;
-    return (31 * ((31 * result) + (this.myName != null ? this.myName.hashCode() : 0))) + (this.myValue != null ? this.myValue.hashCode() : 0);
+    int result = this.enabled ? 1 : 0;
+    return (31 * ((31 * result) + (this.name != null ? this.name.hashCode() : 0))) + (this.value != null ? this.value.hashCode() : 0);
   }
 }

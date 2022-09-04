@@ -127,7 +127,7 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
 
       public void setSelected(AnActionEvent e, boolean state) {
         RequestMappingsTab.this.mySettings.setShowLibraryMappings(state);
-        InfraEndpointsTabSettings.getInstance(RequestMappingsTab.this.getProject()).fireSettingsChanged(REQUEST_MAPPINGS);
+        InfraEndpointsTabSettings.from(RequestMappingsTab.this.getProject()).fireSettingsChanged(REQUEST_MAPPINGS);
       }
     });
     return actions;
@@ -231,7 +231,7 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
             else {
               RequestMappingsTab.this.mySettings.getFilteredRequestMethods().add(method);
             }
-            InfraEndpointsTabSettings.getInstance(RequestMappingsTab.this.getProject()).fireSettingsChanged(REQUEST_MAPPINGS);
+            InfraEndpointsTabSettings.from(RequestMappingsTab.this.getProject()).fireSettingsChanged(REQUEST_MAPPINGS);
           }
 
           @Override

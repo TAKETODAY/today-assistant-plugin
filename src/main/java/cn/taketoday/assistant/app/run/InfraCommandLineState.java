@@ -82,7 +82,7 @@ class InfraCommandLineState extends ApplicationCommandLineState<InfraApplication
   static final String DEBUG_PARAMETER = "-Ddebug";
   static final String TIERED_STOP_AT_LEVEL_1_PARAMETER = "-XX:TieredStopAtLevel=1";
   static final String NO_VERIFY_PARAMETER = "-noverify";
-  static final String HIDE_BANNER_PARAMETER_1_5 = "-Dapp.main.banner-mode=OFF"; //FIXME
+  static final String HIDE_BANNER_PARAMETER_1_5 = "-Dapp.main.banner-mode=OFF";
   static final String ACTIVE_PROFILES_PARAMETER = "-Dcontext.profiles.active";
   static final String TRIGGER_FILE_PARAMETER = "-Ddevtools.restart.trigger-file";
   static final String OUTPUT_ANSI_ENABLED_PARAMETER = "-Doutput.ansi.enabled=always";
@@ -244,9 +244,7 @@ class InfraCommandLineState extends ApplicationCommandLineState<InfraApplication
                         String servletPath = urlUtil.getServletPath(info, mappingPath);
                         String requestUrl = urlUtil.getMappingUrl(applicationUrl, servletPath, mappingPath);
                         NavigatorHttpRequest request = new NavigatorHttpRequest(requestUrl, "GET", Collections.emptyList(), Collections.emptyList());
-                        AppUIUtil.invokeOnEdt(() -> {
-                          notificationPanel.setRequest(request);
-                        });
+                        AppUIUtil.invokeOnEdt(() -> notificationPanel.setRequest(request));
                       }
 
                     });

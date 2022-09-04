@@ -25,8 +25,8 @@ import com.intellij.openapi.Disposable;
 import java.util.Objects;
 
 abstract class AsyncApplicationLiveProperty<T> extends AsyncLiveProperty<T> {
-  private final LiveProperty<InfraModuleDescriptor> myModuleDescriptor;
-  private final LiveProperty<String> myServiceUrl;
+  private final LiveProperty<InfraModuleDescriptor> moduleDescriptor;
+  private final LiveProperty<String> serviceUrl;
 
   protected AsyncApplicationLiveProperty(
           LiveProperty<InfraModuleDescriptor> moduleDescriptor,
@@ -38,20 +38,20 @@ abstract class AsyncApplicationLiveProperty<T> extends AsyncLiveProperty<T> {
           LiveProperty<InfraModuleDescriptor> moduleDescriptor, LiveProperty<String> serviceUrl,
           LifecycleErrorHandler errorHandler, Disposable parent, T defaultValue) {
     super(errorHandler, parent, defaultValue);
-    this.myModuleDescriptor = moduleDescriptor;
-    this.myServiceUrl = serviceUrl;
+    this.serviceUrl = serviceUrl;
+    this.moduleDescriptor = moduleDescriptor;
   }
 
   protected InfraApplicationConnector getApplicationConnector() {
-    return new InfraApplicationConnector(this.myServiceUrl.getValue(), getModuleDescriptor());
+    return new InfraApplicationConnector(this.serviceUrl.getValue(), getModuleDescriptor());
   }
 
   protected String getServiceUrl() {
-    return this.myServiceUrl.getValue();
+    return this.serviceUrl.getValue();
   }
 
   protected InfraModuleDescriptor getModuleDescriptor() {
     return Objects.requireNonNull(
-            this.myModuleDescriptor.getValue());
+            this.moduleDescriptor.getValue());
   }
 }

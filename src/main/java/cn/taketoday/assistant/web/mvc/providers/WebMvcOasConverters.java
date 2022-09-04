@@ -460,9 +460,9 @@ public final class WebMvcOasConverters {
     List<String> responseContentTypes;
     label47:
     {
-      CustomRequestMapping.MethodMapping var10000 = CustomRequestMapping.MethodMapping.META.getJamElement(uMethod.getJavaPsi());
-      if (var10000 != null) {
-        responseContentTypes = var10000.getProduces();
+      CustomRequestMapping.MethodMapping element = CustomRequestMapping.MethodMapping.META.getJamElement(uMethod.getJavaPsi());
+      if (element != null) {
+        responseContentTypes = element.getProduces();
         if (responseContentTypes != null) {
           responseContentTypes = !responseContentTypes.isEmpty() ? responseContentTypes : null;
           if (responseContentTypes != null) {
@@ -711,7 +711,7 @@ public final class WebMvcOasConverters {
         return null;
       }
       OasSchema itemsSchema = new OasSchema(it2.getType(), it2.getFormat(), null, null, null, null, null);
-      return oasSchema.copy(null, null, null, null, null, null, itemsSchema);
+      return oasSchema.copy(it2.getType(), null, null, null, null, null, itemsSchema);
     }
     return null;
   }

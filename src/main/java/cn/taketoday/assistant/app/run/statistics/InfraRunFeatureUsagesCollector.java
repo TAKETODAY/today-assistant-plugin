@@ -114,9 +114,7 @@ final class InfraRunFeatureUsagesCollector extends ProjectUsagesCollector {
       ProgressManager.checkCanceled();
       RunConfiguration configuration = settings.getConfiguration();
       if (configuration instanceof InfraApplicationRunConfiguration sbRunConfig) {
-        mainClassCounter.merge(sbRunConfig.getInfraMainClass(), 1, (integer, integer2) -> {
-          return integer + 1;
-        });
+        mainClassCounter.merge(sbRunConfig.getInfraMainClass(), 1, (integer, integer2) -> integer + 1);
         metrics.add(CONFIG_ACTIVE_PROFILES_SET.metric(StringUtil.isNotEmpty(sbRunConfig.getActiveProfiles())));
         metrics.add(CONFIG_HIDE_BANNER.metric(sbRunConfig.isHideBanner()));
         metrics.add(CONFIG_DEBUG_MODE.metric(sbRunConfig.isDebugMode()));
@@ -126,7 +124,7 @@ final class InfraRunFeatureUsagesCollector extends ProjectUsagesCollector {
         metrics.add(CONFIG_FRAME_DEACTIVATION_UPDATE_POLICY.metric(getUpdatePolicyDescriptor(sbRunConfig.getFrameDeactivationUpdatePolicy())));
         List<InfraAdditionalParameter> parameters = sbRunConfig.getAdditionalParameters();
         int additionalParamsSize = parameters.size();
-        metrics.add(CONFIG_ADDITIONAL_PARAMS_TOTAL.metric(Integer.valueOf(additionalParamsSize), StatisticsUtil.INSTANCE.getCountingStepName(additionalParamsSize, steps)));
+        metrics.add(CONFIG_ADDITIONAL_PARAMS_TOTAL.metric(additionalParamsSize, StatisticsUtil.INSTANCE.getCountingStepName(additionalParamsSize, steps)));
         if (additionalParamsSize > 0) {
           long enabledParams = parameters.stream().filter(InfraAdditionalParameter::isEnabled).count();
           long disabledParams = parameters.size() - enabledParams;

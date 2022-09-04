@@ -84,8 +84,9 @@ public abstract class GenerateBeanDependencyAction extends BaseGenerateAction {
           for (VirtualFilePointer pointer : set.getFiles()) {
             VirtualFile virtualFile = pointer.getFile();
             if (virtualFile != null && !ProjectRootManager.getInstance(module.getProject()).getFileIndex().isInLibraryClasses(virtualFile)) {
-              XmlFile findFile = (XmlFile) PsiManager.getInstance(module.getProject()).findFile(virtualFile);
-              if (JamCommonUtil.isPlainXmlFile(findFile) && InfraDomUtils.isInfraXml(findFile)) {
+              PsiFile findFile = PsiManager.getInstance(module.getProject()).findFile(virtualFile);
+              if (JamCommonUtil.isPlainXmlFile(findFile)
+                      && InfraDomUtils.isInfraXml((XmlFile) findFile)) {
                 return true;
               }
             }
