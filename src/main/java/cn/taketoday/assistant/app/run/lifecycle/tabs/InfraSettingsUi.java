@@ -58,16 +58,16 @@ final class InfraSettingsUi implements ConfigurableUi<InfrastructureSettings> {
     jPanel2.putClientProperty("BorderFactoryClass", "com.intellij.ui.IdeBorderFactory$PlainSmallWithoutIndent");
     jPanel.add(jPanel2, new GridConstraints(2, 0, 1, 1, 0, 3, 3, 3, null, null, null));
     jPanel2.setBorder(IdeBorderFactory.PlainSmallWithoutIndent.createTitledBorder(null,
-            DynamicBundle.getBundle("messages/InfraMvcBundle", InfraSettingsUi.class).getString("infra.settings.initializr"), 0, 0, null, null));
+            DynamicBundle.getBundle("messages/InfraAppBundle", InfraSettingsUi.class).getString("infra.settings.initializr"), 0, 0, null, null));
     JBCheckBox jBCheckBox = new JBCheckBox();
     this.myInitializrAutoCreateRunConfiguration = jBCheckBox;
-    $$$loadButtonText$$$(jBCheckBox, DynamicBundle.getBundle("messages/InfraMvcBundle", InfraSettingsUi.class).getString("infra.settings.create.run.configuration"));
-    jBCheckBox.setToolTipText(ResourceBundle.getBundle("messages/InfraMvcBundle").getString("infra.settings.create.run.configuration.tooltip"));
+    $$$loadButtonText$$$(jBCheckBox, DynamicBundle.getBundle("messages/InfraAppBundle", InfraSettingsUi.class).getString("infra.settings.create.run.configuration"));
+    jBCheckBox.setToolTipText(ResourceBundle.getBundle("messages/InfraAppBundle").getString("infra.settings.create.run.configuration.tooltip"));
     jPanel2.add(jBCheckBox, new GridConstraints(0, 0, 1, 1, 8, 0, 0, 0, null, null, null));
     JBCheckBox jBCheckBox2 = new JBCheckBox();
     this.myAdditionalConfigJsonShowPanel = jBCheckBox2;
-    $$$loadButtonText$$$(jBCheckBox2, DynamicBundle.getBundle("messages/InfraMvcBundle", InfraSettingsUi.class).getString("infra.settings.show.notification.panel"));
-    jBCheckBox2.setToolTipText(ResourceBundle.getBundle("messages/InfraMvcBundle").getString("infra.settings.show.notification.panel.tooltip"));
+    $$$loadButtonText$$$(jBCheckBox2, DynamicBundle.getBundle("messages/InfraAppBundle", InfraSettingsUi.class).getString("infra.settings.show.notification.panel"));
+    jBCheckBox2.setToolTipText(ResourceBundle.getBundle("messages/InfraAppBundle").getString("infra.settings.show.notification.panel.tooltip"));
     jPanel.add(jBCheckBox2, new GridConstraints(0, 0, 1, 1, 8, 0, 0, 0, null, null, null));
     JPanel jPanel3 = new JPanel();
     this.myDashboardEndpointsPanel = jPanel3;

@@ -121,7 +121,7 @@ class InfraCustomizationDialog extends DialogWrapper {
     JPanel jPanel3 = new JPanel();
     this.myTreePanel = jPanel3;
     jPanel3.setLayout(new BorderLayout(0, 0));
-    jPanel3.setToolTipText(ResourceBundle.getBundle("messages/InfraMvcBundle").getString("infra.customization.dialog.config.tree.tooltip"));
+    jPanel3.setToolTipText(ResourceBundle.getBundle("messages/InfraAppBundle").getString("infra.customization.dialog.config.tree.tooltip"));
     jPanel2.add(jPanel3, new GridConstraints(1, 0, 1, 2, 0, 3, 7, 3, null, null, null));
     JBLabel jBLabel = new JBLabel();
     this.myKeyLabel = jBLabel;

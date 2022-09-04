@@ -98,22 +98,22 @@ public class DefaultInfraModelProvider implements InfraModelProvider {
 
   private static InfraAutodetectedFileSet getApplicationFileSet(PsiClass applicationClass, InfraFacet facet) {
 
-    InfraAutodetectedFileSet bootFileSet = new InfraApplicationFileSet(applicationClass, facet);
+    InfraApplicationFileSet fileSet = new InfraApplicationFileSet(applicationClass, facet);
     List<VirtualFile> configFiles = InfraConfigurationFileService.of().findConfigFiles(facet.getModule(), false, (contributor) -> {
-      return contributor.accept(bootFileSet);
+      return contributor.accept(fileSet);
     });
 
     for (VirtualFile configFile : configFiles) {
-      bootFileSet.addFile(configFile);
+      fileSet.addFile(configFile);
     }
 
     List<VirtualFile> imports = InfraConfigurationFileService.of().collectImports(facet.getModule(), configFiles);
 
     for (VirtualFile importedFile : imports) {
-      bootFileSet.addFile(importedFile);
+      fileSet.addFile(importedFile);
     }
 
-    return bootFileSet;
+    return fileSet;
   }
 
   private static InfraAutodetectedFileSet getStarterFileSet(InfraFacet facet) {
@@ -137,29 +137,22 @@ public class DefaultInfraModelProvider implements InfraModelProvider {
 
   static class InfraApplicationFileSet extends InfraAutodetectedFileSet {
     static final String ID_PREFIX = "today_infrastructure_";
-    private static final LayeredIcon ICON;
+    private static final LayeredIcon ICON = new LayeredIcon(Icons.FileSet, Icons.TodayOverlay);
 
     InfraApplicationFileSet(PsiClass application, InfraFacet facet) {
       super(ID_PREFIX + application.getQualifiedName(), application.getName(), facet, ICON);
-      this.addFile(application.getContainingFile().getVirtualFile());
-    }
-
-    static {
-      ICON = new LayeredIcon(Icons.FileSet, Icons.TodayOverlay);
+      addFile(application.getContainingFile().getVirtualFile());
     }
   }
 
   static class InfraStarterFileSet extends InfraAutodetectedFileSet {
     static final String ID_PREFIX = "starter_today_infrastructure";
-    private static final LayeredIcon ICON;
+    private static final LayeredIcon ICON = new LayeredIcon(Icons.FileSet, Icons.TodayOverlay);
 
     InfraStarterFileSet(InfraFacet facet) {
       super(ID_PREFIX, "Starter", facet, ICON);
     }
 
-    static {
-      ICON = new LayeredIcon(Icons.FileSet, Icons.TodayOverlay);
-    }
   }
 
 }
