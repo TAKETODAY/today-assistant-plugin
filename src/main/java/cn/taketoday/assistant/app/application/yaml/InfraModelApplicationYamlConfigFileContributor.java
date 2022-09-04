@@ -281,7 +281,7 @@ public class InfraModelApplicationYamlConfigFileContributor extends InfraModelCo
       return true;
     }
     try {
-      Predicate<Set<String>> profiles = InfraProfilesFactory.getInstance().parseProfileExpressions(StringUtil.split(profileText, ","));
+      Predicate<Set<String>> profiles = InfraProfilesFactory.of().parseProfileExpressions(StringUtil.split(profileText, ","));
       return profiles.test(activeProfiles);
     }
     catch (InfraProfilesFactory.MalformedProfileExpressionException e) {

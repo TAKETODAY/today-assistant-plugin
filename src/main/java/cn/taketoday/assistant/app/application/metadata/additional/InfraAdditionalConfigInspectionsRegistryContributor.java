@@ -54,7 +54,7 @@ public class InfraAdditionalConfigInspectionsRegistryContributor implements Infr
         for (Module module : context.getCompileScope().getAffectedModules()) {
           if (InfraUtils.hasFacet(module)) {
             GlobalSearchScope moduleScope = module.getModuleScope(false).intersectWith(metaInfPackageScope);
-            additionalFiles.addAll(FilenameIndex.getVirtualFilesByName(InfraConfigFileConstants.ADDITIONAL_SPRING_CONFIGURATION_METADATA_JSON, moduleScope));
+            additionalFiles.addAll(FilenameIndex.getVirtualFilesByName(InfraConfigFileConstants.ADDITIONAL_CONFIGURATION_METADATA_JSON, moduleScope));
           }
         }
         return additionalFiles;

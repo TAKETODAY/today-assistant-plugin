@@ -115,7 +115,7 @@ public class ParseCustomBeanIntention implements IntentionAction {
     CustomBeanRegistry.ParseResult result = ref.get();
     String message2 = result.getErrorMessage();
     if (message2 != null) {
-      NotificationGroup group = NotificationGroupManager.getInstance().getNotificationGroup("Spring custom beans");
+      NotificationGroup group = NotificationGroupManager.getInstance().getNotificationGroup("Infra custom beans");
       group.createNotification(message2, NotificationType.ERROR).notify(project);
       return;
     }

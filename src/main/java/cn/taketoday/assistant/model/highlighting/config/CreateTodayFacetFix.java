@@ -50,12 +50,12 @@ class CreateTodayFacetFix implements LocalQuickFix {
   }
 
   public void applyFix(Project project, ProblemDescriptor descriptor) {
-    InfraFacet facet = FacetManager.getInstance(this.myModule).findFacet(InfraFacet.FACET_TYPE_ID, "Spring");
+    InfraFacet facet = FacetManager.getInstance(this.myModule).findFacet(InfraFacet.FACET_TYPE_ID, "Infra");
     if (facet != null) {
       return;
     }
     InfraFacet infraFacet = WriteAction.compute(() -> FacetManager.getInstance(this.myModule)
-            .addFacet(InfraFacet.getFacetType(), "Spring", null));
+            .addFacet(InfraFacet.getFacetType(), "Infra", null));
     DomElementAnnotationsManager.getInstance(project).dropAnnotationsCache();
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       return;

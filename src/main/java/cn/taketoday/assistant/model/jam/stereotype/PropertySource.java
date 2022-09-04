@@ -36,7 +36,7 @@ import cn.taketoday.lang.Nullable;
 public interface PropertySource extends JamElement {
   String IGNORE_RESOURCE_NOT_FOUND_ATTR_NAME = "ignoreResourceNotFound";
 
-  SemKey<PropertySource> PROPERTY_SOURCE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringPropertySource");
+  SemKey<PropertySource> PROPERTY_SOURCE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("InfraPropertySource");
   SemKey<JamMemberMeta> PROPERTY_SOURCE_META_KEY = JamService.getMetaKey(PROPERTY_SOURCE_JAM_KEY);
 
   Set<PropertiesFile> getPropertiesFiles();

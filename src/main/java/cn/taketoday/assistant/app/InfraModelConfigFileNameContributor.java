@@ -150,13 +150,13 @@ public abstract class InfraModelConfigFileNameContributor {
 
   @Nullable
   private static InfraFacet findApplicationFacet(Module module) {
-    InfraFacet springFacet = InfraFacet.from(module);
-    if (springFacet == null) {
+    InfraFacet facet = InfraFacet.from(module);
+    if (facet == null) {
       return null;
     }
     else {
       List<PsiClass> applications = InfraApplicationService.of().getInfraApplications(module);
-      return applications.isEmpty() ? null : springFacet;
+      return applications.isEmpty() ? null : facet;
     }
   }
 

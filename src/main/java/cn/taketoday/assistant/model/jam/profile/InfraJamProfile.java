@@ -150,7 +150,7 @@ public class InfraJamProfile extends CommonModelElement.PsiBase implements Infra
       if (module == null)
         return PsiReference.EMPTY_ARRAY;
 
-      return InfraProfilesFactory.getInstance()
+      return InfraProfilesFactory.of()
               .getProfilesReferences(module, injectionHost, pks.getValueIfKnown(), 0, myDelimiters, myIsDefinition);
     }
   }

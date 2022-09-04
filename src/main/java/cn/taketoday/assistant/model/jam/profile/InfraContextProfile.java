@@ -44,8 +44,8 @@ import cn.taketoday.lang.Nullable;
 public interface InfraContextProfile extends JamElement, InfraProfile {
   String VALUE_ATTR_NAME = "value";
 
-  SemKey<JamAnnotationMeta> CONTEXT_PROFILE_JAM_ANNOTATION_KEY = JamService.ANNO_META_KEY.subKey("SpringContextProfile");
-  SemKey<InfraContextProfile> CONTEXT_PROFILE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringContextProfile");
+  SemKey<JamAnnotationMeta> CONTEXT_PROFILE_JAM_ANNOTATION_KEY = JamService.ANNO_META_KEY.subKey("ContextProfile");
+  SemKey<InfraContextProfile> CONTEXT_PROFILE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("InfraContextProfile");
   SemKey<JamMemberMeta> CONTEXT_PROFILE_META_KEY = JamService.getMetaKey(CONTEXT_PROFILE_JAM_KEY);
 
   @Nullable
@@ -80,7 +80,7 @@ public interface InfraContextProfile extends JamElement, InfraProfile {
   default boolean matches(Set<String> activeProfiles) {
     try {
       Predicate<Set<String>> profiles =
-              InfraProfilesFactory.getInstance().parseProfileExpressions(getExpressions());
+              InfraProfilesFactory.of().parseProfileExpressions(getExpressions());
       return profiles.test(activeProfiles);
     }
     catch (MalformedProfileExpressionException e) {

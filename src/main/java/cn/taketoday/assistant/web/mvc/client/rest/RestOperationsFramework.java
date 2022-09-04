@@ -55,7 +55,7 @@ public final class RestOperationsFramework extends RestTemplateFramework {
 
   public RestOperationsFramework() {
     String message = InfraAppBundle.message("rest.operations.endpoints.view.title");
-    this.presentation = new FrameworkPresentation("Spring-RestOperations", message, Icons.SpringWeb);
+    this.presentation = new FrameworkPresentation("Infra-RestOperations", message, Icons.SpringWeb);
   }
 
   public FrameworkPresentation getPresentation() {

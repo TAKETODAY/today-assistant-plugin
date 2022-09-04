@@ -86,8 +86,8 @@ public class ComponentScanPackagesModel extends CacheableCommonInfraModel {
     Collection<? extends BeanPointer<?>> pointers = calculateScannedBeans();
     Set<CommonInfraBean> javaBeans = new LinkedHashSet<>();
     for (BeanPointer<?> pointer : pointers) {
-      Object mo448getSpringBean = pointer.getBean();
-      if (mo448getSpringBean instanceof InfraStereotypeElement stereotypeElement) {
+      Object pointerBean = pointer.getBean();
+      if (pointerBean instanceof InfraStereotypeElement stereotypeElement) {
         PsiClass psiClass = stereotypeElement.getPsiElement();
         if (JamService.getJamService(psiClass.getProject()).getJamElement(JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY, psiClass) == null) {
           for (InfraJavaBean springJavaBean : stereotypeElement.getBeans()) {
@@ -136,7 +136,7 @@ public class ComponentScanPackagesModel extends CacheableCommonInfraModel {
     return InfraBeanService.of().mapBeans(components);
   }
 
-  public static <T extends cn.taketoday.assistant.beans.stereotype.InfraStereotypeElement> List<CommonInfraBean> getScannedComponents(
+  public static <T extends InfraStereotypeElement> List<CommonInfraBean> getScannedComponents(
           NotNullFunction<? super GlobalSearchScope, ? extends List<T>> components,
           Set<PsiPackage> packages,
           Module module,

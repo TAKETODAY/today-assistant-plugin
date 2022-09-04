@@ -86,7 +86,7 @@ final class InfraConfigurationCheckStartupActivity implements StartupActivity {
         return;
       }
       if (!force && Objects.equals(getCurrentConfigurationChecksum(project), currentProjectChecksum.checksum)) {
-        Logger.getInstance(InfraConfigurationCheckStartupActivity.class).debug("Spring configuration checksum has not changed");
+        Logger.getInstance(InfraConfigurationCheckStartupActivity.class).debug("Infra configuration checksum has not changed");
         return;
       }
       setCurrentConfigurationChecksum(project, Strings.notNullize(currentProjectChecksum.checksum));

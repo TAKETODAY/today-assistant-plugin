@@ -40,7 +40,7 @@ public abstract class HttpExchange<T extends PsiMember> extends InfraExchangeMap
   private static final JamStringAttributeMeta.Single<String> METHOD_META = JamAttributeMeta.singleString("method");
   private static final JamAnnotationArchetype ARCHETYPE = new JamAnnotationArchetype(STANDARD_METHOD_ARCHETYPE).addAttribute(METHOD_META);
   private static final JamAnnotationMeta ANNOTATION_META = new JamAnnotationMeta(InfraExchangeConstant.SPRING_HTTP_EXCHANGE, ARCHETYPE);
-  public static final SemKey<HttpExchange<?>> HTTP_EXCHANGE_JAM_KEY = MAPPING_JAM_KEY.subKey("SpringHttpExchange");
+  public static final SemKey<HttpExchange<?>> HTTP_EXCHANGE_JAM_KEY = MAPPING_JAM_KEY.subKey("InfraHttpExchange");
   public static final SemKey<ClassMapping> CLASS_JAM_KEY = HTTP_EXCHANGE_JAM_KEY.subKey("ClassHttpExchange");
   public static final SemKey<MethodMapping> METHOD_JAM_KEY = HTTP_EXCHANGE_JAM_KEY.subKey("MethodHttpExchange");
 

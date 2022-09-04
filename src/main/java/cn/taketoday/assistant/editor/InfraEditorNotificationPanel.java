@@ -42,7 +42,7 @@ public class InfraEditorNotificationPanel extends EditorNotificationPanel {
   }
 
   /**
-   * Opens general "Spring" settings.
+   * Opens general "TODAT" settings.
    *
    * @param project Current project.
    */

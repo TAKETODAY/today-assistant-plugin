@@ -23,19 +23,27 @@ package cn.taketoday.assistant.model.config.autoconfigure.jam;
 import com.intellij.jam.JamBaseElement;
 import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamClassMeta;
+import com.intellij.patterns.PsiJavaPatterns;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementRef;
+import com.intellij.semantic.SemRegistrar;
 
 import cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant;
 
 public class InfraApplication extends JamBaseElement<PsiClass> {
-  private static final JamAnnotationMeta ANNOTATION_META
-          = new JamAnnotationMeta(InfraConfigConstant.INFRA_APPLICATION,
-          EnableAutoConfiguration.EXCLUDE_ARCHETYPE);
-  public static final JamClassMeta<InfraApplication> META
-          = new JamClassMeta<>(InfraApplication.class).addAnnotation(ANNOTATION_META);
+
+  private static final JamAnnotationMeta ANNOTATION_META = new JamAnnotationMeta(
+          InfraConfigConstant.INFRA_APPLICATION, EnableAutoConfiguration.EXCLUDE_ARCHETYPE);
+
+  public static final JamClassMeta<InfraApplication> META = new JamClassMeta<>(InfraApplication.class)
+          .addAnnotation(ANNOTATION_META);
 
   public InfraApplication(PsiElementRef<?> ref) {
     super(ref);
   }
+
+  public static void register(SemRegistrar registrar) {
+    META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(InfraConfigConstant.INFRA_APPLICATION));
+  }
+
 }

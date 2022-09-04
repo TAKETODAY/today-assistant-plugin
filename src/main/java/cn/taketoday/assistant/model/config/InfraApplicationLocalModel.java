@@ -50,6 +50,7 @@ import cn.taketoday.assistant.model.xml.context.InfraBeansPackagesScan;
  */
 public class InfraApplicationLocalModel extends LocalAnnotationModel {
 
+  @Override
   public List<InfraBeansPackagesScan> getPackagesScans() {
     List<InfraBeansPackagesScan> scans = super.getPackagesScans();
     return ContainerUtil.filter(scans, (scan) -> {
@@ -57,6 +58,7 @@ public class InfraApplicationLocalModel extends LocalAnnotationModel {
     });
   }
 
+  @Override
   protected Set<CommonInfraModel> getPackageScanModels(LocalAnnotationModel localModel) {
     var models = new LinkedHashSet<CommonInfraModel>();
     Module module = localModel.getModule();
@@ -92,7 +94,7 @@ public class InfraApplicationLocalModel extends LocalAnnotationModel {
       element = scan.getIdentifyingPsiElement();
       if (isInfraApplication(element)) {
         psiFile = element.getContainingFile();
-        return scans.stream().filter((packageScan) -> {
+        return scans.stream().filter(packageScan -> {
           return (packageScan instanceof CustomConfigurationPropertiesScan
                   || packageScan instanceof ConfigurationPropertiesScan)
                   && psiFile.equals(packageScan.getContainingFile());

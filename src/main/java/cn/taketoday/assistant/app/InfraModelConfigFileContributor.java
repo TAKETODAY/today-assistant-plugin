@@ -70,18 +70,18 @@ public abstract class InfraModelConfigFileContributor {
     return StringUtil.compare(o2.getExtension(), o1.getExtension(), true);
   };
 
-  private static final String SPRING_DEFAULT_PROFILE = "default";
+  private static final String DEFAULT_PROFILE = "default";
 
   private static final boolean OUR_TEST_MODE = ApplicationManager.getApplication().isUnitTestMode();
 
-  private final FileType myFileType;
+  private final FileType fileType;
 
   protected InfraModelConfigFileContributor(FileType fileType) {
-    myFileType = fileType;
+    this.fileType = fileType;
   }
 
   public FileType getFileType() {
-    return myFileType;
+    return fileType;
   }
 
   /**
@@ -134,7 +134,7 @@ public abstract class InfraModelConfigFileContributor {
     Pair<List<VirtualFile>, List<VirtualFile>>
             configFiles = findApplicationConfigFiles(module, includeTestScope, springConfigName);
     List<VirtualFile> customFiles = ContainerUtil.filter(fileNameContributor.findCustomConfigFiles(module),
-            file -> myFileType.equals(file.getFileType()));
+            file -> fileType.equals(file.getFileType()));
     return ContainerUtil.concat(configFiles.first, ContainerUtil.concat(customFiles, configFiles.second));
   }
 
@@ -145,7 +145,7 @@ public abstract class InfraModelConfigFileContributor {
     List<VirtualFile> baseNameConfigFiles = new SmartList<>();
     List<VirtualFile> directories = getConfigFileDirectories(module, includeTestScope);
     for (VirtualFile directory : directories) {
-      Pair<List<VirtualFile>, List<VirtualFile>> allConfigs = findConfigFiles(module, directory, myFileType, baseName);
+      Pair<List<VirtualFile>, List<VirtualFile>> allConfigs = findConfigFiles(module, directory, fileType, baseName);
       profileConfigFiles.addAll(allConfigs.first);
       baseNameConfigFiles.addAll(allConfigs.second);
     }
@@ -168,7 +168,7 @@ public abstract class InfraModelConfigFileContributor {
       return true;
     Set<String> activeProfiles = params.getActiveProfiles();
     if (ContainerUtil.isEmpty(activeProfiles)) {
-      return SPRING_DEFAULT_PROFILE.equals(fileNameSuffix);
+      return DEFAULT_PROFILE.equals(fileNameSuffix);
     }
     else {
       return activeProfiles.contains(fileNameSuffix);
@@ -204,7 +204,7 @@ public abstract class InfraModelConfigFileContributor {
 
   @Nullable
   public static InfraModelConfigFileContributor getContributor(VirtualFile virtualFile) {
-    return EP_NAME.findFirstSafe(contributor -> virtualFile.getFileType().equals(contributor.myFileType));
+    return EP_NAME.findFirstSafe(contributor -> virtualFile.getFileType().equals(contributor.fileType));
   }
 
   public static List<VirtualFile> getConfigFileDirectories(Module module, boolean includeTestScope) {

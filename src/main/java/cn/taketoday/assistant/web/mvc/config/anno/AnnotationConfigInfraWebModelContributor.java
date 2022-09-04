@@ -52,8 +52,8 @@ public class AnnotationConfigInfraWebModelContributor implements InfraModelProvi
     return getClass().getSimpleName();
   }
 
-  public List<? extends InfraAutodetectedFileSet> getFilesets(InfraFacet springFacet) {
-    Module module = springFacet.getModule();
+  public List<? extends InfraAutodetectedFileSet> getFilesets(InfraFacet infraFacet) {
+    Module module = infraFacet.getModule();
     if (DumbService.isDumb(module.getProject()) || !InfraLibraryUtil.hasWebMvcLibrary(module)) {
       return Collections.emptyList();
     }
@@ -75,7 +75,7 @@ public class AnnotationConfigInfraWebModelContributor implements InfraModelProvi
       String[] servletMappings = parser.getStringArray("getServletMappings", false);
       CommonServlet psiBasedServlet = new PsiBasedServlet(servletName, servletClass, initializer, mappingDefinitionElement, servletMappings);
       ServletFileSet servletFileSet = new ServletFileSet("initializer " + initializer.getQualifiedName() + " servlet context",
-              InfraAppBundle.message("mvc.initializer.context.autodetected", servletName), psiBasedServlet, springFacet);
+              InfraAppBundle.message("mvc.initializer.context.autodetected", servletName), psiBasedServlet, infraFacet);
       List<PsiClass> servletConfigClasses = parser.getPsiClasses("getServletConfigClasses", false);
       boolean hasServletContext = !servletConfigClasses.isEmpty();
       for (PsiClass servletConfigClass : servletConfigClasses) {
@@ -86,7 +86,7 @@ public class AnnotationConfigInfraWebModelContributor implements InfraModelProvi
       smartList.add(servletFileSet);
       CommonServlet rootContextImplicitServlet = hasServletContext ? null : psiBasedServlet;
       ServletFileSet servletFileSet2 = new ServletFileSet("initializer " + initializer.getQualifiedName() + " root context", "MVC " + servletName + " initializer root context",
-              rootContextImplicitServlet, springFacet);
+              rootContextImplicitServlet, infraFacet);
       for (PsiClass rootConfigClasses : parser.getPsiClasses("getRootConfigClasses", false)) {
         if (isConfigurationOrComponent(rootConfigClasses)) {
           ServletFileSet.addInFileset(servletFileSet2, rootConfigClasses.getContainingFile());

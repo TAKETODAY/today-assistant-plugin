@@ -161,8 +161,8 @@ public final class InfraHintReferencesProviderImpl extends InfraHintReferencesPr
         for (TextRange textRange : textRanges) {
           String profile = textRange.substring(elementText);
           try {
-            InfraProfilesFactory.getInstance().parseProfileExpressions(new SmartList<>(profile));
-            PsiReference[] references = InfraProfilesFactory.getInstance().getProfilesReferences(module, element, profile, textRange.getStartOffset() - offset, "()&|", false);
+            InfraProfilesFactory.of().parseProfileExpressions(new SmartList<>(profile));
+            PsiReference[] references = InfraProfilesFactory.of().getProfilesReferences(module, element, profile, textRange.getStartOffset() - offset, "()&|", false);
             ContainerUtil.addAll(smartList, references);
           }
           catch (InfraProfilesFactory.MalformedProfileExpressionException e) {

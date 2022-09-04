@@ -36,7 +36,9 @@ public class EnableAutoConfigDependentModelsProvider extends AbstractAutoConfigD
   @Override
   protected List<PsiClass> getAutoConfigClasses(LocalAnnotationModel localAnnotationModel, ConditionalOnEvaluationContext sharedContext) {
     EnableAutoConfiguration enableAutoConfiguration = EnableAutoConfiguration.META.getJamElement(localAnnotationModel.getConfig());
-    return enableAutoConfiguration == null ? Collections.emptyList() : AutoConfigClassCollector.collectConfigurationClasses(enableAutoConfiguration, sharedContext);
+    return enableAutoConfiguration == null
+           ? Collections.emptyList()
+           : AutoConfigClassCollector.collectConfigurationClasses(enableAutoConfiguration, sharedContext);
   }
 
   @Override

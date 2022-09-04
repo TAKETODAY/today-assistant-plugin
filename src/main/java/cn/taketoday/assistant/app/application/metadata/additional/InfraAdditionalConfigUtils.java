@@ -61,7 +61,7 @@ public class InfraAdditionalConfigUtils {
   public boolean processAllAdditionalMetadataFiles(Processor<? super PsiFile> processor) {
     for (VirtualFile root : myResourceRoots) {
       VirtualFile vf = root.findFileByRelativePath("META-INF/" +
-              InfraConfigFileConstants.ADDITIONAL_SPRING_CONFIGURATION_METADATA_JSON);
+              InfraConfigFileConstants.ADDITIONAL_CONFIGURATION_METADATA_JSON);
       if (vf == null)
         continue;
       PsiFile psiFile = PsiManager.getInstance(myModule.getProject()).findFile(vf);
@@ -92,6 +92,6 @@ public class InfraAdditionalConfigUtils {
       return true;
 
     return psiFile instanceof JsonFile
-            && psiFile.getName().equals(InfraConfigFileConstants.ADDITIONAL_SPRING_CONFIGURATION_METADATA_JSON);
+            && psiFile.getName().equals(InfraConfigFileConstants.ADDITIONAL_CONFIGURATION_METADATA_JSON);
   }
 }

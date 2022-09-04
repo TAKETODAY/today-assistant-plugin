@@ -51,7 +51,7 @@ import cn.taketoday.lang.Nullable;
 public class TestPropertySource extends JamBaseElement<PsiClass> implements PropertySource {
 
   protected static SemKey<TestPropertySource>
-          SPRING_TEST_PROPERTY_SOURCE_JAM_KEY = PROPERTY_SOURCE_JAM_KEY.subKey("SpringTestPropertySource");
+          SPRING_TEST_PROPERTY_SOURCE_JAM_KEY = PROPERTY_SOURCE_JAM_KEY.subKey("InfraTestPropertySource");
 
   private static final JamStringAttributeMeta.Collection<Set<PropertiesFile>> VALUE_ATTR_META =
           JamAttributeMeta.collectionString("value", new PropertiesFileConverter());

@@ -99,7 +99,6 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
   }
 
   @Override
-
   public PsiClass getConfig() {
     return myClass;
   }
@@ -199,7 +198,6 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
   }
 
   @Override
-
   public Set<String> getActiveProfiles() {
     return myActiveProfiles;
   }
@@ -208,7 +206,7 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
   public Set<Pair<LocalModel, LocalModelDependency>> getDependentLocalModels() {
     return CachedValuesManager.getManager(myClass.getProject()).getCachedValue(this, () -> {
       Module module = myModule;
-      Set<Pair<LocalModel, LocalModelDependency>> models = new HashSet<>();
+      HashSet<Pair<LocalModel, LocalModelDependency>> models = new HashSet<>();
       if (!module.isDisposed()) {
         collectImportDependentLocalModels(models);
         collectScanDependentLocalModels(models);

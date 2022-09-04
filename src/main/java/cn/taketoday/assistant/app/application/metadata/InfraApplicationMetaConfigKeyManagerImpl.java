@@ -59,7 +59,7 @@ public class InfraApplicationMetaConfigKeyManagerImpl extends InfraApplicationMe
 
   public List<MetaConfigKey> getAllMetaConfigKeys(@Nullable Module module) {
     List<MetaConfigKey> fromLibraries = CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
-      List<PsiFile> metaInfConfigFiles = InfraUtils.findConfigFilesInMetaInf(module, true, InfraConfigFileConstants.SPRING_CONFIGURATION_METADATA_JSON, PsiFile.class);
+      List<PsiFile> metaInfConfigFiles = InfraUtils.findConfigFilesInMetaInf(module, true, InfraConfigFileConstants.CONFIGURATION_METADATA_JSON, PsiFile.class);
       List<MetaConfigKey> allKeys = new ArrayList<>();
       for (PsiFile configMetadataFile : metaInfConfigFiles) {
         List<MetaConfigKey> keys = getConfigKeysForFile(module, configMetadataFile);
@@ -107,7 +107,7 @@ public class InfraApplicationMetaConfigKeyManagerImpl extends InfraApplicationMe
       SmartList<Object> dependencies = new SmartList<>(PsiModificationTracker.MODIFICATION_COUNT);
       List<MetaConfigKey> allKeys = new ArrayList<>();
       for (Module module : allModules) {
-        File localJsonFile = findLocalMetadataJsonFile(module, InfraConfigFileConstants.SPRING_CONFIGURATION_METADATA_JSON, unitTestMode);
+        File localJsonFile = findLocalMetadataJsonFile(module, InfraConfigFileConstants.CONFIGURATION_METADATA_JSON, unitTestMode);
         if (localJsonFile != null) {
           List<MetaConfigKey> keys = new ArrayList<>();
           Processor<MetaConfigKey> collect = Processors.cancelableCollectProcessor(keys);

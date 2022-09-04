@@ -48,8 +48,8 @@ import static com.intellij.jam.reflect.JamAttributeMeta.collectionString;
 import static com.intellij.jam.reflect.JamAttributeMeta.singleAnno;
 
 public class InfraTestingSql implements TestingSql {
-  private static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = JAM_ANNOTATION_KEY.subKey("SpringTestingSql");
-  public static final SemKey<InfraTestingSql> REPEATABLE_ANNO_JAM_KEY = TestingSql.JAM_KEY.subKey("SpringTestingSql");
+  private static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = JAM_ANNOTATION_KEY.subKey("InfraTestingSql");
+  public static final SemKey<InfraTestingSql> REPEATABLE_ANNO_JAM_KEY = TestingSql.JAM_KEY.subKey("InfraTestingSql");
 
   public static final JamClassMeta<InfraTestingSql> CLASS_META = new JamClassMeta<>(null, InfraTestingSql.class, REPEATABLE_ANNO_JAM_KEY);
   public static final JamMethodMeta<InfraTestingSql> METHOD_META = new JamMethodMeta<>(null, InfraTestingSql.class, REPEATABLE_ANNO_JAM_KEY);

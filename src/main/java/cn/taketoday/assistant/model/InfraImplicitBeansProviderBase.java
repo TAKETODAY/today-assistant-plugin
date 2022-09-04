@@ -69,9 +69,7 @@ public abstract class InfraImplicitBeansProviderBase extends CustomModuleCompone
    * @param beanName Name of implicit bean.
    */
   protected void addImplicitLibraryBean(Collection<CommonInfraBean> implicitBeans,
-          Module module,
-          String className,
-          String beanName) {
+          Module module, String className, String beanName) {
     doAddImplicitBean(implicitBeans, module, className, beanName, true);
   }
 
@@ -81,7 +79,7 @@ public abstract class InfraImplicitBeansProviderBase extends CustomModuleCompone
           String beanName,
           boolean isLibraryClass) {
     PsiClass psiClass = isLibraryClass ? InfraUtils.findLibraryClass(module, className) :
-                              findClassInDependenciesAndLibraries(module, className);
+                        findClassInDependenciesAndLibraries(module, className);
     if (psiClass != null) {
       implicitBeans.add(new InfraImplicitBean(getProviderName(), psiClass, beanName));
     }

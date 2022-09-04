@@ -31,6 +31,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.util.CachedValue;
 import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValueProvider.Result;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.psi.xml.XmlFile;
@@ -71,12 +72,12 @@ public class LocalModelFactory {
       return null;
     }
     else {
-      Map<Pair<Module, String>, LocalXmlModel> localXmlModelsMap = CachedValuesManager.getManager(module.getProject()).getCachedValue(configFile, LOCAL_XML_MODEL_KEY, () -> {
+      var localXmlModelsMap = CachedValuesManager.getManager(module.getProject()).getCachedValue(configFile, LOCAL_XML_MODEL_KEY, () -> {
         Map<Pair<Module, String>, LocalXmlModel> result = ConcurrentFactoryMap.createMap((cacheKey) -> {
           Set<String> profiles = getProfilesFromString(cacheKey.second);
           return new LocalXmlModelImpl(configFile, cacheKey.first, profiles);
         });
-        return CachedValueProvider.Result.create(result, getLocalXmlModelDependencies(configFile));
+        return Result.create(result, getLocalXmlModelDependencies(configFile));
       }, false);
       Pair<Module, String> key = Pair.create(module, ProfileUtils.profilesAsString(activeProfiles));
       return localXmlModelsMap.get(key);
@@ -103,7 +104,7 @@ public class LocalModelFactory {
 
           return new LocalAnnotationModel(psiClass, cacheKey.first, profiles);
         });
-        return CachedValueProvider.Result.create(result, getLocalAnnotationModelDependencies(psiClass));
+        return Result.create(result, getLocalAnnotationModelDependencies(psiClass));
       }, false);
       Pair<Module, String> key = Pair.create(module, ProfileUtils.profilesAsString(activeProfiles));
       return localAnnotationModelsMap.get(key);

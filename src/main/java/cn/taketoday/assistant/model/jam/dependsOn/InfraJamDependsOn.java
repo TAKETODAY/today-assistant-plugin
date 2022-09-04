@@ -48,8 +48,8 @@ import cn.taketoday.lang.Nullable;
 public class InfraJamDependsOn extends CommonModelElement.PsiBase implements JamElement {
   private final PsiElementRef<PsiAnnotation> myPsiAnnotation;
   private final PsiMember myPsiMember;
-  public static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = JamService.ANNO_META_KEY.subKey("SpringJamDependsOn");
-  private static final SemKey<InfraJamDependsOn> JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringJamDependsOn");
+  public static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = JamService.ANNO_META_KEY.subKey("JamDependsOn");
+  private static final SemKey<InfraJamDependsOn> JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("JamDependsOn");
   private static final JamStringAttributeMeta.Collection<BeanPointer<?>> VALUE_ATTR_META = JamAttributeMeta.collectionString("value", new InfraBeanReferenceJamConverter(null));
   private static final JamAnnotationArchetype ARCHETYPE = new JamAnnotationArchetype().addAttribute(VALUE_ATTR_META);
   public static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta(AnnotationConstant.DEPENDS_ON, ARCHETYPE, JAM_ANNO_META_KEY);

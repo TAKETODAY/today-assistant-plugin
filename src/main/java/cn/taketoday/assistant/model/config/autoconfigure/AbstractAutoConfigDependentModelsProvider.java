@@ -56,11 +56,13 @@ public abstract class AbstractAutoConfigDependentModelsProvider extends LocalAnn
 
   protected abstract LocalModelDependencyType getModelDependencyType();
 
-  public boolean processCustomDependentLocalModels(LocalAnnotationModel localAnnotationModel, PairProcessor<? super LocalModel, ? super LocalModelDependency> processor) {
-    if (!acceptModel(localAnnotationModel)) {
+  @Override
+  public boolean processCustomDependentLocalModels(LocalAnnotationModel model,
+          PairProcessor<? super LocalModel, ? super LocalModelDependency> processor) {
+    if (!acceptModel(model)) {
       return true;
     }
-    for (Pair<LocalModel<?>, LocalModelDependency> pair : getAutoConfigModels(localAnnotationModel)) {
+    for (Pair<LocalModel<?>, LocalModelDependency> pair : getAutoConfigModels(model)) {
       if (!processor.process(pair.getFirst(), pair.getSecond())) {
         return false;
       }
@@ -104,13 +106,14 @@ public abstract class AbstractAutoConfigDependentModelsProvider extends LocalAnn
     return setting == null || setting.getBooleanValue();
   }
 
-  private ConditionalOnEvaluationContext processConfigurationClass(Set<Pair<LocalModel<?>, LocalModelDependency>> autoConfigModels, PsiClass autoConfigClass,
-          boolean nonStrictEvaluation, @Nullable ConditionalOnEvaluationContext sharedContext, Module module, Set<String> activeProfiles,
-          NotNullLazyValue<List<VirtualFile>> configFilesCache) {
+  private ConditionalOnEvaluationContext processConfigurationClass(
+          Set<Pair<LocalModel<?>, LocalModelDependency>> autoConfigModels, PsiClass autoConfigClass,
+          boolean nonStrictEvaluation, @Nullable ConditionalOnEvaluationContext sharedContext,
+          Module module, Set<String> activeProfiles, NotNullLazyValue<List<VirtualFile>> configFilesCache) {
     ProgressManager.checkCanceled();
     ConditionalOnEvaluationContext context = createContext(autoConfigClass, module, activeProfiles, configFilesCache, sharedContext);
-    AutoConfigClassConditionEvaluator evaluator = new AutoConfigClassConditionEvaluator(autoConfigClass,
-            nonStrictEvaluation, context);
+    AutoConfigClassConditionEvaluator evaluator = new AutoConfigClassConditionEvaluator(
+            autoConfigClass, nonStrictEvaluation, context);
     if (!evaluator.isActive()) {
       return context;
     }

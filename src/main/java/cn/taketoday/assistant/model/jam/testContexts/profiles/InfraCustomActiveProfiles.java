@@ -48,7 +48,7 @@ public class InfraCustomActiveProfiles implements InfraActiveProfile {
   public static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = ACTIVE_PROFILE_JAM_ANNOTATION_KEY
           .subKey("CustomContextProfile");
 
-  public static final SemKey<InfraCustomActiveProfiles> JAM_KEY = ACTIVE_PROFILE_JAM_KEY.subKey("SpringCustomActiveProfiles");
+  public static final SemKey<InfraCustomActiveProfiles> JAM_KEY = ACTIVE_PROFILE_JAM_KEY.subKey("InfraCustomActiveProfiles");
   public static final SemKey<JamMemberMeta<PsiMember, InfraCustomActiveProfiles>> META_KEY =
           ACTIVE_PROFILE_META_KEY.subKey("CustomContextProfile");
 

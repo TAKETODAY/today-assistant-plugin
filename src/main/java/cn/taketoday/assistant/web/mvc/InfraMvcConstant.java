@@ -31,7 +31,7 @@ public interface InfraMvcConstant {
 
   String MVC_NAMESPACE = "http://www.springframework.org/schema/mvc";
 
-  String MVC_NAMESPACE_KEY = "Spring MVC namespace key";
+  String MVC_NAMESPACE_KEY = "Infra MVC namespace key";
 
   String CONFIGURABLE_WEB_APPLICATION_CONTEXT_CLASS = "cn.taketoday.web.context.ConfigurableWebApplicationContext";
 

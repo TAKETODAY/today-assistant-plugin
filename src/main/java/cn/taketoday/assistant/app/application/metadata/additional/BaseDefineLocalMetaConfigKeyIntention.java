@@ -153,7 +153,7 @@ public abstract class BaseDefineLocalMetaConfigKeyIntention implements Intention
               .createPopupChooserBuilder(roots)
               .setTitle(InfraAppBundle.message("infra.properties.no.json.metadata.popup", keyName))
               .setAdText(InfraAppBundle.message("infra.properties.no.json.metadata.hint",
-                      InfraConfigFileConstants.ADDITIONAL_SPRING_CONFIGURATION_METADATA_JSON))
+                      InfraConfigFileConstants.ADDITIONAL_CONFIGURATION_METADATA_JSON))
               .setRenderer(renderer)
               .setItemChosenCallback(selectedRoot -> {
                 if (selectedRoot == null)
@@ -175,10 +175,10 @@ public abstract class BaseDefineLocalMetaConfigKeyIntention implements Intention
             .run(() -> {
               try {
                 VirtualFile metaInf = VfsUtil.createDirectoryIfMissing(selectedRoot, "META-INF");
-                VirtualFile addVf = metaInf.findChild(InfraConfigFileConstants.ADDITIONAL_SPRING_CONFIGURATION_METADATA_JSON);
+                VirtualFile addVf = metaInf.findChild(InfraConfigFileConstants.ADDITIONAL_CONFIGURATION_METADATA_JSON);
                 if (addVf == null) {
                   addVf =
-                          metaInf.createChildData(project, InfraConfigFileConstants.ADDITIONAL_SPRING_CONFIGURATION_METADATA_JSON);
+                          metaInf.createChildData(project, InfraConfigFileConstants.ADDITIONAL_CONFIGURATION_METADATA_JSON);
                   VfsUtil.saveText(addVf, "{ \"" + InfraMetadataConstant.PROPERTIES + "\": [ ] }");
                 }
 

@@ -49,8 +49,8 @@ public class InfraJamActiveProfiles extends CommonModelElement.PsiBase implement
   private final PsiElementRef<PsiAnnotation> myPsiAnnotation;
   private final PsiMember myPsiMember;
 
-  public static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = ACTIVE_PROFILE_JAM_ANNOTATION_KEY.subKey("SpringJamActiveProfiles");
-  private static final SemKey<InfraJamActiveProfiles> JAM_KEY = ACTIVE_PROFILE_JAM_KEY.subKey("SpringJamActiveProfiles");
+  public static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = ACTIVE_PROFILE_JAM_ANNOTATION_KEY.subKey("InfraJamActiveProfiles");
+  private static final SemKey<InfraJamActiveProfiles> JAM_KEY = ACTIVE_PROFILE_JAM_KEY.subKey("InfraJamActiveProfiles");
 
   public static final JamClassMeta<InfraJamActiveProfiles> META = new JamClassMeta<>(null, InfraJamActiveProfiles.class, JAM_KEY);
   private static final JamConverter<String> PROFILE_CONVERTER = new InfraJamProfile.InfraProfileConverter("", false);

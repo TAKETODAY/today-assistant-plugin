@@ -67,19 +67,19 @@ import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 public class InfraConfigurationFileService {
-  private static final String SPRING_CONFIG_IMPORT_KEY = "context.config.import";
+  private static final String INFRA_CONFIG_IMPORT_KEY = "app.config.import";
 
   public static InfraConfigurationFileService of() {
     return ApplicationManager.getApplication().getService(InfraConfigurationFileService.class);
   }
 
   public boolean isApplicationConfigurationFile(PsiFile file) {
-    return this.getApplicationConfigurationFileIcon(file) != null || isDetectedConfigFile(file);
+    return getApplicationConfigurationFileIcon(file) != null || isDetectedConfigFile(file);
   }
 
   private static boolean isDetectedConfigFile(PsiFile file) {
-    InfraConfigFileDetector[] var1 = InfraConfigFileDetector.EP_NAME.getExtensions();
-    for (InfraConfigFileDetector detector : var1) {
+    InfraConfigFileDetector[] extensions = InfraConfigFileDetector.EP_NAME.getExtensions();
+    for (InfraConfigFileDetector detector : extensions) {
       if (detector.isInfraConfigFile(file)) {
         return true;
       }
@@ -108,7 +108,7 @@ public class InfraConfigurationFileService {
             return fileNameContributor.getFileIcon();
           }
 
-          List<VirtualFile> imports = this.collectImports(module, files);
+          List<VirtualFile> imports = collectImports(module, files);
           if (imports.contains(virtualFile)) {
             return fileNameContributor.getFileIcon();
           }
@@ -128,9 +128,8 @@ public class InfraConfigurationFileService {
   public List<VirtualFile> findConfigFiles(Module module, boolean includeTestScope, Condition<? super InfraModelConfigFileNameContributor> filter) {
 
     List<VirtualFile> result = new SmartList<>();
-    InfraModelConfigFileNameContributor[] var5 = InfraModelConfigFileNameContributor.EP_NAME.getExtensions();
-
-    for (InfraModelConfigFileNameContributor fileNameContributor : var5) {
+    InfraModelConfigFileNameContributor[] extensions = InfraModelConfigFileNameContributor.EP_NAME.getExtensions();
+    for (InfraModelConfigFileNameContributor fileNameContributor : extensions) {
       if (filter.value(fileNameContributor)) {
         result.addAll(findConfigFiles(module, includeTestScope, fileNameContributor));
       }
@@ -194,7 +193,7 @@ public class InfraConfigurationFileService {
 
   public List<VirtualFile> collectImports(Module module, List<VirtualFile> configFiles) {
 
-    if (getSpringConfigImportKey(module) == null) {
+    if (getInfraConfigImportKey(module) == null) {
       return Collections.emptyList();
     }
     else {
@@ -226,7 +225,7 @@ public class InfraConfigurationFileService {
     else {
       PsiFile psiFile = PsiManager.getInstance(module.getProject()).findFile(virtualFile);
       return psiFile == null ? Collections.emptyList() : CachedValuesManager.getCachedValue(psiFile, () -> {
-        MetaConfigKey configImportKey = getSpringConfigImportKey(module);
+        MetaConfigKey configImportKey = getInfraConfigImportKey(module);
         List<InfraConfigImport> imports = configImportKey == null ? Collections.emptyList() : doGetImports(module, psiFile, contributor, configImportKey);
         if (!imports.isEmpty()) {
           List<FileType> fileTypes = ContainerUtil.map(InfraModelConfigFileContributor.EP_NAME.getExtensions(),
@@ -337,9 +336,9 @@ public class InfraConfigurationFileService {
   }
 
   @Nullable
-  private static MetaConfigKey getSpringConfigImportKey(Module module) {
+  private static MetaConfigKey getInfraConfigImportKey(Module module) {
     return InfraApplicationMetaConfigKeyManager.getInstance()
-            .findCanonicalApplicationMetaConfigKey(module, SPRING_CONFIG_IMPORT_KEY);
+            .findCanonicalApplicationMetaConfigKey(module, INFRA_CONFIG_IMPORT_KEY);
   }
 
   private static class InfraConfigImportImpl implements InfraConfigImport {

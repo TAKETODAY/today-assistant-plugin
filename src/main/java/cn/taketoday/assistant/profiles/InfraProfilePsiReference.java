@@ -46,9 +46,7 @@ public class InfraProfilePsiReference extends PsiReferenceBase<PsiElement> {
   private final boolean myIsDefinition;
 
   public InfraProfilePsiReference(PsiElement element,
-          TextRange range,
-          Module module,
-          boolean definition) {
+          TextRange range, Module module, boolean definition) {
     super(element, range);
     myIsDefinition = definition;
     myProfileName = range.substring(element.getText());
@@ -65,7 +63,7 @@ public class InfraProfilePsiReference extends PsiReferenceBase<PsiElement> {
       target = new InfraProfileTarget(getElement(), myProfileName, getRangeInElement().getStartOffset());
     }
     else {
-      target = InfraProfilesFactory.getInstance().findProfileTarget(myModule, includeTestScope(), myProfileName);
+      target = InfraProfilesFactory.of().findProfileTarget(myModule, includeTestScope(), myProfileName);
     }
     return target == null ? null : PomService.convertToPsi(getElement().getProject(), target);
   }
@@ -78,7 +76,7 @@ public class InfraProfilePsiReference extends PsiReferenceBase<PsiElement> {
   @Override
   public Object[] getVariants() {
     Set<String> names = new LinkedHashSet<>();
-    for (InfraProfileTarget target : InfraProfilesFactory.getInstance().findProfileTargets(myModule, includeTestScope())) {
+    for (InfraProfileTarget target : InfraProfilesFactory.of().findProfileTargets(myModule, includeTestScope())) {
       names.add(target.getName());
     }
     return ContainerUtil.map2Array(names, Object.class, name -> LookupElementBuilder.create(name).withIcon(Icons.SpringProfile));

@@ -135,7 +135,7 @@ public class InfraBeansGroupingRule extends SingleParentUsageGroupingRule {
 
     public int compareTo(UsageGroup usageGroup) {
       if (!(usageGroup instanceof BeansUsageGroup)) {
-        LOG.error("SpringBeansUsageGroup expected but " + usageGroup.getClass() + " found");
+        LOG.error("InfraBeansUsageGroup expected but " + usageGroup.getClass() + " found");
         return 0;
       }
       return this.myName.compareToIgnoreCase(((BeansUsageGroup) usageGroup).myName);

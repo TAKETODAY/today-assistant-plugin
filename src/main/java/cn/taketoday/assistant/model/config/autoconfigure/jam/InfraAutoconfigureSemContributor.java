@@ -83,7 +83,8 @@ final class InfraAutoconfigureSemContributor extends SemContributor {
 
   @Override
   public void registerSemProviders(SemRegistrar registrar, Project project) {
-    InfraApplication.META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(INFRA_APPLICATION));
+    InfraApplication.register(registrar);
+
     SemService semService = SemService.getSemService(project);
 
     ConfigurationProperties.CLASS_META.register(registrar, PsiJavaPatterns.psiClass().withAnnotation(InfraClassesConstants.CONFIGURATION_PROPERTIES));

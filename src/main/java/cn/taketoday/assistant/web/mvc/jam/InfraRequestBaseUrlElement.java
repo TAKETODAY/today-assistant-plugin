@@ -33,7 +33,7 @@ import kotlin.jvm.internal.Intrinsics;
 public abstract class InfraRequestBaseUrlElement extends InfraStereotypeElement {
 
   private static final SemKey<InfraRequestBaseUrlElement> JAM_ELEMENT_KEY
-          = PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("SpringRequestBaseUrl");
+          = PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("InfraRequestBaseUrl");
 
   public static final Companion Companion = new Companion(null);
 

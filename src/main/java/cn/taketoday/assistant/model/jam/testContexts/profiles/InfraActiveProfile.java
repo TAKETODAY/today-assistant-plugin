@@ -37,8 +37,8 @@ public interface InfraActiveProfile extends JamElement {
   String PROFILES_ATTR_NAME = "profiles";
   String[] PROFILES_ATTRS = { PROFILES_ATTR_NAME, VALUE_ATTR_NAME };
 
-  SemKey<JamAnnotationMeta> ACTIVE_PROFILE_JAM_ANNOTATION_KEY = JamService.ANNO_META_KEY.subKey("SpringActiveProfile");
-  SemKey<InfraActiveProfile> ACTIVE_PROFILE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringActiveProfile");
+  SemKey<JamAnnotationMeta> ACTIVE_PROFILE_JAM_ANNOTATION_KEY = JamService.ANNO_META_KEY.subKey("InfraActiveProfile");
+  SemKey<InfraActiveProfile> ACTIVE_PROFILE_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("InfraActiveProfile");
   SemKey<JamMemberMeta> ACTIVE_PROFILE_META_KEY = JamService.getMetaKey(ACTIVE_PROFILE_JAM_KEY);
 
   @Nullable

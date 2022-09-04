@@ -33,7 +33,7 @@ import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
 public class InfraMyBatisMapper extends InfraStereotypeElement {
   public static final String MAPPER_DEFINITION = "@Mapper";
   public static final JamClassMeta<InfraMyBatisMapper> META = new JamClassMeta<>(null, InfraMyBatisMapper.class,
-          JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("SpringMyBatisMapper"));
+          JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("InfraMyBatisMapper"));
   public static final String MAPPER_ANNOTATION = "org.apache.ibatis.annotations.Mapper";
   private static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta(MAPPER_ANNOTATION);
 

@@ -43,8 +43,8 @@ import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.lang.Nullable;
 
 public class InfraContextImport extends CommonModelElement.PsiBase implements InfraImport {
-  private static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = IMPORT_JAM_ANNOTATION_KEY.subKey("SpringContextImport");
-  private static final SemKey<InfraContextImport> JAM_KEY = IMPORT_JAM_KEY.subKey("SpringContextImport");
+  private static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = IMPORT_JAM_ANNOTATION_KEY.subKey("InfraContextImport");
+  private static final SemKey<InfraContextImport> JAM_KEY = IMPORT_JAM_KEY.subKey("InfraContextImport");
   private static final JamClassAttributeMeta.Collection VALUE_ATTR_META = new JamClassAttributeMeta.Collection("value");
   private static final JamAnnotationArchetype ARCHETYPE = new JamAnnotationArchetype().addAttribute(VALUE_ATTR_META);
   private static final JamAnnotationMeta ANNO_META = new JamAnnotationMeta(AnnotationConstant.CONTEXT_IMPORT, ARCHETYPE, JAM_ANNO_META_KEY);

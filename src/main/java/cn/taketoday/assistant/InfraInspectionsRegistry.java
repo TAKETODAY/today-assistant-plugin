@@ -84,7 +84,7 @@ public abstract class InfraInspectionsRegistry {
   }
 
   /**
-   * Returns all registered inspections. Used by Compiler|Validation "Spring Model".
+   * Returns all registered inspections. Used by Compiler|Validation "Infra Model".
    *
    * @return Inspections.
    */

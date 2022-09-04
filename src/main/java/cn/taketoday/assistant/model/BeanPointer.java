@@ -48,8 +48,8 @@ public interface BeanPointer<T extends CommonInfraBean> extends PsiElementPointe
   /**
    * Sort beans for UI purposes.
    */
-  Comparator<BeanPointer<?>> DISPLAY_COMPARATOR = (o1, o2) -> Comparing.compare(InfraPresentationProvider.getBeanName(o1),
-          InfraPresentationProvider.getBeanName(o2));
+  Comparator<BeanPointer<?>> DISPLAY_COMPARATOR =
+          (o1, o2) -> Comparing.compare(InfraPresentationProvider.getBeanName(o1), InfraPresentationProvider.getBeanName(o2));
 
   /**
    * Defined bean name.

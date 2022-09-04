@@ -85,7 +85,7 @@ public class ProfileExpressionInspection extends AbstractInfraLocalInspection {
       return;
     }
     try {
-      InfraProfilesFactory.getInstance().parseProfileExpressions(new SmartList<>(attributeElement.getStringValue()));
+      InfraProfilesFactory.of().parseProfileExpressions(new SmartList<>(attributeElement.getStringValue()));
     }
     catch (InfraProfilesFactory.MalformedProfileExpressionException e) {
       holder.registerProblem(psiElement, e.getMessage());

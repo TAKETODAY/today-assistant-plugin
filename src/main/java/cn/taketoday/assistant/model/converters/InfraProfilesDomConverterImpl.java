@@ -51,6 +51,6 @@ public class InfraProfilesDomConverterImpl extends InfraProfilesDomConverter {
       return PsiReference.EMPTY_ARRAY;
     }
     String roles = genericDomValue.getStringValue();
-    return InfraProfilesFactory.getInstance().getProfilesReferences(module, element, roles, 0, InfraUtils.INFRA_DELIMITERS, true);
+    return InfraProfilesFactory.of().getProfilesReferences(module, element, roles, 0, InfraUtils.INFRA_DELIMITERS, true);
   }
 }

@@ -78,7 +78,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,41 +86,37 @@ import cn.taketoday.assistant.app.application.metadata.additional.InfraAdditiona
 import cn.taketoday.lang.Nullable;
 
 final class InfraConfigurationMetadataParser {
-  private static final Logger LOG;
+  private static final Logger LOG = Logger.getInstance(InfraConfigurationMetadataParser.class);
   @Nullable
-  private final Module myLocalModule;
+  private final Module localModule;
   @Nullable
-  private final PsiFile myJsonPsiFile;
+  private final PsiFile jsonPsiFile;
   @Nullable
-  private final File myLocalJsonFile;
-  private final String myLibraryName;
-  private final Caching myCaching;
-  private final NotNullLazyValue<Map<String, PsiElement>> myAdditionalConfigTargets;
-  private static final Pair<PsiType, MetaConfigKey.AccessType> DUMMY_TYPE;
+  private final File localJsonFile;
+  private final String libraryName;
+  private final Caching caching;
+  private final NotNullLazyValue<Map<String, PsiElement>> additionalConfigTargets;
 
-  static {
-    LOG = Logger.getInstance(InfraConfigurationMetadataParser.class);
-    DUMMY_TYPE = Pair.create(PsiType.NULL, MetaConfigKey.AccessType.NORMAL);
+  private static final Pair<PsiType, MetaConfigKey.AccessType> DUMMY_TYPE = Pair.create(PsiType.NULL, MetaConfigKey.AccessType.NORMAL);
+
+  InfraConfigurationMetadataParser(@Nullable PsiFile jsonPsiFile) {
+    this.jsonPsiFile = jsonPsiFile;
+    this.localJsonFile = null;
+    this.localModule = null;
+    this.libraryName = getLibraryOrContainingJarName(jsonPsiFile);
+    this.caching = new Caching(jsonPsiFile.getResolveScope());
+    this.additionalConfigTargets = NotNullLazyValue.lazy(Collections::emptyMap);
   }
 
-  InfraConfigurationMetadataParser(PsiFile jsonPsiFile) {
-    this.myJsonPsiFile = jsonPsiFile;
-    this.myLocalJsonFile = null;
-    this.myLocalModule = null;
-    this.myLibraryName = getLibraryOrContainingJarName(jsonPsiFile);
-    this.myCaching = new Caching(jsonPsiFile.getResolveScope());
-    this.myAdditionalConfigTargets = NotNullLazyValue.lazy(Collections::emptyMap);
-  }
-
-  InfraConfigurationMetadataParser(Module module, File localJsonFile) {
-    this.myLocalModule = module;
-    this.myJsonPsiFile = null;
-    this.myLocalJsonFile = localJsonFile;
-    this.myLibraryName = this.myLocalModule.getName();
-    this.myCaching = new Caching(module.getModuleRuntimeScope(false));
-    this.myAdditionalConfigTargets = NotNullLazyValue.lazy(() -> {
+  InfraConfigurationMetadataParser(Module module, @Nullable File localJsonFile) {
+    this.localModule = module;
+    this.jsonPsiFile = null;
+    this.localJsonFile = localJsonFile;
+    this.libraryName = this.localModule.getName();
+    this.caching = new Caching(module.getModuleRuntimeScope(false));
+    this.additionalConfigTargets = NotNullLazyValue.lazy(() -> {
       Map<String, PsiElement> additionalConfigTargets = new HashMap<>();
-      InfraAdditionalConfigUtils utils = new InfraAdditionalConfigUtils(this.myLocalModule);
+      InfraAdditionalConfigUtils utils = new InfraAdditionalConfigUtils(this.localModule);
       utils.processAllAdditionalMetadataFiles(psiFile -> {
         collectAdditionalConfigTargets(psiFile, additionalConfigTargets);
         return true;
@@ -270,22 +265,22 @@ final class InfraConfigurationMetadataParser {
       return true;
     }
     catch (Throwable e2) {
-      LOG.info("Error parsing Spring Boot metadata JSON from " + path.get(), e2);
+      LOG.info("Error parsing Infra metadata JSON from " + path.get(), e2);
       return true;
     }
   }
 
   private JsonReader openReader(Ref<String> pathRef) throws IOException {
-    if (this.myJsonPsiFile != null) {
-      VirtualFile file = this.myJsonPsiFile.getVirtualFile();
+    if (this.jsonPsiFile != null) {
+      VirtualFile file = this.jsonPsiFile.getVirtualFile();
       pathRef.set(file.getPath());
       String content = VfsUtilCore.loadText(file);
       return new JsonReader(new CharSequenceReader(content));
     }
     else {
-      assert this.myLocalJsonFile != null;
-      pathRef.set(this.myLocalJsonFile.getPath());
-      return new JsonReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(this.myLocalJsonFile)), StandardCharsets.UTF_8));
+      assert this.localJsonFile != null;
+      pathRef.set(this.localJsonFile.getPath());
+      return new JsonReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(this.localJsonFile)), StandardCharsets.UTF_8));
     }
   }
 
@@ -318,12 +313,12 @@ final class InfraConfigurationMetadataParser {
     if (StringUtil.isEmpty(sourceTypeText)) {
       return getFallbackDeclaration(configKeyName, type, false);
     }
-    PsiClass sourceTypeClass = this.myCaching.myCachedClass.get(sourceTypeText);
+    PsiClass sourceTypeClass = this.caching.myCachedClass.get(sourceTypeText);
     if (sourceTypeClass == null) {
       return getFallbackDeclaration(configKeyName, type, true);
     }
     return Pair.pair(MetaConfigKey.DeclarationResolveResult.PROPERTY,
-            new InfraConfigKeyDeclarationPsiElement(this.myLibraryName, sourceTypeClass,
+            new InfraConfigKeyDeclarationPsiElement(this.libraryName, sourceTypeClass,
                     findPropertyNavigationTarget(sourceTypeClass, configKeyName, module), configKeyName, sourceTypeText, type));
   }
 
@@ -349,15 +344,15 @@ final class InfraConfigurationMetadataParser {
   @Nullable
   private Pair<MetaConfigKey.DeclarationResolveResult, PsiElement> getFallbackDeclaration(
           String configKeyName, PsiType type, boolean unresolvedSourceTypeClass) {
-    PsiElement additionalTarget = myAdditionalConfigTargets.getValue().get(configKeyName);
-    if (this.myJsonPsiFile != null) {
+    PsiElement additionalTarget = additionalConfigTargets.getValue().get(configKeyName);
+    if (this.jsonPsiFile != null) {
       return Pair.pair(unresolvedSourceTypeClass ? MetaConfigKey.DeclarationResolveResult.JSON_UNRESOLVED_SOURCE_TYPE : MetaConfigKey.DeclarationResolveResult.JSON,
-              new InfraConfigKeyDeclarationPsiElement(this.myLibraryName, this.myJsonPsiFile, ObjectUtils.chooseNotNull(additionalTarget, this.myJsonPsiFile), configKeyName,
+              new InfraConfigKeyDeclarationPsiElement(this.libraryName, this.jsonPsiFile, ObjectUtils.chooseNotNull(additionalTarget, this.jsonPsiFile), configKeyName,
                       configKeyName, type));
     }
     else if (additionalTarget != null) {
       return Pair.pair(MetaConfigKey.DeclarationResolveResult.ADDITIONAL_JSON,
-              new InfraConfigKeyDeclarationPsiElement(this.myLibraryName, additionalTarget, additionalTarget, configKeyName, configKeyName, type));
+              new InfraConfigKeyDeclarationPsiElement(this.libraryName, additionalTarget, additionalTarget, configKeyName, configKeyName, type));
     }
     else {
       return null;
@@ -399,9 +394,7 @@ final class InfraConfigurationMetadataParser {
       return Collections.emptyMap();
     }
     Map<String, MetaConfigKey.ItemHint> itemHintsMap = new HashMap<>();
-    Iterator it = hintsElement.getAsJsonArray().iterator();
-    while (it.hasNext()) {
-      JsonElement value = (JsonElement) it.next();
+    for (JsonElement value : hintsElement.getAsJsonArray()) {
       JsonObject entry = value.getAsJsonObject();
       String nameValue = getStringLiteral(entry, InfraMetadataConstant.NAME);
       if (nameValue != null) {
@@ -425,9 +418,7 @@ final class InfraConfigurationMetadataParser {
       return Collections.emptyList();
     }
     SmartList smartList = new SmartList();
-    Iterator it = providersObject.getAsJsonArray().iterator();
-    while (it.hasNext()) {
-      JsonElement arrayValue = (JsonElement) it.next();
+    for (JsonElement arrayValue : providersObject.getAsJsonArray()) {
       if (arrayValue.isJsonObject() && (name = getStringLiteral((providerObject = arrayValue.getAsJsonObject()),
               InfraMetadataConstant.NAME)) != null) {
         Map<String, String> parameters = getItemHintProviderParameters(providerObject);

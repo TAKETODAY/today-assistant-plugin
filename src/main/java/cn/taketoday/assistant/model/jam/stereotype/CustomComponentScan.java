@@ -27,7 +27,7 @@ import com.intellij.semantic.SemKey;
 import cn.taketoday.assistant.beans.stereotype.ComponentScan;
 
 public class CustomComponentScan extends CustomComponentScanBase {
-  public static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = COMPONENT_SCAN_META_KEY.subKey("SpringJamComponentScan");
+  public static final SemKey<JamAnnotationMeta> JAM_ANNO_META_KEY = COMPONENT_SCAN_META_KEY.subKey("InfraJamComponentScan");
 
   public static final SemKey<CustomComponentScan> JAM_KEY = AbstractComponentScan.COMPONENT_SCAN_JAM_KEY.subKey("CustomJamComponentScan");
   public static final SemKey<JamMemberMeta<PsiClass, CustomComponentScan>> META_KEY =

@@ -43,6 +43,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.util.CachedValue;
 import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValueProvider.Result;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.semantic.SemKey;
 import com.intellij.util.ArrayUtil;
@@ -84,14 +85,15 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
     myScanned = CachedValuesManager.getManager(psiElement.getProject()).createCachedValue(() -> {
       Map<Module, Set<CommonInfraBean>> map = ConcurrentFactoryMap.createMap(this::getScannedBeans);
       PsiFile file = myPsiElement.getContainingFile();
-      return CachedValueProvider.Result.create(map, file == null ? new Object[] { ModificationTracker.EVER_CHANGED } : getScannedElementsDependencies(file));
+      return Result.create(map, file == null ? new Object[] { ModificationTracker.EVER_CHANGED } : getScannedElementsDependencies(file));
     }, false);
   }
 
   @Override
   public final Set<CommonInfraBean> getScannedElements(Module module) {
-    if (module.isDisposed())
+    if (module.isDisposed()) {
       return Collections.emptySet();
+    }
     return myScanned.getValue().get(module);
   }
 
@@ -123,7 +125,6 @@ public abstract class AbstractComponentScan extends CommonModelElement.PsiBase i
   }
 
   @Override
-
   public Set<PsiPackage> getPsiPackages() {
     Set<PsiPackage> definedPackages = getDefinedPackages();
     return definedPackages.isEmpty() ? getDefaultPsiPackages() : definedPackages;

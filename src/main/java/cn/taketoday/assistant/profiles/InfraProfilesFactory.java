@@ -64,7 +64,7 @@ import cn.taketoday.lang.Nullable;
 
 public class InfraProfilesFactory {
 
-  public static InfraProfilesFactory getInstance() {
+  public static InfraProfilesFactory of() {
     return ApplicationManager.getApplication().getService(InfraProfilesFactory.class);
   }
 
@@ -88,7 +88,7 @@ public class InfraProfilesFactory {
   }
 
   public PsiReference[] getProfilesReferences(
-          Module module, PsiElement element, @cn.taketoday.lang.Nullable String value,
+          Module module, PsiElement element, @Nullable String value,
           int valueOffset, String delimiters, boolean isDefinition) {
     List<TextRange> ranges = getProfileRanges(value, delimiters);
     if (ranges.isEmpty()) {
@@ -108,11 +108,11 @@ public class InfraProfilesFactory {
   }
 
   private static List<InfraProfileTarget> findDomTargets(Module module, boolean includeTests) {
-    return (CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
+    return CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
       Map<Boolean, List<InfraProfileTarget>> map = ConcurrentFactoryMap.createMap(
               withTests -> findDomTargets(module, module.getModuleScope(withTests)));
       return CachedValueProvider.Result.create(map, DomManager.getDomManager(module.getProject()));
-    })).get(includeTests);
+    }).get(includeTests);
   }
 
   public static List<InfraProfileTarget> findDomTargets(Module module, GlobalSearchScope scope) {

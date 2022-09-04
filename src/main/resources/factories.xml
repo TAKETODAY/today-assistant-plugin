@@ -115,8 +115,8 @@
     <factoryBean factory="cn.taketoday.beans.factory.config.FieldRetrievingFactoryBean" objectType=""/>
     <factoryBean factory="cn.taketoday.transaction.interceptor.TransactionProxyFactoryBean" resolver="TransactionProxyFactoryBeanTypeResolver"/>
     <factoryBean factory="cn.taketoday.jndi.JndiObjectFactoryBean" resolver="JndiObjectFactoryBeanTypeResolver"/>
-    <factoryBean factory="cn.taketoday.ejb.access.LocalStatelessSessionProxyFactoryBean" objectType="" resolver="SpringEjbTypeResolver"/>
-    <factoryBean factory="cn.taketoday.ejb.access.SimpleRemoteStatelessSessionProxyFactoryBean" objectType="" resolver="SpringEjbTypeResolver"/>
+    <factoryBean factory="cn.taketoday.ejb.access.LocalStatelessSessionProxyFactoryBean" objectType="" resolver="InfraEjbTypeResolver"/>
+    <factoryBean factory="cn.taketoday.ejb.access.SimpleRemoteStatelessSessionProxyFactoryBean" objectType="" resolver="InfraEjbTypeResolver"/>
 
     <!-- type can not be resolved or has no meaning. listed for completeness -->
     <factoryBean factory="cn.taketoday.aop.framework.AbstractSingletonProxyFactoryBean" objectType=""/>

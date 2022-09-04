@@ -55,7 +55,7 @@ class InfraConfigFileUsageTypeProvider implements UsageTypeProvider {
       return null;
     }
     if (virtualFile.getFileType() == JsonFileType.INSTANCE) {
-      if (virtualFile.getName().equals(InfraConfigFileConstants.ADDITIONAL_SPRING_CONFIGURATION_METADATA_JSON)) {
+      if (virtualFile.getName().equals(InfraConfigFileConstants.ADDITIONAL_CONFIGURATION_METADATA_JSON)) {
         return ADDITIONAL_METADATA_USAGE_TYPE;
       }
       return null;

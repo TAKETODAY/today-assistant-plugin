@@ -90,7 +90,7 @@ public class InfraAdditionalConfigReferenceContributor extends PsiReferenceContr
       }
     });
     private static final PsiFilePattern.Capture<JsonFile> SPRING_CONFIGURATION_METADATA_JSON = PlatformPatterns.psiFile(JsonFile.class)
-            .withName(InfraConfigFileConstants.SPRING_CONFIGURATION_METADATA_JSON);
+            .withName(InfraConfigFileConstants.CONFIGURATION_METADATA_JSON);
     private static final PatternCondition<JsonStringLiteral> VALUE_PATTERN = new PatternCondition<JsonStringLiteral>("inPropertyValue") {
 
       public boolean accepts(JsonStringLiteral property, ProcessingContext context) {

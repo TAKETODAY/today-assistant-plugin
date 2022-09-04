@@ -45,7 +45,7 @@ import cn.taketoday.lang.Nullable;
 public class JamPropertySource extends JamBaseElement<PsiClass> implements PropertySource {
 
   public static final SemKey<JamPropertySource> REPEATABLE_ANNO_JAM_KEY =
-          PropertySource.PROPERTY_SOURCE_JAM_KEY.subKey("SpringJamPropertySource");
+          PropertySource.PROPERTY_SOURCE_JAM_KEY.subKey("InfraJamPropertySource");
 
   private static final JamStringAttributeMeta.Collection<Set<PropertiesFile>> VALUE_ATTR_META =
           JamAttributeMeta.collectionString("value", new PropertiesFileConverter());

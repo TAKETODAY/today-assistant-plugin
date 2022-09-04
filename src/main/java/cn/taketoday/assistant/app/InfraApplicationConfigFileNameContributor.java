@@ -33,15 +33,12 @@ public class InfraApplicationConfigFileNameContributor extends InfraModelConfigF
   public static final Key<CustomSetting.STRING> CONFIG_NAME_CUSTOM_SETTING_ID = Key.create("infra_app_infra__config_name");
   public static final Key<CustomSetting.STRING> CONFIG_CUSTOM_FILES_ID = Key.create("infra_app_infra_config_custom_files");
   private static final String CONFIG_NAME_DEFAULT = "application";
-  private static final String CONFIG_FILE_KEY = "context.config.name";
+  private static final String CONFIG_FILE_KEY = "app.config.name";
 
   InfraApplicationConfigFileNameContributor() {
-    super(new InfraModelConfigFileNameContributor.CustomSettingDescriptor(CONFIG_NAME_CUSTOM_SETTING_ID,
-                    message("app.config.files.name.setting", CONFIG_FILE_KEY), CONFIG_NAME_DEFAULT),
-            new InfraModelConfigFileNameContributor.CustomSettingDescriptor(CONFIG_CUSTOM_FILES_ID,
-                    message("app.custom.config.files.locations"), ""),
-            new InfraModelConfigFileNameContributor.CustomizationPresentation(CONFIG_FILE_KEY,
-                    message("app.config.files.section.title")), Icons.TodayApp);
+    super(new CustomSettingDescriptor(CONFIG_NAME_CUSTOM_SETTING_ID, message("app.config.files.name.setting", CONFIG_FILE_KEY), CONFIG_NAME_DEFAULT),
+            new CustomSettingDescriptor(CONFIG_CUSTOM_FILES_ID, message("app.custom.config.files.locations"), ""),
+            new CustomizationPresentation(CONFIG_FILE_KEY, message("app.config.files.section.title")), Icons.TodayApp);
   }
 
   public boolean accept(InfraFileSet fileSet) {

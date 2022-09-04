@@ -100,7 +100,7 @@ public final class InfraProfileCompletionProvider extends TextFieldWithAutoCompl
 
   private Collection<String> getProfiles(Module module) {
     return ApplicationManager.getApplication().runReadAction((Computable<Collection<String>>) () -> {
-      List<InfraProfileTarget> targets = InfraProfilesFactory.getInstance().findProfileTargets(module, myIncludeTests);
+      List<InfraProfileTarget> targets = InfraProfilesFactory.of().findProfileTargets(module, myIncludeTests);
       return ContainerUtil.map2Set(targets, InfraProfileTarget::getName);
     });
   }

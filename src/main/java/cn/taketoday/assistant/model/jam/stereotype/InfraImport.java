@@ -34,8 +34,8 @@ import java.util.List;
 import cn.taketoday.lang.Nullable;
 
 public interface InfraImport extends CommonModelElement, JamElement {
-  SemKey<JamAnnotationMeta> IMPORT_JAM_ANNOTATION_KEY = JamService.ANNO_META_KEY.subKey("SpringImport");
-  SemKey<InfraImport> IMPORT_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringImport");
+  SemKey<JamAnnotationMeta> IMPORT_JAM_ANNOTATION_KEY = JamService.ANNO_META_KEY.subKey("InfraImport");
+  SemKey<InfraImport> IMPORT_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("InfraImport");
   SemKey<JamMemberMeta> IMPORT_META_KEY = JamService.getMetaKey(IMPORT_JAM_KEY);
   String VALUE_ATTR_NAME = "value";
 

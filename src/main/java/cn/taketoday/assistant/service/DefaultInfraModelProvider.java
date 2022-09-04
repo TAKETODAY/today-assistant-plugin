@@ -145,7 +145,7 @@ public class DefaultInfraModelProvider implements InfraModelProvider {
     }
 
     static {
-      ICON = new LayeredIcon(cn.taketoday.assistant.Icons.FileSet, Icons.TodayOverlay);
+      ICON = new LayeredIcon(Icons.FileSet, Icons.TodayOverlay);
     }
   }
 
@@ -158,7 +158,7 @@ public class DefaultInfraModelProvider implements InfraModelProvider {
     }
 
     static {
-      ICON = new LayeredIcon(cn.taketoday.assistant.Icons.FileSet, Icons.TodayOverlay);
+      ICON = new LayeredIcon(Icons.FileSet, Icons.TodayOverlay);
     }
   }
 

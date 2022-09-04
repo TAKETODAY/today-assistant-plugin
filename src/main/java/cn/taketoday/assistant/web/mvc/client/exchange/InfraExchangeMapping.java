@@ -56,7 +56,7 @@ public abstract class InfraExchangeMapping<T extends PsiMember> extends JamBaseE
   private static final JamStringAttributeMeta.Collection<String> ACCEPT_META = JamAttributeMeta.collectionString("accept", new ContentTypeJamConverter());
   protected static final JamAnnotationArchetype STANDARD_METHOD_ARCHETYPE = new JamAnnotationArchetype().addAttribute(VALUE_META).addAttribute(URL_META).addAttribute(CONTENT_TYPE_META)
           .addAttribute(ACCEPT_META);
-  public static final SemKey<InfraExchangeMapping<?>> MAPPING_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("SpringExchangeMapping",
+  public static final SemKey<InfraExchangeMapping<?>> MAPPING_JAM_KEY = JamService.JAM_ELEMENT_KEY.subKey("InfraExchangeMapping",
           new SemKey[] { UrlPathInlayHintsProviderSemElement.INLAY_HINT_SEM_KEY });
 
   @Nullable

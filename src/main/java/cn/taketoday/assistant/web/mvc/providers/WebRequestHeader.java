@@ -54,7 +54,7 @@ final class WebRequestHeader {
   }
 
   public String toString() {
-    return "SpringRequestHeader(name=" + this.name + ", values=" + this.values + ")";
+    return "InfraRequestHeader(name=" + this.name + ", values=" + this.values + ")";
   }
 
   public int hashCode() {

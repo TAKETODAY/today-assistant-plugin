@@ -99,7 +99,9 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
       return true;
     }
     PsiClass psiClass = PsiTreeUtil.getParentOfType(psiAnnotation, PsiClass.class);
-    return psiClass != null && JamService.getJamService(psiAnnotation.getProject()).getJamElement(AbstractComponentScan.COMPONENT_SCAN_JAM_KEY, psiClass) != null;
+    return psiClass != null
+            && JamService.getJamService(psiAnnotation.getProject())
+            .getJamElement(AbstractComponentScan.COMPONENT_SCAN_JAM_KEY, psiClass) != null;
   }
 
   private static void annotateComponentScans(UAnnotation uAnnotation, Collection<? super RelatedItemLineMarkerInfo<?>> result) {
@@ -115,7 +117,7 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
           if (componentScans != null) {
             for (ComponentScan componentScan : componentScans.getComponentScans()) {
               if (psiAnnotation.equals(componentScan.getAnnotation())) {
-                annotateSpringBeansPackagesScan(result, identifier, componentScan);
+                annotateBeansPackagesScan(result, identifier, componentScan);
               }
             }
           }
@@ -138,10 +140,10 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
         }).map(scan2 -> {
           return (AbstractComponentScan) scan2;
         }).collect(Collectors.toList());
-        AbstractComponentScan scan3 = ContainerUtil.getFirstItem(scans);
-        PsiAnnotation psiAnnotation = scan3 == null ? null : scan3.getAnnotation();
+        AbstractComponentScan firstItem = ContainerUtil.getFirstItem(scans);
+        PsiAnnotation psiAnnotation = firstItem == null ? null : firstItem.getAnnotation();
         if (psiAnnotation != null) {
-          annotateSpringBeansPackagesScan(result, identifier, psiAnnotation, scans);
+          annotateBeansPackagesScan(result, identifier, psiAnnotation, scans);
         }
       }
     }
@@ -155,17 +157,17 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
     return parent.getParent() instanceof PsiClass;
   }
 
-  private static void annotateSpringBeansPackagesScan(
+  private static void annotateBeansPackagesScan(
           Collection<? super RelatedItemLineMarkerInfo<?>> result, PsiElement identifier,
           AbstractComponentScan scan) {
     PsiAnnotation psiAnnotation = scan.getAnnotation();
     if (psiAnnotation == null) {
       return;
     }
-    annotateSpringBeansPackagesScan(result, identifier, psiAnnotation, new SmartList<>(scan));
+    annotateBeansPackagesScan(result, identifier, psiAnnotation, new SmartList<>(scan));
   }
 
-  private static void annotateSpringBeansPackagesScan(
+  private static void annotateBeansPackagesScan(
           Collection<? super RelatedItemLineMarkerInfo<?>> result,
           PsiElement identifier, PsiAnnotation psiAnnotation, List<? extends AbstractComponentScan> scans) {
     addJavaBeanGutterIcon(result, identifier, NotNullLazyValue.lazy(() -> {
@@ -173,10 +175,10 @@ public class ComponentScanAnnotator extends AbstractInfraAnnotator {
       if (module == null) {
         return Collections.emptySet();
       }
-      Set<CommonInfraBean> scannedElements = scans.stream().flatMap(scan -> {
-        return scan.getScannedElements(module).stream();
-      }).collect(Collectors.toSet());
-      List<BeanPointer<?>> beans = new ArrayList<>(InfraBeanService.of().mapBeans(scannedElements));
+      Set<CommonInfraBean> scannedElements = scans.stream()
+              .flatMap(scan -> scan.getScannedElements(module).stream())
+              .collect(Collectors.toSet());
+      ArrayList<BeanPointer<?>> beans = new ArrayList<>(InfraBeanService.of().mapBeans(scannedElements));
       beans.sort(BeanPointer.DISPLAY_COMPARATOR);
       return ContainerUtil.map(beans, BeanPointer.TO_BEAN);
     }), Icons.Gutter.SpringScan);

@@ -26,7 +26,7 @@ public interface InfraConfigFileConstants {
   String APPLICATION_YML = "application.yml";
   String BOOTSTRAP = "bootstrap";
   String BOOTSTRAP_PROPERTIES = "bootstrap.properties";
-  String SPRING_CONFIGURATION_METADATA_JSON = "infra-configuration-metadata.json";
-  String ADDITIONAL_SPRING_CONFIGURATION_METADATA_JSON = "additional-infra-configuration-metadata.json";
+  String CONFIGURATION_METADATA_JSON = "infra-configuration-metadata.json";
+  String ADDITIONAL_CONFIGURATION_METADATA_JSON = "additional-infra-configuration-metadata.json";
 
 }
