@@ -48,7 +48,9 @@ public class InfraApplicationPropertiesAnnotator extends InfraConfigFileAnnotato
       return;
     }
     PsiFile file = holder.getCurrentAnnotationSession().getFile();
-    if (!(file instanceof PropertiesFile) || !InfraUtils.hasFacets(file.getProject()) || !InfraConfigurationFileService.of().isApplicationConfigurationFile(file)) {
+    if (!(file instanceof PropertiesFile)
+            || !InfraUtils.hasFacets(file.getProject())
+            || !InfraConfigurationFileService.of().isApplicationConfigurationFile(file)) {
       return;
     }
     if (element instanceof PropertyValueImpl) {

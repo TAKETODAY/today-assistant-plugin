@@ -45,8 +45,7 @@ public class InfraConfigFileHighlightingUtil {
   }
 
   public void highlightDeprecatedConfigKey(PsiElement keyElement,
-          MetaConfigKey configKey,
-          LocalQuickFix... quickFixes) {
+          MetaConfigKey configKey, LocalQuickFix... quickFixes) {
     Deprecation deprecation = configKey.getDeprecation();
     String reasonShortText = deprecation.getReason().getShortText();
     String reason = StringUtil.isNotEmpty(reasonShortText)

@@ -67,8 +67,7 @@ public class InfraModelApplicationPropertiesConfigFileContributor extends InfraM
     String fileName = propertiesFile.getVirtualFile().getNameWithoutExtension();
     String profileSuffix = StringUtil.substringAfter(fileName, "-");
     if (!isProfileRelevant(params, profileSuffix)) {
-      List<ConfigurationValueResult> emptyList2 = Collections.emptyList();
-      return emptyList2;
+      return Collections.emptyList();
     }
     SmartList smartList = new SmartList();
     List<List<IProperty>> documents = getDocuments(propertiesFile, params.getModule());

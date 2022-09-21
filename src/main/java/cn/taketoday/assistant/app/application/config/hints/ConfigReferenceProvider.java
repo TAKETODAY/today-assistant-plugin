@@ -107,15 +107,13 @@ public class ConfigReferenceProvider implements HintReferenceProvider {
           boolean includeTestScope = file != null && ProjectFileIndex.getInstance(psiElement.getProject()).isInTestSourceContent(file);
           return new SmartList(getClasspathRoots(module, includeTestScope));
         }
-        Collection<PsiFileSystemItem> computeDefaultContexts = super.computeDefaultContexts();
-        return computeDefaultContexts;
+        return super.computeDefaultContexts();
       }
     };
     if (text.startsWith("/")) {
       referenceSet.addCustomization(FileReferenceSet.DEFAULT_PATH_EVALUATOR_OPTION, FileReferenceSet.ABSOLUTE_TOP_LEVEL);
     }
-    FileReference[] allReferences = referenceSet.getAllReferences();
-    return allReferences;
+    return referenceSet.getAllReferences();
   }
 
   public static List<PsiDirectory> getClasspathRoots(Module module, boolean includeTestScope) {
@@ -147,16 +145,13 @@ public class ConfigReferenceProvider implements HintReferenceProvider {
       }
 
       protected Condition<PsiFileSystemItem> getReferenceCompletionFilter() {
-        return (v0) -> {
-          return v0.isDirectory();
-        };
+        return PsiFileSystemItem::isDirectory;
       }
 
       public Collection<PsiFileSystemItem> computeDefaultContexts() {
         PsiDirectory contentRoot = getContentRoot(psiElement);
         if (contentRoot == null) {
-          Collection<PsiFileSystemItem> computeDefaultContexts = super.computeDefaultContexts();
-          return computeDefaultContexts;
+          return super.computeDefaultContexts();
         }
         return new SmartList(contentRoot);
       }
@@ -164,8 +159,7 @@ public class ConfigReferenceProvider implements HintReferenceProvider {
     if (text.startsWith("/")) {
       referenceSet.addCustomization(FileReferenceSet.DEFAULT_PATH_EVALUATOR_OPTION, FileReferenceSet.ABSOLUTE_TOP_LEVEL);
     }
-    FileReference[] allReferences = referenceSet.getAllReferences();
-    return allReferences;
+    return referenceSet.getAllReferences();
   }
 
   private static FileReference[] getFileReferences(PsiElement psiElement, String text, int offset) {
@@ -178,8 +172,7 @@ public class ConfigReferenceProvider implements HintReferenceProvider {
       public Collection<PsiFileSystemItem> computeDefaultContexts() {
         PsiDirectory contentRoot = getContentRoot(psiElement);
         if (contentRoot == null) {
-          Collection<PsiFileSystemItem> computeDefaultContexts = super.computeDefaultContexts();
-          return computeDefaultContexts;
+          return super.computeDefaultContexts();
         }
         return new SmartList(contentRoot);
       }
@@ -187,8 +180,7 @@ public class ConfigReferenceProvider implements HintReferenceProvider {
     if (text.startsWith("/")) {
       referenceSet.addCustomization(FileReferenceSet.DEFAULT_PATH_EVALUATOR_OPTION, FileReferenceSet.ABSOLUTE_TOP_LEVEL);
     }
-    FileReference[] allReferences = referenceSet.getAllReferences();
-    return allReferences;
+    return referenceSet.getAllReferences();
   }
 
   private static FileType[] getFileTypes() {
@@ -224,10 +216,9 @@ public class ConfigReferenceProvider implements HintReferenceProvider {
       if (!this.myOptional) {
         prefixes.add(OPTIONAL_PREFIX);
       }
-      Object[] map2Array = ContainerUtil.map2Array(prefixes, prefix -> {
+      return ContainerUtil.map2Array(prefixes, prefix -> {
         return LookupElementBuilder.create(prefix).bold();
       });
-      return map2Array;
     }
   }
 }

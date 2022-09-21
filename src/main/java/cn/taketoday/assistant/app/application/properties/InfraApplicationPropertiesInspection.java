@@ -86,7 +86,6 @@ public class InfraApplicationPropertiesInspection extends LocalInspectionTool {
   public ProblemDescriptor[] checkFile(PsiFile file, InspectionManager manager, boolean isOnTheFly) {
     PropertyImpl property;
     PropertyKeyImpl propertyKey;
-    PsiReference[] references;
     ConfigKeyParts keyParts;
     if (!(file instanceof PropertiesFile propertiesFile)) {
       return null;
@@ -94,7 +93,6 @@ public class InfraApplicationPropertiesInspection extends LocalInspectionTool {
     if (!InfraUtils.hasFacets(manager.getProject()) || !InfraConfigurationFileService.of().isApplicationConfigurationFile(file)) {
       return ProblemDescriptor.EMPTY_ARRAY;
     }
-    Module module = ModuleUtilCore.findModuleForPsiElement(file);
     ProblemsHolder holder = new ProblemsHolder(manager, file, isOnTheFly);
     InfraConfigFileHighlightingUtil configFileHighlightingUtil = new InfraConfigFileHighlightingUtil(holder);
     for (IProperty iproperty : propertiesFile.getProperties()) {
@@ -163,8 +161,7 @@ public class InfraApplicationPropertiesInspection extends LocalInspectionTool {
     return replacement == null ? LocalQuickFix.EMPTY_ARRAY : new LocalQuickFix[] { new LocalQuickFixAndIntentionActionOnPsiElement(property) {
 
       public String getText() {
-        String message = InfraAppBundle.message("application.config.replacement.quick.fix", replacement);
-        return message;
+        return InfraAppBundle.message("application.config.replacement.quick.fix", replacement);
       }
 
       public void invoke(Project project, PsiFile file, @Nullable Editor editor, PsiElement startElement, PsiElement endElement) {
