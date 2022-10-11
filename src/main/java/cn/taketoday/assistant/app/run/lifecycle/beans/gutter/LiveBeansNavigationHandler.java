@@ -73,7 +73,7 @@ import javax.swing.ListCellRenderer;
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.InfraManager;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManager;
 import cn.taketoday.assistant.app.run.lifecycle.beans.BeansEndpoint;
@@ -189,7 +189,7 @@ final class LiveBeansNavigationHandler implements GutterIconNavigationHandler<Ps
   }
 
   public static PsiElementPointer findBeanPointer(BeanNavigationItem item, LiveBean liveBean) {
-    if (!(item.info.getRunProfile() instanceof InfraApplicationRunConfigurationBase runConfiguration)) {
+    if (!(item.info.getRunProfile() instanceof InfraApplicationRunConfig runConfiguration)) {
       return () -> null;
     }
     InfraModel combinedModel = InfraManager.from(item.project).getCombinedModel(runConfiguration.getModule());
@@ -379,7 +379,7 @@ final class LiveBeansNavigationHandler implements GutterIconNavigationHandler<Ps
     }
     Collection<InfraApplicationInfo> infos = InfraApplicationLifecycleManager.from(project).getInfraApplicationInfos();
     return infos.stream().anyMatch(info -> {
-      return info.getEndpointData(BeansEndpoint.getInstance()).getValue() != null;
+      return info.getEndpointData(BeansEndpoint.of()).getValue() != null;
     });
   }
 
@@ -388,7 +388,7 @@ final class LiveBeansNavigationHandler implements GutterIconNavigationHandler<Ps
     SmartList<BeanNavigationItem> smartList = new SmartList<>();
     Collection<InfraApplicationInfo> infos = InfraApplicationLifecycleManager.from(project).getInfraApplicationInfos();
     for (InfraApplicationInfo info : infos) {
-      LiveBeansModel beansModel = info.getEndpointData(BeansEndpoint.getInstance()).getValue();
+      LiveBeansModel beansModel = info.getEndpointData(BeansEndpoint.of()).getValue();
       if (beansModel != null) {
         beansModel.getBeansByName(beanName).stream().filter(beanMatcher).forEach(liveBean -> {
           smartList.add(new BeanNavigationItem(project, info, liveBean));

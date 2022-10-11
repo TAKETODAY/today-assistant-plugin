@@ -310,6 +310,12 @@
         condition="cn.taketoday.jdbc.config.DataSourceAutoConfiguration.PooledDataSourceCondition"
         implementation="cn.taketoday.assistant.model.config.autoconfigure.conditions.PooledDataSourceCondition"/>
 
+    <replacementTokenResolver
+        implementation="cn.taketoday.assistant.app.run.maven.InfraMavenReplacementTokenResolver"/>
+
+    <replacementTokenResolver
+        implementation="cn.taketoday.assistant.app.run.gradle.InfraGradleReplacementTokenResolver"/>
+
   </extensions>
 
 

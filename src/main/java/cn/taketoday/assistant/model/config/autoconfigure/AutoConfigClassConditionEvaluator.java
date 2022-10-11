@@ -24,16 +24,16 @@ import com.intellij.psi.PsiClass;
 
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionalOnEvaluationContext;
 
-class AutoConfigClassConditionEvaluator extends AutoConfigConditionEvaluatorBase {
-  private final PsiClass myAutoConfigClass;
+class AutoConfigClassConditionEvaluator extends AbstractAutoConfigConditionEvaluator {
+  private final PsiClass autoConfigClass;
 
   AutoConfigClassConditionEvaluator(PsiClass autoConfigClass, boolean nonStrictEvaluation, ConditionalOnEvaluationContext conditionalOnEvaluationContext) {
     super(nonStrictEvaluation, conditionalOnEvaluationContext);
-    this.myAutoConfigClass = autoConfigClass;
+    this.autoConfigClass = autoConfigClass;
   }
 
   @Override
   protected ConditionalCollector getConditionalCollector() {
-    return ConditionalCollector.forClass(this.myAutoConfigClass);
+    return ConditionalCollector.forClass(autoConfigClass);
   }
 }

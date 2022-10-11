@@ -85,7 +85,7 @@ class InfraApplicationYamlKeyCompletionProvider extends CompletionProvider<Compl
 
     public YAMLKeyValue createNewEntry(YAMLDocument document, LookupElementDecorator<LookupElement> item, @Nullable YAMLKeyValue parent) {
       String qualifiedKey = item.getCopyableUserData(CONFIG_KEY);
-      ConfigYamlAccessor accessor = new ConfigYamlAccessor(document, InfraApplicationMetaConfigKeyManager.getInstance());
+      ConfigYamlAccessor accessor = new ConfigYamlAccessor(document, InfraApplicationMetaConfigKeyManager.of());
       YAMLKeyValue keyValue = accessor.findExistingKey(qualifiedKey);
       if (keyValue != null) {
         item.putUserData(NEW_CONFIG_KEY, keyValue);
@@ -128,7 +128,7 @@ class InfraApplicationYamlKeyCompletionProvider extends CompletionProvider<Compl
     if (module == null) {
       return;
     }
-    InfraApplicationMetaConfigKeyManager keyManager = InfraApplicationMetaConfigKeyManager.getInstance();
+    InfraApplicationMetaConfigKeyManager keyManager = InfraApplicationMetaConfigKeyManager.of();
     List<? extends MetaConfigKey> configKeys = keyManager.getAllMetaConfigKeys(module);
     MetaConfigKeyManager.ConfigKeyNameBinder binder = keyManager.getConfigKeyNameBinder(module);
     PsiElement element = parameters.getPosition();

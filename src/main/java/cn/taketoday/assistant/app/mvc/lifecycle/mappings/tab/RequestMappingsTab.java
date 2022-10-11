@@ -49,7 +49,7 @@ import cn.taketoday.assistant.InfraAppBundle;
 import cn.taketoday.assistant.InfraLibraryUtil;
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMapping;
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMappingsModel;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationUrlUtil;
@@ -58,34 +58,38 @@ import cn.taketoday.assistant.app.run.lifecycle.tabs.InfraEndpointsTabSettings;
 import cn.taketoday.assistant.web.mvc.jam.RequestMethod;
 import cn.taketoday.lang.Nullable;
 
+import static cn.taketoday.assistant.InfraAppBundle.messagePointer;
+
 public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
   private static final String REQUEST_MAPPINGS = "REQUEST_MAPPINGS";
-  private final List<LiveRequestMapping> myRequestMappings;
-  private final JComponent myWrapper;
-  private final RequestMappingsPanel myRequestMappingsPanel;
-  private volatile boolean myMappingsEnabled;
-  private final RequestMappingsEndpointTabSettings mySettings;
 
-  public RequestMappingsTab(Endpoint<LiveRequestMappingsModel> endpoint, InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  private final JComponent wrapper;
+  private volatile boolean mappingsEnabled;
+  private final RequestMappingsPanel requestMappingsPanel;
+  private final List<LiveRequestMapping> requestMappings;
+  private final RequestMappingsEndpointTabSettings settings;
+
+  public RequestMappingsTab(Endpoint<LiveRequestMappingsModel> endpoint, InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     super(endpoint, runConfiguration, processHandler);
-    this.myRequestMappings = new ArrayList();
-    this.myMappingsEnabled = false;
-    this.mySettings = RequestMappingsEndpointTabSettings.getInstance(getProject());
-    this.myRequestMappingsPanel = new RequestMappingsPanel(getProject(), getRunConfiguration(), processHandler,
+    this.mappingsEnabled = false;
+    this.requestMappings = new ArrayList<>();
+    this.settings = RequestMappingsEndpointTabSettings.getInstance(getProject());
+    this.requestMappingsPanel = new RequestMappingsPanel(getProject(), getRunConfiguration(), processHandler,
             ContainerUtil.newArrayList(new MarkAsDefaultAction(), new RestoreEmptyDefaultPathAction()));
-    this.myRequestMappingsPanel.setDefaultPath(runConfiguration.getUrlPath());
-    Disposer.register(this, this.myRequestMappingsPanel);
-    this.myWrapper = DumbService.getInstance(getProject()).wrapGently(this.myRequestMappingsPanel, this);
+    this.requestMappingsPanel.setDefaultPath(runConfiguration.getUrlPath());
+    Disposer.register(this, this.requestMappingsPanel);
+    this.wrapper = DumbService.getInstance(getProject()).wrapGently(this.requestMappingsPanel, this);
     MessageBusConnection connection = getProject().getMessageBus().connect(this);
     connection.subscribe(RunManagerListener.TOPIC, new RunManagerListener() {
 
+      @Override
       public void runConfigurationChanged(RunnerAndConfigurationSettings settings) {
         RunConfiguration configuration = settings.getConfiguration();
-        if (RequestMappingsTab.this.getRunConfiguration().getName().equals(configuration.getName())
-                && (configuration instanceof InfraApplicationRunConfigurationBase applicationRunConfigurationBase)) {
-          String defaultPath = applicationRunConfigurationBase.getUrlPath();
-          RequestMappingsTab.this.getRunConfiguration().setUrlPath(defaultPath);
-          RequestMappingsTab.this.myRequestMappingsPanel.setDefaultPath(defaultPath);
+        if (getRunConfiguration().getName().equals(configuration.getName())
+                && (configuration instanceof InfraApplicationRunConfig config)) {
+          String defaultPath = config.getUrlPath();
+          getRunConfiguration().setUrlPath(defaultPath);
+          requestMappingsPanel.setDefaultPath(defaultPath);
         }
       }
     });
@@ -94,7 +98,7 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
       @Override
       public void settingsChanged(String changeType) {
         if (changeType.equals(REQUEST_MAPPINGS)) {
-          RequestMappingsTab.this.myRequestMappingsPanel.setItems(Collections.unmodifiableList(RequestMappingsTab.this.myRequestMappings));
+          requestMappingsPanel.setItems(Collections.unmodifiableList(requestMappings));
         }
       }
     });
@@ -106,14 +110,11 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
   }
 
   @Override
-
   public Icon getIcon() {
-    Icon icon = Icons.RequestMapping;
-    return icon;
+    return Icons.RequestMapping;
   }
 
   @Override
-
   protected List<AnAction> getToolbarActions() {
     List<AnAction> actions = new ArrayList<>();
     actions.add(new OpenInBrowserAction());
@@ -122,11 +123,11 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
     actions.add(new EndpointToggleAction(InfraAppBundle.message("infra.application.endpoints.mappings.show.library.mappings.action.name"), null, AllIcons.Nodes.PpLib) {
 
       public boolean isSelected(AnActionEvent e) {
-        return RequestMappingsTab.this.mySettings.isShowLibraryMappings();
+        return RequestMappingsTab.this.settings.isShowLibraryMappings();
       }
 
       public void setSelected(AnActionEvent e, boolean state) {
-        RequestMappingsTab.this.mySettings.setShowLibraryMappings(state);
+        RequestMappingsTab.this.settings.setShowLibraryMappings(state);
         InfraEndpointsTabSettings.from(RequestMappingsTab.this.getProject()).fireSettingsChanged(REQUEST_MAPPINGS);
       }
     });
@@ -134,26 +135,25 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
   }
 
   @Override
-
   protected JComponent getEndpointComponent() {
-    JComponent jComponent = this.myWrapper;
+    JComponent jComponent = this.wrapper;
     return jComponent;
   }
 
   @Override
   public void doUpdateComponent(@Nullable LiveRequestMappingsModel model) {
-    this.myRequestMappings.clear();
+    this.requestMappings.clear();
     if (model != null) {
-      this.myRequestMappings.addAll(model.getRequestMappings());
+      this.requestMappings.addAll(model.getRequestMappings());
     }
-    this.myRequestMappingsPanel.setItems(Collections.unmodifiableList(this.myRequestMappings));
+    this.requestMappingsPanel.setItems(Collections.unmodifiableList(this.requestMappings));
   }
 
   @Override
   public void checkAvailability() {
     super.checkAvailability();
-    this.myMappingsEnabled = InfraLibraryUtil.hasRequestMappings(getRunConfiguration().getModule());
-    if (isActuatorsEnabled() && !this.myMappingsEnabled) {
+    this.mappingsEnabled = InfraLibraryUtil.hasRequestMappings(getRunConfiguration().getModule());
+    if (isActuatorsEnabled() && !this.mappingsEnabled) {
       showMessage(InfraAppBundle.message("infra.application.endpoints.mappings.disabled"));
     }
   }
@@ -161,7 +161,7 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
   @Override
   public void updateRefreshAction(AnActionEvent e, InfraApplicationInfo info) {
     super.updateRefreshAction(e, info);
-    if (!this.myMappingsEnabled) {
+    if (!this.mappingsEnabled) {
       e.getPresentation().setEnabled(false);
     }
   }
@@ -169,17 +169,19 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
   private class MarkAsDefaultAction extends AnAction {
 
     MarkAsDefaultAction() {
-      super(InfraAppBundle.messagePointer("infra.application.endpoints.mappings.mark.default.action.name"), AllIcons.Actions.SetDefault);
+      super(messagePointer("infra.application.endpoints.mappings.mark.default.action.name"), AllIcons.Actions.SetDefault);
     }
 
+    @Override
     public void update(AnActionEvent e) {
-      LiveRequestMapping mapping = RequestMappingsTab.this.myRequestMappingsPanel.getSelectedMapping();
+      LiveRequestMapping mapping = RequestMappingsTab.this.requestMappingsPanel.getSelectedMapping();
       String path = mapping != null ? mapping.getPath() : null;
       e.getPresentation().setEnabledAndVisible(path != null && !path.equals(RequestMappingsTab.this.getRunConfiguration().getUrlPath()) && mapping.canNavigate());
     }
 
+    @Override
     public void actionPerformed(AnActionEvent e) {
-      LiveRequestMapping mapping = RequestMappingsTab.this.myRequestMappingsPanel.getSelectedMapping();
+      LiveRequestMapping mapping = RequestMappingsTab.this.requestMappingsPanel.getSelectedMapping();
       String path = mapping != null ? mapping.getPath() : null;
       if (path == null) {
         return;
@@ -191,15 +193,17 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
   private class RestoreEmptyDefaultPathAction extends AnAction {
 
     RestoreEmptyDefaultPathAction() {
-      super(InfraAppBundle.messagePointer("infra.application.endpoints.mappings.restore.empty.default.path.action.name"));
+      super(messagePointer("infra.application.endpoints.mappings.restore.empty.default.path.action.name"));
     }
 
+    @Override
     public void update(AnActionEvent e) {
-      LiveRequestMapping mapping = RequestMappingsTab.this.myRequestMappingsPanel.getSelectedMapping();
+      LiveRequestMapping mapping = RequestMappingsTab.this.requestMappingsPanel.getSelectedMapping();
       String path = mapping != null ? mapping.getPath() : null;
       e.getPresentation().setEnabledAndVisible(path != null && path.equals(RequestMappingsTab.this.getRunConfiguration().getUrlPath()));
     }
 
+    @Override
     public void actionPerformed(AnActionEvent e) {
       InfraApplicationUrlUtil.getInstance().updatePath(RequestMappingsTab.this.getProject(), RequestMappingsTab.this.getRunConfiguration(), "");
     }
@@ -208,28 +212,25 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
   private class LiveRequestMethodActionGroup extends DefaultActionGroup implements CheckedActionGroup {
 
     LiveRequestMethodActionGroup() {
-      RequestMethod[] values;
       setPopup(true);
-      getTemplatePresentation().setText(InfraAppBundle.messagePointer("infra.application.endpoints.mappings.request.method.action.name"));
+      getTemplatePresentation().setText(messagePointer("infra.application.endpoints.mappings.request.method.action.name"));
       getTemplatePresentation().setIcon(AllIcons.Nodes.Method);
       for (RequestMethod method : RequestMethod.values()) {
         String name = method.name();
         add(new EndpointToggleAction(name) {
 
-          {
-            RequestMappingsTab requestMappingsTab = RequestMappingsTab.this;
-          }
-
+          @Override
           public boolean isSelected(AnActionEvent e) {
-            return !RequestMappingsTab.this.mySettings.getFilteredRequestMethods().contains(method);
+            return !RequestMappingsTab.this.settings.getFilteredRequestMethods().contains(method);
           }
 
+          @Override
           public void setSelected(AnActionEvent e, boolean state) {
             if (state) {
-              RequestMappingsTab.this.mySettings.getFilteredRequestMethods().remove(method);
+              RequestMappingsTab.this.settings.getFilteredRequestMethods().remove(method);
             }
             else {
-              RequestMappingsTab.this.mySettings.getFilteredRequestMethods().add(method);
+              RequestMappingsTab.this.settings.getFilteredRequestMethods().add(method);
             }
             InfraEndpointsTabSettings.from(RequestMappingsTab.this.getProject()).fireSettingsChanged(REQUEST_MAPPINGS);
           }
@@ -245,6 +246,7 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
       }
     }
 
+    @Override
     public void update(AnActionEvent e) {
       RequestMappingsTab.this.updateActionPresentation(e);
     }
@@ -253,22 +255,24 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
   private class OpenInBrowserAction extends AnAction {
 
     OpenInBrowserAction() {
-      super(InfraAppBundle.messagePointer("infra.application.endpoints.mappings.open.in.browser.action.name"), AllIcons.Nodes.PpWeb);
+      super(messagePointer("infra.application.endpoints.mappings.open.in.browser.action.name"), AllIcons.Nodes.PpWeb);
     }
 
+    @Override
     public void update(AnActionEvent e) {
       Presentation presentation = e.getPresentation();
       InfraApplicationInfo info = RequestMappingsTab.this.getInfo();
       String applicationUrl = info == null ? null : info.getApplicationUrl().getValue();
       presentation.setEnabled(applicationUrl != null);
       if (applicationUrl == null) {
-        presentation.setDescription(InfraAppBundle.messagePointer("infra.application.endpoints.mappings.open.in.browser.action.description"));
+        presentation.setDescription(messagePointer("infra.application.endpoints.mappings.open.in.browser.action.description"));
       }
       else {
-        presentation.setDescription(InfraAppBundle.messagePointer("infra.application.endpoints.mappings.open.url", applicationUrl));
+        presentation.setDescription(messagePointer("infra.application.endpoints.mappings.open.url", applicationUrl));
       }
     }
 
+    @Override
     public void actionPerformed(AnActionEvent e) {
       String applicationUrl;
       InfraApplicationInfo info = RequestMappingsTab.this.getInfo();

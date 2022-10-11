@@ -27,7 +27,6 @@ import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsActions;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.AppUIUtil;
 import com.intellij.ui.JBColor;
@@ -42,7 +41,6 @@ import java.awt.GridBagLayout;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -52,12 +50,12 @@ import javax.swing.ScrollPaneConstants;
 
 import cn.taketoday.assistant.InfraAppBundle;
 import cn.taketoday.assistant.InfraLibraryUtil;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationConfigurationException;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManager;
-import cn.taketoday.assistant.app.run.lifecycle.LiveProperty;
+import cn.taketoday.assistant.app.run.lifecycle.Property;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -67,34 +65,35 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
   private static final String MESSAGE_CARD = "message";
   private static final String ENDPOINT_CARD = "endpoint";
 
-  private final Endpoint<T> myEndpoint;
-  private final InfraApplicationRunConfigurationBase myRunConfiguration;
-  private final ProcessHandler myProcessHandler;
-  private final LiveProperty.LivePropertyListener myEndpointListener;
+  private final Endpoint<T> endpoint;
+  private final InfraApplicationRunConfig runConfiguration;
 
-  private final CardLayout myRootPanelLayout;
-  private final JPanel myRootPanel;
-  private final JBLoadingPanel myMessagePanel;
-  private final JLabel myMessageLabel;
+  private final ProcessHandler processHandler;
+  private final Property.PropertyListener endpointListener;
 
-  private TooltipChangeListener myTooltipChangeListener;
+  private final JPanel rootPanel;
+  private final JLabel messageLabel;
+  private final CardLayout rootPanelLayout;
+  private final JBLoadingPanel messagePanel;
 
-  private volatile boolean myActuatorsEnabled;
+  private TooltipChangeListener tooltipChangeListener;
 
-  protected EndpointTab(Endpoint<T> endpoint, InfraApplicationRunConfigurationBase runConfiguration,
+  private volatile boolean actuatorsEnabled;
+
+  protected EndpointTab(Endpoint<T> endpoint, InfraApplicationRunConfig runConfiguration,
           ProcessHandler processHandler) {
-    myEndpoint = endpoint;
-    myRunConfiguration = runConfiguration;
-    myProcessHandler = processHandler;
+    this.endpoint = endpoint;
+    this.runConfiguration = runConfiguration;
+    this.processHandler = processHandler;
 
-    myEndpointListener = new LiveProperty.LivePropertyListener() {
+    endpointListener = new Property.PropertyListener() {
       @Override
       public void propertyChanged() {
         AppUIUtil.invokeLaterIfProjectAlive(getProject(), () -> {
-          if (myMessagePanel.isLoading()) {
-            myMessagePanel.stopLoading();
+          if (messagePanel.isLoading()) {
+            messagePanel.stopLoading();
           }
-          myRootPanelLayout.show(myRootPanel, ENDPOINT_CARD);
+          rootPanelLayout.show(rootPanel, ENDPOINT_CARD);
         });
         updateComponent();
       }
@@ -107,14 +106,15 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
         }
         messageBuilder.append(e.getLocalizedMessage());
 
-        Set<Throwable> causes = new HashSet<>();
+        HashSet<Throwable> causes = new HashSet<>();
         Throwable parent = e;
         Throwable cause = e.getCause();
         causes.add(parent);
         while (cause != null && !causes.contains(cause)) {
-          messageBuilder.append("<br>").append(InfraAppBundle.message("infra.application.endpoints.error.caused.by",
-                  cause.getClass().getName(),
-                  cause.getLocalizedMessage()));
+          messageBuilder.append("<br>")
+                  .append(InfraAppBundle.message("infra.app.endpoints.error.caused.by",
+                          cause.getClass().getName(),
+                          cause.getLocalizedMessage()));
           parent = cause;
           cause = parent.getCause();
           causes.add(parent);
@@ -123,39 +123,39 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
       }
     };
 
-    myRootPanelLayout = new CardLayout();
-    myRootPanel = new JPanel(myRootPanelLayout);
+    rootPanelLayout = new CardLayout();
+    rootPanel = new JPanel(rootPanelLayout);
 
-    myMessagePanel = new JBLoadingPanel(new GridBagLayout(), this);
-    String name = StringUtil.shortenTextWithEllipsis(myRunConfiguration.getName(), 30, 3);
-    myMessagePanel.setLoadingText(InfraAppBundle.message("infra.application.endpoints.application.is.starting", name));
-    myMessagePanel.startLoading();
+    messagePanel = new JBLoadingPanel(new GridBagLayout(), this);
+    String name = StringUtil.shortenTextWithEllipsis(this.runConfiguration.getName(), 30, 3);
+    messagePanel.setLoadingText(InfraAppBundle.message("infra.app.endpoints.application.is.starting", name));
+    messagePanel.startLoading();
 
-    myMessageLabel = new JBLabel();
-    myMessageLabel.setForeground(JBColor.GRAY);
+    messageLabel = new JBLabel();
+    messageLabel.setForeground(JBColor.GRAY);
 
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.anchor = GridBagConstraints.CENTER;
     gbc.fill = GridBagConstraints.BOTH;
     gbc.weighty = 0.66;
-    myMessagePanel.add(myMessageLabel, gbc);
+    messagePanel.add(messageLabel, gbc);
 
     // Add bottom spacer
     gbc.weighty = 0.33;
     gbc.gridy = 1;
-    myMessagePanel.add(new JBLabel(), gbc);
+    messagePanel.add(new JBLabel(), gbc);
 
-    myRootPanel.add(MESSAGE_CARD, ScrollPaneFactory.createScrollPane(myMessagePanel,
+    rootPanel.add(MESSAGE_CARD, ScrollPaneFactory.createScrollPane(messagePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
   }
 
   public String getId() {
-    return myEndpoint.getId();
+    return endpoint.getId();
   }
 
   public Endpoint<T> getEndpoint() {
-    return myEndpoint;
+    return endpoint;
   }
 
   public abstract String getTitle();
@@ -166,9 +166,9 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
   public void dispose() {
     InfraApplicationInfo info = getInfo();
     if (info != null) {
-      getLiveProperty(info).removePropertyListener(myEndpointListener);
+      getLiveProperty(info).removePropertyListener(endpointListener);
     }
-    myTooltipChangeListener = null;
+    this.tooltipChangeListener = null;
   }
 
   @Nullable
@@ -178,8 +178,8 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
   }
 
   public final JComponent getComponent() {
-    myRootPanel.add(ENDPOINT_CARD, getEndpointComponent());
-    return myRootPanel;
+    rootPanel.add(ENDPOINT_CARD, getEndpointComponent());
+    return rootPanel;
   }
 
   public final void refresh() {
@@ -190,76 +190,76 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
   }
 
   public final void initPropertyListeners(InfraApplicationInfo info) {
-    getLiveProperty(info).addPropertyListener(myEndpointListener);
+    getLiveProperty(info).addPropertyListener(endpointListener);
     doInitPropertyListeners(info);
   }
 
   public final void showMessage(@Nullable String message) {
     AppUIUtil.invokeLaterIfProjectAlive(getProject(), () -> {
-      if (myMessagePanel.isLoading()) {
-        myMessagePanel.stopLoading();
+      if (messagePanel.isLoading()) {
+        messagePanel.stopLoading();
       }
-      myRootPanelLayout.show(myRootPanel, MESSAGE_CARD);
-      myMessageLabel.setText(message);
+      rootPanelLayout.show(rootPanel, MESSAGE_CARD);
+      messageLabel.setText(message);
     });
   }
 
   public final void showLoading() {
     AppUIUtil.invokeLaterIfProjectAlive(getProject(), () -> {
-      myMessageLabel.setText(null);
-      myMessagePanel.startLoading();
-      myRootPanelLayout.show(myRootPanel, MESSAGE_CARD);
+      messageLabel.setText(null);
+      messagePanel.startLoading();
+      rootPanelLayout.show(rootPanel, MESSAGE_CARD);
     });
   }
 
   public final void setTooltipChangeListener(@Nullable TooltipChangeListener tooltipChangeListener) {
-    myTooltipChangeListener = tooltipChangeListener;
+    this.tooltipChangeListener = tooltipChangeListener;
   }
 
   protected final Project getProject() {
-    return myRunConfiguration.getProject();
+    return runConfiguration.getProject();
   }
 
   protected final boolean isActuatorsEnabled() {
-    return myActuatorsEnabled;
+    return actuatorsEnabled;
   }
 
   public void checkAvailability() {
-    myActuatorsEnabled = InfraLibraryUtil.hasActuators(myRunConfiguration.getModule());
-    if (!myActuatorsEnabled) {
-      showMessage(InfraAppBundle.message("infra.application.endpoints.error.actuator.starter.disabled"));
+    actuatorsEnabled = InfraLibraryUtil.hasActuators(runConfiguration.getModule());
+    if (!actuatorsEnabled) {
+      showMessage(InfraAppBundle.message("infra.app.endpoints.error.actuator.starter.disabled"));
     }
   }
 
   public void updateRefreshAction(AnActionEvent e, InfraApplicationInfo info) {
-    e.getPresentation().setEnabled(myActuatorsEnabled);
+    e.getPresentation().setEnabled(actuatorsEnabled);
   }
 
-  protected final InfraApplicationRunConfigurationBase getRunConfiguration() {
-    return myRunConfiguration;
+  protected final InfraApplicationRunConfig getRunConfiguration() {
+    return runConfiguration;
   }
 
   protected final ProcessHandler getProcessHandler() {
-    return myProcessHandler;
+    return processHandler;
   }
 
   protected final JPanel getRootPanel() {
-    return myRootPanel;
+    return rootPanel;
   }
 
   private void setTimeStampTooltip(long timeStamp) {
-    if (myTooltipChangeListener != null) {
+    if (tooltipChangeListener != null) {
       String message = null;
       if (timeStamp > 0) {
-        message =
-                InfraAppBundle.message("infra.application.endpoints.updated.at", DateFormatUtil.formatTimeWithSeconds(timeStamp));
+        message = InfraAppBundle.message(
+                "infra.app.endpoints.updated.at", DateFormatUtil.formatTimeWithSeconds(timeStamp));
       }
-      myTooltipChangeListener.tooltipChanged(message);
+      tooltipChangeListener.tooltipChanged(message);
     }
   }
 
   protected final boolean isTabLoading() {
-    return myMessagePanel.isLoading();
+    return messagePanel.isLoading();
   }
 
   @Nullable
@@ -268,13 +268,13 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
     if (!project.isOpen() || project.isDisposed()) {
       return null;
     }
-    return InfraApplicationLifecycleManager.from(project).getInfraApplicationInfo(myProcessHandler);
+    return InfraApplicationLifecycleManager.from(project).getInfraApplicationInfo(processHandler);
   }
 
   protected final void infoRemoved() {
     AppUIUtil.invokeLaterIfProjectAlive(getProject(), () -> {
-      if (myMessagePanel.isLoading()) {
-        myMessagePanel.stopLoading();
+      if (messagePanel.isLoading()) {
+        messagePanel.stopLoading();
       }
     });
   }
@@ -288,27 +288,25 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
     return Collections.emptyList();
   }
 
-  protected void doInitPropertyListeners(InfraApplicationInfo info) {
+  protected void doInitPropertyListeners(InfraApplicationInfo info) { }
+
+  protected String getErrorMessage(String cause) {
+    return InfraAppBundle.message("infra.app.endpoints.error.failed.to.retrieve.endpoint.data.detailed",
+            endpoint.getId(), cause);
   }
 
-  protected @NlsContexts.Label String getErrorMessage(String cause) {
-    return InfraAppBundle.message("infra.application.endpoints.error.failed.to.retrieve.endpoint.data.detailed",
-            myEndpoint.getId(),
-            cause);
-  }
-
-  protected LiveProperty<T> getLiveProperty(InfraApplicationInfo info) {
-    return info.getEndpointData(myEndpoint);
+  protected Property<T> getLiveProperty(InfraApplicationInfo info) {
+    return info.getEndpointData(endpoint);
   }
 
   protected abstract JComponent getEndpointComponent();
 
   private void updateComponent() {
     InfraApplicationInfo info = InfraApplicationLifecycleManager.from(getProject())
-            .getInfraApplicationInfo(myProcessHandler);
-    LiveProperty<T> liveProperty = info != null ? getLiveProperty(info) : null;
-    T value = liveProperty != null ? liveProperty.getValue() : null;
-    long timeStamp = liveProperty != null ? liveProperty.getTimeStamp() : -1L;
+            .getInfraApplicationInfo(processHandler);
+    Property<T> property = info != null ? getLiveProperty(info) : null;
+    T value = property != null ? property.getValue() : null;
+    long timeStamp = property != null ? property.getTimeStamp() : -1L;
     AppUIUtil.invokeLaterIfProjectAlive(getProject(), () -> {
       setTimeStampTooltip(timeStamp);
       doUpdateComponent(value);
@@ -318,10 +316,12 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
   protected abstract void doUpdateComponent(@Nullable T value);
 
   interface TooltipChangeListener {
-    void tooltipChanged(@Nullable @NlsContexts.Tooltip String tooltip);
+
+    void tooltipChanged(@Nullable String tooltip);
   }
 
   protected abstract class EndpointToggleAction extends ToggleAction {
+
     protected EndpointToggleAction(@Nullable @NlsActions.ActionText String text) {
       super(text);
     }

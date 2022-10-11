@@ -41,6 +41,7 @@ import static cn.taketoday.assistant.InfraAppBundle.message;
 class RouterPredicateParser extends LiveRequestMappingPredicateParser {
   static LiveRequestMappingPredicateParser INSTANCE = new RouterPredicateParser();
 
+  @Override
   protected List<LiveRequestMappingPredicate> parseMapping(String mapping) {
     try {
       RouterPredicateParser.RouterPredicateExpression expression = parseExpression(mapping);
@@ -193,11 +194,9 @@ class RouterPredicateParser extends LiveRequestMappingPredicateParser {
       }
       else {
         var result = new SmartList<RouterPredicateParser.RouterPredicateBuilder>();
-        if (!rightBuilders.isEmpty()) {
-          for (RouterPredicateBuilder leftBuilder : leftBuilders) {
-            for (RouterPredicateBuilder rightBuilder : rightBuilders) {
-              result.add(leftBuilder.append(rightBuilder));
-            }
+        for (RouterPredicateBuilder leftBuilder : leftBuilders) {
+          for (RouterPredicateBuilder rightBuilder : rightBuilders) {
+            result.add(leftBuilder.append(rightBuilder));
           }
         }
 
@@ -208,7 +207,7 @@ class RouterPredicateParser extends LiveRequestMappingPredicateParser {
 
   private static RouterPredicateParser.RouterPredicateExpression or(
           RouterPredicateParser.RouterPredicateExpression left, RouterPredicateParser.RouterPredicateExpression right) {
-    return (negative) -> {
+    return negative -> {
       List<RouterPredicateParser.RouterPredicateBuilder> leftBuilders = left.eval(negative);
       List<RouterPredicateParser.RouterPredicateBuilder> rightBuilders = right.eval(negative);
       if (leftBuilders.isEmpty()) {
@@ -331,7 +330,7 @@ class RouterPredicateParser extends LiveRequestMappingPredicateParser {
   }
 
   private interface RouterPredicateExpression {
-    List<RouterPredicateParser.RouterPredicateBuilder> eval(boolean var1);
+    List<RouterPredicateParser.RouterPredicateBuilder> eval(boolean negative);
   }
 
   private static class RouterPredicateBuilder {
@@ -342,8 +341,7 @@ class RouterPredicateParser extends LiveRequestMappingPredicateParser {
     List<String> consumes;
     List<Pair<String, String>> params;
 
-    RouterPredicateBuilder() {
-    }
+    RouterPredicateBuilder() { }
 
     RouterPredicateBuilder(RouterPredicateParser.RouterPredicateBuilder builder) {
       this.path = builder.path;
@@ -355,17 +353,14 @@ class RouterPredicateParser extends LiveRequestMappingPredicateParser {
     }
 
     LiveRequestMappingPredicate build() {
-      return this.path == null
-             ? null
-             : new LiveRequestMappingPredicate(this.path, this.requestMethods == null
-                                                          ? Collections.emptyList() : this.requestMethods,
-                     this.headers == null ? Collections.emptyList() : this.headers, this.produces == null ? Collections.emptyList() : this.produces,
-                     this.consumes == null ? Collections.emptyList() : this.consumes, this.params == null ? Collections.emptyList() : this.params);
+      return this.path == null ? null : new LiveRequestMappingPredicate(
+              this.path, this.requestMethods == null ? Collections.emptyList() : this.requestMethods,
+              this.headers == null ? Collections.emptyList() : this.headers, this.produces == null ? Collections.emptyList() : this.produces,
+              this.consumes == null ? Collections.emptyList() : this.consumes, this.params == null ? Collections.emptyList() : this.params);
     }
 
     RouterPredicateParser.RouterPredicateBuilder append(RouterPredicateParser.RouterPredicateBuilder builder) {
-
-      RouterPredicateParser.RouterPredicateBuilder commonBuilder = new RouterPredicateParser.RouterPredicateBuilder(this);
+      var commonBuilder = new RouterPredicateParser.RouterPredicateBuilder(this);
       if (commonBuilder.path == null) {
         commonBuilder.path = builder.path;
       }
@@ -413,9 +408,10 @@ class RouterPredicateParser extends LiveRequestMappingPredicateParser {
 
     RouterPredicateParser.RouterPredicateBuilder combine(
             RouterPredicateParser.RouterPredicateBuilder builder) {
-      if (Objects.equals(this.path, builder.path) && Comparing.equal(this.headers, builder.headers) && Comparing.equal(this.params, builder.params)) {
-        RouterPredicateParser.RouterPredicateBuilder commonBuilder = new RouterPredicateParser.RouterPredicateBuilder(
-                this);
+      if (Objects.equals(this.path, builder.path)
+              && Comparing.equal(this.headers, builder.headers)
+              && Comparing.equal(this.params, builder.params)) {
+        var commonBuilder = new RouterPredicateParser.RouterPredicateBuilder(this);
         if (commonBuilder.requestMethods == null) {
           commonBuilder.requestMethods = builder.requestMethods;
         }
@@ -454,15 +450,11 @@ class RouterPredicateParser extends LiveRequestMappingPredicateParser {
     INVERT,
     BRACKET;
 
-    Context() {
-    }
   }
 
   private enum Operator {
     AND,
     OR;
 
-    Operator() {
-    }
   }
 }

@@ -32,7 +32,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 
 import cn.taketoday.assistant.Icons;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.InfraRunBundle;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveBeansModel;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveContext;
@@ -41,7 +41,7 @@ import cn.taketoday.lang.Nullable;
 class LiveContextsPanel extends LifecycleFinderRecursivePanel<LiveContext> {
   private static final String LIVE_CONTEXTS_PANEL_GROUP_ID = "LiveContextsPanel";
 
-  LiveContextsPanel(Project project, InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  LiveContextsPanel(Project project, InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     super(project, null, LIVE_CONTEXTS_PANEL_GROUP_ID, runConfiguration, processHandler);
   }
 

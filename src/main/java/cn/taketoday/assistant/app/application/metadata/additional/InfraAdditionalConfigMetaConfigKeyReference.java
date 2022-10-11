@@ -65,7 +65,7 @@ class InfraAdditionalConfigMetaConfigKeyReference extends MetaConfigKeyReference
   }
 
   InfraAdditionalConfigMetaConfigKeyReference(PsiElement element, Mode mode) {
-    super(InfraApplicationMetaConfigKeyManager.getInstance(), element, ElementManipulators.getValueText(element));
+    super(InfraApplicationMetaConfigKeyManager.of(), element, ElementManipulators.getValueText(element));
     this.myMode = mode;
   }
 
@@ -84,8 +84,8 @@ class InfraAdditionalConfigMetaConfigKeyReference extends MetaConfigKeyReference
       List<MetaConfigKey> emptyList = Collections.emptyList();
       return emptyList;
     }
-    List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(module);
-    MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.getInstance().getConfigKeyNameBinder(module);
+    List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(module);
+    MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.of().getConfigKeyNameBinder(module);
     List<MetaConfigKey> filter = ContainerUtil.filter(allKeys, configKey -> {
       String keyName = configKey.getName();
       if (configKey.isAccessType(MetaConfigKey.AccessType.MAP_GROUP)) {
@@ -106,7 +106,7 @@ class InfraAdditionalConfigMetaConfigKeyReference extends MetaConfigKeyReference
 
   public Object[] getVariants() {
     Set<String> existingKeys = this.myMode == Mode.HINTS ? collectExistingKeys() : Collections.emptySet();
-    List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(getElement());
+    List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(getElement());
     List<LookupElement> allVariants = new ArrayList<>(allKeys.size());
     for (MetaConfigKey key : allKeys) {
       MetaConfigKey.MetaConfigKeyPresentation presentation = key.getPresentation();

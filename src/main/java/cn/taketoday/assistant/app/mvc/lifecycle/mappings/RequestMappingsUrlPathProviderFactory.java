@@ -30,7 +30,7 @@ import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMappin
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMappingsModel;
 import cn.taketoday.assistant.app.run.InfraApplicationUrlPathProviderFactory;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
-import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationServerConfiguration;
+import cn.taketoday.assistant.app.run.lifecycle.InfraWebServerConfig;
 import cn.taketoday.lang.Nullable;
 
 public class RequestMappingsUrlPathProviderFactory implements InfraApplicationUrlPathProviderFactory {
@@ -54,8 +54,8 @@ public class RequestMappingsUrlPathProviderFactory implements InfraApplicationUr
   @Override
   @Nullable
   public String getServletPath(InfraApplicationInfo info, String path) {
-    InfraApplicationServerConfiguration applicationServerConfiguration = info.getServerConfiguration().getValue();
-    String servletPath = applicationServerConfiguration == null ? null : applicationServerConfiguration.getServletPath();
+    InfraWebServerConfig applicationServerConfiguration = info.getServerConfig().getValue();
+    String servletPath = applicationServerConfiguration == null ? null : applicationServerConfiguration.servletPath();
     LiveRequestMappingsModel mappingsModel = info.getEndpointData(RequestMappingsEndpoint.getInstance()).getValue();
     if (mappingsModel != null) {
       for (LiveRequestMapping mapping : mappingsModel.getRequestMappings()) {

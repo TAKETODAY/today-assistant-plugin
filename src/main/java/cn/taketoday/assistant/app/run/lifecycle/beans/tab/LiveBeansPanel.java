@@ -59,7 +59,7 @@ import javax.swing.JComponent;
 import cn.taketoday.assistant.CommonInfraModel;
 import cn.taketoday.assistant.InfraManager;
 import cn.taketoday.assistant.InfraPresentationProvider;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.InfraRunBundle;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveBean;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveBeansModel;
@@ -76,11 +76,11 @@ public class LiveBeansPanel extends LifecycleFinderRecursivePanel<LiveBeansPanel
   private final NullableFactory<CommonInfraModel> myModelFactory;
   private final NavigateToBeanClassAction myNavigateAction;
 
-  public LiveBeansPanel(Project project, InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  public LiveBeansPanel(Project project, InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     this(project, null, LIVE_BEANS_PANEL_GROUP_ID, runConfiguration, processHandler);
   }
 
-  public LiveBeansPanel(Project project, @Nullable FinderRecursivePanel parent, @Nullable String groupId, InfraApplicationRunConfigurationBase runConfiguration,
+  public LiveBeansPanel(Project project, @Nullable FinderRecursivePanel parent, @Nullable String groupId, InfraApplicationRunConfig runConfiguration,
           ProcessHandler processHandler) {
     super(project, parent, groupId, runConfiguration, processHandler);
     this.myModelFactory = () -> {
@@ -118,7 +118,7 @@ public class LiveBeansPanel extends LifecycleFinderRecursivePanel<LiveBeansPanel
       resources = model.getResources();
     }
     CommonInfraModel infraModel = this.myModelFactory.create();
-    InfraApplicationRunConfigurationBase runConfiguration = getRunConfiguration();
+    InfraApplicationRunConfig runConfiguration = getRunConfiguration();
     Module module = runConfiguration.getModule();
     PsiElement mainClass = runConfiguration.getMainClass();
     GlobalSearchScope searchScope = runConfiguration.getSearchScope();
@@ -265,7 +265,7 @@ public class LiveBeansPanel extends LifecycleFinderRecursivePanel<LiveBeansPanel
   @Override
   public boolean doUpdateItem(LiveBeanItem item) {
     LiveBean bean = item.getBean();
-    InfraApplicationRunConfigurationBase runConfiguration = getRunConfiguration();
+    InfraApplicationRunConfig runConfiguration = getRunConfiguration();
     GlobalSearchScope searchScope = runConfiguration.getSearchScope();
     PsiElement resourceElement = null;
     if (bean.getResource() != null) {

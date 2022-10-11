@@ -46,7 +46,7 @@ import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMappin
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMappingsModel;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManager;
-import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationServerConfiguration;
+import cn.taketoday.assistant.app.run.lifecycle.InfraWebServerConfig;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
 import cn.taketoday.assistant.settings.InfraGeneralSettings;
 import cn.taketoday.assistant.util.InfraUtils;
@@ -69,8 +69,8 @@ public class LiveRequestMappingsLineMarkerProvider implements InfraMergingMvcReq
       for (InfraApplicationInfo info : infos) {
         LiveRequestMappingsModel mappingsModel = info.getEndpointData(RequestMappingsEndpoint.getInstance()).getValue();
         if (mappingsModel != null && (applicationUrl = info.getApplicationUrl().getValue()) != null) {
-          InfraApplicationServerConfiguration applicationServerConfiguration = info.getServerConfiguration().getValue();
-          String servletPath = applicationServerConfiguration == null ? null : applicationServerConfiguration.getServletPath();
+          InfraWebServerConfig applicationServerConfiguration = info.getServerConfig().getValue();
+          String servletPath = applicationServerConfiguration == null ? null : applicationServerConfiguration.servletPath();
           List<LiveRequestMapping> mappings = mappingsModel.getRequestMappingsByMethod(psiMethod);
           if (!mappings.isEmpty()) {
             smartList.add(new MethodNavigationItem(project, info, applicationUrl, servletPath, mappings, "ICON_NAVIGATION"));

@@ -34,7 +34,6 @@ import com.intellij.microservices.jvm.config.MetaConfigKeyReference;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -55,11 +54,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraLibraryUtil;
-import cn.taketoday.assistant.InfraLibraryUtil.TodayVersion;
+import cn.taketoday.assistant.InfraVersion;
 import cn.taketoday.assistant.app.InfraClassesConstants;
 import cn.taketoday.assistant.app.InfraConfigurationFileService;
 import cn.taketoday.assistant.model.values.InfraPlaceholderReferenceResolver;
@@ -92,8 +90,9 @@ public class InfraPlaceholderReference extends PsiReferenceBase.Poly<PsiElement>
 
       for (Random random : Random.values()) {
         String randomValue = random.getValue();
-        if (random.isSupportsParameters() && StringUtil.startsWith(after, randomValue) ||
-                after.equals(randomValue)) {
+        if (random.isSupportsParameters()
+                && StringUtil.startsWith(after, randomValue)
+                || after.equals(randomValue)) {
           if (InfraLibraryUtil.isBelowVersion(getModule(), random.getMinimumVersion())) {
             continue;
           }
@@ -112,9 +111,9 @@ public class InfraPlaceholderReference extends PsiReferenceBase.Poly<PsiElement>
       return PsiElementResolveResult.createResults(systemProperty.getPsiElement());
     }
 
-    Set<PsiElement> additionalProperties = new HashSet<>();
-    for (InfraPlaceholderReferenceResolver placeholderReferenceResolver : InfraPlaceholderReferenceResolver.EP_NAME.getExtensionList()) {
-      Pair<List<PsiElement>, List<VirtualFile>> resolveResult = placeholderReferenceResolver.resolve(this);
+    HashSet<PsiElement> additionalProperties = new HashSet<>();
+    for (InfraPlaceholderReferenceResolver resolver : InfraPlaceholderReferenceResolver.array()) {
+      var resolveResult = resolver.resolve(this);
       additionalProperties.addAll(resolveResult.first);
     }
     if (!additionalProperties.isEmpty()) {
@@ -148,8 +147,8 @@ public class InfraPlaceholderReference extends PsiReferenceBase.Poly<PsiElement>
 
   @Override
   public Object[] getVariants() {
-    List<LookupElement> variants = new SmartList<>();
-    for (InfraPlaceholderReferenceResolver placeholderReferenceResolver : InfraPlaceholderReferenceResolver.EP_NAME.getExtensionList()) {
+    SmartList<LookupElement> variants = new SmartList<>();
+    for (InfraPlaceholderReferenceResolver placeholderReferenceResolver : InfraPlaceholderReferenceResolver.array()) {
       variants.addAll(placeholderReferenceResolver.getVariants(this));
     }
 
@@ -217,22 +216,22 @@ public class InfraPlaceholderReference extends PsiReferenceBase.Poly<PsiElement>
   }
 
   enum Random {
-    INT("int", true, TodayVersion.ANY),
-    LONG("long", true, TodayVersion.ANY),
-    VALUE("value", false, TodayVersion.ANY),
-    UUID("uuid", false, TodayVersion.ANY);
+    INT("int", true, InfraVersion.ANY),
+    LONG("long", true, InfraVersion.ANY),
+    VALUE("value", false, InfraVersion.ANY),
+    UUID("uuid", false, InfraVersion.ANY);
 
     private final String myValue;
     private final boolean mySupportsParameters;
-    private final TodayVersion myMinimumVersion;
+    private final InfraVersion myMinimumVersion;
 
-    Random(String value, boolean supportsParameters, TodayVersion minimumVersion) {
+    Random(String value, boolean supportsParameters, InfraVersion minimumVersion) {
       myValue = value;
       mySupportsParameters = supportsParameters;
       myMinimumVersion = minimumVersion;
     }
 
-    TodayVersion getMinimumVersion() {
+    InfraVersion getMinimumVersion() {
       return myMinimumVersion;
     }
 

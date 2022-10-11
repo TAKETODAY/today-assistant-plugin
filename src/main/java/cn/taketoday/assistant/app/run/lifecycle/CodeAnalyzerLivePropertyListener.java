@@ -22,7 +22,7 @@ package cn.taketoday.assistant.app.run.lifecycle;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.project.Project;
 
-public final class CodeAnalyzerLivePropertyListener implements LiveProperty.LivePropertyListener {
+public final class CodeAnalyzerLivePropertyListener implements Property.PropertyListener {
   private final Project myProject;
 
   public CodeAnalyzerLivePropertyListener(Project project) {

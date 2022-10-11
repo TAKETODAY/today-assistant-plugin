@@ -29,7 +29,8 @@ public abstract class InfraApplicationMetaConfigKeyManager extends MetaConfigKey
    */
   public static final Key<Boolean> ELEMENT_IN_EXTERNAL_CONTEXT = Key.create("ElementInExternalContext");
 
-  public static InfraApplicationMetaConfigKeyManager getInstance() {
+  public static InfraApplicationMetaConfigKeyManager of() {
     return ApplicationManager.getApplication().getService(InfraApplicationMetaConfigKeyManager.class);
   }
+
 }

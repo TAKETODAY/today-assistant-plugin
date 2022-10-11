@@ -25,8 +25,7 @@ import java.util.Set;
 import javax.management.InstanceNotFoundException;
 
 class InfraApplicationConnector extends InfraJmxConnector {
-  static final String SPRING_JMX_DEFAULT_DOMAIN_PROPERTY = "jmx.default-domain";
-  static final String ENDPOINTS_JMX_ENABLED_PROPERTY_1X = "endpoints.jmx.enabled";
+  static final String JMX_DEFAULT_DOMAIN_PROPERTY = "infra.jmx.default-domain";
   static final String ENDPOINTS_JMX_EXPOSURE_INCLUDE_PROPERTY_2X = "management.endpoints.jmx.exposure.include";
   static final String ENDPOINTS_JMX_EXPOSURE_EXCLUDE_PROPERTY_2X = "management.endpoints.jmx.exposure.exclude";
   static final String SERVER_SSL_ENABLED_PROPERTY = "server.ssl.enabled";
@@ -36,6 +35,7 @@ class InfraApplicationConnector extends InfraJmxConnector {
   private static final String READY_ATTR = "Ready";
   private static final String GET_PROPERTY_OPERATION = "getProperty";
   private static final String LOCAL_SERVER_PORT_PROPERTY = "local.server.port";
+
   private final InfraModuleDescriptor myModuleDescriptor;
   static final ApplicationProperty ENDPOINTS_JMX_DOMAIN_PROPERTY = new ApplicationProperty("management.endpoints.jmx.domain");
   static final ApplicationProperty ENDPOINTS_ENABLED_PROPERTY = new ApplicationProperty("management.endpoints.enabled-by-default");
@@ -44,7 +44,7 @@ class InfraApplicationConnector extends InfraJmxConnector {
   static final ApplicationProperty SERVER_SERVLET_PATH_PROPERTY = new ApplicationProperty("mvc.servlet.path");
 
   InfraApplicationConnector(String serviceUrl, InfraModuleDescriptor moduleDescriptor) {
-    super(serviceUrl, moduleDescriptor.getApplicationAdminJmxName());
+    super(serviceUrl, moduleDescriptor.getAppAdminJmxName());
     this.myModuleDescriptor = moduleDescriptor;
   }
 

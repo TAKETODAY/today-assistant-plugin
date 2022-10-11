@@ -128,7 +128,7 @@ public class InfraConfigKeyReferenceSearcher extends QueryExecutorBase<PsiRefere
 
   @Nullable
   private static MetaConfigKey findMetaConfigKeyInModule(String keyName, Module module) {
-    for (MetaConfigKey key : InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(module)) {
+    for (MetaConfigKey key : InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(module)) {
       if (keyName.equals(key.getName())) {
         return key;
       }

@@ -178,7 +178,7 @@ public class InfraApplicationPropertiesInspection extends LocalInspectionTool {
           property2.setName(replacement);
         }
         Module module = ModuleUtilCore.findModuleForPsiElement(property2);
-        MetaConfigKey replacementMetaConfigKey = InfraApplicationMetaConfigKeyManager.getInstance().findApplicationMetaConfigKey(module, property2.getKey());
+        MetaConfigKey replacementMetaConfigKey = InfraApplicationMetaConfigKeyManager.of().findApplicationMetaConfigKey(module, property2.getKey());
         if (replacementMetaConfigKey == null || replacementMetaConfigKey.getType() == null || configKey.getType() == null || configKey.getType()
                 .isAssignableFrom(replacementMetaConfigKey.getType()) || (value = InfraApplicationPropertiesUtil.getPropertyValue(
                 property2)) == null) {

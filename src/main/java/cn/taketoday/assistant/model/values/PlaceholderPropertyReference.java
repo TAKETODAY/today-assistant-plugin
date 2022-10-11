@@ -162,8 +162,8 @@ public class PlaceholderPropertyReference extends PropertyReferenceBase implemen
     }
     Set<PsiElement> additionalProperties = new HashSet<>();
     Set<VirtualFile> processedFiles = new HashSet<>();
-    for (InfraPlaceholderReferenceResolver placeholderReferenceResolver : InfraPlaceholderReferenceResolver.EP_NAME.getExtensionList()) {
-      Pair<List<PsiElement>, List<VirtualFile>> resolveResult = placeholderReferenceResolver.resolve(this);
+    for (InfraPlaceholderReferenceResolver resolver : InfraPlaceholderReferenceResolver.array()) {
+      var resolveResult = resolver.resolve(this);
       additionalProperties.addAll(resolveResult.first);
       processedFiles.addAll(resolveResult.second);
     }
@@ -419,8 +419,8 @@ public class PlaceholderPropertyReference extends PropertyReferenceBase implemen
     if (super.isProperty(element)) {
       return true;
     }
-    for (InfraPlaceholderReferenceResolver placeholderReferenceResolver : InfraPlaceholderReferenceResolver.EP_NAME.getExtensionList()) {
-      if (placeholderReferenceResolver.isProperty(element)) {
+    for (InfraPlaceholderReferenceResolver resolver : InfraPlaceholderReferenceResolver.array()) {
+      if (resolver.isProperty(element)) {
         return true;
       }
     }

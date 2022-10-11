@@ -44,7 +44,7 @@ final class InfraApplicationUrlPathEditAction extends AnAction {
       return;
     }
     RunConfiguration runConfiguration = node.getConfigurationSettings().getConfiguration();
-    if (!(runConfiguration instanceof InfraApplicationRunConfigurationBase)) {
+    if (!(runConfiguration instanceof InfraApplicationRunConfig)) {
       e.getPresentation().setEnabledAndVisible(false);
       return;
     }
@@ -67,7 +67,7 @@ final class InfraApplicationUrlPathEditAction extends AnAction {
       return;
     }
     RunConfiguration configuration = node.getConfigurationSettings().getConfiguration();
-    if (!(configuration instanceof InfraApplicationRunConfigurationBase configurable) || (info = getInfo(node)) == null) {
+    if (!(configuration instanceof InfraApplicationRunConfig configurable) || (info = getInfo(node)) == null) {
       return;
     }
     new InfraApplicationUrlPathConfigurable(configuration.getProject(), configurable, info).show();

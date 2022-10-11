@@ -39,10 +39,11 @@ import cn.taketoday.lang.Nullable;
 public abstract class InfraModel extends AbstractProcessableModel {
 
   @Nullable
-  private final Module myModule;
-  private Set<InfraModel> myDependencies;
+  private final Module module;
+  private Set<InfraModel> dependencies;
   @Nullable
   private final InfraFileSet fileSet;
+
   public static final CommonInfraModel UNKNOWN = new CommonInfraModel() {
 
     @Override
@@ -78,9 +79,9 @@ public abstract class InfraModel extends AbstractProcessableModel {
   }
 
   public InfraModel(@Nullable Module module, @Nullable InfraFileSet fileSet) {
-    this.myDependencies = Collections.emptySet();
+    this.dependencies = Collections.emptySet();
     this.fileSet = fileSet;
-    this.myModule = module;
+    this.module = module;
   }
 
   @Nullable
@@ -89,34 +90,37 @@ public abstract class InfraModel extends AbstractProcessableModel {
   }
 
   public Set<InfraModel> getDependencies() {
-    return this.myDependencies;
+    return this.dependencies;
   }
 
   public void setDependencies(Set<InfraModel> dependencies) {
-    this.myDependencies = dependencies;
+    this.dependencies = dependencies;
   }
 
   @Override
   public final Set<CommonInfraModel> getRelatedModels() {
     Set<CommonInfraModel> models = new LinkedHashSet<>();
     ContainerUtil.addAllNotNull(models, getRelatedModels(true));
-    if (this.myModule != null && !this.myModule.isDisposed()) {
-      models.add(CustomModuleComponentsDiscoverer.getCustomBeansModel(this.myModule));
+    if (module != null && !module.isDisposed()) {
+      models.add(CustomModuleComponentsDiscoverer.getCustomBeansModel(module));
     }
     return models;
   }
 
   @Nullable
+  @Override
   public Module getModule() {
-    return this.myModule;
+    return module;
   }
 
+  @Override
   public String toString() {
     InfraFileSet fileSet = this.fileSet;
     return getClass().getName() + (fileSet != null ? " fileset=" + fileSet.getId() : "");
   }
 
   @Nullable
+  @Override
   public Set<String> getActiveProfiles() {
     if (this.fileSet == null) {
       return null;

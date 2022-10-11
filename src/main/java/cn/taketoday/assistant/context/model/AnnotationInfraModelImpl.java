@@ -86,7 +86,7 @@ public class AnnotationInfraModelImpl extends AnnotationInfraModel {
       Module module = getModule();
       if (module != null) {
         Project project = module.getProject();
-        Set<PsiPackage> packages = new LinkedHashSet<>();
+        var packages = new LinkedHashSet<PsiPackage>();
         for (String pkg : scannedCtx.getComponentScanPackages()) {
           PsiPackage psiPackage = JavaPsiFacade.getInstance(project).findPackage(pkg);
           ContainerUtil.addIfNotNull(packages, psiPackage);
@@ -98,15 +98,17 @@ public class AnnotationInfraModelImpl extends AnnotationInfraModel {
   }
 
   private Set<LocalAnnotationModel> getLocalAnnotationModels(boolean checkActiveProfiles) {
-    JamPsiClassInfraBean springConfiguration;
+    JamPsiClassInfraBean configuration;
     Set<String> activeProfiles = getActiveProfiles();
     Set<LocalAnnotationModel> models = new LinkedHashSet<>();
-    for (SmartPsiElementPointer<? extends PsiClass> psiElementPointer : this.configClasses) {
-      PsiClass configClass = psiElementPointer.getElement();
-      if (configClass != null && configClass.isValid() && ((springConfiguration = ObjectUtils.chooseNotNull(getConfiguration(configClass),
-              getComponent(configClass))) == null || !checkActiveProfiles || ProfileUtils.isInActiveProfiles(springConfiguration, activeProfiles))) {
+    for (var pointer : configClasses) {
+      PsiClass configClass = pointer.getElement();
+      if (configClass != null && configClass.isValid()
+              && ((configuration = ObjectUtils.chooseNotNull(getConfiguration(configClass),
+              getComponent(configClass))) == null || !checkActiveProfiles || ProfileUtils.isInActiveProfiles(configuration, activeProfiles))) {
         Set<String> profiles = (activeProfiles == null || !checkActiveProfiles) ? Collections.emptySet() : activeProfiles;
-        LocalAnnotationModel model = LocalModelFactory.of().getOrCreateLocalAnnotationModel(configClass, getModule(), profiles);
+        LocalAnnotationModel model = LocalModelFactory.of()
+                .getOrCreateLocalAnnotationModel(configClass, getModule(), profiles);
         if (model != null) {
           models.add(model);
         }

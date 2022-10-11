@@ -24,12 +24,12 @@ import com.intellij.openapi.Disposable;
 
 import cn.taketoday.assistant.app.run.InfraRunBundle;
 
-class ServerPortLiveProperty extends AsyncApplicationLiveProperty<Integer> {
+class ServerPortProperty extends AsyncApplicationProperty<Integer> {
   private static final long SERVER_PORT_RETRY_INTERVAL = 200;
   private static final int SERVER_PORT_RETRY_COUNT = 20;
   private static final Integer DEFAULT_VALUE = -1;
 
-  ServerPortLiveProperty(LiveProperty<InfraModuleDescriptor> moduleDescriptor, LiveProperty<String> serviceUrl,
+  ServerPortProperty(Property<InfraModuleDescriptor> moduleDescriptor, Property<String> serviceUrl,
           LifecycleErrorHandler errorHandler, Disposable parent) {
     super(moduleDescriptor, serviceUrl, errorHandler, parent, DEFAULT_VALUE);
   }

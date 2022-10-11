@@ -31,42 +31,43 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 class InfraJmxConnector implements Closeable {
-  private final String myServiceUrl;
-  private final ObjectName myObjectName;
-  private JMXConnector myConnector;
-  private MBeanServerConnection myConnection;
+
+  private final String serviceUrl;
+  private final ObjectName objectName;
+  private JMXConnector connector;
+  private MBeanServerConnection connection;
 
   InfraJmxConnector(String serviceUrl, String objectName) {
-    this.myServiceUrl = serviceUrl;
-    this.myObjectName = toObjectName(objectName);
+    this.serviceUrl = serviceUrl;
+    this.objectName = toObjectName(objectName);
   }
 
   private JMXConnector getJmxConnector() throws IOException {
-    return JMXConnectorFactory.connect(new JMXServiceURL(this.myServiceUrl), null);
+    return JMXConnectorFactory.connect(new JMXServiceURL(this.serviceUrl), null);
   }
 
   protected MBeanServerConnection getJmxConnection() throws IOException {
-    if (this.myConnection == null) {
-      if (this.myConnector == null) {
-        this.myConnector = getJmxConnector();
+    if (this.connection == null) {
+      if (this.connector == null) {
+        this.connector = getJmxConnector();
       }
-      this.myConnection = this.myConnector.getMBeanServerConnection();
+      this.connection = this.connector.getMBeanServerConnection();
     }
-    return this.myConnection;
+    return this.connection;
   }
 
   protected ObjectName getObjectName() {
-    return this.myObjectName;
+    return this.objectName;
   }
 
   @Override
   public void close() {
-    if (this.myConnector != null) {
+    if (this.connector != null) {
       try {
-        this.myConnector.close();
+        this.connector.close();
       }
       catch (IOException ignored) { }
-      this.myConnector = null;
+      this.connector = null;
     }
   }
 

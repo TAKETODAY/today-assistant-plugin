@@ -114,7 +114,7 @@ class InfraApplicationYamlKeyReferenceProvider extends PsiReferenceProvider {
   private static final class YamlKeyMetaConfigKeyReference extends MetaConfigKeyReference<YAMLKeyValue> {
 
     private YamlKeyMetaConfigKeyReference(YAMLKeyValue yamlKeyValue, String keyText) {
-      super(InfraApplicationMetaConfigKeyManager.getInstance(), yamlKeyValue, keyText);
+      super(InfraApplicationMetaConfigKeyManager.of(), yamlKeyValue, keyText);
       setRangeInElement(ConfigYamlUtils.getKeyReferenceRange(yamlKeyValue));
     }
 

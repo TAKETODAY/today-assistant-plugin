@@ -34,14 +34,14 @@ import cn.taketoday.lang.Nullable;
 
 class LiveRequestMappingImpl implements LiveRequestMapping {
   private final String myMapping;
-  private final LiveRequestMappingPredicate myPredicate;
+  private final LiveRequestMappingPredicate predicate;
   private final String myBean;
   private final LiveHandlerMethod myMethod;
   private final LiveDispatcherServlet myDispatcherServlet;
 
   LiveRequestMappingImpl(String mapping, LiveRequestMappingPredicate predicate, @Nullable String bean, @Nullable String method, LiveDispatcherServlet dispatcherServlet) {
     this.myMapping = mapping;
-    this.myPredicate = predicate;
+    this.predicate = predicate;
     this.myBean = bean;
     this.myMethod = method != null ? new cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.impl.LiveHandlerMethodImpl(method) : null;
     this.myDispatcherServlet = dispatcherServlet;
@@ -57,39 +57,39 @@ class LiveRequestMappingImpl implements LiveRequestMapping {
   @Override
 
   public String getPath() {
-    String path = this.myPredicate.getPath();
+    String path = this.predicate.path();
     return path;
   }
 
   @Override
 
   public List<String> getRequestMethods() {
-    List<String> unmodifiableList = Collections.unmodifiableList(this.myPredicate.getRequestMethods());
+    List<String> unmodifiableList = Collections.unmodifiableList(this.predicate.requestMethods());
     return unmodifiableList;
   }
 
   @Override
 
   public List<Pair<String, String>> getHeaders() {
-    return Collections.unmodifiableList(this.myPredicate.getHeaders());
+    return Collections.unmodifiableList(this.predicate.headers());
   }
 
   @Override
 
   public List<String> getProduces() {
-    return Collections.unmodifiableList(this.myPredicate.getProduces());
+    return Collections.unmodifiableList(this.predicate.produces());
   }
 
   @Override
 
   public List<String> getConsumes() {
-    return Collections.unmodifiableList(this.myPredicate.getConsumes());
+    return Collections.unmodifiableList(this.predicate.consumes());
   }
 
   @Override
 
   public List<Pair<String, String>> getParams() {
-    return Collections.unmodifiableList(this.myPredicate.getParams());
+    return Collections.unmodifiableList(this.predicate.params());
   }
 
   @Override
@@ -106,7 +106,7 @@ class LiveRequestMappingImpl implements LiveRequestMapping {
 
   @Override
   public boolean canNavigate() {
-    return this.myMethod != null && (this.myPredicate.getRequestMethods().isEmpty() || this.myPredicate.getRequestMethods().contains("GET"));
+    return this.myMethod != null && (this.predicate.requestMethods().isEmpty() || this.predicate.requestMethods().contains("GET"));
   }
 
   @Override
@@ -120,7 +120,7 @@ class LiveRequestMappingImpl implements LiveRequestMapping {
       return true;
     }
     if (obj instanceof LiveRequestMappingImpl liveMapping) {
-      return this.myMapping.equals(liveMapping.myMapping) && this.myPredicate.getPath().equals(liveMapping.myPredicate.getPath()) && Objects.equals(this.myBean, liveMapping.myBean) && Comparing.equal(
+      return this.myMapping.equals(liveMapping.myMapping) && this.predicate.path().equals(liveMapping.predicate.path()) && Objects.equals(this.myBean, liveMapping.myBean) && Comparing.equal(
               this.myMethod, liveMapping.myMethod) && this.myDispatcherServlet.equals(liveMapping.myDispatcherServlet);
     }
     return false;
@@ -128,7 +128,7 @@ class LiveRequestMappingImpl implements LiveRequestMapping {
 
   public int hashCode() {
     int result = (31 * 17) + this.myMapping.hashCode();
-    return (31 * ((31 * ((31 * ((31 * result) + this.myPredicate.getPath()
+    return (31 * ((31 * ((31 * ((31 * result) + this.predicate.path()
             .hashCode())) + (this.myBean != null ? this.myBean.hashCode() : 0))) + (this.myMethod != null ? this.myMethod.hashCode() : 0))) + this.myDispatcherServlet.hashCode();
   }
 

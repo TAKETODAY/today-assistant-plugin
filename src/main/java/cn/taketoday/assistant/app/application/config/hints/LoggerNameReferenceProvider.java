@@ -172,7 +172,7 @@ public class LoggerNameReferenceProvider implements HintReferenceProvider {
       MetaConfigKey loggingGroupKey;
       PsiFile psiFile;
       Module module = ModuleUtilCore.findModuleForPsiElement(getElement());
-      if (module == null || (loggingGroupKey = InfraApplicationMetaConfigKeyManager.getInstance().findCanonicalApplicationMetaConfigKey(module, LOGGING_GROUP_KEY)) == null) {
+      if (module == null || (loggingGroupKey = InfraApplicationMetaConfigKeyManager.of().findCanonicalApplicationMetaConfigKey(module, LOGGING_GROUP_KEY)) == null) {
         return;
       }
       PsiManager psiManager = PsiManager.getInstance(module.getProject());

@@ -48,6 +48,7 @@ import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
 import cn.taketoday.assistant.context.model.LocalModel;
 import cn.taketoday.assistant.gutter.GutterIconBuilder;
+import cn.taketoday.assistant.model.InfraProfile;
 import cn.taketoday.assistant.model.jam.testContexts.ContextConfiguration;
 import cn.taketoday.assistant.model.jam.testContexts.InfraContextConfiguration;
 import cn.taketoday.assistant.model.jam.testContexts.InfraContextHierarchy;
@@ -122,7 +123,7 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
         toNavigate.addAll(javaContexts);
         Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
         if (module != null) {
-          Set<String> annotationActiveProfiles = ContainerUtil.newLinkedHashSet("_DEFAULT_TEST_PROFILE_NAME_");
+          Set<String> annotationActiveProfiles = ContainerUtil.newLinkedHashSet(InfraProfile.DEFAULT_TEST_PROFILE_NAME);
 
           for (TestingImplicitContextsProvider provider : TestingImplicitContextsProvider.EP_NAME.getExtensionList()) {
             for (CommonInfraModel model : provider.getModels(module, contextConfiguration, annotationActiveProfiles)) {
@@ -134,7 +135,8 @@ public class TestConfigurationAnnotator extends AbstractInfraAnnotator {
         }
 
         GutterIconBuilder<PsiElement> builder = GutterIconBuilder.create(Icons.Gutter.Today);
-        builder.setTargets(toNavigate).setPopupTitle(InfraBundle.message("app.context.to.navigate"))
+        builder.setTargets(toNavigate)
+                .setPopupTitle(InfraBundle.message("app.context.to.navigate"))
                 .setTooltipText(InfraBundle.message("app.context.navigate.tooltip"));
         PsiElement identifier = UAnnotationKt.getNamePsiElement(UastContextKt.toUElement(annotation, UAnnotation.class));
         if (identifier != null) {

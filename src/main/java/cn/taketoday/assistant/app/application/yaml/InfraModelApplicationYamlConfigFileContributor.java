@@ -86,7 +86,7 @@ public class InfraModelApplicationYamlConfigFileContributor extends InfraModelCo
     }
     MetaConfigKey configKey = params.getConfigKey();
     String keyName = configKey.getName();
-    MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.getInstance().getConfigKeyNameBinder(params.getModule());
+    MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.of().getConfigKeyNameBinder(params.getModule());
     boolean multipleOccurrencesPossible = configKey.isAccessType(MetaConfigKey.AccessType.ENUM_MAP, MetaConfigKey.AccessType.MAP, MetaConfigKey.AccessType.INDEXED);
     boolean processParts = multipleOccurrencesPossible && !(params.getKeyIndex() == null && params.getKeyProperty() == null);
     SmartList<ConfigurationValueResult> smartList = new SmartList<>();
@@ -272,7 +272,7 @@ public class InfraModelApplicationYamlConfigFileContributor extends InfraModelCo
     if (ContainerUtil.isEmpty(activeProfiles)) {
       return true;
     }
-    ConfigYamlAccessor accessor = new ConfigYamlAccessor(document, params.getModule(), InfraApplicationMetaConfigKeyManager.getInstance());
+    ConfigYamlAccessor accessor = new ConfigYamlAccessor(document, params.getModule(), InfraApplicationMetaConfigKeyManager.of());
     String profileText = getProfileByKey(InfraMetadataConstant.INFRA_PROFILES_KEY, accessor, null);
     if (profileText == null) {
       profileText = getProfileByKey(InfraMetadataConstant.INFRA_CONFIG_ACTIVE_ON_PROFILE_KEY, accessor, fileProfile);

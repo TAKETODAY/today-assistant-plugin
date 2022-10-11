@@ -73,19 +73,16 @@ import cn.taketoday.lang.Nullable;
 
 public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
 
+  protected final Module module;
   private final PsiClass myClass;
-
-  protected final Module myModule;
-
-  protected final Set<String> myActiveProfiles;
-
-  private final CachedValue<Collection<ContextJavaBean>> myLocalContextBeansCachedValue;
+  protected final Set<String> activeProfiles;
+  private final CachedValue<Collection<ContextJavaBean>> localContextBeansCachedValue;
 
   public LocalAnnotationModel(PsiClass aClass, Module module, Set<String> activeProfiles) {
     this.myClass = aClass;
-    this.myModule = module;
-    this.myActiveProfiles = Set.copyOf(activeProfiles);
-    this.myLocalContextBeansCachedValue = CachedValuesManager.getManager(myClass.getProject()).createCachedValue(() -> {
+    this.module = module;
+    this.activeProfiles = Set.copyOf(activeProfiles);
+    this.localContextBeansCachedValue = CachedValuesManager.getManager(myClass.getProject()).createCachedValue(() -> {
       List<ContextJavaBean> beans = JamService.getJamService(myClass.getProject())
               .getAnnotatedMembersList(myClass, ContextJavaBean.BEAN_JAM_KEY, JamService.CHECK_METHOD | JamService.CHECK_DEEP);
       Set<PsiFile> dependencies = ContainerUtil.newHashSet(myClass.getContainingFile());
@@ -107,7 +104,7 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
   public Collection<BeanPointer<?>> getLocalBeans() {
     Collection<CommonInfraBean> allBeans = new SmartList<>();
     ContainerUtil.addIfNotNull(allBeans, getBeanForClass(myClass));
-    ContainerUtil.addAllNotNull(allBeans, ProfileUtils.filterBeansInActiveProfiles(myLocalContextBeansCachedValue.getValue(), myActiveProfiles));
+    ContainerUtil.addAllNotNull(allBeans, ProfileUtils.filterBeansInActiveProfiles(localContextBeansCachedValue.getValue(), activeProfiles));
     return InfraBeanService.of().mapBeans(allBeans);
   }
 
@@ -140,7 +137,7 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
   protected Set<CommonInfraModel> getPackageScanModels(LocalAnnotationModel localModel) {
     Set<CommonInfraModel> models = new LinkedHashSet<>();
     for (InfraBeansPackagesScan scan : localModel.getPackagesScans()) {
-      models.add(new InfraComponentScanModel<>(localModel.myModule, scan, localModel.myActiveProfiles));
+      models.add(new InfraComponentScanModel<>(localModel.module, scan, localModel.activeProfiles));
     }
     return models;
   }
@@ -163,7 +160,7 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
 
   @Override
   public Module getModule() {
-    return myModule;
+    return module;
   }
 
   @Override
@@ -199,13 +196,13 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
 
   @Override
   public Set<String> getActiveProfiles() {
-    return myActiveProfiles;
+    return activeProfiles;
   }
 
   @Override
   public Set<Pair<LocalModel, LocalModelDependency>> getDependentLocalModels() {
     return CachedValuesManager.getManager(myClass.getProject()).getCachedValue(this, () -> {
-      Module module = myModule;
+      Module module = this.module;
       HashSet<Pair<LocalModel, LocalModelDependency>> models = new HashSet<>();
       if (!module.isDisposed()) {
         collectImportDependentLocalModels(models);
@@ -228,7 +225,7 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
   }
 
   private void collectImportDependentLocalModels(Set<Pair<LocalModel, LocalModelDependency>> models) {
-    Module module = myModule;
+    Module module = this.module;
     collectImportDependentLocalModels(models, module, myClass);
     for (PsiClass superClass : InheritanceUtil.getSuperClasses(myClass)) {
       if (!"java.lang.Object".equals(superClass.getQualifiedName())) {
@@ -240,11 +237,11 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
   private void collectImportDependentLocalModels(Set<Pair<LocalModel, LocalModelDependency>> models, Module module, PsiClass psiClass) {
     InfraJamService.of().processImportedResources(psiClass, pair -> {
       for (XmlFile xmlFile : pair.first) {
-        addNotNullModel(models, LocalModelFactory.of().getOrCreateLocalXmlModel(xmlFile, module, myActiveProfiles),
+        addNotNullModel(models, LocalModelFactory.of().getOrCreateLocalXmlModel(xmlFile, module, activeProfiles),
                 LocalModelDependency.create(LocalModelDependencyType.IMPORT, pair.second));
       }
       return true;
-    }, myModule);
+    }, this.module);
     InfraJamService.of().processImportedClasses(psiClass, pair2 -> {
       addNotNullModel(models, getLocalAnnotationModel(pair2.first),
               LocalModelDependency.create(LocalModelDependencyType.IMPORT, pair2.second));
@@ -254,7 +251,7 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
 
   private void collectScanDependentLocalModels(Set<Pair<LocalModel, LocalModelDependency>> models) {
     String className;
-    Module module = myModule;
+    Module module = this.module;
     List<InfraBeansPackagesScan> scans = getPackagesScans();
     for (InfraBeansPackagesScan packagesScan : scans) {
       if (!module.isDisposed()) {
@@ -265,7 +262,7 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
             if (InfraUtils.isBeanCandidateClass(psiClass)
                     && JamService.getJamService(psiClass.getProject())
                     .getJamElement(JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY, psiClass) != null
-                    && ProfileUtils.isInActiveProfiles(stereotypeElement, myActiveProfiles)) {
+                    && ProfileUtils.isInActiveProfiles(stereotypeElement, activeProfiles)) {
               PsiElement identifyingElementForDependency = packagesScan.getIdentifyingPsiElement();
               if (identifyingElementForDependency == null && (className = psiClass.getQualifiedName()) != null) {
                 Set<PsiPackage> packages = packagesScan.getPsiPackages();
@@ -298,7 +295,7 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
 
   @Nullable
   protected LocalAnnotationModel getLocalAnnotationModel(PsiClass aClass) {
-    return LocalModelFactory.of().getOrCreateLocalAnnotationModel(aClass, myModule, myActiveProfiles);
+    return LocalModelFactory.of().getOrCreateLocalAnnotationModel(aClass, module, activeProfiles);
   }
 
   public boolean equals(Object o) {
@@ -308,15 +305,15 @@ public class LocalAnnotationModel extends AbstractSimpleLocalModel<PsiClass> {
     if (!(o instanceof LocalAnnotationModel model)) {
       return false;
     }
-    return myClass.equals(model.myClass) && myModule.equals(model.myModule) && ProfileUtils.profilesAsString(myActiveProfiles)
-            .equals(ProfileUtils.profilesAsString(model.myActiveProfiles));
+    return myClass.equals(model.myClass) && module.equals(model.module) && ProfileUtils.profilesAsString(activeProfiles)
+            .equals(ProfileUtils.profilesAsString(model.activeProfiles));
   }
 
   public int hashCode() {
     int result = myClass.hashCode();
-    int result2 = (31 * result) + this.myModule.hashCode();
+    int result2 = (31 * result) + this.module.hashCode();
     int profilesHashCode = 0;
-    for (String profile : this.myActiveProfiles) {
+    for (String profile : this.activeProfiles) {
       if (!profile.equals(InfraProfile.DEFAULT_PROFILE_NAME)) {
         profilesHashCode += profile.hashCode();
       }

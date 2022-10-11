@@ -32,6 +32,7 @@ import java.util.List;
 import cn.taketoday.lang.Nullable;
 
 public interface InfraPlaceholderReferenceResolver {
+
   ExtensionPointName<InfraPlaceholderReferenceResolver> EP_NAME =
           ExtensionPointName.create("cn.taketoday.assistant.placeholderReferenceResolver");
 
@@ -43,4 +44,9 @@ public interface InfraPlaceholderReferenceResolver {
 
   @Nullable
   String getPropertyValue(PsiReference reference, PsiElement psiElement);
+
+  static InfraPlaceholderReferenceResolver[] array() {
+    return EP_NAME.getExtensions();
+  }
+
 }

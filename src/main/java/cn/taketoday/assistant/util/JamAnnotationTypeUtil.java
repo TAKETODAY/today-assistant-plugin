@@ -78,13 +78,14 @@ public abstract class JamAnnotationTypeUtil {
       PsiClass psiClass;
       for (InfraModel model : InfraManager.from(module.getProject()).getAllModels(module)) {
         List<BeanPointer<?>> beanPointers = InfraModelSearchers.findBeans(model, searchParameters);
-        for (BeanPointer beanPointer : beanPointers) {
+        for (BeanPointer<?> beanPointer : beanPointers) {
           CommonInfraBean bean = beanPointer.getBean();
-          InfraPropertyDefinition propertyDefinition = InfraPropertyUtils.findPropertyByName(bean, "customQualifierTypes");
-          if (propertyDefinition instanceof InfraProperty) {
-            for (String value : InfraPropertyUtils.getListOrSetValues((InfraProperty) propertyDefinition)) {
+          var propertyDef = InfraPropertyUtils.findPropertyByName(bean, "customQualifierTypes");
+          if (propertyDef instanceof InfraProperty infraProperty) {
+            for (String value : InfraPropertyUtils.getListOrSetValues(infraProperty)) {
               if (!StringUtil.isEmptyOrSpaces(value)
-                      && (psiClass = facade.findClass(value, moduleSearchScope)) != null && psiClass.isAnnotationType()) {
+                      && (psiClass = facade.findClass(value, moduleSearchScope)) != null
+                      && psiClass.isAnnotationType()) {
                 types.add(psiClass);
               }
             }

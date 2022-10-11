@@ -24,7 +24,7 @@ import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.tabs.EndpointTab;
 import cn.taketoday.lang.Nullable;
 
@@ -40,9 +40,9 @@ public abstract class Endpoint<T> {
 
   private static final String ENDPOINT_BEAN_NAME_SUFFIX = "Endpoint";
 
-  private final String myId;
-  private final String myBeanName;
-  private final String myOperationName;
+  private final String id;
+  private final String beanName;
+  private final String operationName;
 
   public Endpoint(String id) {
     this(id, id + ENDPOINT_BEAN_NAME_SUFFIX);
@@ -53,33 +53,30 @@ public abstract class Endpoint<T> {
   }
 
   public Endpoint(String id, String beanName, String operationName) {
-    myId = id;
-    myBeanName = beanName;
-    myOperationName = operationName;
+    this.id = id;
+    this.beanName = beanName;
+    this.operationName = operationName;
   }
 
   /**
    * @return the id of the endpoint
    */
-
   public final String getId() {
-    return myId;
+    return id;
   }
 
   /**
    * @return the name of the endpoint bean
    */
-
   public final String getBeanName() {
-    return myBeanName;
+    return beanName;
   }
 
   /**
    * @return the name of the operation invoked on an endpoint MBean to retrieve data (used for Spring Boot 2.x)
    */
-
   public String getOperationName() {
-    return myOperationName;
+    return operationName;
   }
 
   /**
@@ -92,8 +89,8 @@ public abstract class Endpoint<T> {
    * Creates an endpoint sub-tab for Run/Debug/Run Dashboard tool window.
    */
   @Nullable
-  public EndpointTab<T> createEndpointTab(InfraApplicationRunConfigurationBase runConfiguration,
-          ProcessHandler processHandler) {
+  public EndpointTab<T> createEndpointTab(
+          InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     return null;
   }
 
@@ -101,6 +98,7 @@ public abstract class Endpoint<T> {
    * The method is invoked when {@link InfraApplicationInfo} instance is created for running Spring Boot application.
    */
   public void infoCreated(Project project, ProcessHandler processHandler, InfraApplicationInfo info) {
+    
   }
 
   /**

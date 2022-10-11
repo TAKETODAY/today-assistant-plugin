@@ -47,7 +47,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 
 import cn.taketoday.assistant.Icons;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveBeansModel;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveContext;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveResource;
@@ -59,12 +59,12 @@ import static cn.taketoday.assistant.app.run.InfraRunBundle.message;
 class LiveResourcesPanel extends LifecycleFinderRecursivePanel<LiveResourcesPanel.LiveResourceItem> {
   private static final String LIVE_RESOURCES_PANEL_GROUP_ID = "LiveResourcesPanel";
 
-  LiveResourcesPanel(Project project, InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  LiveResourcesPanel(Project project, InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     this(project, null, LIVE_RESOURCES_PANEL_GROUP_ID, runConfiguration, processHandler);
   }
 
   LiveResourcesPanel(Project project, @Nullable FinderRecursivePanel parent,
-          @Nullable String groupId, InfraApplicationRunConfigurationBase runConfiguration,
+          @Nullable String groupId, InfraApplicationRunConfig runConfiguration,
           ProcessHandler processHandler) {
     super(project, parent, groupId, runConfiguration, processHandler);
   }
@@ -87,7 +87,7 @@ class LiveResourcesPanel extends LifecycleFinderRecursivePanel<LiveResourcesPane
       }
       resources = model.getResources();
     }
-    InfraApplicationRunConfigurationBase runConfiguration = getRunConfiguration();
+    InfraApplicationRunConfig runConfiguration = getRunConfiguration();
     Module module = runConfiguration.getModule();
     PsiClass mainClass = runConfiguration.getMainClass();
     GlobalSearchScope searchScope = getRunConfiguration().getSearchScope();
@@ -171,7 +171,7 @@ class LiveResourcesPanel extends LifecycleFinderRecursivePanel<LiveResourcesPane
 
   @Override
   public boolean doUpdateItem(LiveResourceItem item) {
-    InfraApplicationRunConfigurationBase runConfiguration = getRunConfiguration();
+    InfraApplicationRunConfig runConfiguration = getRunConfiguration();
     Module module = runConfiguration.getModule();
     PsiClass mainClass = runConfiguration.getMainClass();
     GlobalSearchScope searchScope = getRunConfiguration().getSearchScope();

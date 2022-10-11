@@ -18,33 +18,36 @@
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
 
-package cn.taketoday.assistant.app.run.lifecycle.health;
+package cn.taketoday.assistant;
 
-import com.intellij.execution.process.ProcessHandler;
+import com.intellij.openapi.util.text.StringUtil;
 
-import java.util.Map;
+public enum InfraVersion {
+  ANY("1.0", "cn.taketoday.beans.factory.BeanFactory"),
+  V_4_0("4.0", "cn.taketoday.stereotype.Component");
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
-import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
-import cn.taketoday.assistant.app.run.lifecycle.health.tab.HealthTab;
-import cn.taketoday.assistant.app.run.lifecycle.tabs.EndpointTab;
-import cn.taketoday.lang.Nullable;
+  private final String version;
+  private final String detectionClassFqn;
 
-final class HealthEndpoint extends Endpoint<Map> {
-  private static final String ENDPOINT_ID = "health";
-
-  public HealthEndpoint() {
-    super(ENDPOINT_ID);
+  InfraVersion(String version, String detectionClassFqn) {
+    this.version = version;
+    this.detectionClassFqn = detectionClassFqn;
   }
 
-  @Override
-  public Map parseData(@Nullable Object data) {
-    return (Map) data;
+  public boolean isAtLeast(InfraVersion reference) {
+    if (reference == ANY) {
+      return true;
+    }
+    else {
+      return StringUtil.compareVersionNumbers(this.version, reference.version) >= 0;
+    }
   }
 
-  @Override
-  public EndpointTab<Map> createEndpointTab(InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
-    return new HealthTab(this, runConfiguration, processHandler);
+  public String getVersion() {
+    return this.version;
   }
 
+  public String getDetectionClassFqn() {
+    return this.detectionClassFqn;
+  }
 }

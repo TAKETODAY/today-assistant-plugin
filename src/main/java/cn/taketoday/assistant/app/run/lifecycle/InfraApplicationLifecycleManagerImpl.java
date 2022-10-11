@@ -46,22 +46,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import cn.taketoday.assistant.app.run.InfraApplicationRunConfiguration;
 import cn.taketoday.lang.Nullable;
 
-public final class InfraApplicationLifecycleManagerImpl implements InfraApplicationLifecycleManager, Disposable {
+public final class InfraApplicationLifecycleManagerImpl
+        implements InfraApplicationLifecycleManager, Disposable {
   public static final Key<Boolean> JMX_ENABLED = Key.create("INFRA_APPLICATION_JMX_ENABLED");
-  private final Project myProject;
-  private final Map<ProcessHandler, InfraApplicationDescriptor> myRunningApps = new ConcurrentHashMap();
-  private final Map<ProcessHandler, InfraApplicationInfo> myInfos = new ConcurrentHashMap();
-  private final List<InfoListener> myListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+
+  private final Project project;
+  private final Map<ProcessHandler, InfraApplicationInfo> infos = new ConcurrentHashMap<>();
+  private final Map<ProcessHandler, InfraApplicationDescriptor> runningApps = new ConcurrentHashMap<>();
+  private final List<InfoListener> listeners = ContainerUtil.createLockFreeCopyOnWriteList();
 
   public InfraApplicationLifecycleManagerImpl(Project project) {
-    this.myProject = project;
+    this.project = project;
     init();
-    new InfraApplicationCompileManager(this.myProject, this);
+    new InfraApplicationCompileManager(this.project, this);
   }
 
   private void init() {
-    this.myProject.getMessageBus().connect(this).subscribe(ExecutionManager.EXECUTION_TOPIC, new ExecutionListener() {
+    project.getMessageBus().connect(this).subscribe(ExecutionManager.EXECUTION_TOPIC, new ExecutionListener() {
 
+      @Override
       public void processStarted(String executorId, ExecutionEnvironment env, ProcessHandler handler) {
         Module module;
         RunnerAndConfigurationSettings configurationSettings = env.getRunnerAndConfigurationSettings();
@@ -70,29 +73,27 @@ public final class InfraApplicationLifecycleManagerImpl implements InfraApplicat
                 || (module = appRunConfig.getModule()) == null) {
           return;
         }
-        myRunningApps.put(handler, new InfraApplicationDescriptorImpl(handler, appRunConfig, executorId, module));
+        runningApps.put(handler, new InfraApplicationDescriptorImpl(handler, appRunConfig, executorId, module));
         if (!isLifecycleManagementEnabled(handler)) {
           return;
         }
         InfraApplicationInfo info = InfraApplicationInfoImpl.createInfo(
-                myProject, appRunConfig.getModule(), env, appRunConfig, appRunConfig.getActiveProfiles(), handler);
+                project, appRunConfig.getModule(), env, appRunConfig, appRunConfig.getActiveProfiles(), handler);
         Disposer.register(InfraApplicationLifecycleManagerImpl.this, info);
-        myInfos.put(handler, info);
-        myListeners.forEach(listener -> {
-          listener.infoAdded(handler, info);
-        });
+        infos.put(handler, info);
+        listeners.forEach(listener -> listener.infoAdded(handler, info));
 
-        XDebugSession session = getDebugSession(myProject, handler);
+        XDebugSession session = getDebugSession(project, handler);
         if (session != null) {
           XDebugSessionListener sessionListener = new XDebugSessionListener() {
             public void sessionResumed() {
-              myProject.getMessageBus()
+              project.getMessageBus()
                       .syncPublisher(RunDashboardManager.DASHBOARD_TOPIC)
                       .configurationChanged(appRunConfig, false);
             }
           };
           session.addSessionListener(sessionListener);
-          info.getReadyState().addPropertyListener(new LiveProperty.LivePropertyListener() {
+          info.getReadyState().addPropertyListener(new Property.PropertyListener() {
             @Override
             public void propertyChanged() {
             }
@@ -109,27 +110,27 @@ public final class InfraApplicationLifecycleManagerImpl implements InfraApplicat
       }
 
       public void processTerminating(String executorId, ExecutionEnvironment env, ProcessHandler handler) {
-        myRunningApps.remove(handler);
-        InfraApplicationInfo info = myInfos.remove(handler);
+        runningApps.remove(handler);
+        InfraApplicationInfo info = infos.remove(handler);
         if (info != null) {
           Disposer.dispose(info);
-          myListeners.forEach(listener -> {
+          listeners.forEach(listener -> {
             listener.infoRemoved(handler, info);
           });
-          DaemonCodeAnalyzer.getInstance(myProject).restart();
+          DaemonCodeAnalyzer.getInstance(project).restart();
         }
       }
     });
   }
 
   public void dispose() {
-    this.myRunningApps.clear();
-    this.myInfos.forEach((handler, info) -> {
-      this.myListeners.forEach(listener -> {
+    this.runningApps.clear();
+    this.infos.forEach((handler, info) -> {
+      this.listeners.forEach(listener -> {
         listener.infoRemoved(handler, info);
       });
     });
-    this.myInfos.clear();
+    this.infos.clear();
   }
 
   @Override
@@ -140,38 +141,37 @@ public final class InfraApplicationLifecycleManagerImpl implements InfraApplicat
   @Override
   @Nullable
   public InfraApplicationInfo getInfraApplicationInfo(ProcessHandler handler) {
-    return this.myInfos.get(handler);
+    return this.infos.get(handler);
   }
 
   @Override
   public List<InfraApplicationInfo> getInfraApplicationInfos() {
-    return new ArrayList<>(this.myInfos.values());
+    return new ArrayList<>(this.infos.values());
   }
 
   @Override
   @Nullable
   public InfraApplicationDescriptor getInfraApplicationDescriptor(ProcessHandler handler) {
-    return this.myRunningApps.get(handler);
+    return this.runningApps.get(handler);
   }
 
   @Override
   public List<InfraApplicationDescriptor> getRunningInfraApplications() {
-    return new ArrayList<>(this.myRunningApps.values());
+    return new ArrayList<>(this.runningApps.values());
   }
 
   @Override
   public void addInfoListener(InfraApplicationLifecycleManager.InfoListener listener) {
-    this.myListeners.add(listener);
+    this.listeners.add(listener);
   }
 
   @Override
   public void removeInfoListener(InfraApplicationLifecycleManager.InfoListener listener) {
-    this.myListeners.remove(listener);
+    this.listeners.remove(listener);
   }
 
   @Nullable
   public static XDebugSession getDebugSession(Project project, ProcessHandler processHandler) {
-    XDebugSession[] debugSessions;
     for (XDebugSession session : XDebuggerManager.getInstance(project).getDebugSessions()) {
       if (Comparing.equal(session.getDebugProcess().getProcessHandler(), processHandler)) {
         return session;

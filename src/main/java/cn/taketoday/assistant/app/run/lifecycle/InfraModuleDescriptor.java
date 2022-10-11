@@ -26,50 +26,57 @@ import com.intellij.util.ObjectUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import cn.taketoday.assistant.InfraLibraryUtil;
-import cn.taketoday.assistant.InfraLibraryUtil.TodayVersion;
+import cn.taketoday.assistant.InfraVersion;
 import cn.taketoday.assistant.model.config.InfraConfigValueSearcher;
 import cn.taketoday.lang.Nullable;
 
 final class InfraModuleDescriptor {
 
-  private static final String JMX_NAME_PROPERTY_KEY = "application.admin.jmx-name";
-  private static final String APPLICATION_OBJECT_NAME = "cn.taketoday.today-infrastructure:type=Admin,name=Application";
+  private static final String JMX_NAME_PROPERTY_KEY = "app.admin.jmx-name";
+  private static final String APPLICATION_OBJECT_NAME = "cn.taketoday.app:type=Admin,name=InfraApplication";
+
   static final InfraModuleDescriptor DEFAULT_DESCRIPTOR = getDescriptor(null, true, APPLICATION_OBJECT_NAME);
-  private final TodayVersion myVersion;
-  private final boolean myActuatorsEnabled;
-  private final String myApplicationAdminJmxName;
-  private final Map<String, Boolean> myEndpointsAvailable;
+
+  private final InfraVersion version;
+  private final boolean actuatorsEnabled;
+  private final String appAdminJmxName;
+
+  private final Map<String, Boolean> endpointsAvailable;
 
   static InfraModuleDescriptor getDescriptor(@Nullable Module module, String activeProfiles) {
-    return getDescriptor(module != null ? InfraLibraryUtil.getVersion(module)
-                                        : null, InfraLibraryUtil.hasActuators(module), getApplicationAdminJmxName(module, activeProfiles));
+    return getDescriptor(
+            module != null
+            ? InfraLibraryUtil.getVersion(module)
+            : null, InfraLibraryUtil.hasActuators(module), getAppAdminJmxName(module, activeProfiles));
   }
 
-  static InfraModuleDescriptor getDescriptor(@Nullable TodayVersion version, boolean actuatorsEnabled, String applicationAdminJmxName) {
+  static InfraModuleDescriptor getDescriptor(
+          @Nullable InfraVersion version, boolean actuatorsEnabled, String applicationAdminJmxName) {
     return new InfraModuleDescriptor(version, actuatorsEnabled, applicationAdminJmxName);
   }
 
-  private static String getApplicationAdminJmxName(@Nullable Module module, String activeProfiles) {
+  private static String getAppAdminJmxName(@Nullable Module module, String activeProfiles) {
     if (module == null) {
       return APPLICATION_OBJECT_NAME;
     }
     Set<String> profilesSet = getProfilesSet(activeProfiles);
-    InfraConfigValueSearcher searcher = InfraConfigValueSearcher.productionForProfiles(module, JMX_NAME_PROPERTY_KEY, profilesSet);
+    var searcher = InfraConfigValueSearcher.productionForProfiles(module, JMX_NAME_PROPERTY_KEY, profilesSet);
     return ObjectUtils.chooseNotNull(searcher.findValueText(), APPLICATION_OBJECT_NAME);
   }
 
   @Nullable
   private static Set<String> getProfilesSet(String activeProfiles) {
     String[] profiles = activeProfiles != null ? activeProfiles.split(",") : null;
-    Set<String> profilesSet = new HashSet<>();
+    var profilesSet = new HashSet<String>();
     if (profiles != null) {
       for (String profile : profiles) {
-        String profile2 = profile.trim();
-        if (!profile2.isEmpty()) {
-          profilesSet.add(profile2);
+        profile = profile.trim();
+        if (!profile.isEmpty()) {
+          profilesSet.add(profile);
         }
       }
     }
@@ -79,32 +86,33 @@ final class InfraModuleDescriptor {
     return profilesSet;
   }
 
-  private InfraModuleDescriptor(@Nullable TodayVersion version, boolean actuatorsEnabled, String applicationAdminJmxName) {
-    this.myEndpointsAvailable = new HashMap<>();
-    this.myVersion = version;
-    this.myActuatorsEnabled = actuatorsEnabled;
-    this.myApplicationAdminJmxName = applicationAdminJmxName;
+  private InfraModuleDescriptor(@Nullable InfraVersion version,
+          boolean actuatorsEnabled, String appAdminJmxName) {
+    this.endpointsAvailable = new HashMap<>();
+    this.version = version;
+    this.actuatorsEnabled = actuatorsEnabled;
+    this.appAdminJmxName = appAdminJmxName;
   }
 
   @Nullable
-  TodayVersion getVersion() {
-    return this.myVersion;
+  InfraVersion getVersion() {
+    return this.version;
   }
 
   boolean isActuatorsEnabled() {
-    return this.myActuatorsEnabled;
+    return this.actuatorsEnabled;
   }
 
   boolean isEndpointAvailable(Endpoint endpoint) {
-    return this.myEndpointsAvailable.getOrDefault(endpoint.getId(), Boolean.TRUE).booleanValue();
+    return this.endpointsAvailable.getOrDefault(endpoint.getId(), Boolean.TRUE);
   }
 
   void setEndpointAvailable(Endpoint endpoint, boolean available) {
-    this.myEndpointsAvailable.put(endpoint.getId(), Boolean.valueOf(available));
+    this.endpointsAvailable.put(endpoint.getId(), available);
   }
 
-  String getApplicationAdminJmxName() {
-    return this.myApplicationAdminJmxName;
+  String getAppAdminJmxName() {
+    return this.appAdminJmxName;
   }
 
   public boolean equals(Object o) {
@@ -114,12 +122,15 @@ final class InfraModuleDescriptor {
     if (!(o instanceof InfraModuleDescriptor descriptor)) {
       return false;
     }
-    return this.myVersion == descriptor.myVersion && this.myActuatorsEnabled == descriptor.myActuatorsEnabled && this.myApplicationAdminJmxName.equals(
-            descriptor.myApplicationAdminJmxName) && this.myEndpointsAvailable.equals(descriptor.myEndpointsAvailable);
+    return version == descriptor.version
+            && actuatorsEnabled == descriptor.actuatorsEnabled
+            && appAdminJmxName.equals(descriptor.appAdminJmxName)
+            && endpointsAvailable.equals(descriptor.endpointsAvailable);
   }
 
+  @Override
   public int hashCode() {
-    int result = (31 * 17) + (this.myVersion != null ? this.myVersion.hashCode() : 0);
-    return (31 * ((31 * ((31 * result) + (this.myActuatorsEnabled ? 1 : 0))) + this.myApplicationAdminJmxName.hashCode())) + this.myEndpointsAvailable.hashCode();
+    return Objects.hash(version, actuatorsEnabled, appAdminJmxName);
   }
+
 }

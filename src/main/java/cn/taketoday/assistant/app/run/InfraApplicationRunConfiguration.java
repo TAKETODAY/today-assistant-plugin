@@ -85,7 +85,8 @@ import cn.taketoday.lang.Nullable;
 
 import static cn.taketoday.assistant.app.run.InfraRunBundle.message;
 
-public final class InfraApplicationRunConfiguration extends ApplicationConfiguration implements InfraApplicationRunConfigurationBase {
+public final class InfraApplicationRunConfiguration
+        extends ApplicationConfiguration implements InfraApplicationRunConfig {
 
   public InfraApplicationRunConfiguration(Project project, ConfigurationFactory factory, String name) {
     super(name, project, factory);
@@ -153,24 +154,28 @@ public final class InfraApplicationRunConfiguration extends ApplicationConfigura
       InfraAdditionalParameter parameter = parameters.get(i);
       if (StringUtil.isEmptyOrSpaces(parameter.getName())) {
         int index = i;
-        throw new RuntimeConfigurationError(message("infra.application.run.configuration.invalid.parameter", i + 1), () -> {
-          parameters.remove(index);
-        });
+        throw new RuntimeConfigurationError(message(
+                "infra.application.run.configuration.invalid.parameter", i + 1),
+                () -> parameters.remove(index)
+        );
       }
     }
   }
 
   public void checkUpdateActionUpdatePolicy() throws RuntimeConfigurationException {
     InfraApplicationUpdatePolicy policy;
-    if (!DumbService.isDumb(getProject()) && (policy = getUpdateActionUpdatePolicy()) != null && !policy.isAvailableForConfiguration(this)) {
-      throw new RuntimeConfigurationWarning(message("infra.application.run.configuration.policy.not.available.on.update.action", policy.getName()));
+    if (!DumbService.isDumb(getProject())
+            && (policy = getUpdateActionUpdatePolicy()) != null && !policy.isAvailableForConfiguration(this)) {
+      throw new RuntimeConfigurationWarning(message(
+              "infra.application.run.configuration.policy.not.available.on.update.action", policy.getName()));
     }
   }
 
   public void checkFrameDeactivationUpdatePolicy() throws RuntimeConfigurationException {
     InfraApplicationUpdatePolicy policy = getFrameDeactivationUpdatePolicy();
     if (policy != null && !policy.isAvailableForConfiguration(this)) {
-      throw new RuntimeConfigurationWarning(message("infra.application.run.configuration.policy.not.available.on.frame.deactivation", policy.getName()));
+      throw new RuntimeConfigurationWarning(message(
+              "infra.application.run.configuration.policy.not.available.on.frame.deactivation", policy.getName()));
     }
   }
 

@@ -51,7 +51,7 @@ public class InfraApplicationUrlPathConfigurable extends DialogWrapper {
 
   private final Project myProject;
 
-  private final InfraApplicationRunConfigurationBase myRunConfiguration;
+  private final InfraApplicationRunConfig myRunConfiguration;
 
   private final InfraApplicationInfo myInfo;
 
@@ -99,7 +99,7 @@ public class InfraApplicationUrlPathConfigurable extends DialogWrapper {
     }
   }
 
-  public InfraApplicationUrlPathConfigurable(Project project, InfraApplicationRunConfigurationBase runConfiguration, InfraApplicationInfo info) {
+  public InfraApplicationUrlPathConfigurable(Project project, InfraApplicationRunConfig runConfiguration, InfraApplicationInfo info) {
     super(project);
     this.myProject = project;
     this.myRunConfiguration = runConfiguration;

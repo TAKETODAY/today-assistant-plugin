@@ -35,6 +35,7 @@ import com.intellij.psi.PsiLiteral;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValueProvider.Result;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.xml.XmlElement;
 import com.intellij.uast.UastModificationTracker;
@@ -111,7 +112,7 @@ public class InfraProfilesFactory {
     return CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
       Map<Boolean, List<InfraProfileTarget>> map = ConcurrentFactoryMap.createMap(
               withTests -> findDomTargets(module, module.getModuleScope(withTests)));
-      return CachedValueProvider.Result.create(map, DomManager.getDomManager(module.getProject()));
+      return Result.create(map, DomManager.getDomManager(module.getProject()));
     }).get(includeTests);
   }
 
@@ -132,9 +133,8 @@ public class InfraProfilesFactory {
       List<TextRange> ranges = getProfileRanges(value, InfraUtils.INFRA_DELIMITERS);
       if (!ranges.isEmpty()) {
         int offset = ElementManipulators.getOffsetInElement(xmlElement);
-        targets.addAll(ContainerUtil.map(ranges, range -> {
-          return new InfraProfileTarget(xmlElement, range.substring(value), range.getStartOffset() + offset);
-        }));
+        targets.addAll(ContainerUtil.map(
+                ranges, range -> new InfraProfileTarget(xmlElement, range.substring(value), range.getStartOffset() + offset)));
       }
     }
     for (Beans beansProfile : beans.getBeansProfiles()) {
@@ -144,24 +144,25 @@ public class InfraProfilesFactory {
 
   private static List<InfraProfileTarget> findJamTargets(Module module, boolean includeTests) {
     return (CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
-      Map<Boolean, List<InfraProfileTarget>> map = ConcurrentFactoryMap.createMap(
+      var map = ConcurrentFactoryMap.<Boolean, List<InfraProfileTarget>>createMap(
               withTests -> findJamTargets(module, module.getModuleScope(withTests)));
       Project project = module.getProject();
-      return CachedValueProvider.Result.create(map, ProjectRootManager.getInstance(project), UastModificationTracker.getInstance(project));
+      return Result.create(map, ProjectRootManager.getInstance(project), UastModificationTracker.getInstance(project));
     })).get(includeTests);
   }
 
   public static List<InfraProfileTarget> findJamTargets(Module module, GlobalSearchScope scope) {
-    List<InfraProfileTarget> targets = new ArrayList<>();
-    JamService jamService = JamService.getJamService(module.getProject());
-    List<String> fqns = new ArrayList<>(SemContributorUtil.getCustomMetaAnnotations(AnnotationConstant.PROFILE).fun(module));
+    var targets = new ArrayList<InfraProfileTarget>();
+    var fqns = new ArrayList<>(SemContributorUtil.getCustomMetaAnnotations(AnnotationConstant.PROFILE).fun(module));
     fqns.add(AnnotationConstant.PROFILE);
+
+    JamService jamService = JamService.getJamService(module.getProject());
     for (String fqn : fqns) {
-      List<InfraContextProfile> jamProfiles = jamService.getJamClassElements(InfraContextProfile.CONTEXT_PROFILE_JAM_KEY, fqn, scope);
+      var jamProfiles = jamService.getJamClassElements(InfraContextProfile.CONTEXT_PROFILE_JAM_KEY, fqn, scope);
       for (InfraContextProfile jamProfile : jamProfiles) {
         targets.addAll(getProfileTargets(jamProfile));
       }
-      List<InfraContextProfile> jamMethodProfiles = jamService.getJamMethodElements(InfraContextProfile.CONTEXT_PROFILE_JAM_KEY, fqn, scope);
+      var jamMethodProfiles = jamService.getJamMethodElements(InfraContextProfile.CONTEXT_PROFILE_JAM_KEY, fqn, scope);
       for (InfraContextProfile jamProfile2 : jamMethodProfiles) {
         targets.addAll(getProfileTargets(jamProfile2));
       }
@@ -190,7 +191,7 @@ public class InfraProfilesFactory {
     return smartList;
   }
 
-  private static List<TextRange> getProfileRanges(@cn.taketoday.lang.Nullable String value, String delimiters) {
+  private static List<TextRange> getProfileRanges(@Nullable String value, String delimiters) {
     if (StringUtil.isEmptyOrSpaces(value)) {
       return Collections.emptyList();
     }

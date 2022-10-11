@@ -17,28 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see [http://www.gnu.org/licenses/]
  */
-package cn.taketoday.assistant.app.run;
 
-import com.intellij.execution.configurations.LocatableConfiguration;
-import com.intellij.openapi.module.Module;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.search.GlobalSearchScope;
+package cn.taketoday.assistant.app.run.lifecycle;
 
-public interface InfraApplicationRunConfigurationBase extends LocatableConfiguration {
+import cn.taketoday.lang.Nullable;
 
-  void setModule(Module module);
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ */
+public record InfraWebServerConfig(
+        boolean sslEnabled, @Nullable String contextPath,
+        @Nullable String servletPath, @Nullable String address) {
 
-  Module getModule();
-
-  void setInfraMainClass(String mainClass);
-
-  String getInfraMainClass();
-
-  PsiClass getMainClass();
-
-  GlobalSearchScope getSearchScope();
-
-  String getUrlPath();
-
-  void setUrlPath(String value);
 }

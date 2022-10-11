@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cn.taketoday.assistant.app.run.InfraRunBundle;
+import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationDescriptor;
 
 final class UpdateClassesAndResourcesPolicy extends InfraApplicationUpdatePolicy {
   private static final String ID = "UpdateClassesAndResources";
@@ -41,9 +42,13 @@ final class UpdateClassesAndResourcesPolicy extends InfraApplicationUpdatePolicy
 
   @Override
   public void runUpdate(InfraApplicationUpdateContext context) {
-    List<ModuleBuildTask> modulesBuildTasks = context.getDescriptors().stream().map((v0) -> {
-      return v0.getModule();
-    }).distinct().map(ModuleBuildTaskImpl::new).collect(Collectors.toList());
-    ProjectTaskManager.getInstance(context.getProject()).run(new ProjectTaskContext(context.isOnFrameDeactivation()), new ProjectTaskList(modulesBuildTasks));
+    List<ModuleBuildTask> modulesBuildTasks = context.getDescriptors()
+            .stream()
+            .map(InfraApplicationDescriptor::getModule)
+            .distinct()
+            .map(ModuleBuildTaskImpl::new)
+            .collect(Collectors.toList());
+    ProjectTaskManager.getInstance(context.getProject())
+            .run(new ProjectTaskContext(context.isOnFrameDeactivation()), new ProjectTaskList(modulesBuildTasks));
   }
 }

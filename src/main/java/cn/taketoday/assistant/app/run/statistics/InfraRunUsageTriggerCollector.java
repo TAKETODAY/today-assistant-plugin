@@ -32,14 +32,15 @@ import com.intellij.internal.statistic.utils.PluginInfoDetectorKt;
 import com.intellij.openapi.project.Project;
 
 public final class InfraRunUsageTriggerCollector extends CounterUsagesCollector {
-  private static final EventLogGroup SPRING_BOOT_RUN_USAGES_GROUP = new EventLogGroup("infra.run.usages", 4);
-  private static final EventId1<String> EDIT_RUNTIME_BEAN = SPRING_BOOT_RUN_USAGES_GROUP.registerEvent("edit.runtime.bean", EventFields.ActionPlace);
-  private static final EventId1<String> EDIT_RUNTIME_RESOURCE = SPRING_BOOT_RUN_USAGES_GROUP.registerEvent("edit.runtime.resource", EventFields.ActionPlace);
-  private static final EventId1<String> RUNTIME_BEANS_NAVIGATION_HANDLER = SPRING_BOOT_RUN_USAGES_GROUP.registerEvent("runtime.beans.navigation.handler", EventFields.ActionPlace);
-  private static final EventId RUNTIME_BEAN_SELECTED = SPRING_BOOT_RUN_USAGES_GROUP.registerEvent("runtime.bean.selected");
-  private static final EventId RUNTIME_RESOURCE_SELECTED = SPRING_BOOT_RUN_USAGES_GROUP.registerEvent("runtime.resource.selected");
+
+  private static final EventLogGroup INFRA_RUN_USAGES_GROUP = new EventLogGroup("infra.run.usages", 4);
+  private static final EventId1<String> EDIT_RUNTIME_BEAN = INFRA_RUN_USAGES_GROUP.registerEvent("edit.runtime.bean", EventFields.ActionPlace);
+  private static final EventId1<String> EDIT_RUNTIME_RESOURCE = INFRA_RUN_USAGES_GROUP.registerEvent("edit.runtime.resource", EventFields.ActionPlace);
+  private static final EventId1<String> RUNTIME_BEANS_NAVIGATION_HANDLER = INFRA_RUN_USAGES_GROUP.registerEvent("runtime.beans.navigation.handler", EventFields.ActionPlace);
+  private static final EventId RUNTIME_BEAN_SELECTED = INFRA_RUN_USAGES_GROUP.registerEvent("runtime.bean.selected");
+  private static final EventId RUNTIME_RESOURCE_SELECTED = INFRA_RUN_USAGES_GROUP.registerEvent("runtime.resource.selected");
   private static final ClassEventField ACTUATOR_FIELD = EventFields.Class("actuator");
-  private static final EventId2<Class<?>, PluginInfo> ACTUATOR_TAB_SELECTED = SPRING_BOOT_RUN_USAGES_GROUP.registerEvent("actuator.tab.selected", ACTUATOR_FIELD, EventFields.PluginInfo);
+  private static final EventId2<Class<?>, PluginInfo> ACTUATOR_TAB_SELECTED = INFRA_RUN_USAGES_GROUP.registerEvent("actuator.tab.selected", ACTUATOR_FIELD, EventFields.PluginInfo);
 
   public static void logEditRuntimeBean(Project project, String place) {
     EDIT_RUNTIME_BEAN.log(project, place);
@@ -66,6 +67,6 @@ public final class InfraRunUsageTriggerCollector extends CounterUsagesCollector 
   }
 
   public EventLogGroup getGroup() {
-    return SPRING_BOOT_RUN_USAGES_GROUP;
+    return INFRA_RUN_USAGES_GROUP;
   }
 }

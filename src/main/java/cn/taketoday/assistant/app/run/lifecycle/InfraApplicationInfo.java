@@ -29,13 +29,13 @@ public interface InfraApplicationInfo extends Disposable {
 
   RunProfile getRunProfile();
 
-  LiveProperty<Boolean> getReadyState();
+  Property<Boolean> getReadyState();
 
-  LiveProperty<Integer> getServerPort();
+  Property<Integer> getServerPort();
 
-  LiveProperty<InfraApplicationServerConfiguration> getServerConfiguration();
+  Property<InfraWebServerConfig> getServerConfig();
 
-  LiveProperty<String> getApplicationUrl();
+  Property<String> getApplicationUrl();
 
-  <T> LiveProperty<T> getEndpointData(Endpoint<T> endpoint);
+  <T> Property<T> getEndpointData(Endpoint<T> endpoint);
 }

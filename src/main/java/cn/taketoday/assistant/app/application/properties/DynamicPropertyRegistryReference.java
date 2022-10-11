@@ -55,7 +55,7 @@ final class DynamicPropertyRegistryReference extends MetaConfigKeyReference<PsiE
   }
 
   public DynamicPropertyRegistryReference(PsiElement psiElement, String propertyName) {
-    super(InfraApplicationMetaConfigKeyManager.getInstance(), psiElement, propertyName);
+    super(InfraApplicationMetaConfigKeyManager.of(), psiElement, propertyName);
     this.psiElement = psiElement;
     this.propertyName = propertyName;
     this.MAP_DOT_TAIL = new CharTailType('.') {

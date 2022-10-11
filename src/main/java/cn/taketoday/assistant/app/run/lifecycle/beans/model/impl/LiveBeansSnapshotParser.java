@@ -134,8 +134,6 @@ public final class LiveBeansSnapshotParser {
     public String parent;
     public Bean[] beans = EMPTY_BEANS;
 
-    private Context() {
-    }
   }
 
   private static class Bean {
@@ -145,22 +143,15 @@ public final class LiveBeansSnapshotParser {
     public String resource;
     public String[] dependencies = ArrayUtilRt.EMPTY_STRING_ARRAY;
 
-    private Bean() {
-    }
   }
 
   private static class EndpointApplication {
     public Map<String, EndpointContext> contexts;
-
-    private EndpointApplication() {
-    }
   }
 
   private static class EndpointContext {
     public Map<String, Bean> beans;
     public String parentId;
 
-    private EndpointContext() {
-    }
   }
 }

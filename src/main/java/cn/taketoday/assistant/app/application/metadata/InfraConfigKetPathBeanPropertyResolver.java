@@ -88,12 +88,16 @@ public class InfraConfigKetPathBeanPropertyResolver implements ConfigKeyPathBean
   @Nullable
   public static PsiMethod getBindingConstructor(PsiClass psiClass, @Nullable Module module, @Nullable MetaConfigKey configKey) {
     boolean version3 = true;
-    boolean keyBinding = version3 || (configKey != null && hasConfigurationPropertiesConstructorBinding(configKey));
-    Supplier<List<String>> excludedAnnotations = version3 ? () -> {
-      return ContainerUtil.mapNotNull(MetaAnnotationUtil.getAnnotationTypesWithChildren(module, AnnotationConstant.AUTOWIRED, false),
-              PsiClass::getQualifiedName);
-    } : null;
-    return getBindingConstructor(psiClass, keyBinding, excludedAnnotations);
+    if (!version3) {
+      if (configKey != null) {
+        hasConfigurationPropertiesConstructorBinding(configKey);
+      }
+    }
+    Supplier<List<String>> excludedAnnotations = () -> ContainerUtil.mapNotNull(
+            MetaAnnotationUtil.getAnnotationTypesWithChildren(module, AnnotationConstant.AUTOWIRED, false),
+            PsiClass::getQualifiedName
+    );
+    return getBindingConstructor(psiClass, true, excludedAnnotations);
   }
 
   private static boolean hasConfigurationPropertiesConstructorBinding(MetaConfigKey configKey) {

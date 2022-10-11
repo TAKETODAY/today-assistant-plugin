@@ -87,7 +87,6 @@ import cn.taketoday.assistant.model.InfraQualifier;
 import cn.taketoday.assistant.model.ModelSearchParameters;
 import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
 import cn.taketoday.assistant.model.jam.javaConfig.InfraJavaBean;
-import cn.taketoday.assistant.model.jam.javaConfig.InfraJavaConfiguration;
 import cn.taketoday.assistant.model.jam.javaConfig.InfraOldJavaConfigurationUtil;
 import cn.taketoday.assistant.model.utils.InfraBeanUtils;
 import cn.taketoday.assistant.model.utils.ProfileUtils;
@@ -103,66 +102,64 @@ import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
 public class LocalXmlModelImpl extends LocalXmlModel {
-  private volatile Collection<BeanPointer<?>> myLocalXmlBeans;
-  private final XmlFile myConfigFile;
-  private final Module myModule;
-  private final Set<String> myActiveProfiles;
-  private final LocalXmlModelIndexProcessor myIndexProcessor;
-  private final NotNullLazyValue<BeanNamesMapper> myLocalBeanNamesMapper;
-  private final CachedValue<Set<InfraComponentScanModel<?>>> scannedModels;
-  private final CachedValue<CommonInfraModel> javaConfigurationModel;
-  private final CachedValue<CommonInfraModel> explicitlyDefinedBeansModel;
-  private final CachedValue<List<BeanPointer<?>>> myPlaceholders;
-  private final Map<String, Collection<XmlTag>> myCustomBeanIdCandidates;
-  private final CachedValue<Set<String>> myProfiles;
-  private final CachedValue<List<BeanPointer<?>>> myAnnotationConfigApplicationContexts;
-  private final CachedValue<List<InfraBeansPackagesScan>> myComponentScanBeans;
-  private final CachedValue<MultiMap<BeanPointer<?>, BeanPointer<?>>> myDirectInheritorsMap;
-  private final Map<InfraQualifier, List<BeanPointer<?>>> myLocalBeansByQualifier;
   private static final Key<CachedValue<Set<PsiClass>>> EXPLICIT_BEAN_CLASSES = Key.create("explicitBeanClasses");
 
+  private volatile Collection<BeanPointer<?>> localXmlBeans;
+
+  private final Module module;
+  private final XmlFile configFile;
+  private final Set<String> activeProfiles;
+  private final CachedValue<Set<String>> profiles;
+  private final LocalXmlModelIndexProcessor indexProcessor;
+  private final NotNullLazyValue<BeanNamesMapper> localBeanNamesMapper;
+  private final CachedValue<List<BeanPointer<?>>> placeholders;
+  private final CachedValue<CommonInfraModel> javaConfigurationModel;
+  private final CachedValue<Set<InfraComponentScanModel<?>>> scannedModels;
+  private final CachedValue<CommonInfraModel> explicitlyDefinedBeansModel;
+
+  private final Map<String, Collection<XmlTag>> customBeanIdCandidates;
+  private final Map<InfraQualifier, List<BeanPointer<?>>> localBeansByQualifier;
+
+  private final CachedValue<List<InfraBeansPackagesScan>> componentScanBeans;
+  private final CachedValue<List<BeanPointer<?>>> annotationConfigApplicationContexts;
+  private final CachedValue<MultiMap<BeanPointer<?>, BeanPointer<?>>> directInheritorsMap;
+
   public LocalXmlModelImpl(XmlFile configFile, Module module, Set<String> activeProfiles) {
-    this.myLocalBeanNamesMapper = NotNullLazyValue.volatileLazy(() -> {
-      return new BeanNamesMapper(this);
+    this.localBeanNamesMapper = NotNullLazyValue.volatileLazy(() -> new BeanNamesMapper(this));
+    this.module = module;
+    this.configFile = configFile;
+    this.activeProfiles = activeProfiles;
+    this.indexProcessor = CachedValuesManager.getCachedValue(configFile, () -> createIndexProcessor(configFile));
+    this.customBeanIdCandidates = ConcurrentFactoryMap.createMap(key -> {
+      return !canProcessBeans() ? Collections.emptyList() : indexProcessor.getCustomBeanCandidates(key);
     });
-    this.myConfigFile = configFile;
-    this.myModule = module;
-    this.myActiveProfiles = activeProfiles;
-    this.myIndexProcessor = CachedValuesManager.getCachedValue(this.myConfigFile, () -> {
-      return createIndexProcessor(configFile);
-    });
-    this.myCustomBeanIdCandidates = ConcurrentFactoryMap.createMap(key -> {
-      return !canProcessBeans() ? Collections.emptyList() : this.myIndexProcessor.getCustomBeanCandidates(key);
-    });
-    this.myLocalBeansByQualifier = ConcurrentFactoryMap.createMap(key2 -> {
-      return findLocalBeansByQualifier(this, key2);
-    });
-    this.scannedModels = CachedValuesManager.getManager(myModule.getProject()).createCachedValue(() -> {
-      return CachedValueProvider.Result.create(getPackagesScans(this.myActiveProfiles).stream().map(scan -> {
-        return new InfraComponentScanModel<>(this.myModule, scan, this.myActiveProfiles);
+    this.localBeansByQualifier = ConcurrentFactoryMap.createMap(key2 -> findLocalBeansByQualifier(this, key2));
+    this.scannedModels = CachedValuesManager.getManager(this.module.getProject()).createCachedValue(() -> {
+      return CachedValueProvider.Result.create(getPackagesScans(this.activeProfiles).stream().map(scan -> {
+        return new InfraComponentScanModel<>(this.module, scan, this.activeProfiles);
       }).collect(Collectors.toSet()), getOutsideModelDependencies(this));
     }, false);
-    this.myPlaceholders = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
+    this.placeholders = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
       return CachedValueProvider.Result.create(computePlaceholders(), getOutsideModelDependencies(this));
     }, false);
-    this.myProfiles = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
+    this.profiles = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
       return CachedValueProvider.Result.create(computeProfiles(), getOutsideModelDependencies(this));
     }, false);
-    this.myAnnotationConfigApplicationContexts = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
+    this.annotationConfigApplicationContexts = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
       return CachedValueProvider.Result.create(computeAnnotationConfigApplicationContexts(), getOutsideModelDependencies(this));
     }, false);
-    this.myComponentScanBeans = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
-      return CachedValueProvider.Result.create(canProcessBeans() ? this.myIndexProcessor.getComponentScans() : Collections.emptyList(), getOutsideModelDependencies(this));
+    this.componentScanBeans = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
+      return CachedValueProvider.Result.create(canProcessBeans() ? this.indexProcessor.getComponentScans() : Collections.emptyList(), getOutsideModelDependencies(this));
     }, false);
-    this.myDirectInheritorsMap = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
+    this.directInheritorsMap = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
       return CachedValueProvider.Result.create(computeDirectInheritorsMap(), getOutsideModelDependencies(this));
     }, false);
     this.javaConfigurationModel = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
-      CommonInfraModel model = new BeansInfraModel(myModule, NotNullLazyValue.lazy(this::computeJavaConfigurations));
+      CommonInfraModel model = new BeansInfraModel(this.module, NotNullLazyValue.lazy(this::computeJavaConfigurations));
       return CachedValueProvider.Result.create(model, getOutsideModelDependencies(this));
     }, false);
     this.explicitlyDefinedBeansModel = CachedValuesManager.getManager(getProject()).createCachedValue(() -> {
-      CommonInfraModel model = new BeansInfraModel(myModule, NotNullLazyValue.lazy(this::computeExplicitlyDefinedBeans));
+      CommonInfraModel model = new BeansInfraModel(this.module, NotNullLazyValue.lazy(this::computeExplicitlyDefinedBeans));
       return CachedValueProvider.Result.create(model, getOutsideModelDependencies(this));
     }, false);
   }
@@ -175,26 +172,26 @@ public class LocalXmlModelImpl extends LocalXmlModel {
   @Override
   @Nullable
   public DomFileElement<Beans> getRoot() {
-    return InfraDomUtils.getDomFileElement(this.myConfigFile);
+    return InfraDomUtils.getDomFileElement(this.configFile);
   }
 
   private Project getProject() {
-    return this.myConfigFile.getProject();
+    return this.configFile.getProject();
   }
 
   @Override
 
   public XmlFile getConfig() {
-    return myConfigFile;
+    return configFile;
   }
 
   @Override
   public Collection<XmlTag> getCustomBeans(String id) {
-    return this.myCustomBeanIdCandidates.get(id);
+    return this.customBeanIdCandidates.get(id);
   }
 
   private BeanNamesMapper getLocalBeanNamesMapper() {
-    return this.myLocalBeanNamesMapper.getValue();
+    return this.localBeanNamesMapper.getValue();
   }
 
   @Override
@@ -209,12 +206,12 @@ public class LocalXmlModelImpl extends LocalXmlModel {
 
   @Override
   public Collection<BeanPointer<?>> getLocalBeans() {
-    if (this.myLocalXmlBeans == null) {
+    if (this.localXmlBeans == null) {
       Collection<BeanPointer<?>> calculateLocalXmlBeans = calculateLocalXmlBeans();
-      this.myLocalXmlBeans = calculateLocalXmlBeans;
+      this.localXmlBeans = calculateLocalXmlBeans;
       return calculateLocalXmlBeans;
     }
-    return this.myLocalXmlBeans;
+    return this.localXmlBeans;
   }
 
   protected Collection<BeanPointer<?>> calculateLocalXmlBeans() {
@@ -236,10 +233,10 @@ public class LocalXmlModelImpl extends LocalXmlModel {
     ContainerUtil.addAllNotNull(models, getDependentLocalModels().stream().map(pair -> pair.first).collect(Collectors.toSet()));
     ContainerUtil.addAllNotNull(models, getCachedPackageScanModel());
     ContainerUtil.addAllNotNull(models, getCustomDiscoveredBeansModel());
-    if (InfraUtils.findLibraryClass(myModule, AnnotationConstant.CONFIGURATION) != null) {
+    if (InfraUtils.findLibraryClass(module, AnnotationConstant.CONFIGURATION) != null) {
       ContainerUtil.addIfNotNull(models, getOldJavaConfigurationBeansModel());
     }
-    if (isProcessExplicitlyDefinedAnnotatedBeans(myModule)) {
+    if (isProcessExplicitlyDefinedAnnotatedBeans(module)) {
       ContainerUtil.addIfNotNull(models, getExplicitlyDefinedBeansModel());
     }
     return models;
@@ -254,7 +251,7 @@ public class LocalXmlModelImpl extends LocalXmlModel {
   }
 
   private void processDomBeans(Beans rootElement, Processor<CommonInfraBean> processor) {
-    if (ProfileUtils.isActiveProfile(rootElement, myActiveProfiles)) {
+    if (ProfileUtils.isActiveProfile(rootElement, activeProfiles)) {
       InfraBeanUtils.of().processChildBeans(rootElement, false, processor);
       for (Beans profile : rootElement.getBeansProfiles()) {
         processDomBeans(profile, processor);
@@ -266,7 +263,7 @@ public class LocalXmlModelImpl extends LocalXmlModel {
   public List<BeanPointer<?>> getDescendantBeans(BeanPointer<?> pointer) {
     Set<BeanPointer<?>> visited = new HashSet<>();
     visited.add(pointer);
-    MultiMap<BeanPointer<?>, BeanPointer<?>> map = this.myDirectInheritorsMap.getValue();
+    MultiMap<BeanPointer<?>, BeanPointer<?>> map = this.directInheritorsMap.getValue();
     addDescendants(map, pointer, visited);
     visited.remove(pointer);
     return new SmartList<>(visited);
@@ -283,22 +280,22 @@ public class LocalXmlModelImpl extends LocalXmlModel {
 
   @Override
   public Module getModule() {
-    return this.myModule;
+    return this.module;
   }
 
   @Override
   public List<BeanPointer<?>> getPlaceholderConfigurerBeans() {
-    return this.myPlaceholders.getValue();
+    return this.placeholders.getValue();
   }
 
   @Override
 
   public List<InfraBeansPackagesScan> getPackagesScans() {
-    return getPackagesScans(myActiveProfiles);
+    return getPackagesScans(activeProfiles);
   }
 
   protected List<InfraBeansPackagesScan> getPackagesScans(Set<String> activeProfiles) {
-    List<InfraBeansPackagesScan> allComponentScans = this.myComponentScanBeans.getValue();
+    List<InfraBeansPackagesScan> allComponentScans = this.componentScanBeans.getValue();
     return (activeProfiles.isEmpty() || InfraProfile.DEFAULT_TEST_PROFILE_NAME.equals(ContainerUtil.getOnlyItem(activeProfiles))) ? allComponentScans : ContainerUtil.mapNotNull(allComponentScans,
             scan -> {
               if ((scan instanceof DomInfraBean) && isInActiveProfile((DomInfraBean) scan, activeProfiles)) {
@@ -310,18 +307,18 @@ public class LocalXmlModelImpl extends LocalXmlModel {
 
   @Override
   public List<BeanPointer<?>> getAnnotationConfigAppContexts() {
-    return this.myAnnotationConfigApplicationContexts.getValue();
+    return this.annotationConfigApplicationContexts.getValue();
   }
 
   @Override
   public Set<String> getProfiles() {
-    return this.myProfiles.getValue();
+    return this.profiles.getValue();
   }
 
   @Override
 
   public Set<String> getActiveProfiles() {
-    return this.myActiveProfiles;
+    return this.activeProfiles;
   }
 
   public boolean equals(Object o) {
@@ -331,13 +328,13 @@ public class LocalXmlModelImpl extends LocalXmlModel {
     if (!(o instanceof LocalXmlModel model)) {
       return false;
     }
-    return this.myConfigFile.equals(model.getConfig()) && this.myModule.equals(model.getModule()) && ProfileUtils.profilesAsString(this.myActiveProfiles)
+    return this.configFile.equals(model.getConfig()) && this.module.equals(model.getModule()) && ProfileUtils.profilesAsString(this.activeProfiles)
             .equals(ProfileUtils.profilesAsString(model.getActiveProfiles()));
   }
 
   public int hashCode() {
-    int result = this.myConfigFile.hashCode();
-    return (31 * ((31 * result) + this.myModule.hashCode())) + ProfileUtils.profilesAsString(this.myActiveProfiles).hashCode();
+    int result = this.configFile.hashCode();
+    return (31 * ((31 * result) + this.module.hashCode())) + ProfileUtils.profilesAsString(this.activeProfiles).hashCode();
   }
 
   @Override
@@ -372,7 +369,7 @@ public class LocalXmlModelImpl extends LocalXmlModel {
     if (!params.canSearch() || !canProcessBeans()) {
       return true;
     }
-    return this.myIndexProcessor.processByClass(params, processor, myActiveProfiles, this.myModule, onlyPlainBeans);
+    return this.indexProcessor.processByClass(params, processor, activeProfiles, this.module, onlyPlainBeans);
   }
 
   @Override
@@ -380,12 +377,12 @@ public class LocalXmlModelImpl extends LocalXmlModel {
     if (!params.canSearch() || !canProcessBeans()) {
       return true;
     }
-    return this.myIndexProcessor.processByName(params, processor, myActiveProfiles);
+    return this.indexProcessor.processByName(params, processor, activeProfiles);
   }
 
   private boolean canProcessBeans() {
     DomFileElement<Beans> root = getRoot();
-    return root != null && ProfileUtils.isActiveProfile(root.getRootElement(), myActiveProfiles);
+    return root != null && ProfileUtils.isActiveProfile(root.getRootElement(), activeProfiles);
   }
 
   @Override
@@ -395,11 +392,11 @@ public class LocalXmlModelImpl extends LocalXmlModel {
   }
 
   private static Set<Pair<LocalModel, LocalModelDependency>> getCachedDependentLocalModels(LocalXmlModelImpl model) {
-    return CachedValuesManager.getManager(model.myConfigFile.getProject()).getCachedValue(model, () -> {
+    return CachedValuesManager.getManager(model.configFile.getProject()).getCachedValue(model, () -> {
       Set<Pair<LocalModel, LocalModelDependency>> models = new LinkedHashSet<>();
-      Set<String> profiles = model.myActiveProfiles;
-      Module module = model.myModule;
-      for (Map.Entry<XmlFile, LocalModelDependency> importedXml : getImports(model.myConfigFile, profiles).entrySet()) {
+      Set<String> profiles = model.activeProfiles;
+      Module module = model.module;
+      for (Map.Entry<XmlFile, LocalModelDependency> importedXml : getImports(model.configFile, profiles).entrySet()) {
         addNotNullModel(models, LocalModelFactory.of().getOrCreateLocalXmlModel(importedXml.getKey(), module, profiles), importedXml.getValue());
       }
       for (InfraBeansPackagesScan packagesScan : model.getPackagesScans()) {
@@ -534,7 +531,7 @@ public class LocalXmlModelImpl extends LocalXmlModel {
     if (!canProcessBeans()) {
       return Collections.emptyList();
     }
-    PsiClass annotationConfigAppContext = InfraUtils.findLibraryClass(this.myModule, InfraConstant.ANNOTATION_CONFIG_APPLICATION_CONTEXT);
+    PsiClass annotationConfigAppContext = InfraUtils.findLibraryClass(this.module, InfraConstant.ANNOTATION_CONFIG_APPLICATION_CONTEXT);
     if (annotationConfigAppContext == null) {
       return Collections.emptyList();
     }
@@ -550,7 +547,7 @@ public class LocalXmlModelImpl extends LocalXmlModel {
       }
     };
     var searchParameters = ModelSearchParameters.byClass(annotationConfigAppContext).withInheritors();
-    myIndexProcessor.processByClass(searchParameters, processor, myActiveProfiles, this.myModule, true);
+    indexProcessor.processByClass(searchParameters, processor, activeProfiles, this.module, true);
     return smartList;
   }
 
@@ -567,8 +564,8 @@ public class LocalXmlModelImpl extends LocalXmlModel {
 
   private Collection<? extends BeanPointer<?>> computeJavaConfigurations() {
     Set<BeanPointer<?>> pointers = new LinkedHashSet<>();
-    for (InfraJavaConfiguration javaConfiguration : InfraOldJavaConfigurationUtil.getJavaConfigurations(this.myModule)) {
-      for (InfraJavaBean javaBean : javaConfiguration.getBeans()) {
+    for (var javaConfig : InfraOldJavaConfigurationUtil.getJavaConfigurations(this.module)) {
+      for (InfraJavaBean javaBean : javaConfig.getBeans()) {
         if (javaBean.isPublic()) {
           pointers.add(InfraBeanService.of().createBeanPointer(javaBean));
         }
@@ -579,13 +576,13 @@ public class LocalXmlModelImpl extends LocalXmlModel {
 
   private Collection<? extends BeanPointer<?>> computeExplicitlyDefinedBeans() {
     Set<CommonInfraBean> explicitBeans = new LinkedHashSet<>();
-    Module module = myModule;
+    Module module = this.module;
     if (isProcessExplicitlyDefinedAnnotatedBeans(module)) {
       for (PsiClass explicitBeanClass : getExplicitBeanCandidatePsiClasses(module)) {
         if (InfraUtils.isBeanCandidateClass(explicitBeanClass)) {
           ModelSearchParameters.BeanClass candidateClassParams = ModelSearchParameters.byClass(explicitBeanClass).effectiveBeanTypes();
           var findFirstProcessor = new CommonProcessors.FindFirstProcessor<>();
-          myIndexProcessor.processByClass(candidateClassParams, findFirstProcessor, myActiveProfiles, this.myModule, true);
+          indexProcessor.processByClass(candidateClassParams, findFirstProcessor, activeProfiles, this.module, true);
           if (findFirstProcessor.isFound()) {
             explicitBeans.addAll(InfraJamService.of().getContextBeans(explicitBeanClass, Collections.emptySet()));
           }
@@ -597,7 +594,7 @@ public class LocalXmlModelImpl extends LocalXmlModel {
 
   @Override
   public List<BeanPointer<?>> findQualified(InfraQualifier qualifier) {
-    return this.myLocalBeansByQualifier.get(qualifier);
+    return this.localBeansByQualifier.get(qualifier);
   }
 
   private Set<String> computeProfiles() {

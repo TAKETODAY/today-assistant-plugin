@@ -28,11 +28,11 @@ import javax.management.InstanceNotFoundException;
 import javax.management.ObjectInstance;
 
 class InfraLiveBeansConnector extends InfraJmxConnector {
-  private static final String SPRING_BOOT_LIVE_BEANS_OBJECT_NAME = ":application=*";
+  private static final String LIVE_BEANS_OBJECT_NAME = ":application=*";
   private static final String SNAPSHOT_ATTR = "SnapshotAsJson";
 
   InfraLiveBeansConnector(String serviceUrl) {
-    super(serviceUrl, SPRING_BOOT_LIVE_BEANS_OBJECT_NAME);
+    super(serviceUrl, LIVE_BEANS_OBJECT_NAME);
   }
 
   String getSnapshot() throws Exception {

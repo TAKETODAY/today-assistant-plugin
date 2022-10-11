@@ -24,12 +24,12 @@ import com.intellij.microservices.jvm.config.MetaConfigKey;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+import cn.taketoday.core.style.ToStringBuilder;
 import cn.taketoday.lang.Nullable;
 import kotlin.collections.SetsKt;
-import kotlin.jvm.internal.DefaultConstructorMarker;
 import kotlin.jvm.internal.Intrinsics;
 
 public final class ConfigurationValueSearchParams {
@@ -50,128 +50,12 @@ public final class ConfigurationValueSearchParams {
 
   public static final Set<String> PROCESS_ALL_VALUES = SetsKt.setOf("PROCESS_ALL_VALUES");
 
-  public Module component1() {
-    return this.module;
+  public ConfigurationValueSearchParams(Module module, boolean checkRelaxedNames, @Nullable Set<String> set, MetaConfigKey configKey) {
+    this(module, checkRelaxedNames, set, configKey, null, null, false, null);
   }
 
-  public boolean component2() {
-    return this.checkRelaxedNames;
-  }
-
-  @Nullable
-  public Set<String> component3() {
-    return this.activeProfiles;
-  }
-
-  public MetaConfigKey component4() {
-    return this.configKey;
-  }
-
-  @Nullable
-  public String component5() {
-    return this.keyIndex;
-  }
-
-  @Nullable
-  public String component6() {
-    return this.keyProperty;
-  }
-
-  public boolean component7() {
-    return this.processImports;
-  }
-
-  public Set<VirtualFile> component8() {
-    return this.processedFiles;
-  }
-
-  public ConfigurationValueSearchParams copy(Module module, boolean checkRelaxedNames,
-          @Nullable Set<String> set, MetaConfigKey configKey, @Nullable String keyIndex,
-          @Nullable String keyProperty, boolean processImports, Set<VirtualFile> set2) {
-    Intrinsics.checkNotNullParameter(module, "module");
-    Intrinsics.checkNotNullParameter(configKey, "configKey");
-    Intrinsics.checkNotNullParameter(set2, "processedFiles");
-    return new ConfigurationValueSearchParams(module, checkRelaxedNames, set, configKey, keyIndex, keyProperty, processImports, set2);
-  }
-
-  public static ConfigurationValueSearchParams copy$default(ConfigurationValueSearchParams configurationValueSearchParams, Module module, boolean z, Set set, MetaConfigKey metaConfigKey, String str,
-          String str2, boolean z2, Set set2, int i, Object obj) {
-    if ((i & 1) != 0) {
-      module = configurationValueSearchParams.module;
-    }
-    if ((i & 2) != 0) {
-      z = configurationValueSearchParams.checkRelaxedNames;
-    }
-    if ((i & 4) != 0) {
-      set = configurationValueSearchParams.activeProfiles;
-    }
-    if ((i & 8) != 0) {
-      metaConfigKey = configurationValueSearchParams.configKey;
-    }
-    if ((i & 16) != 0) {
-      str = configurationValueSearchParams.keyIndex;
-    }
-    if ((i & 32) != 0) {
-      str2 = configurationValueSearchParams.keyProperty;
-    }
-    if ((i & 64) != 0) {
-      z2 = configurationValueSearchParams.processImports;
-    }
-    if ((i & 128) != 0) {
-      set2 = configurationValueSearchParams.processedFiles;
-    }
-    return configurationValueSearchParams.copy(module, z, set, metaConfigKey, str, str2, z2, set2);
-  }
-
-  public String toString() {
-    return "ConfigurationValueSearchParams(module=" + this.module + ", checkRelaxedNames=" + this.checkRelaxedNames + ", activeProfiles=" + this.activeProfiles + ", configKey=" + this.configKey + ", keyIndex=" + this.keyIndex + ", keyProperty=" + this.keyProperty + ", processImports=" + this.processImports + ", processedFiles=" + this.processedFiles + ")";
-  }
-
-  public int hashCode() {
-    Module module = this.module;
-    int hashCode = (module != null ? module.hashCode() : 0) * 31;
-    boolean z = this.checkRelaxedNames;
-    if (z) {
-      z = true;
-    }
-    int i = z ? 1 : 0;
-    int i2 = z ? 1 : 0;
-    int i3 = (hashCode + i) * 31;
-    Set<String> set = this.activeProfiles;
-    int hashCode2 = (i3 + (set != null ? set.hashCode() : 0)) * 31;
-    MetaConfigKey metaConfigKey = this.configKey;
-    int hashCode3 = (hashCode2 + (metaConfigKey != null ? metaConfigKey.hashCode() : 0)) * 31;
-    String str = this.keyIndex;
-    int hashCode4 = (hashCode3 + (str != null ? str.hashCode() : 0)) * 31;
-    String str2 = this.keyProperty;
-    int hashCode5 = (hashCode4 + (str2 != null ? str2.hashCode() : 0)) * 31;
-    boolean z2 = this.processImports;
-    if (z2) {
-      z2 = true;
-    }
-    int i4 = z2 ? 1 : 0;
-    int i5 = z2 ? 1 : 0;
-    int i6 = (hashCode5 + i4) * 31;
-    Set<VirtualFile> set2 = this.processedFiles;
-    return i6 + (set2 != null ? set2.hashCode() : 0);
-  }
-
-  public boolean equals(@Nullable Object obj) {
-    if (this != obj) {
-      if (!(obj instanceof ConfigurationValueSearchParams configurationValueSearchParams)) {
-        return false;
-      }
-      return Intrinsics.areEqual(this.module, configurationValueSearchParams.module) && this.checkRelaxedNames == configurationValueSearchParams.checkRelaxedNames && Intrinsics.areEqual(
-              this.activeProfiles, configurationValueSearchParams.activeProfiles) && Intrinsics.areEqual(this.configKey, configurationValueSearchParams.configKey) && Intrinsics.areEqual(this.keyIndex,
-              configurationValueSearchParams.keyIndex) && Intrinsics.areEqual(this.keyProperty,
-              configurationValueSearchParams.keyProperty) && this.processImports == configurationValueSearchParams.processImports && Intrinsics.areEqual(this.processedFiles,
-              configurationValueSearchParams.processedFiles);
-    }
-    return true;
-  }
-
-  public Module getModule() {
-    return this.module;
+  public ConfigurationValueSearchParams(Module module, MetaConfigKey configKey) {
+    this(module, true, PROCESS_ALL_VALUES, configKey);
   }
 
   public ConfigurationValueSearchParams(Module module, boolean checkRelaxedNames,
@@ -188,14 +72,12 @@ public final class ConfigurationValueSearchParams {
     this.processedFiles = set2;
   }
 
-  public boolean getCheckRelaxedNames() {
-    return this.checkRelaxedNames;
+  public Module getModule() {
+    return this.module;
   }
 
-  public ConfigurationValueSearchParams(Module module, boolean z, Set set, MetaConfigKey metaConfigKey,
-          String str, String str2, boolean z2, Set set2, int i,
-          DefaultConstructorMarker defaultConstructorMarker) {
-    this(module, (i & 2) != 0 || z, set, metaConfigKey, str, str2, (i & 64) != 0 || z2, (i & 128) != 0 ? new HashSet() : set2);
+  public boolean getCheckRelaxedNames() {
+    return this.checkRelaxedNames;
   }
 
   @Nullable
@@ -225,19 +107,43 @@ public final class ConfigurationValueSearchParams {
     return this.processedFiles;
   }
 
-  public ConfigurationValueSearchParams(Module module, boolean checkRelaxedNames, @Nullable Set<String> set, MetaConfigKey configKey) {
-    this(module, checkRelaxedNames, set, configKey, null, null, false, null, 192, null);
-  }
-
-  public ConfigurationValueSearchParams(Module module, boolean z, Set set, MetaConfigKey metaConfigKey, int i, DefaultConstructorMarker defaultConstructorMarker) {
-    this(module, (i & 2) != 0 || z, set, metaConfigKey);
-  }
-
-  public ConfigurationValueSearchParams(Module module, MetaConfigKey configKey) {
-    this(module, true, PROCESS_ALL_VALUES, configKey);
-  }
-
   public boolean isProcessAllProfiles() {
-    return Intrinsics.areEqual(this.activeProfiles, PROCESS_ALL_VALUES);
+    return Objects.equals(activeProfiles, PROCESS_ALL_VALUES);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(module, checkRelaxedNames, activeProfiles,
+            configKey, keyIndex, keyProperty, processImports, processedFiles);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (!(o instanceof ConfigurationValueSearchParams that))
+      return false;
+    return checkRelaxedNames == that.checkRelaxedNames
+            && processImports == that.processImports
+            && Objects.equals(module, that.module)
+            && Objects.equals(keyIndex, that.keyIndex)
+            && Objects.equals(configKey, that.configKey)
+            && Objects.equals(keyProperty, that.keyProperty)
+            && Objects.equals(activeProfiles, that.activeProfiles)
+            && Objects.equals(processedFiles, that.processedFiles);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.from(this)
+            .append("module", module)
+            .append("checkRelaxedNames", checkRelaxedNames)
+            .append("activeProfiles", activeProfiles)
+            .append("configKey", configKey)
+            .append("keyIndex", keyIndex)
+            .append("keyProperty", keyProperty)
+            .append("processImports", processImports)
+            .append("processedFiles", processedFiles)
+            .toString();
   }
 }

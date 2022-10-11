@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.lang.Nullable;
 
 /**
@@ -81,7 +81,7 @@ public abstract class InfraApplicationUpdatePolicy {
     return true;
   }
 
-  public boolean isAvailableForConfiguration(InfraApplicationRunConfigurationBase configuration) {
+  public boolean isAvailableForConfiguration(InfraApplicationRunConfig configuration) {
     return true;
   }
 

@@ -38,7 +38,7 @@ import cn.taketoday.lang.Nullable;
 public class InfraApplicationYamlDocumentationProvider extends ConfigKeyDocumentationProviderBase {
 
   protected MetaConfigKeyManager getConfigManager() {
-    return InfraApplicationMetaConfigKeyManager.getInstance();
+    return InfraApplicationMetaConfigKeyManager.of();
   }
 
   @Nls

@@ -33,7 +33,7 @@ import com.intellij.task.impl.ModuleBuildTaskImpl;
 import java.util.Collections;
 import java.util.List;
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.InfraRunBundle;
 
 final class UpdateClassesAndTriggerFilePolicy extends InfraApplicationUpdatePolicy implements cn.taketoday.assistant.app.run.update.TriggerFilePolicy {
@@ -50,7 +50,7 @@ final class UpdateClassesAndTriggerFilePolicy extends InfraApplicationUpdatePoli
   }
 
   @Override
-  public boolean isAvailableForConfiguration(InfraApplicationRunConfigurationBase configuration) {
+  public boolean isAvailableForConfiguration(InfraApplicationRunConfig configuration) {
     return false;
   }
 

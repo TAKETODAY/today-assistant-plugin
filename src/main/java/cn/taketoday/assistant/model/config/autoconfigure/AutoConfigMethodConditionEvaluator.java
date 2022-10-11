@@ -24,7 +24,7 @@ import com.intellij.psi.PsiMethod;
 
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionalOnEvaluationContext;
 
-class AutoConfigMethodConditionEvaluator extends AutoConfigConditionEvaluatorBase {
+class AutoConfigMethodConditionEvaluator extends AbstractAutoConfigConditionEvaluator {
   private final PsiMethod myAutoConfigMethod;
 
   AutoConfigMethodConditionEvaluator(PsiMethod autoConfigMethod, boolean nonStrictEvaluation, ConditionalOnEvaluationContext conditionalOnEvaluationContext) {

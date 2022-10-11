@@ -241,11 +241,9 @@ final class InfraMetadataEditorNotificationsProvider implements EditorNotificati
             return;
           }
 
-          InfraMetadataEditorNotificationsProvider.this.updateQueue.queue(new Update("SB metadata notification update") {
+          updateQueue.queue(new Update("SB metadata notification update") {
             public void run() {
-              ReadAction.run(() -> {
-                InfraMetadataEditorNotificationsProvider.this.psiClassOwnerCachedTrigger.getValue(file);
-              });
+              ReadAction.run(() -> psiClassOwnerCachedTrigger.getValue(file));
             }
           });
         }

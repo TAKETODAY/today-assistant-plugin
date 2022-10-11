@@ -47,34 +47,38 @@ import cn.taketoday.lang.Nullable;
 final class InfraApplicationInfoImpl implements InfraApplicationInfo {
 
   private static final String NOTIFICATION_DISPLAY_ID = "Infrastructure Application Endpoints";
-  private final RunConfiguration myConfiguration;
-  private final LiveProperty<InfraModuleDescriptor> myModuleDescriptor;
-  private final LiveProperty<Boolean> myReadyState;
-  private final LiveProperty<Integer> myServerPort;
-  private final LiveProperty<InfraApplicationServerConfiguration> myServerConfiguration;
-  private final Map<String, LiveProperty<?>> myEndpoints;
-  private final LiveProperty<String> myApplicationUrl;
 
-  private volatile boolean myDisposed;
+  private final Property<Boolean> readyState;
+  private final Property<Integer> serverPort;
+  private final Property<String> applicationUrl;
+  private final Property<InfraWebServerConfig> serverConfig;
+  private final Property<InfraModuleDescriptor> moduleDescriptor;
+
+  private final RunConfiguration configuration;
+  private final Map<String, Property<?>> endpoints;
+
+  private volatile boolean disposed;
 
   static InfraApplicationInfo createInfo(Project project, Module module,
           ExecutionEnvironment environment, RunConfiguration configuration,
           @Nullable String activeProfiles, ProcessHandler processHandler) {
 
-    InfraApplicationInfoImpl info = new InfraApplicationInfoImpl(project, module, environment, configuration, activeProfiles, processHandler);
+    var info = new InfraApplicationInfoImpl(
+            project, module, environment, configuration, activeProfiles, processHandler);
     for (Endpoint<?> endpoint : Endpoint.EP_NAME.getExtensions()) {
       endpoint.infoCreated(project, processHandler, info);
     }
-    info.myModuleDescriptor.compute();
+    info.moduleDescriptor.compute();
     return info;
   }
 
-  private InfraApplicationInfoImpl(Project project, Module module, ExecutionEnvironment environment, RunConfiguration configuration,
+  private InfraApplicationInfoImpl(Project project, Module module,
+          ExecutionEnvironment environment, RunConfiguration configuration,
           @Nullable String activeProfiles, ProcessHandler processHandler) {
-    this.myEndpoints = new HashMap<>();
-    this.myConfiguration = configuration;
+    this.endpoints = new HashMap<>();
+    this.configuration = configuration;
     LifecycleErrorHandler errorHandler = message -> {
-      if (this.myDisposed) {
+      if (disposed) {
         return;
       }
       String toolWindowId = RunContentManager.getInstance(project).getToolWindowIdByEnvironment(environment);
@@ -85,13 +89,13 @@ final class InfraApplicationInfoImpl implements InfraApplicationInfo {
                 .notify(project);
       }
     };
-    this.myModuleDescriptor = new AsyncLiveProperty<>(errorHandler, this,
-            InfraModuleDescriptor.DEFAULT_DESCRIPTOR) {
+    this.moduleDescriptor = new AsyncProperty<>(
+            errorHandler, this, InfraModuleDescriptor.DEFAULT_DESCRIPTOR) {
       @Override
       public InfraModuleDescriptor doCompute() {
         DumbService dumbService = DumbService.getInstance(project);
         return dumbService.runReadActionInSmartMode(() -> {
-          InfraModuleDescriptor moduleDescriptor = InfraModuleDescriptor.getDescriptor(module, activeProfiles);
+          var moduleDescriptor = InfraModuleDescriptor.getDescriptor(module, activeProfiles);
           for (Endpoint<?> endpoint : Endpoint.EP_NAME.getExtensions()) {
             moduleDescriptor.setEndpointAvailable(endpoint, endpoint.isAvailable(module));
           }
@@ -99,26 +103,25 @@ final class InfraApplicationInfoImpl implements InfraApplicationInfo {
         });
       }
     };
-    LiveProperty<String> serviceUrl = new JmxServiceUrlLiveProperty(errorHandler, this, processHandler);
-    this.myReadyState = new ReadyStateLiveProperty(this.myModuleDescriptor, serviceUrl, errorHandler, this);
-    this.myServerPort = MappedPortProperty.withMappedPorts(
-            new ServerPortLiveProperty(this.myModuleDescriptor, serviceUrl, errorHandler, this), processHandler);
-    this.myServerConfiguration = new ServerConfigurationLiveProperty(this.myModuleDescriptor, serviceUrl, errorHandler, this);
-    Endpoint<LiveBeansModel> beansEndpoint = BeansEndpoint.getInstance();
+    var serviceUrl = new JmxServiceUrlProperty(errorHandler, this, processHandler);
+    this.readyState = new ReadyStateProperty(moduleDescriptor, serviceUrl, errorHandler, this);
+    this.serverPort = MappedPortProperty.withMappedPorts(
+            new ServerPortProperty(moduleDescriptor, serviceUrl, errorHandler, this), processHandler);
+    this.serverConfig = new ServerConfigurationProperty(moduleDescriptor, serviceUrl, errorHandler, this);
+    var beansEndpoint = BeansEndpoint.of();
 
-    var beans3Endpoint = new EndpointLiveProperty<>(beansEndpoint,
-            this.myModuleDescriptor, serviceUrl, errorHandler, this, null);
-    LiveProperty<LiveBeansModel> liveBeansModel = new AsyncLiveProperty<>(errorHandler, this) {
+    var beans3Endpoint = new EndpointProperty<>(beansEndpoint,
+            moduleDescriptor, serviceUrl, errorHandler, this, null);
+    Property<LiveBeansModel> liveBeansModel = new AsyncProperty<>(errorHandler, this) {
       @Override
       public LiveBeansModel doCompute() throws LifecycleException {
-        InfraModuleDescriptor moduleDescriptor = Objects.requireNonNull(
-                myModuleDescriptor.getValue());
+        var moduleDescriptor = Objects.requireNonNull(InfraApplicationInfoImpl.this.moduleDescriptor.getValue());
         var version = moduleDescriptor.getVersion();
         if (version != null) {
           return beans3Endpoint.doCompute();
         }
-        InfraLiveBeansConnector connector = new InfraLiveBeansConnector(serviceUrl.getValue());
-        try {
+
+        try (var connector = new InfraLiveBeansConnector(serviceUrl.getValue())) {
           try {
             String snapshot = connector.getSnapshot();
             LiveBeansSnapshotParser parser = new LiveBeansSnapshotParser();
@@ -130,44 +133,34 @@ final class InfraApplicationInfoImpl implements InfraApplicationInfo {
             throw new LifecycleException(InfraRunBundle.message("infra.application.endpoints.error.failed.to.retrieve.application.beans.snapshot", e.getLocalizedMessage()), e);
           }
         }
-        catch (Throwable th) {
-          try {
-            connector.close();
-          }
-          catch (Throwable th2) {
-            th.addSuppressed(th2);
-          }
-          throw th;
-        }
       }
     };
-    this.myEndpoints.put(beansEndpoint.getId(), liveBeansModel);
+    endpoints.put(beansEndpoint.getId(), liveBeansModel);
     for (Endpoint<?> endpoint : Endpoint.EP_NAME.getExtensions()) {
       if (endpoint != beansEndpoint) {
-        LiveProperty<?> endpointData = new EndpointLiveProperty<>(endpoint, this.myModuleDescriptor, serviceUrl, errorHandler, this, liveBeansModel);
-        this.myEndpoints.put(endpoint.getId(), endpointData);
+        var endpointData = new EndpointProperty<>(endpoint, moduleDescriptor, serviceUrl, errorHandler, this, liveBeansModel);
+        endpoints.put(endpoint.getId(), endpointData);
       }
     }
-    this.myApplicationUrl = new ApplicationUrlLiveProperty(errorHandler, this).withServerPort(this.myServerPort)
-            .withServerConfiguration(this.myServerConfiguration);
-    this.myModuleDescriptor.addPropertyListener(new LiveProperty.LivePropertyListener() {
+    this.applicationUrl = new ApplicationUrlProperty(errorHandler, this).withServerPort(serverPort)
+            .withServerConfiguration(serverConfig);
+    moduleDescriptor.addPropertyListener(new Property.PropertyListener() {
       @Override
-      public void propertyChanged() {
-      }
+      public void propertyChanged() { }
 
       @Override
       public void computationFinished() {
-        myReadyState.compute();
+        readyState.compute();
       }
     });
-    this.myReadyState.addPropertyListener(new LiveProperty.LivePropertyListener() {
+    readyState.addPropertyListener(new Property.PropertyListener() {
 
       @Override
       public void propertyChanged() {
         project.getMessageBus()
                 .syncPublisher(RunDashboardManager.DASHBOARD_TOPIC)
-                .configurationChanged(myConfiguration, false);
-        myServerPort.compute();
+                .configurationChanged(InfraApplicationInfoImpl.this.configuration, false);
+        serverPort.compute();
         liveBeansModel.compute();
       }
 
@@ -175,64 +168,63 @@ final class InfraApplicationInfoImpl implements InfraApplicationInfo {
       public void computationFailed(Exception e) {
         project.getMessageBus()
                 .syncPublisher(RunDashboardManager.DASHBOARD_TOPIC)
-                .configurationChanged(myConfiguration, false);
+                .configurationChanged(InfraApplicationInfoImpl.this.configuration, false);
       }
 
     });
-    liveBeansModel.addPropertyListener(new LiveProperty.LivePropertyListener() {
+    liveBeansModel.addPropertyListener(new Property.PropertyListener() {
       @Override
-      public void propertyChanged() {
-      }
+      public void propertyChanged() { }
 
       @Override
       public void computationFinished() {
-        for (LiveProperty<?> endpointData2 : InfraApplicationInfoImpl.this.myEndpoints.values()) {
-          if (endpointData2 != liveBeansModel) {
-            endpointData2.compute();
+        for (Property<?> property : endpoints.values()) {
+          if (property != liveBeansModel) {
+            property.compute();
           }
         }
       }
     });
 
-    this.myServerPort.addPropertyListener(() -> {
+    serverPort.addPropertyListener(() -> {
       project.getMessageBus()
               .syncPublisher(RunDashboardManager.DASHBOARD_TOPIC)
-              .configurationChanged(this.myConfiguration, false);
-      this.myServerConfiguration.compute();
+              .configurationChanged(this.configuration, false);
+      serverConfig.compute();
     });
   }
 
   @Override
   public RunProfile getRunProfile() {
-    return this.myConfiguration;
+    return configuration;
   }
 
   @Override
-  public LiveProperty<Boolean> getReadyState() {
-    return this.myReadyState;
+  public Property<Boolean> getReadyState() {
+    return readyState;
   }
 
   @Override
-  public LiveProperty<Integer> getServerPort() {
-    return this.myServerPort;
+  public Property<Integer> getServerPort() {
+    return serverPort;
   }
 
   @Override
-  public LiveProperty<InfraApplicationServerConfiguration> getServerConfiguration() {
-    return this.myServerConfiguration;
+  public Property<InfraWebServerConfig> getServerConfig() {
+    return serverConfig;
   }
 
   @Override
-  public LiveProperty<String> getApplicationUrl() {
-    return this.myApplicationUrl;
+  public Property<String> getApplicationUrl() {
+    return applicationUrl;
   }
 
   @Override
-  public <T> LiveProperty<T> getEndpointData(Endpoint<T> endpoint) {
-    return (LiveProperty<T>) this.myEndpoints.get(endpoint.getId());
+  public <T> Property<T> getEndpointData(Endpoint<T> endpoint) {
+    return (Property<T>) endpoints.get(endpoint.getId());
   }
 
   public void dispose() {
-    this.myDisposed = true;
+    this.disposed = true;
   }
 }

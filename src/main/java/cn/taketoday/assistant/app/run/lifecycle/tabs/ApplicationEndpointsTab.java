@@ -56,28 +56,30 @@ import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManager;
-import cn.taketoday.assistant.app.run.lifecycle.LiveProperty;
-import cn.taketoday.assistant.app.run.statistics.InfraRunUsageTriggerCollector;
+import cn.taketoday.assistant.app.run.lifecycle.Property;
 import cn.taketoday.lang.Nullable;
 
 import static cn.taketoday.assistant.app.run.InfraRunBundle.message;
 import static cn.taketoday.assistant.app.run.InfraRunBundle.messagePointer;
+import static cn.taketoday.assistant.app.run.statistics.InfraRunUsageTriggerCollector.logActuatorTabSelected;
 
 public class ApplicationEndpointsTab extends AdditionalTabComponent {
-  private final InfraApplicationRunConfigurationBase runConfiguration;
+
   private final ProcessHandler processHandler;
   private final TabbedPaneWrapper wrapper;
   private final List<EndpointTab<?>> tabs;
+
   private DefaultActionGroup actionGroup;
+  private final InfraApplicationRunConfig runConfiguration;
   private final Map<EndpointTab<?>, ActionGroup> tabActions;
-  private final LiveProperty.LivePropertyListener readyStateListener;
+  private final Property.PropertyListener readyStateListener;
   private InfraApplicationLifecycleManager.InfoListener infoListener;
 
-  public ApplicationEndpointsTab(InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  public ApplicationEndpointsTab(InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     super(new BorderLayout());
     this.tabs = new ArrayList<>();
     this.tabActions = new HashMap<>();
@@ -103,7 +105,8 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
     Endpoint.EP_NAME.addExtensionPointListener(new ExtensionPointListener<>() {
       @Override
       public void extensionRemoved(Endpoint<?> extension, PluginDescriptor pluginDescriptor) {
-        for (int i = 0; i < tabs.size(); i++) {
+        int size = tabs.size();
+        for (int i = 0; i < size; i++) {
           EndpointTab<?> tab = tabs.get(i);
           if (tab.getId().equals(extension.getId())) {
             wrapper.removeTabAt(i);
@@ -119,22 +122,24 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
     }, this);
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
       DumbService.getInstance(getProject()).runReadActionInSmartMode(() -> {
-        this.tabs.forEach(EndpointTab::checkAvailability);
+        tabs.forEach(EndpointTab::checkAvailability);
       });
     });
     String selectedTabId = InfraEndpointsTabSettings.from(getProject()).getSelectedTab();
     for (EndpointTab<?> tab : tabs) {
       wrapper.addTab(tab.getTitle(), tab.getIcon(), tab.getComponent(), null);
       int tabIndex = wrapper.getTabCount() - 1;
+
       tab.setTooltipChangeListener(tooltip -> {
         wrapper.setToolTipTextAt(tabIndex, tooltip);
       });
+
       if (tab.getId().equals(selectedTabId)) {
         wrapper.setSelectedIndex(tabIndex);
       }
       Disposer.register(this, tab);
     }
-    this.readyStateListener = new LiveProperty.LivePropertyListener() {
+    this.readyStateListener = new Property.PropertyListener() {
 
       @Override
       public void propertyChanged() { }
@@ -142,27 +147,27 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
       @Override
       public void computationFailed(Exception e) {
         for (EndpointTab<?> tab2 : tabs) {
-          tab2.showMessage(
-                  message("infra.application.endpoints.application.ready.check.failed", e.getLocalizedMessage()));
+          tab2.showMessage(message("infra.application.endpoints.application.ready.check.failed",
+                  e.getLocalizedMessage()));
         }
       }
     };
     InfraApplicationInfo info = getInfo();
     if (info != null) {
       info.getReadyState().addPropertyListener(this.readyStateListener);
-      for (EndpointTab<?> tab2 : this.tabs) {
-        tab2.initPropertyListeners(info);
+      for (EndpointTab<?> tab : this.tabs) {
+        tab.initPropertyListeners(info);
       }
     }
     else {
       this.infoListener = new InfraApplicationLifecycleManager.InfoListener() {
 
         @Override
-        public void infoAdded(ProcessHandler handler, InfraApplicationInfo info2) {
+        public void infoAdded(ProcessHandler handler, InfraApplicationInfo info) {
           if (processHandler.equals(handler)) {
-            info2.getReadyState().addPropertyListener(readyStateListener);
-            for (EndpointTab<?> tab3 : tabs) {
-              tab3.initPropertyListeners(info2);
+            info.getReadyState().addPropertyListener(readyStateListener);
+            for (EndpointTab<?> tab : tabs) {
+              tab.initPropertyListeners(info);
             }
           }
         }
@@ -189,19 +194,15 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
       }
       return null;
     });
-    this.wrapper.addChangeListener(new ChangeListener() {
-      private EndpointTab<?> selectedTab;
-
-      {
-        this.selectedTab = getSelectedTab();
-      }
+    wrapper.addChangeListener(new ChangeListener() {
+      private EndpointTab<?> selectedTab = getSelectedTab();
 
       @Override
       public void stateChanged(ChangeEvent e) {
         EndpointTab<?> oldSelectedTab = this.selectedTab;
         this.selectedTab = getSelectedTab();
-        if (oldSelectedTab != this.selectedTab && this.selectedTab != null) {
-          InfraRunUsageTriggerCollector.logActuatorTabSelected(getProject(), this.selectedTab.getEndpoint().getClass());
+        if (oldSelectedTab != selectedTab && selectedTab != null) {
+          logActuatorTabSelected(getProject(), selectedTab.getEndpoint().getClass());
         }
       }
     });
@@ -210,18 +211,20 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
   public void setSelected() {
     EndpointTab<?> selectedTab = getSelectedTab();
     if (selectedTab != null) {
-      InfraRunUsageTriggerCollector.logActuatorTabSelected(getProject(), selectedTab.getEndpoint().getClass());
+      logActuatorTabSelected(getProject(), selectedTab.getEndpoint().getClass());
     }
   }
 
+  @Override
   public JComponent getPreferredFocusableComponent() {
-    return this.wrapper.getComponent();
+    return wrapper.getComponent();
   }
 
   @Nullable
+  @Override
   public ActionGroup getToolbarActions() {
     this.actionGroup = new DefaultActionGroup();
-    this.actionGroup.add(new AnAction() {
+    actionGroup.add(new AnAction() {
       @Override
       public void update(AnActionEvent e) {
         Presentation presentation = e.getPresentation();
@@ -249,8 +252,8 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
         tabs.get(wrapper.getSelectedIndex()).refresh();
       }
     });
-    this.actionGroup.addSeparator();
-    for (EndpointTab<?> tab : this.tabs) {
+    actionGroup.addSeparator();
+    for (EndpointTab<?> tab : tabs) {
       DefaultActionGroup actionGroup = new DefaultActionGroup() {
         public void update(AnActionEvent e) {
           e.getPresentation().setVisible(tab == getSelectedTab());
@@ -258,52 +261,58 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
       };
       actionGroup.addAll(tab.getToolbarActions());
       this.actionGroup.add(actionGroup);
-      this.tabActions.put(tab, actionGroup);
+      tabActions.put(tab, actionGroup);
     }
-    return this.actionGroup;
+    return actionGroup;
   }
 
   @Nullable
+  @Override
   public JComponent getSearchComponent() {
     return null;
   }
 
+  @Override
   @Nullable
   public String getToolbarPlace() {
     return "unknown";
   }
 
+  @Override
   @Nullable
   public JComponent getToolbarContextComponent() {
-    return this.wrapper.getComponent();
+    return wrapper.getComponent();
   }
 
+  @Override
   public boolean isContentBuiltIn() {
     return false;
   }
 
+  @Override
   public String getTabTitle() {
     return message("infra.application.endpoints.tab.title");
   }
 
+  @Override
   public void dispose() {
-    if (this.infoListener != null) {
-      InfraApplicationLifecycleManager.from(getProject()).removeInfoListener(this.infoListener);
+    if (infoListener != null) {
+      InfraApplicationLifecycleManager.from(getProject()).removeInfoListener(infoListener);
     }
     InfraApplicationInfo info = getInfo();
     if (info != null) {
-      info.getReadyState().removePropertyListener(this.readyStateListener);
+      info.getReadyState().removePropertyListener(readyStateListener);
     }
   }
 
   private Project getProject() {
-    return this.runConfiguration.getProject();
+    return runConfiguration.getProject();
   }
 
   @Nullable
   private EndpointTab<?> getSelectedTab() {
-    if (this.wrapper.getSelectedIndex() >= 0) {
-      return this.tabs.get(this.wrapper.getSelectedIndex());
+    if (wrapper.getSelectedIndex() >= 0) {
+      return tabs.get(wrapper.getSelectedIndex());
     }
     return null;
   }
@@ -314,17 +323,19 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
     if (project.isDisposed()) {
       return null;
     }
-    return InfraApplicationLifecycleManager.from(project).getInfraApplicationInfo(this.processHandler);
+    return InfraApplicationLifecycleManager.from(project).getInfraApplicationInfo(processHandler);
   }
 
   private class FocusOnStartAction extends AnAction implements Toggleable {
-    private final JBTabs myTabs;
+    private final JBTabs tabs;
 
     FocusOnStartAction(JBTabs tabs) {
-      super(ActionsBundle.actionText("Runner.FocusOnStartup"), ActionsBundle.actionDescription("Runner.FocusOnStartup"), null);
-      this.myTabs = tabs;
+      super(ActionsBundle.actionText("Runner.FocusOnStartup"),
+              ActionsBundle.actionDescription("Runner.FocusOnStartup"), null);
+      this.tabs = tabs;
     }
 
+    @Override
     public void update(AnActionEvent e) {
       EndpointTab<?> currentTab = getCurrentTab();
       boolean visible = currentTab != null;
@@ -334,6 +345,7 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
       }
     }
 
+    @Override
     public void actionPerformed(AnActionEvent e) {
       EndpointTab<?> currentTab = getCurrentTab();
       if (currentTab == null) {
@@ -349,12 +361,13 @@ public class ApplicationEndpointsTab extends AdditionalTabComponent {
 
     @Nullable
     private EndpointTab<?> getCurrentTab() {
-      TabInfo info = this.myTabs.getTargetInfo();
-      int index = info == null ? wrapper.getSelectedIndex() : this.myTabs.getIndexOf(info);
+      TabInfo info = tabs.getTargetInfo();
+      int index = info == null ? wrapper.getSelectedIndex() : tabs.getIndexOf(info);
       if (index >= 0) {
-        return tabs.get(index);
+        return ApplicationEndpointsTab.this.tabs.get(index);
       }
       return null;
     }
   }
+
 }

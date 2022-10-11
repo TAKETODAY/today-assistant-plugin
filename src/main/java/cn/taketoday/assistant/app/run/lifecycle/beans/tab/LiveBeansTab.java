@@ -46,7 +46,7 @@ import javax.swing.JComponent;
 
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraBundle;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.InfraRunBundle;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
@@ -69,7 +69,7 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
   private volatile boolean myNeedUpdateAfterRefresh;
   private final BeansEndpointTabSettings mySettings;
 
-  public LiveBeansTab(Endpoint<LiveBeansModel> endpoint, InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  public LiveBeansTab(Endpoint<LiveBeansModel> endpoint, InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     super(endpoint, runConfiguration, processHandler);
     this.myMainPanel = new SimpleToolWindowPanel(false, true);
     this.myDiagramDataHolder = new UserDataHolderBase();

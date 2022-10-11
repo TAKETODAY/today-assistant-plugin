@@ -53,7 +53,9 @@ import cn.taketoday.lang.Nullable;
 
 class BeanNameFilter extends MultipleOccurrencesFilter {
   private static final String[] DETECTION_MESSAGES = {
-          "Error creating bean with name '", "containing bean '",
+          "Error creating bean with name '",
+          "containing bean '",
+          "Bean with name '",
           "Creating shared instance of singleton bean '",
           "Creating MapperFactoryBean with name '",
           "@EventListener methods processed on bean '"

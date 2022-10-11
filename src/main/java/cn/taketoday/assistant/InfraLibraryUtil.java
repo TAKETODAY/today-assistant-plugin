@@ -32,7 +32,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValueProvider.Result;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.ProcessingContext;
@@ -60,11 +60,11 @@ public class InfraLibraryUtil {
   };
 
   public static boolean hasLibrary(Project project) {
-    return JavaLibraryUtils.hasLibraryClass(project, TodayVersion.ANY.getDetectionClassFqn());
+    return JavaLibraryUtils.hasLibraryClass(project, InfraVersion.ANY.getDetectionClassFqn());
   }
 
   public static boolean hasLibrary(@Nullable Module module) {
-    return isAtLeastVersion(module, TodayVersion.ANY);
+    return isAtLeastVersion(module, InfraVersion.ANY);
   }
 
   public static boolean hasFrameworkLibrary(Project project) {
@@ -88,7 +88,7 @@ public class InfraLibraryUtil {
             && hasWebMvcLibrary(project);
   }
 
-  public static boolean isAtLeastVersion(@Nullable Module module, TodayVersion version) {
+  public static boolean isAtLeastVersion(@Nullable Module module, InfraVersion version) {
     if (module == null) {
       return false;
     }
@@ -96,7 +96,7 @@ public class InfraLibraryUtil {
       return false;
     }
     else {
-      TodayVersion cached = getCachedVersion(module);
+      InfraVersion cached = getCachedVersion(module);
       return cached != null && cached.isAtLeast(version);
     }
   }
@@ -107,21 +107,19 @@ public class InfraLibraryUtil {
 
   @Nullable
   public static String getVersionFromJar(Module module) {
-    return JarVersionDetectionUtil.detectJarVersion(TodayVersion.V_4_0.getDetectionClassFqn(), module);
+    return JarVersionDetectionUtil.detectJarVersion(InfraVersion.V_4_0.getDetectionClassFqn(), module);
   }
 
   public static boolean hasConfigurationMetadataAnnotationProcessor(Module module) {
     AnnotationProcessingConfiguration configuration = CompilerConfiguration.getInstance(module.getProject()).getAnnotationProcessingConfiguration(module);
-    if (!configuration.isEnabled()) {
-      return false;
-    }
-    else {
+    if (configuration.isEnabled()) {
       Set<String> processors = configuration.getProcessors();
-      if (!processors.isEmpty() && !processors.contains("cn.taketoday.framework.configurationprocessor.ConfigurationMetadataAnnotationProcessor")) {
+      if (!processors.isEmpty() && !processors.contains(
+              "cn.taketoday.config.processor.ConfigurationMetadataAnnotationProcessor")) {
         return false;
       }
       else if (configuration.isObtainProcessorsFromClasspath()) {
-        PsiClass processor = InfraUtils.findLibraryClass(module, "cn.taketoday.framework.configurationprocessor.ConfigurationMetadataAnnotationProcessor");
+        PsiClass processor = InfraUtils.findLibraryClass(module, "cn.taketoday.config.processor.ConfigurationMetadataAnnotationProcessor");
         return processor != null;
       }
       else {
@@ -133,30 +131,30 @@ public class InfraLibraryUtil {
               segment = segment.substring(fileNameIndex + 1);
             }
 
-            if (segment.contains("infra-boot-configuration-processor")) {
+            if (segment.contains("infra-configuration-processor")) {
               return true;
             }
           }
         }
-
-        return false;
       }
     }
+
+    return false;
   }
 
-  public static TodayVersion getVersion(Module module) {
+  public static InfraVersion getVersion(Module module) {
     return getCachedVersion(module);
   }
 
   @Nullable
-  private static TodayVersion getCachedVersion(Module module) {
+  private static InfraVersion getCachedVersion(Module module) {
     Project project = module.getProject();
     return CachedValuesManager.getManager(project).getCachedValue(module, () -> {
-      GlobalSearchScope scope = GlobalSearchScope.moduleRuntimeScope(module, false);
+      InfraVersion detected = null;
       JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(project);
-      TodayVersion detected = null;
-      TodayVersion[] versions = ArrayUtil.reverseArray(TodayVersion.values());
-      for (TodayVersion version : versions) {
+      GlobalSearchScope scope = GlobalSearchScope.moduleRuntimeScope(module, false);
+      InfraVersion[] versions = ArrayUtil.reverseArray(InfraVersion.values());
+      for (InfraVersion version : versions) {
         PsiClass psiClass = javaPsiFacade.findClass(version.getDetectionClassFqn(), scope);
         if (psiClass != null) {
           detected = version;
@@ -164,45 +162,16 @@ public class InfraLibraryUtil {
         }
       }
 
-      return CachedValueProvider.Result.create(detected, JavaLibraryModificationTracker.getInstance(project));
+      return Result.create(detected, JavaLibraryModificationTracker.getInstance(project));
     });
   }
 
   public static boolean hasActuators(Module module) {
-    return InfraUtils.findLibraryClass(module, "cn.taketoday.framework.actuate.endpoint.Endpoint") != null;
+    return InfraUtils.findLibraryClass(module, "cn.taketoday.actuate.endpoint.Endpoint") != null;
   }
 
-  public static boolean isBelowVersion(@Nullable Module module, TodayVersion version) {
+  public static boolean isBelowVersion(@Nullable Module module, InfraVersion version) {
     return !isAtLeastVersion(module, version);
   }
 
-  public enum TodayVersion {
-    ANY("1.0", "cn.taketoday.beans.factory.BeanFactory"),
-    V_4_0("4.0", "cn.taketoday.stereotype.Component");
-
-    private final String myVersion;
-    private final String myDetectionClassFqn;
-
-    TodayVersion(String version, String detectionClassFqn) {
-      this.myVersion = version;
-      this.myDetectionClassFqn = detectionClassFqn;
-    }
-
-    public boolean isAtLeast(TodayVersion reference) {
-      if (reference == ANY) {
-        return true;
-      }
-      else {
-        return StringUtil.compareVersionNumbers(this.myVersion, reference.myVersion) >= 0;
-      }
-    }
-
-    public String getVersion() {
-      return this.myVersion;
-    }
-
-    public String getDetectionClassFqn() {
-      return this.myDetectionClassFqn;
-    }
-  }
 }

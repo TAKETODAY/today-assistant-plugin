@@ -175,8 +175,8 @@ public class XmlPropertyPlaceholderFoldingBuilder extends FoldingBuilderEx {
       text = ((IProperty) property).getUnescapedValue();
     }
     else if (property != null) {
-      for (InfraPlaceholderReferenceResolver placeholderReferenceResolver : InfraPlaceholderReferenceResolver.EP_NAME.getExtensionList()) {
-        text = placeholderReferenceResolver.getPropertyValue(resolveResult.first, property);
+      for (InfraPlaceholderReferenceResolver resolver : InfraPlaceholderReferenceResolver.array()) {
+        text = resolver.getPropertyValue(resolveResult.first, property);
         if (text != null) {
           break;
         }

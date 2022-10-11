@@ -28,7 +28,7 @@ import com.intellij.openapi.util.text.StringUtil;
 
 import java.util.Arrays;
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.InfraApplicationUrlPathProviderFactory;
 import cn.taketoday.lang.Nullable;
 
@@ -40,8 +40,8 @@ public class InfraApplicationUrlUtil {
 
   @Nullable
   public String getServletPath(InfraApplicationInfo info, @Nullable String path) {
-    InfraApplicationServerConfiguration configuration = info.getServerConfiguration().getValue();
-    String servletPath = configuration == null ? null : configuration.getServletPath();
+    InfraWebServerConfig configuration = info.getServerConfig().getValue();
+    String servletPath = configuration == null ? null : configuration.servletPath();
     return StringUtil.isEmpty(path) ? servletPath : Arrays.stream(InfraApplicationUrlPathProviderFactory.EP_NAME.getExtensions())
             .findFirst().map((factory) -> factory.getServletPath(info, path))
             .orElse(servletPath);
@@ -66,13 +66,13 @@ public class InfraApplicationUrlUtil {
     return applicationUrl + path;
   }
 
-  public void updatePath(Project project, InfraApplicationRunConfigurationBase runConfiguration, String path) {
+  public void updatePath(Project project, InfraApplicationRunConfig runConfiguration, String path) {
 
     RunManagerImpl runManager = (RunManagerImpl) RunManager.getInstance(project);
     RunnerAndConfigurationSettings configurationSettings = runManager.findSettings(runConfiguration);
     if (configurationSettings != null) {
-      if (configurationSettings.getConfiguration() instanceof InfraApplicationRunConfigurationBase) {
-        ((InfraApplicationRunConfigurationBase) configurationSettings.getConfiguration()).setUrlPath(path);
+      if (configurationSettings.getConfiguration() instanceof InfraApplicationRunConfig) {
+        ((InfraApplicationRunConfig) configurationSettings.getConfiguration()).setUrlPath(path);
         runConfiguration.setUrlPath(path);
         runManager.fireRunConfigurationChanged(configurationSettings);
       }

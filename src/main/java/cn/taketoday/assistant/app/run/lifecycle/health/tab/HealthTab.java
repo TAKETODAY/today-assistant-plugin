@@ -55,10 +55,10 @@ import javax.swing.JComponent;
 
 import cn.taketoday.assistant.Icons;
 import cn.taketoday.assistant.InfraAppBundle;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
-import cn.taketoday.assistant.app.run.lifecycle.LiveProperty;
+import cn.taketoday.assistant.app.run.lifecycle.Property;
 import cn.taketoday.assistant.app.run.lifecycle.tabs.EndpointTab;
 import cn.taketoday.assistant.app.run.lifecycle.tabs.InfraEndpointsTabSettings;
 import cn.taketoday.lang.Nullable;
@@ -74,9 +74,9 @@ public class HealthTab extends EndpointTab<Map> {
   private final TreeExpander myExpander;
   private final Alarm myAlarm;
   private boolean myPendingHealthCheck;
-  private final LiveProperty.LivePropertyListener myHealthListener;
+  private final Property.PropertyListener myHealthListener;
 
-  public HealthTab(Endpoint<Map> endpoint, InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  public HealthTab(Endpoint<Map> endpoint, InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     super(endpoint, runConfiguration, processHandler);
     this.myTreeStructure = new HealthTreeStructure(getProject());
     this.myTreeModel = new StructureTreeModel<>(this.myTreeStructure, this);
@@ -98,7 +98,7 @@ public class HealthTab extends EndpointTab<Map> {
         }
       }
     });
-    this.myHealthListener = new LiveProperty.LivePropertyListener() {
+    this.myHealthListener = new Property.PropertyListener() {
       @Override
       public void propertyChanged() {
       }

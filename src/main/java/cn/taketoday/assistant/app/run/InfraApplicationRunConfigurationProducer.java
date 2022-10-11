@@ -51,37 +51,43 @@ import cn.taketoday.lang.Nullable;
 
 final class InfraApplicationRunConfigurationProducer
         extends JavaRunConfigurationProducerBase<InfraApplicationRunConfiguration> {
-
+  @Override
   public ConfigurationFactory getConfigurationFactory() {
     return InfraApplicationConfigurationType.of().getConfigurationFactories()[0];
   }
 
-  public boolean setupConfigurationFromContext(InfraApplicationRunConfiguration configuration, ConfigurationContext context,
-          Ref<PsiElement> sourceElement) {
-    Pair<PsiClass, PsiElement> classWithAnchor;
+  @Override
+  public boolean setupConfigurationFromContext(InfraApplicationRunConfiguration configuration,
+          ConfigurationContext context, Ref<PsiElement> sourceElement) {
     Module module = context.getModule();
-    if (InfraLibraryUtil.hasFrameworkLibrary(module) && (classWithAnchor = findInfraApplication(sourceElement.get())) != null) {
-      if (classWithAnchor.second != null) {
-        sourceElement.set(classWithAnchor.second);
+    if (InfraLibraryUtil.hasFrameworkLibrary(module)) {
+      Pair<PsiClass, PsiElement> application = findInfraApplication(sourceElement.get());
+      if (application != null) {
+        if (application.second != null) {
+          sourceElement.set(application.second);
+        }
+        configuration.setInfraMainClass(JavaExecutionUtil.getRuntimeQualifiedName(application.first));
+        configuration.setGeneratedName();
+        setupConfigurationModule(context, configuration);
+        return true;
       }
-      configuration.setInfraMainClass(JavaExecutionUtil.getRuntimeQualifiedName(classWithAnchor.first));
-      configuration.setGeneratedName();
-      setupConfigurationModule(context, configuration);
-      return true;
     }
     return false;
   }
 
+  @Override
   public boolean isConfigurationFromContext(InfraApplicationRunConfiguration configuration, ConfigurationContext context) {
-    Pair<PsiClass, PsiElement> contextClassWithAnchor;
+    Pair<PsiClass, PsiElement> app;
     Module configurationModule = configuration.getConfigurationModule().getModule();
-    if (Comparing.equal(context.getModule(), configurationModule) && (contextClassWithAnchor = findInfraApplication(context.getPsiLocation())) != null) {
+    if (Comparing.equal(context.getModule(), configurationModule)
+            && (app = findInfraApplication(context.getPsiLocation())) != null) {
       String configFqn = configuration.getInfraMainClass();
-      return Comparing.strEqual(configFqn, contextClassWithAnchor.first.getQualifiedName());
+      return Comparing.strEqual(configFqn, app.first.getQualifiedName());
     }
     return false;
   }
 
+  @Override
   public boolean shouldReplace(ConfigurationFromContext self, ConfigurationFromContext other) {
     RunConfiguration configuration = other.getConfiguration();
     if ((configuration instanceof ModuleBasedConfiguration moduleBasedConfiguration) && (configuration instanceof CommonJavaRunConfigurationParameters)) {
@@ -93,37 +99,42 @@ final class InfraApplicationRunConfigurationProducer
 
   @Nullable
   private static Pair<PsiClass, PsiElement> findInfraApplication(@Nullable PsiElement psiElement) {
-    UFile file;
-    PsiClass psiClass;
-    UFile file2;
-    PsiClass psiClass2;
     if (psiElement == null) {
       return null;
     }
+
     UMethod uMethod = UastContextKt.getUastParentOfType(psiElement, UMethod.class);
     if (uMethod != null) {
+      UFile file2;
+      PsiClass infraApplication;
       PsiClass mainClass = UastUtils.getMainMethodClass(uMethod);
-      if (mainClass != null && (file2 = UastContextKt.getUastParentOfType(psiElement, UFile.class)) != null && (psiClass2 = findInfraApplication(mainClass, file2)) != null) {
-        return Pair.create(psiClass2, null);
+      if (mainClass != null
+              && (file2 = UastContextKt.getUastParentOfType(psiElement, UFile.class)) != null
+              && (infraApplication = findInfraApplication(mainClass, file2)) != null) {
+        return Pair.create(infraApplication, null);
       }
       return null;
     }
-    UFile file3 = UastContextKt.toUElement(psiElement, UFile.class);
-    if (file3 != null) {
-      for (UClass uClass : file3.getClasses()) {
+    UFile element = UastContextKt.toUElement(psiElement, UFile.class);
+    if (element != null) {
+      for (UClass uClass : element.getClasses()) {
         if (UastUtils.findMainInClass(uClass) != null) {
-          PsiClass psiClass3 = findInfraApplication(uClass.getJavaPsi(), file3);
-          if (psiClass3 != null) {
-            return Pair.create(psiClass3, UElementKt.getSourcePsiElement(uClass));
+          PsiClass infraApplication = findInfraApplication(uClass.getJavaPsi(), element);
+          if (infraApplication != null) {
+            return Pair.create(infraApplication, UElementKt.getSourcePsiElement(uClass));
           }
           return null;
         }
       }
       return null;
     }
-    PsiClass mainClass2 = ApplicationConfigurationType.getMainClass(psiElement);
-    if (mainClass2 != null && (file = UastContextKt.getUastParentOfType(psiElement, UFile.class)) != null && (psiClass = findInfraApplication(mainClass2, file)) != null) {
-      return Pair.pair(psiClass, mainClass2);
+    UFile file;
+    PsiClass infraApplication;
+    PsiClass mainClass = ApplicationConfigurationType.getMainClass(psiElement);
+    if (mainClass != null
+            && (file = UastContextKt.getUastParentOfType(psiElement, UFile.class)) != null
+            && (infraApplication = findInfraApplication(mainClass, file)) != null) {
+      return Pair.pair(infraApplication, mainClass);
     }
     return null;
   }
@@ -148,8 +159,9 @@ final class InfraApplicationRunConfigurationProducer
   @Nullable
   private static PsiClass findInfraApplication(PsiClass mainClass, UClass uClass) {
     PsiClass psiClass = uClass.getJavaPsi();
-    if (InfraApplicationService.of().isInfraApplication(psiClass)
-            && mainClass.equals(InfraApplicationService.of().findMainClassCandidate(psiClass))) {
+    InfraApplicationService service = InfraApplicationService.of();
+    if (service.isInfraApplication(psiClass)
+            && mainClass.equals(service.findMainClassCandidate(psiClass))) {
       return psiClass;
     }
     if (psiClass.getContainingClass() == null || psiClass.hasModifierProperty("static")) {

@@ -48,6 +48,7 @@ import java.util.Set;
 import cn.taketoday.assistant.AnnotationConstant;
 import cn.taketoday.assistant.CommonInfraModel;
 import cn.taketoday.assistant.InfraLibraryUtil;
+import cn.taketoday.assistant.InfraVersion;
 import cn.taketoday.assistant.JavaeeConstant;
 import cn.taketoday.assistant.beans.AutowireUtil;
 import cn.taketoday.assistant.model.BeanPointer;
@@ -181,7 +182,7 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
       Map<ConstructorArgDefinition, PsiParameter> resolvedArgs = new HashMap<>(params.length);
       this.myResolvedArgs.put(method, resolvedArgs);
       boolean isAutowired = constructorAutowire || AnnotationUtil.isAnnotated(method, AUTOWIRE_ANNOTATIONS, 0) || (methods.size() == 1 && method.isConstructor() && InfraLibraryUtil.isAtLeastVersion(
-              ModuleUtilCore.findModuleForPsiElement(method), InfraLibraryUtil.TodayVersion.V_4_0));
+              ModuleUtilCore.findModuleForPsiElement(method), InfraVersion.V_4_0));
       Map<PsiParameter, Collection<BeanPointer<?>>> autowiredParams = new HashMap<>();
       this.myAutowiredParams.put(method, autowiredParams);
       int autowiredCount = 0;

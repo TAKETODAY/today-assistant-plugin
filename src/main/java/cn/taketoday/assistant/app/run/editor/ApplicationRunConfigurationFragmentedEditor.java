@@ -116,6 +116,8 @@ import kotlin.jvm.internal.Intrinsics;
 import kotlin.text.StringsKt;
 
 import static cn.taketoday.assistant.app.run.InfraRunBundle.message;
+import static cn.taketoday.assistant.app.run.editor.ApplicationRunConfigurationFragmentedEditorKt.LAUNCH_OPTIMIZATION_13_DESCRIPTION;
+import static cn.taketoday.assistant.app.run.editor.ApplicationRunConfigurationFragmentedEditorKt.LAUNCH_OPTIMIZATION_DESCRIPTION;
 
 public final class ApplicationRunConfigurationFragmentedEditor extends RunConfigurationFragmentedEditor<InfraApplicationRunConfiguration> {
   private final SmartList<Consumer<JrePathEditor.JreComboBoxItem>> jrePathListeners;
@@ -593,17 +595,17 @@ public final class ApplicationRunConfigurationFragmentedEditor extends RunConfig
                 configuration.setEnableLaunchOptimization(!value.booleanValue());
               }
             });
-    launchOptimization.setActionDescription("-XX:TieredStopAtLevel=1 -noverify");
+    launchOptimization.setActionDescription(LAUNCH_OPTIMIZATION_DESCRIPTION);
     launchOptimization.setActionHint(StringUtil.removeHtmlTags(message("infra.application.run.configuration.launch.optimization.tooltip")));
     this.jrePathListeners.add(item -> {
       String it = item.getVersion();
       JavaSdkVersion version = it != null ? JavaSdkVersion.fromVersionString(it) : null;
       boolean noVerify = version == null || !version.isAtLeast(JavaSdkVersion.JDK_13);
       if (noVerify) {
-        launchOptimization.setActionDescription("-XX:TieredStopAtLevel=1 -noverify");
+        launchOptimization.setActionDescription(LAUNCH_OPTIMIZATION_DESCRIPTION);
         return;
       }
-      launchOptimization.setActionDescription("-XX:TieredStopAtLevel=1");
+      launchOptimization.setActionDescription(LAUNCH_OPTIMIZATION_13_DESCRIPTION);
     });
     fragments.add(launchOptimization);
     SettingsEditorFragment jmxAgent = SettingsEditorFragment.createTag("infra.jmx.agent", message("infra.run.config.fragment.jmx.agent"),

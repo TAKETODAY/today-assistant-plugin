@@ -61,7 +61,7 @@ public interface ConditionalOnEvaluationContext extends UserDataHolderEx {
           boolean checkRelaxedNames,
           String configKey) {
     MetaConfigKey key =
-            InfraApplicationMetaConfigKeyManager.getInstance().findCanonicalApplicationMetaConfigKey(getModule(), configKey);
+            InfraApplicationMetaConfigKeyManager.of().findCanonicalApplicationMetaConfigKey(getModule(), configKey);
     if (key == null)
       return true;
 
@@ -69,6 +69,5 @@ public interface ConditionalOnEvaluationContext extends UserDataHolderEx {
   }
 
   boolean processConfigurationValues(Processor<? super List<ConfigurationValueResult>> processor,
-          boolean checkRelaxedNames,
-          MetaConfigKey configKey);
+          boolean checkRelaxedNames, MetaConfigKey configKey);
 }

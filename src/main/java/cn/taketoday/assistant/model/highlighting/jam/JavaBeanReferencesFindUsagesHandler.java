@@ -48,6 +48,7 @@ public class JavaBeanReferencesFindUsagesHandler extends FindUsagesHandler {
     this.pointer = InfraBeanService.of().createBeanPointer(this.infraBean);
   }
 
+  @Override
   public PsiElement[] getSecondaryElements() {
     List<InfraJavaExternalBean> list = InfraOldJavaConfigurationUtil.findExternalBeanReferences(this.infraBean);
     Set<PsiElement> psiElements = new HashSet<>();
@@ -58,7 +59,9 @@ public class JavaBeanReferencesFindUsagesHandler extends FindUsagesHandler {
     return PsiUtilCore.toPsiElementArray(psiElements);
   }
 
-  public boolean processElementUsages(PsiElement element, Processor<? super UsageInfo> processor, FindUsagesOptions options) {
+  @Override
+  public boolean processElementUsages(PsiElement element,
+          Processor<? super UsageInfo> processor, FindUsagesOptions options) {
     return super.processElementUsages(element, processor, options)
             && AutowiredBeanFindUsagesHandler.processAutowiredBeans(element, processor, options, this.pointer);
   }

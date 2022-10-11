@@ -23,6 +23,7 @@ package cn.taketoday.assistant.model.highlighting.xml;
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.lang.annotation.HighlightSeverity;
+import com.intellij.lang.jvm.JvmModifier;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
@@ -51,23 +52,27 @@ import cn.taketoday.lang.Nullable;
 public final class BeanInstantiationInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
-    String message;
+  protected void checkBean(InfraBean infraBean, Beans beans,
+          DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+
     PsiClass psiClass = infraBean.getClazz().getValue();
     if (psiClass != null && !infraBean.isAbstract() && psiClass.hasModifierProperty("abstract")) {
       boolean factory = DomUtil.hasXml(infraBean.getFactoryMethod());
       boolean lookup = hasLookupMethods(infraBean) || hasAnnotatedLookupMethods(psiClass);
       if (!factory && !lookup && !isJavaConfigBean(infraBean)) {
         GenericAttributeValue<PsiClass> clazz = infraBean.getClazz();
-        HighlightSeverity highlightSeverity = HighlightSeverity.WARNING;
-        if (psiClass.isInterface()) {
-          message = InfraBundle.message("interface.not.allowed");
-        }
-        else {
-          message = InfraBundle.message("abstract.class.not.allowed");
-        }
-        holder.createProblem(clazz, highlightSeverity, message, new MarkAbstractFix(infraBean.getAbstract()));
+        String message = getMessage(psiClass);
+        holder.createProblem(clazz, HighlightSeverity.WARNING, message, new MarkAbstractFix(infraBean.getAbstract()));
       }
+    }
+  }
+
+  private static String getMessage(PsiClass psiClass) {
+    if (psiClass.isInterface()) {
+      return InfraBundle.message("interface.not.allowed");
+    }
+    else {
+      return InfraBundle.message("abstract.class.not.allowed");
     }
   }
 
@@ -108,8 +113,8 @@ public final class BeanInstantiationInspection extends InfraBeanInspectionBase {
     Module module;
     PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     if (DomUtil.hasXml(infraBean) && beanClass != null && (module = infraBean.getModule()) != null) {
-      for (InfraJavaConfiguration javaConfiguration : InfraOldJavaConfigurationUtil.getJavaConfigurations(module)) {
-        if (beanClass.equals(javaConfiguration.getPsiClass())) {
+      for (InfraJavaConfiguration config : InfraOldJavaConfigurationUtil.getJavaConfigurations(module)) {
+        if (beanClass.equals(config.getPsiClass())) {
           return true;
         }
       }

@@ -24,49 +24,50 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.microservices.jvm.config.ConfigTunnelPortMapping;
 import com.intellij.openapi.util.Disposer;
 
-class MappedPortProperty extends AbstractLiveProperty<Integer> implements LiveProperty.LivePropertyListener {
-  private final LiveProperty<Integer> myRemoteProperty;
-  private final ConfigTunnelPortMapping myPortMapping;
+import java.util.function.Consumer;
 
-  public static LiveProperty<Integer> withMappedPorts(LiveProperty<Integer> remoteProperty, ProcessHandler processHandler) {
-    ConfigTunnelPortMapping portMapping = ConfigTunnelPortMapping.MAPPING_KEY.get(processHandler);
+class MappedPortProperty extends AbstractProperty<Integer> implements Property.PropertyListener {
+  private final Property<Integer> remoteProperty;
+  private final ConfigTunnelPortMapping portMapping;
+
+  public static Property<Integer> withMappedPorts(Property<Integer> remoteProperty, ProcessHandler processHandler) {
+    var portMapping = ConfigTunnelPortMapping.MAPPING_KEY.get(processHandler);
     return portMapping == null ? remoteProperty : new MappedPortProperty(remoteProperty, portMapping);
   }
 
-  private MappedPortProperty(LiveProperty<Integer> remoteProperty, ConfigTunnelPortMapping portMapping) {
+  private MappedPortProperty(Property<Integer> remoteProperty, ConfigTunnelPortMapping portMapping) {
     super(null);
-    this.myRemoteProperty = remoteProperty;
-    this.myPortMapping = portMapping;
-    this.myRemoteProperty.addPropertyListener(this);
+    this.remoteProperty = remoteProperty;
+    this.portMapping = portMapping;
+    this.remoteProperty.addPropertyListener(this);
     Disposer.register(remoteProperty, this);
   }
 
   @Override
   public void compute() {
-    this.myRemoteProperty.compute();
+    this.remoteProperty.compute();
   }
 
   public void dispose() {
-    this.myRemoteProperty.removePropertyListener(this);
+    this.remoteProperty.removePropertyListener(this);
   }
 
   @Override
   public void computationFailed(Exception e) {
-    getListeners().forEach(listener -> {
-      listener.computationFailed(e);
-    });
+    dispatchComputationFailed(e);
   }
 
   @Override
   public void computationFinished() {
-    getListeners().forEach(LivePropertyListener::computationFinished);
+    dispatchComputationFinished();
   }
 
   @Override
   public void propertyChanged() {
-    Integer remoteValue = this.myRemoteProperty.getValue();
-    Integer mappedValue = remoteValue == null ? null : this.myPortMapping.getLocalPort(remoteValue);
+    Integer remoteValue = remoteProperty.getValue();
+    Integer mappedValue = remoteValue == null ? null : portMapping.getLocalPort(remoteValue);
     setValue(mappedValue);
-    getListeners().forEach(LivePropertyListener::propertyChanged);
+    dispatchPropertyChanged();
   }
+
 }

@@ -27,42 +27,64 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import cn.taketoday.lang.Nullable;
 
-abstract class AbstractLiveProperty<T> implements LiveProperty<T> {
-  private final AtomicReference<T> myValue = new AtomicReference<>();
-  private volatile long myTimeStamp = -1;
-  private final List<LivePropertyListener> myListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+abstract class AbstractProperty<T> implements Property<T> {
 
-  protected AbstractLiveProperty(T defaultValue) {
-    this.myValue.set(defaultValue);
+  private final AtomicReference<T> value = new AtomicReference<>();
+
+  private volatile long timeStamp = -1;
+
+  private final List<PropertyListener> listeners = ContainerUtil.createLockFreeCopyOnWriteList();
+
+  protected AbstractProperty(T defaultValue) {
+    this.value.set(defaultValue);
   }
 
   @Override
   @Nullable
   public T getValue() {
-    return this.myValue.get();
+    return this.value.get();
   }
 
   @Override
   public long getTimeStamp() {
-    return this.myTimeStamp;
+    return this.timeStamp;
   }
 
   @Override
-  public void addPropertyListener(LiveProperty.LivePropertyListener listener) {
-    this.myListeners.add(listener);
+  public void addPropertyListener(PropertyListener listener) {
+    this.listeners.add(listener);
   }
 
   @Override
-  public void removePropertyListener(LiveProperty.LivePropertyListener listener) {
-    this.myListeners.remove(listener);
+  public void removePropertyListener(PropertyListener listener) {
+    this.listeners.remove(listener);
   }
 
   protected T setValue(T value) {
-    this.myTimeStamp = System.currentTimeMillis();
-    return this.myValue.getAndSet(value);
+    this.timeStamp = System.currentTimeMillis();
+    return this.value.getAndSet(value);
   }
 
-  protected List<LivePropertyListener> getListeners() {
-    return this.myListeners;
+  protected List<PropertyListener> getListeners() {
+    return this.listeners;
   }
+
+  public void dispatchComputationFailed(Exception e) {
+    for (PropertyListener listener : listeners) {
+      listener.computationFailed(e);
+    }
+  }
+
+  public void dispatchComputationFinished() {
+    for (PropertyListener listener : listeners) {
+      listener.computationFinished();
+    }
+  }
+
+  public void dispatchPropertyChanged() {
+    for (PropertyListener listener : listeners) {
+      listener.propertyChanged();
+    }
+  }
+
 }

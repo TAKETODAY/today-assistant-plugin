@@ -40,14 +40,14 @@ import cn.taketoday.assistant.model.jam.JamBeanPointer;
 import cn.taketoday.lang.Nullable;
 
 class AutoConfigLocalAnnotationModel extends LocalAnnotationModel {
-  private final boolean myNonStrictEvaluation;
-  private final ConditionalOnEvaluationContext mySharedContext;
+  private final boolean nonStrictEvaluation;
+  private final ConditionalOnEvaluationContext sharedContext;
 
   AutoConfigLocalAnnotationModel(PsiClass aClass, Module module, Set<String> activeProfiles, boolean nonStrictEvaluation,
           ConditionalOnEvaluationContext sharedContext) {
     super(aClass, module, activeProfiles);
-    this.myNonStrictEvaluation = nonStrictEvaluation;
-    this.mySharedContext = sharedContext;
+    this.nonStrictEvaluation = nonStrictEvaluation;
+    this.sharedContext = sharedContext;
   }
 
   @Nullable
@@ -56,11 +56,11 @@ class AutoConfigLocalAnnotationModel extends LocalAnnotationModel {
     if (!passesConditionClassMatch) {
       return null;
     }
-    AutoConfigClassConditionEvaluator evaluator = new AutoConfigClassConditionEvaluator(configClass, this.myNonStrictEvaluation, this.mySharedContext);
+    var evaluator = new AutoConfigClassConditionEvaluator(configClass, nonStrictEvaluation, sharedContext);
     if (!evaluator.isActive()) {
       return null;
     }
-    return new AutoConfigLocalAnnotationModel(configClass, getModule(), getActiveProfiles(), this.myNonStrictEvaluation, this.mySharedContext);
+    return new AutoConfigLocalAnnotationModel(configClass, getModule(), getActiveProfiles(), nonStrictEvaluation, this.sharedContext);
   }
 
   public Collection<BeanPointer<?>> getLocalBeans() {
@@ -78,15 +78,15 @@ class AutoConfigLocalAnnotationModel extends LocalAnnotationModel {
             && (getConfig().equals(firstElement.getNavigationElement()) || getConfig().equals(firstElement))) {
 
       Condition<ConditionalEvaluationContext> condition = context -> {
-        AutoConfigClassConditionEvaluator classEvaluator = new AutoConfigClassConditionEvaluator(getConfig(), false, this.mySharedContext);
-        this.mySharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, context.getModel());
+        var classEvaluator = new AutoConfigClassConditionEvaluator(getConfig(), false, this.sharedContext);
+        this.sharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, context.getModel());
         try {
           boolean isActive = classEvaluator.isActive();
-          this.mySharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, null);
+          this.sharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, null);
           return isActive;
         }
         catch (Throwable th) {
-          this.mySharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, null);
+          this.sharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, null);
           throw th;
         }
       };
@@ -106,19 +106,19 @@ class AutoConfigLocalAnnotationModel extends LocalAnnotationModel {
             if (!passesConditionClassMatch) {
               return false;
             }
-            AutoConfigMethodConditionEvaluator evaluator = new AutoConfigMethodConditionEvaluator(psiMethod, false, this.mySharedContext);
-            this.mySharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, context2.getModel());
+            AutoConfigMethodConditionEvaluator evaluator = new AutoConfigMethodConditionEvaluator(psiMethod, false, this.sharedContext);
+            this.sharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, context2.getModel());
             try {
               if (!evaluator.isActive()) {
                 return false;
               }
-              AutoConfigClassConditionEvaluator classEvaluator = new AutoConfigClassConditionEvaluator(getConfig(), false, this.mySharedContext);
+              AutoConfigClassConditionEvaluator classEvaluator = new AutoConfigClassConditionEvaluator(getConfig(), false, this.sharedContext);
               boolean isActive = classEvaluator.isActive();
-              this.mySharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, null);
+              this.sharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, null);
               return isActive;
             }
             finally {
-              this.mySharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, null);
+              this.sharedContext.putUserData(ConditionalOnEvaluationContext.MODEL_KEY, null);
             }
           };
           beanPointer = DelegateConditionalBeanPointer.createPointer((JamBeanPointer) beanPointer, condition2);

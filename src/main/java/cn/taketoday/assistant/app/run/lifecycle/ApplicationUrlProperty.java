@@ -24,49 +24,45 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.net.NetUtils;
 
-class ApplicationUrlLiveProperty extends cn.taketoday.assistant.app.run.lifecycle.AsyncLiveProperty<String> {
-  private cn.taketoday.assistant.app.run.lifecycle.LiveProperty<Integer> myServerPort;
-  private cn.taketoday.assistant.app.run.lifecycle.LiveProperty<InfraApplicationServerConfiguration> myServerConfiguration;
+class ApplicationUrlProperty extends AsyncProperty<String> {
+  private Property<Integer> serverPort;
+  private Property<InfraWebServerConfig> serverConfig;
 
-  protected ApplicationUrlLiveProperty(cn.taketoday.assistant.app.run.lifecycle.LifecycleErrorHandler errorHandler, Disposable parent) {
+  protected ApplicationUrlProperty(LifecycleErrorHandler errorHandler, Disposable parent) {
     super(errorHandler, parent);
   }
 
-  ApplicationUrlLiveProperty withServerPort(cn.taketoday.assistant.app.run.lifecycle.LiveProperty<Integer> serverPort) {
-    this.myServerPort = serverPort;
-    this.myServerPort.addPropertyListener(() -> {
-      compute();
-    });
+  ApplicationUrlProperty withServerPort(Property<Integer> serverPort) {
+    this.serverPort = serverPort;
+    this.serverPort.addPropertyListener(this::compute);
     return this;
   }
 
-  ApplicationUrlLiveProperty withServerConfiguration(LiveProperty<InfraApplicationServerConfiguration> serverConfiguration) {
-    this.myServerConfiguration = serverConfiguration;
-    this.myServerConfiguration.addPropertyListener(() -> {
-      compute();
-    });
+  ApplicationUrlProperty withServerConfiguration(Property<InfraWebServerConfig> serverConfig) {
+    this.serverConfig = serverConfig;
+    this.serverConfig.addPropertyListener(this::compute);
     return this;
   }
 
   @Override
   public String doCompute() {
     Integer serverPort;
-    if (this.myServerPort == null || (serverPort = this.myServerPort.getValue()) == null || serverPort.intValue() <= 0) {
+    if (this.serverPort == null || (serverPort = this.serverPort.getValue()) == null || serverPort <= 0) {
       return null;
     }
     String path = "";
     String scheme = "http";
     String address = NetUtils.getLocalHostString();
-    InfraApplicationServerConfiguration serverConfiguration = this.myServerConfiguration != null ? this.myServerConfiguration.getValue() : null;
-    if (serverConfiguration != null) {
-      if (serverConfiguration.isSslEnabled()) {
+    InfraWebServerConfig serverConfig = this.serverConfig != null ? this.serverConfig.getValue() : null;
+    if (serverConfig != null) {
+      if (serverConfig.sslEnabled()) {
         scheme = "https";
       }
-      String contextPath = serverConfiguration.getContextPath();
+      String contextPath = serverConfig.contextPath();
       if (contextPath != null) {
         path = path + contextPath;
       }
-      String serverAddress = serverConfiguration.getAddress();
+      String serverAddress = serverConfig.address();
       if (StringUtil.isNotEmpty(serverAddress)) {
         address = serverAddress;
       }

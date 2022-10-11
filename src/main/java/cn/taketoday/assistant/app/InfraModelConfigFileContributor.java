@@ -88,68 +88,13 @@ public abstract class InfraModelConfigFileContributor {
     return fileType;
   }
 
-  /**
-   * Returns all default and user configuration files.
-   *
-   * @param module Module to evaluate.
-   * @param includeTestScope
-   * @return Configuration files for this contributor.
-   * @deprecated Use {@link InfraConfigurationFileService#findConfigFiles(Module, boolean)} instead.
-   */
-  @Deprecated
-  public List<VirtualFile> getConfigurationFiles(Module module, boolean includeTestScope) {
-    List<VirtualFile> files = new SmartList<>();
-    for (InfraModelConfigFileNameContributor fileNameContributor : InfraModelConfigFileNameContributor.EP_NAME.getExtensions()) {
-      if (fileNameContributor.accept(module)) {
-        files.addAll(getConfigurationFiles(module, fileNameContributor, includeTestScope));
-      }
-    }
-    return files;
-  }
-
-  /**
-   * Returns all default and user configuration files applicable for the given file set.
-   *
-   * @param module Module to evaluate.
-   * @param fileSet Fileset to evaluate.
-   * @param includeTestScope
-   * @return Configuration files for this contributor.
-   * @deprecated Use {@link InfraConfigurationFileService#findConfigFiles(Module, boolean, Condition)} instead.
-   */
-  @Deprecated
-  public List<VirtualFile> getConfigurationFiles(Module module, InfraFileSet fileSet, boolean includeTestScope) {
-    List<VirtualFile> files = new SmartList<>();
-    for (InfraModelConfigFileNameContributor fileNameContributor : InfraModelConfigFileNameContributor.EP_NAME.getExtensions()) {
-      if (fileNameContributor.accept(fileSet)) {
-        files.addAll(getConfigurationFiles(module, fileNameContributor, includeTestScope));
-        break;
-      }
-    }
-    return files;
-  }
-
-  /**
-   * @deprecated Use {@link InfraConfigurationFileService#findConfigFiles(Module, boolean, Condition)} instead.
-   */
-  @Deprecated
-  public List<VirtualFile> getConfigurationFiles(Module module, InfraModelConfigFileNameContributor fileNameContributor,
-          boolean includeTestScope) {
-    String springConfigName = fileNameContributor.getInfraConfigName(module);
-    Pair<List<VirtualFile>, List<VirtualFile>>
-            configFiles = findApplicationConfigFiles(module, includeTestScope, springConfigName);
-    List<VirtualFile> customFiles = ContainerUtil.filter(fileNameContributor.findCustomConfigFiles(module),
-            file -> fileType.equals(file.getFileType()));
-    return ContainerUtil.concat(configFiles.first, ContainerUtil.concat(customFiles, configFiles.second));
-  }
-
-  public Pair<List<VirtualFile>, List<VirtualFile>> findApplicationConfigFiles(Module module,
-          boolean includeTestScope,
-          String baseName) {
-    List<VirtualFile> profileConfigFiles = new SmartList<>();
-    List<VirtualFile> baseNameConfigFiles = new SmartList<>();
-    List<VirtualFile> directories = getConfigFileDirectories(module, includeTestScope);
+  public Pair<List<VirtualFile>, List<VirtualFile>> findApplicationConfigFiles(
+          Module module, boolean includeTestScope, String baseName) {
+    var profileConfigFiles = new SmartList<VirtualFile>();
+    var baseNameConfigFiles = new SmartList<VirtualFile>();
+    var directories = getConfigFileDirectories(module, includeTestScope);
     for (VirtualFile directory : directories) {
-      Pair<List<VirtualFile>, List<VirtualFile>> allConfigs = findConfigFiles(module, directory, fileType, baseName);
+      var allConfigs = findConfigFiles(module, directory, fileType, baseName);
       profileConfigFiles.addAll(allConfigs.first);
       baseNameConfigFiles.addAll(allConfigs.second);
     }
@@ -179,21 +124,20 @@ public abstract class InfraModelConfigFileContributor {
     }
   }
 
-  protected static void processImports(ConfigurationValueSearchParams params, VirtualFile virtualFile,
-          List<ConfigurationValueResult> results, int documentId) {
-    if (!params.getProcessImports())
-      return;
-
-    List<InfraConfigImport> imports =
-            InfraConfigurationFileService.of().getImports(params.getModule(), virtualFile);
-    for (InfraConfigImport configImport : imports) {
-      VirtualFile importedFile = configImport.getVirtualFile();
-      if (configImport.getDocumentId() == documentId && !params.getProcessedFiles().contains(importedFile)) {
-        PsiFile psiFile = PsiManager.getInstance(params.getModule().getProject()).findFile(importedFile);
-        if (psiFile != null) {
-          InfraModelConfigFileContributor contributor = getContributor(importedFile);
-          if (contributor != null) {
-            results.addAll(contributor.findConfigurationValues(psiFile, params));
+  protected static void processImports(ConfigurationValueSearchParams params,
+          VirtualFile virtualFile, List<ConfigurationValueResult> results, int documentId) {
+    if (params.getProcessImports()) {
+      var imports = InfraConfigurationFileService.of().getImports(params.getModule(), virtualFile);
+      for (InfraConfigImport configImport : imports) {
+        VirtualFile importedFile = configImport.getVirtualFile();
+        if (configImport.getDocumentId() == documentId
+                && !params.getProcessedFiles().contains(importedFile)) {
+          PsiFile psiFile = PsiManager.getInstance(params.getModule().getProject()).findFile(importedFile);
+          if (psiFile != null) {
+            var contributor = getContributor(importedFile);
+            if (contributor != null) {
+              results.addAll(contributor.findConfigurationValues(psiFile, params));
+            }
           }
         }
       }
@@ -217,8 +161,7 @@ public abstract class InfraModelConfigFileContributor {
     }
 
     ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
-
-    List<VirtualFile> roots = new ArrayList<>();
+    var roots = new ArrayList<VirtualFile>();
     if (OUR_TEST_MODE && !USE_RESOURCE_ROOTS_FOR_TESTS) {
       ContainerUtil.addAll(roots, moduleRootManager.getContentRoots());
     }
@@ -235,10 +178,8 @@ public abstract class InfraModelConfigFileContributor {
     return ContainerUtil.concat(configRoots, roots);
   }
 
-  public static Pair<List<VirtualFile>, List<VirtualFile>> findConfigFiles(Module module,
-          VirtualFile directory,
-          FileType fileType,
-          String baseName) {
+  public static Pair<List<VirtualFile>, List<VirtualFile>> findConfigFiles(
+          Module module, VirtualFile directory, FileType fileType, String baseName) {
     GlobalSearchScope searchScope = GlobalSearchScopesCore.directoriesScope(module.getProject(), false, directory);
     String fileNamePrefix = baseName + '-';
 

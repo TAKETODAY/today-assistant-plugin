@@ -22,28 +22,18 @@ package cn.taketoday.assistant.model.jam.javaConfig;
 import com.intellij.jam.JamService;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.SmartList;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import cn.taketoday.assistant.AnnotationConstant;
-import cn.taketoday.assistant.InfraManager;
-import cn.taketoday.assistant.InfraModelVisitorUtils;
-import cn.taketoday.assistant.context.model.InfraModel;
-import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.CommonInfraBean;
-import cn.taketoday.assistant.model.ModelSearchParameters;
 import cn.taketoday.assistant.model.utils.InfraBeanUtils;
-import cn.taketoday.assistant.model.utils.InfraModelSearchers;
-import cn.taketoday.lang.Nullable;
 
 public final class InfraOldJavaConfigurationUtil {
 
@@ -53,31 +43,6 @@ public final class InfraOldJavaConfigurationUtil {
     return jamService.getJamClassElements(JavaConfigConfiguration.META,
             AnnotationConstant.CONFIGURATION,
             GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module));
-  }
-
-  public static List<BeanPointer<?>> findExternalBeans(PsiMethod psiMethod) {
-    Module module = ModuleUtilCore.findModuleForPsiElement(psiMethod);
-    PsiClass psiClass = psiMethod.getContainingClass();
-    if (module == null || psiClass == null) {
-      return Collections.emptyList();
-    }
-    if (getExternalBean(psiMethod) == null) {
-      return Collections.emptyList();
-    }
-    List<BeanPointer<?>> extBeans = new SmartList<>();
-    for (InfraModel model : InfraManager.from(psiMethod.getProject()).getAllModels(module)) {
-      boolean hasJavaConfigBean = InfraModelSearchers.doesBeanExist(model, ModelSearchParameters.byClass(psiClass));
-      if (hasJavaConfigBean) {
-        String externalBeanName = psiMethod.getName();
-        for (BeanPointer infraBean : InfraModelVisitorUtils.getAllDomBeans(model)) {
-          String beanName = infraBean.getName();
-          if (externalBeanName.equals(beanName) || Arrays.asList(infraBean.getAliases()).contains(externalBeanName)) {
-            extBeans.add(infraBean);
-          }
-        }
-      }
-    }
-    return extBeans;
   }
 
   public static List<InfraJavaExternalBean> findExternalBeanReferences(CommonInfraBean infraBean) {
@@ -95,9 +60,9 @@ public final class InfraOldJavaConfigurationUtil {
       return Collections.emptyList();
     }
 
-    List<InfraJavaExternalBean> extBeans = new ArrayList<>();
-    for (JavaConfigConfiguration javaConfiguration : getJavaConfigurations(module)) {
-      for (InfraJavaExternalBean externalBean : javaConfiguration.getExternalBeans()) {
+    ArrayList<InfraJavaExternalBean> extBeans = new ArrayList<>();
+    for (JavaConfigConfiguration beans : getJavaConfigurations(module)) {
+      for (InfraJavaExternalBean externalBean : beans.getExternalBeans()) {
         PsiMethod psiMethod = externalBean.getPsiElement();
         if (beanNames.contains(psiMethod.getName())) {
           extBeans.add(externalBean);
@@ -107,20 +72,4 @@ public final class InfraOldJavaConfigurationUtil {
     return extBeans;
   }
 
-  @Nullable
-  public static InfraJavaExternalBean getExternalBean(PsiMethod psiMethod) {
-    Module module = ModuleUtilCore.findModuleForPsiElement(psiMethod);
-    if (module != null) {
-      for (JavaConfigConfiguration javaConfiguration : getJavaConfigurations(module)) {
-        if (psiMethod.getContainingFile().equals(javaConfiguration.getPsiClass().getContainingFile())) {
-          for (InfraJavaExternalBean externalBean : javaConfiguration.getExternalBeans()) {
-            if (psiMethod.equals(externalBean.getPsiElement())) {
-              return externalBean;
-            }
-          }
-        }
-      }
-    }
-    return null;
-  }
 }

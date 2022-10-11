@@ -110,7 +110,7 @@ public class InfraConfigurationPropertyReferenceSearcher extends QueryExecutorBa
   private static List<MetaConfigKey> findMetaConfigKeysInModule(Module module, String prefix, PsiMethod psiMethod) {
     SmartList<MetaConfigKey> smartList = new SmartList<>();
     boolean constructorBinding = psiMethod.isConstructor();
-    for (MetaConfigKey key : InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(module)) {
+    for (MetaConfigKey key : InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(module)) {
       if (key.getDeclarationResolveResult() == MetaConfigKey.DeclarationResolveResult.PROPERTY
               && StringUtil.startsWith(key.getName(), prefix)) {
         PsiElement declaration = key.getDeclaration().getNavigationElement();

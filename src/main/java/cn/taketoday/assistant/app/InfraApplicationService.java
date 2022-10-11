@@ -71,7 +71,7 @@ public class InfraApplicationService {
       GlobalSearchScope scope = module.getModuleScope(false);
       ArrayList<String> fqns = new ArrayList<>(EnableAutoConfiguration.getAnnotations().fun(module));
       fqns.add(AnnotationConstant.EnableAutoConfiguration);
-      List<PsiClass> applications = new SmartList<>();
+      SmartList<PsiClass> applications = new SmartList<>();
 
       for (String fqn : fqns) {
         List<EnableAutoConfiguration> elements = jamService.getJamClassElements(EnableAutoConfiguration.JAM_KEY, fqn, scope);
@@ -112,7 +112,7 @@ public class InfraApplicationService {
         return psiClass;
       }
       else {
-        List<UMethod> mainMethodCandidates = new SmartList<>();
+        SmartList<UMethod> mainMethodCandidates = new SmartList<>();
         for (UClass uClass : file.getClasses()) {
           UMethod[] methods = uClass.getMethods();
 

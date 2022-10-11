@@ -72,9 +72,8 @@ abstract class LiveRequestMappingPredicateParser {
       List<String> produces = getProduces(mapping);
       List<String> consumes = getConsumes(mapping);
       List<Pair<String, String>> params = getParams(mapping);
-      return ContainerUtil.map(paths, path -> {
-        return new LiveRequestMappingPredicate(path, requestMethods, headers, produces, consumes, params);
-      });
+      return ContainerUtil.map(paths, path -> new LiveRequestMappingPredicate(
+              path, requestMethods, headers, produces, consumes, params));
     }
 
     protected List<String> getRequestMethods(String mapping) {
@@ -100,14 +99,16 @@ abstract class LiveRequestMappingPredicateParser {
     private static <P> List<P> parsePartValues(String mapping, @Nullable String partPattern, String part, String separator, Function<String, P> mapper) {
       int end;
       if (partPattern == null) {
-        List<P> emptyList = Collections.emptyList();
-        return emptyList;
+        return Collections.emptyList();
       }
       String partPrefix = String.format(partPattern, part);
       int partIndex = mapping.indexOf(partPrefix);
       if (partIndex >= 0 && (end = mapping.indexOf(93, partIndex)) > partIndex) {
         String values = mapping.substring(partIndex + partPrefix.length(), end);
-        return Arrays.stream(values.split(Pattern.quote(separator))).map(String::trim).map(mapper).collect(Collectors.toList());
+        return Arrays.stream(values.split(Pattern.quote(separator)))
+                .map(String::trim)
+                .map(mapper)
+                .collect(Collectors.toList());
       }
       return Collections.emptyList();
     }
@@ -116,7 +117,9 @@ abstract class LiveRequestMappingPredicateParser {
       int separatorIndex = keyValue.indexOf('=');
       if (separatorIndex >= 0) {
         boolean negative = separatorIndex > 0 && keyValue.charAt(separatorIndex - 1) == '!';
-        String key = negative ? keyValue.substring(0, separatorIndex - 1) : keyValue.substring(0, separatorIndex);
+        String key = negative
+                     ? keyValue.substring(0, separatorIndex - 1)
+                     : keyValue.substring(0, separatorIndex);
         String value = separatorIndex < keyValue.length() - 1 ? keyValue.substring(separatorIndex + 1) : "";
         if (negative) {
           value = "!" + value;
@@ -132,7 +135,7 @@ abstract class LiveRequestMappingPredicateParser {
 
     @Override
     List<String> getPaths(String mapping) {
-      return new SmartList(mapping);
+      return new SmartList<>(mapping);
     }
 
     @Override
@@ -143,11 +146,7 @@ abstract class LiveRequestMappingPredicateParser {
   }
 
   private static class MappingPredicateParser extends WebPredicateParserBase {
-    static LiveRequestMappingPredicateParser INSTANCE;
-
-    static {
-      INSTANCE = new MappingPredicateParser();
-    }
+    static final LiveRequestMappingPredicateParser INSTANCE = new MappingPredicateParser();
 
     @Override
     List<String> getPaths(String mapping) {

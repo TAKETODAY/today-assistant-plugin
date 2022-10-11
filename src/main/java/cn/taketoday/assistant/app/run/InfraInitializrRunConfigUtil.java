@@ -47,9 +47,7 @@ final class InfraInitializrRunConfigUtil {
       createRunConfiguration(InfraApplicationConfigurationType.of(), module);
     }
     else {
-      ReadAction.nonBlocking(() -> {
-                createRunConfiguration(InfraApplicationConfigurationType.of(), module);
-              })
+      ReadAction.nonBlocking(() -> createRunConfiguration(InfraApplicationConfigurationType.of(), module))
               .inSmartMode(module.getProject())
               .expireWith(executorDisposable)
               .expireWith(module)
@@ -76,9 +74,8 @@ final class InfraInitializrRunConfigUtil {
     }
     try {
       RunManager runManager = RunManager.getInstance(module.getProject());
-      RunnerAndConfigurationSettings settings =
-              runManager.createConfiguration("", type.getDefaultConfigurationFactory());
-      InfraApplicationRunConfigurationBase newRunConfig = (InfraApplicationRunConfigurationBase) settings.getConfiguration();
+      var settings = runManager.createConfiguration("", type.getConfigurationFactory());
+      var newRunConfig = (InfraApplicationRunConfig) settings.getConfiguration();
       newRunConfig.setModule(module);
       newRunConfig.setInfraMainClass(mainClass);
       settings.setName(newRunConfig.suggestedName());
@@ -102,7 +99,7 @@ final class InfraInitializrRunConfigUtil {
     Module configModule;
     RunManager runManager = RunManager.getInstance(module.getProject());
     for (RunConfiguration configuration : runManager.getConfigurationsList(type)) {
-      if (configuration instanceof InfraApplicationRunConfigurationBase infraConfig) {
+      if (configuration instanceof InfraApplicationRunConfig infraConfig) {
         if (infraConfig.getInfraMainClass().equals(applicationClass.getQualifiedName())
                 && (configModule = infraConfig.getModule()) != null) {
           if (configModule.equals(module)) {

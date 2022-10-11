@@ -31,14 +31,14 @@ import java.util.function.Supplier;
 
 import javax.swing.JComponent;
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveBean;
 
 public interface LiveBeansPanelContent {
   ExtensionPointName<LiveBeansPanelContent> EP_NAME = ExtensionPointName.create("cn.taketoday.assistant.app.run.liveBeansPanelContent");
 
   JComponent createComponent(Project project, UserDataHolder userDataHolder, Disposable disposable, Supplier<? extends List<LiveBean>> supplier,
-          InfraApplicationRunConfigurationBase infraApplicationRunConfigurationBase, boolean z);
+          InfraApplicationRunConfig infraApplicationRunConfig, boolean z);
 
   void update(UserDataHolder userDataHolder);
 

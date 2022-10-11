@@ -26,7 +26,7 @@ import cn.taketoday.lang.Nullable;
 /**
  * @author konstantin.aleev
  */
-public interface LiveProperty<T> extends Disposable {
+public interface Property<T> extends Disposable {
   void compute();
 
   @Nullable
@@ -37,11 +37,11 @@ public interface LiveProperty<T> extends Disposable {
    */
   long getTimeStamp();
 
-  void addPropertyListener(LivePropertyListener listener);
+  void addPropertyListener(PropertyListener listener);
 
-  void removePropertyListener(LivePropertyListener listener);
+  void removePropertyListener(PropertyListener listener);
 
-  interface LivePropertyListener {
+  interface PropertyListener {
     void propertyChanged();
 
     default void computationFailed(Exception e) {

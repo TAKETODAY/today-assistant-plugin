@@ -146,7 +146,7 @@ abstract class ConditionalOnEndpointBase implements ConditionalOnJamElement {
       PsiAnnotationMemberValue psiElement = context.getPsiElement();
       if ($assertionsDisabled || psiElement != null) {
         Module module = ObjectUtils.chooseNotNull(this.myModule, ModuleUtilCore.findModuleForPsiElement(psiElement));
-        return InfraApplicationMetaConfigKeyManager.getInstance().findCanonicalApplicationMetaConfigKey(module, getConfigurationKey(s));
+        return InfraApplicationMetaConfigKeyManager.of().findCanonicalApplicationMetaConfigKey(module, getConfigurationKey(s));
       }
       throw new AssertionError();
     }
@@ -166,7 +166,7 @@ abstract class ConditionalOnEndpointBase implements ConditionalOnJamElement {
     }
 
     public Collection<MetaConfigKey> getVariants(JamStringAttributeElement<MetaConfigKey> context) {
-      List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(context.getPsiElement());
+      List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(context.getPsiElement());
       SmartList smartList = new SmartList();
       for (MetaConfigKey key : allKeys) {
         if (key.isAccessType(MetaConfigKey.AccessType.NORMAL)) {

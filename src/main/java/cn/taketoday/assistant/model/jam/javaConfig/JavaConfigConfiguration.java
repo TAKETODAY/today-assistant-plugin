@@ -54,4 +54,5 @@ public class JavaConfigConfiguration extends InfraJavaConfiguration {
   public List<? extends InfraJavaExternalBean> getExternalBeans() {
     return EXTERNAL_BEANS_QUERY.findChildren(PsiElementRef.real(getPsiElement()));
   }
+
 }

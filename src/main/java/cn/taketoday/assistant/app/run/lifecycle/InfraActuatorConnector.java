@@ -28,18 +28,21 @@ import javax.management.InstanceNotFoundException;
 import javax.management.ObjectInstance;
 
 class InfraActuatorConnector extends InfraJmxConnector {
-  static final String DEFAULT_DOMAIN = "cn.taketoday.framework";
-  private static final String SPRING_BOOT_ENDPOINT_OBJECT_NAME = "%s:type=Endpoint,name=%s,*";
+  static final String DEFAULT_DOMAIN = "cn.taketoday.app";
+  private static final String ENDPOINT_OBJECT_NAME = "%s:type=Endpoint,name=%s,*";
   private static final String CONTEXT_KEY_PROPERTY = "context";
   private static final String DATA_ATTR = "Data";
 
   InfraActuatorConnector(String serviceUrl, String domain, String beanName) {
-    super(serviceUrl, String.format(SPRING_BOOT_ENDPOINT_OBJECT_NAME, domain, beanName));
+    super(serviceUrl, String.format(ENDPOINT_OBJECT_NAME, domain, beanName));
   }
 
   Object getData(String operationName) throws Exception {
     Set<ObjectInstance> objectInstances = getJmxConnection().queryMBeans(getObjectName(), null);
-    ObjectInstance objectInstance = objectInstances.stream().filter(o -> o.getObjectName().getKeyProperty(CONTEXT_KEY_PROPERTY) == null).findFirst().orElse(null);
+    ObjectInstance objectInstance = objectInstances.stream()
+            .filter(o -> o.getObjectName().getKeyProperty(CONTEXT_KEY_PROPERTY) == null)
+            .findFirst()
+            .orElse(null);
     if (objectInstance == null) {
       throw new InstanceNotFoundException(getObjectName().toString());
     }

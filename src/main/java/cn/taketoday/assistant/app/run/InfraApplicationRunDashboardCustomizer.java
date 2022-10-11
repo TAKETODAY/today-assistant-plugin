@@ -65,12 +65,12 @@ final class InfraApplicationRunDashboardCustomizer extends RunDashboardCustomize
   private static final String DEVTOOLS_TAIL = " [devtools]";
 
   public boolean isApplicable(RunnerAndConfigurationSettings settings, @Nullable RunContentDescriptor descriptor) {
-    return settings.getConfiguration() instanceof InfraApplicationRunConfigurationBase;
+    return settings.getConfiguration() instanceof InfraApplicationRunConfig;
   }
 
   public boolean updatePresentation(PresentationData presentation, RunDashboardRunConfigurationNode node) {
     RunConfiguration configuration = node.getConfigurationSettings().getConfiguration();
-    if (!(configuration instanceof InfraApplicationRunConfigurationBase configurationBase)) {
+    if (!(configuration instanceof InfraApplicationRunConfig configurationBase)) {
       return false;
     }
     if (!DumbService.getInstance(node.getProject()).isDumb()) {
@@ -116,7 +116,7 @@ final class InfraApplicationRunDashboardCustomizer extends RunDashboardCustomize
     return true;
   }
 
-  private static boolean hasDevtools(InfraApplicationRunConfigurationBase springBootRunConfiguration) {
+  private static boolean hasDevtools(InfraApplicationRunConfig springBootRunConfiguration) {
     Module module = springBootRunConfiguration.getModule();
     if (module == null || module.isDisposed()) {
       return false;
@@ -140,9 +140,9 @@ final class InfraApplicationRunDashboardCustomizer extends RunDashboardCustomize
 
   private static class ApplicationLinkListener implements Runnable {
     final InfraApplicationInfo myLinkInfo;
-    final InfraApplicationRunConfigurationBase myConfiguration;
+    final InfraApplicationRunConfig myConfiguration;
 
-    ApplicationLinkListener(InfraApplicationInfo linkInfo, InfraApplicationRunConfigurationBase configuration) {
+    ApplicationLinkListener(InfraApplicationInfo linkInfo, InfraApplicationRunConfig configuration) {
       this.myLinkInfo = linkInfo;
       this.myConfiguration = configuration;
     }

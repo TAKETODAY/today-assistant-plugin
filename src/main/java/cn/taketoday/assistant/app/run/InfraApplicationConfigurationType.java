@@ -39,54 +39,64 @@ public final class InfraApplicationConfigurationType implements ConfigurationTyp
     return ConfigurationTypeUtil.findConfigurationType(InfraApplicationConfigurationType.class);
   }
 
-  private final ConfigurationFactory myFactory = new ConfigurationFactory(this) {
+  private final ConfigurationFactory factory = new ConfigurationFactory(this) {
 
+    @Override
     public RunConfiguration createTemplateConfiguration(Project project) {
       return new InfraApplicationRunConfiguration(project, this, "");
     }
 
+    @Override
     public boolean isApplicable(Project project) {
       return InfraLibraryUtil.hasFrameworkLibrary(project);
     }
 
+    @Override
     public String getId() {
       return "Infra";
     }
 
+    @Override
     public boolean isEditableInDumbMode() {
       return true;
     }
 
+    @Override
     public Class<? extends BaseState> getOptionsClass() {
       return InfraApplicationRunConfigurationOptions.class;
     }
   };
 
+  @Override
   public String getDisplayName() {
     return InfraRunBundle.message("infra.run.config.type.name");
   }
 
+  @Override
   public String getConfigurationTypeDescription() {
     return InfraRunBundle.message("infra.run.config.type.description");
   }
 
+  @Override
   public Icon getIcon() {
     return Icons.Today;
   }
 
+  @Override
   public String getId() {
     return ID;
   }
 
+  @Override
   public ConfigurationFactory[] getConfigurationFactories() {
-    return new ConfigurationFactory[] { this.myFactory };
+    return new ConfigurationFactory[] { this.factory };
   }
-
+  @Override
   public String getHelpTopic() {
     return "reference.dialogs.rundebug.InfraApplicationConfigurationType";
   }
 
-  public ConfigurationFactory getDefaultConfigurationFactory() {
-    return this.myFactory;
+  public ConfigurationFactory getConfigurationFactory() {
+    return this.factory;
   }
 }

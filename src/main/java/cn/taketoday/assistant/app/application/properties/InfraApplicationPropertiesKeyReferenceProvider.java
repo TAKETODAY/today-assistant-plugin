@@ -73,7 +73,7 @@ class InfraApplicationPropertiesKeyReferenceProvider extends PsiReferenceProvide
     private final PropertyImpl myProperty;
 
     private PropertyKeyMetaConfigKeyReference(PsiElement element, PropertyImpl property) {
-      super(InfraApplicationMetaConfigKeyManager.getInstance(), element, property.getName());
+      super(InfraApplicationMetaConfigKeyManager.of(), element, property.getName());
       this.myProperty = property;
     }
 
@@ -104,7 +104,7 @@ class InfraApplicationPropertiesKeyReferenceProvider extends PsiReferenceProvide
           return offset;
         }
       };
-      List<? extends MetaConfigKey> configKeys = InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(getElement());
+      List<? extends MetaConfigKey> configKeys = InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(getElement());
       List<LookupElement> result = new ArrayList<>(configKeys.size());
       for (MetaConfigKey configKey : configKeys) {
         String name = configKey.getName();

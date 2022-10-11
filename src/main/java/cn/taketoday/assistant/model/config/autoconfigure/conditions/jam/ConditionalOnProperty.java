@@ -203,7 +203,7 @@ public class ConditionalOnProperty extends JamBaseElement<PsiModifierListOwner> 
       }
       PsiAnnotationMemberValue psiElement = context.getPsiElement();
       Module module = ObjectUtils.chooseNotNull(this.myModule, ModuleUtilCore.findModuleForPsiElement(psiElement));
-      MetaConfigKey key = InfraApplicationMetaConfigKeyManager.getInstance().findCanonicalApplicationMetaConfigKey(module, prefix + s);
+      MetaConfigKey key = InfraApplicationMetaConfigKeyManager.of().findCanonicalApplicationMetaConfigKey(module, prefix + s);
       if (!isValidKey(key)) {
         return null;
       }
@@ -234,8 +234,8 @@ public class ConditionalOnProperty extends JamBaseElement<PsiModifierListOwner> 
       String prefix = StringUtil.notNullize(getPrefixValueForName(context));
       PsiAnnotationMemberValue psiElement = context.getPsiElement();
       if (psiElement != null && (module = ModuleUtilCore.findModuleForPsiElement(psiElement)) != null) {
-        List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(module);
-        MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.getInstance().getConfigKeyNameBinder(module);
+        List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(module);
+        MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.of().getConfigKeyNameBinder(module);
         SmartList smartList = new SmartList();
         for (MetaConfigKey key : allKeys) {
           if (isValidKey(key) && (prefix.isEmpty() || binder.matchesPrefix(key, prefix))) {
@@ -271,7 +271,7 @@ public class ConditionalOnProperty extends JamBaseElement<PsiModifierListOwner> 
 
     public Collection<String> getVariants(JamStringAttributeElement<String> context) {
       int lastDot;
-      List<? extends MetaConfigKey> keys = InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(context.getPsiElement());
+      List<? extends MetaConfigKey> keys = InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(context.getPsiElement());
       Set<String> prefixes = new LinkedHashSet<>();
       for (MetaConfigKey key : keys) {
         if (isValidKey(key) && (lastDot = key.getName().lastIndexOf(46)) != -1) {

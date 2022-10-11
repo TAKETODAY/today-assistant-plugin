@@ -51,12 +51,12 @@ import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMappin
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMappingsModel;
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.impl.LiveRequestMappingsParser;
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.tab.RequestMappingsTab;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.CodeAnalyzerLivePropertyListener;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
-import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationServerConfiguration;
-import cn.taketoday.assistant.app.run.lifecycle.LiveProperty;
+import cn.taketoday.assistant.app.run.lifecycle.InfraWebServerConfig;
+import cn.taketoday.assistant.app.run.lifecycle.Property;
 import cn.taketoday.assistant.app.run.lifecycle.tabs.EndpointTab;
 import cn.taketoday.lang.Nullable;
 
@@ -74,14 +74,14 @@ public final class RequestMappingsEndpoint extends Endpoint<LiveRequestMappingsM
   }
 
   @Override
-  public EndpointTab<LiveRequestMappingsModel> createEndpointTab(InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  public EndpointTab<LiveRequestMappingsModel> createEndpointTab(InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     return new RequestMappingsTab(this, runConfiguration, processHandler);
   }
 
   @Override
   public void infoCreated(Project project, ProcessHandler processHandler, InfraApplicationInfo info) {
-    LiveProperty<LiveRequestMappingsModel> endpointData = info.getEndpointData(this);
-    LiveProperty.LivePropertyListener analyzerRestarter = new CodeAnalyzerLivePropertyListener(project);
+    Property<LiveRequestMappingsModel> endpointData = info.getEndpointData(this);
+    Property.PropertyListener analyzerRestarter = new CodeAnalyzerLivePropertyListener(project);
     endpointData.addPropertyListener(analyzerRestarter);
     info.getApplicationUrl().addPropertyListener(analyzerRestarter);
     RequestMappingLinkListener linkListener = new RequestMappingLinkListener(project, processHandler, info);
@@ -100,7 +100,7 @@ public final class RequestMappingsEndpoint extends Endpoint<LiveRequestMappingsM
     return Endpoint.EP_NAME.findExtension(RequestMappingsEndpoint.class);
   }
 
-  private class RequestMappingLinkListener implements LiveProperty.LivePropertyListener {
+  private class RequestMappingLinkListener implements Property.PropertyListener {
     private final Project myProject;
     private final ProcessHandler myProcessHandler;
     private final InfraApplicationInfo myInfo;
@@ -131,8 +131,8 @@ public final class RequestMappingsEndpoint extends Endpoint<LiveRequestMappingsM
           }
         };
 
-        InfraApplicationServerConfiguration configuration = myInfo.getServerConfiguration().getValue();
-        String servletPath = configuration == null ? null : configuration.getServletPath();
+        InfraWebServerConfig configuration = myInfo.getServerConfig().getValue();
+        String servletPath = configuration == null ? null : configuration.servletPath();
         AppUIExecutor.onUiThread().submit(() -> {
           if (!disposed.value(null)) {
             LiveRequestMappingsModel model = myInfo.getEndpointData(RequestMappingsEndpoint.this).getValue();

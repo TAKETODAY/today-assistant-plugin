@@ -132,7 +132,7 @@ class InfraApplicationMetaConfigKeyImpl implements MetaConfigKey {
   }
 
   public MetaConfigKeyManager getManager() {
-    return InfraApplicationMetaConfigKeyManager.getInstance();
+    return InfraApplicationMetaConfigKeyManager.of();
   }
 
   @Nullable

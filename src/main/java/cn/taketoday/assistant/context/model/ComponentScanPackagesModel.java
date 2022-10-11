@@ -59,27 +59,28 @@ import cn.taketoday.assistant.service.InfraJamService;
 import cn.taketoday.lang.Nullable;
 
 public class ComponentScanPackagesModel extends CacheableCommonInfraModel {
-  private final NotNullLazyValue<? extends Set<PsiPackage>> myPackages;
-  private volatile Collection<BeanPointer<?>> myScannedBeans;
-  private final Map<InfraQualifier, List<BeanPointer<?>>> myLocalBeansByQualifier;
 
-  private final Module myModule;
+  private final Module module;
+  private volatile Collection<BeanPointer<?>> scannedBeans;
+  private final NotNullLazyValue<? extends Set<PsiPackage>> packages;
+  private final Map<InfraQualifier, List<BeanPointer<?>>> localBeansByQualifier;
+
   private static boolean ourAllowDefaultPackageForTests;
 
   public ComponentScanPackagesModel(NotNullLazyValue<? extends Set<PsiPackage>> packages, Module module) {
-    this.myPackages = packages;
-    this.myModule = module;
-    this.myLocalBeansByQualifier = ConcurrentFactoryMap.createMap(key -> findLocalBeansByQualifier(this, key));
+    this.module = module;
+    this.packages = packages;
+    this.localBeansByQualifier = ConcurrentFactoryMap.createMap(key -> findLocalBeansByQualifier(this, key));
   }
 
   @Override
   public Collection<BeanPointer<?>> getLocalBeans() {
-    if (this.myScannedBeans == null) {
+    if (this.scannedBeans == null) {
       Collection<BeanPointer<?>> calculateLocalBeans = calculateLocalBeans();
-      this.myScannedBeans = calculateLocalBeans;
+      this.scannedBeans = calculateLocalBeans;
       return calculateLocalBeans;
     }
-    return this.myScannedBeans;
+    return this.scannedBeans;
   }
 
   public final Collection<BeanPointer<?>> calculateLocalBeans() {
@@ -90,23 +91,23 @@ public class ComponentScanPackagesModel extends CacheableCommonInfraModel {
       if (pointerBean instanceof InfraStereotypeElement stereotypeElement) {
         PsiClass psiClass = stereotypeElement.getPsiElement();
         if (JamService.getJamService(psiClass.getProject()).getJamElement(JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY, psiClass) == null) {
-          for (InfraJavaBean springJavaBean : stereotypeElement.getBeans()) {
-            javaBeans.add(springJavaBean);
-            if (springJavaBean instanceof ImplicitlyRegisteredBeansProvider) {
-              javaBeans.addAll(((ImplicitlyRegisteredBeansProvider) springJavaBean).getImplicitlyRegistered());
+          for (InfraJavaBean javaBean : stereotypeElement.getBeans()) {
+            javaBeans.add(javaBean);
+            if (javaBean instanceof ImplicitlyRegisteredBeansProvider provider) {
+              javaBeans.addAll(provider.getImplicitlyRegistered());
             }
           }
         }
       }
     }
-    Set<BeanPointer<?>> beans = new LinkedHashSet<>();
+    LinkedHashSet<BeanPointer<?>> beans = new LinkedHashSet<>();
     beans.addAll(pointers);
     beans.addAll(InfraBeanService.of().mapBeans(javaBeans));
     return beans;
   }
 
   protected Collection<BeanPointer<?>> calculateScannedBeans() {
-    return getScannedComponents(this.myPackages.getValue(), myModule, getActiveProfiles());
+    return getScannedComponents(packages.getValue(), module, getActiveProfiles());
   }
 
   public static Collection<BeanPointer<?>> getScannedComponents(Set<PsiPackage> packages, Module module, @Nullable Set<String> profiles) {
@@ -170,7 +171,7 @@ public class ComponentScanPackagesModel extends CacheableCommonInfraModel {
 
   @Override
   public Module getModule() {
-    return myModule;
+    return module;
   }
 
   @Override
@@ -180,6 +181,6 @@ public class ComponentScanPackagesModel extends CacheableCommonInfraModel {
 
   @Override
   public List<BeanPointer<?>> findQualified(InfraQualifier qualifier) {
-    return this.myLocalBeansByQualifier.get(qualifier);
+    return this.localBeansByQualifier.get(qualifier);
   }
 }

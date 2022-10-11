@@ -34,7 +34,7 @@ import cn.taketoday.lang.Nullable;
 public class InfraApplicationPropertiesDocumentationProvider extends ConfigKeyDocumentationProviderBase {
 
   protected MetaConfigKeyManager getConfigManager() {
-    return InfraApplicationMetaConfigKeyManager.getInstance();
+    return InfraApplicationMetaConfigKeyManager.of();
   }
 
   @Nullable

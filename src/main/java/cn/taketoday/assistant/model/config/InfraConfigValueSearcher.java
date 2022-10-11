@@ -30,50 +30,51 @@ import com.intellij.util.Processor;
 import com.intellij.util.containers.ContainerUtil;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import cn.taketoday.assistant.app.InfraConfigurationFileService;
 import cn.taketoday.assistant.app.InfraModelConfigFileContributor;
 import cn.taketoday.assistant.app.application.metadata.InfraApplicationMetaConfigKeyManager;
+import cn.taketoday.assistant.model.InfraProfile;
 import cn.taketoday.lang.Nullable;
-import kotlin.jvm.internal.DefaultConstructorMarker;
 
 public final class InfraConfigValueSearcher {
-  private final Module myModule;
-  private final boolean myIncludeTests;
-  private final String myConfigKey;
-  private final boolean myCheckRelaxedNames;
-  private final Set<String> myActiveProfiles;
-  private final String myKeyIndex;
-  private final String myKeyProperty;
 
-  public static InfraConfigValueSearcher productionForAllProfiles(Module module, String configKey) {
-    return new InfraConfigValueSearcher(module, false, configKey, false, ConfigurationValueSearchParams.PROCESS_ALL_VALUES, null, null, 106, null);
+  private final Module module;
+  private final boolean includeTests;
+  private final String configKey;
+  private final boolean checkRelaxedNames;
+  private final Set<String> activeProfiles;
+  private final String keyIndex;
+  private final String keyProperty;
+
+  public static InfraConfigValueSearcher productionForAllProfiles(
+          Module module, String configKey) {
+    return new InfraConfigValueSearcher(module, false, configKey,
+            false, ConfigurationValueSearchParams.PROCESS_ALL_VALUES, null, null);
   }
 
-  public static InfraConfigValueSearcher productionForProfiles(Module module, String configKey, @Nullable Set<String> set) {
-    return new InfraConfigValueSearcher(module, false, configKey, false, set, null, null, 106, null);
+  public static InfraConfigValueSearcher productionForProfiles(
+          Module module, String configKey, @Nullable Set<String> set) {
+    return new InfraConfigValueSearcher(module, false, configKey, false, set, null, null);
   }
 
-  public static InfraConfigValueSearcher productionForProfiles(Module module, String configKey, @Nullable Set<String> set, @Nullable String keyIndex, @Nullable String keyProperty) {
-    return new InfraConfigValueSearcher(module, false, configKey, false, set, keyIndex, keyProperty, 10, null);
+  public static InfraConfigValueSearcher productionForProfiles(
+          Module module, String configKey, @Nullable Set<String> set,
+          @Nullable String keyIndex, @Nullable String keyProperty) {
+    return new InfraConfigValueSearcher(module, false, configKey, false, set, keyIndex, keyProperty);
   }
 
-  public InfraConfigValueSearcher(Module myModule, boolean myIncludeTests, String myConfigKey,
-          boolean myCheckRelaxedNames, @Nullable Set<String> set, @Nullable String myKeyIndex,
-          @Nullable String myKeyProperty) {
-    this.myModule = myModule;
-    this.myIncludeTests = myIncludeTests;
-    this.myConfigKey = myConfigKey;
-    this.myCheckRelaxedNames = myCheckRelaxedNames;
-    this.myActiveProfiles = set;
-    this.myKeyIndex = myKeyIndex;
-    this.myKeyProperty = myKeyProperty;
-  }
-
-  public InfraConfigValueSearcher(Module module, boolean z, String str, boolean z2, Set set, String str2, String str3, int i, DefaultConstructorMarker defaultConstructorMarker) {
-    this(module, (i & 2) == 0 && z, str, (i & 8) != 0 || z2, (i & 16) != 0 ? null : set, (i & 32) != 0 ? null : str2, (i & 64) != 0 ? null : str3);
+  public InfraConfigValueSearcher(Module module, boolean includeTests, String configKey,
+          boolean checkRelaxedNames, @Nullable Set<String> set, @Nullable String keyIndex,
+          @Nullable String keyProperty) {
+    this.module = module;
+    this.includeTests = includeTests;
+    this.configKey = configKey;
+    this.checkRelaxedNames = checkRelaxedNames;
+    this.activeProfiles = set;
+    this.keyIndex = keyIndex;
+    this.keyProperty = keyProperty;
   }
 
   @Nullable
@@ -81,9 +82,9 @@ public final class InfraConfigValueSearcher {
     if (set == null) {
       return null;
     }
-    if (set.contains("_DEFAULT_TEST_PROFILE_NAME_")) {
-      LinkedHashSet result = new LinkedHashSet(set);
-      result.remove("_DEFAULT_TEST_PROFILE_NAME_");
+    if (set.contains(InfraProfile.DEFAULT_TEST_PROFILE_NAME)) {
+      LinkedHashSet<String> result = new LinkedHashSet<>(set);
+      result.remove(InfraProfile.DEFAULT_TEST_PROFILE_NAME);
       return result;
     }
     return set;
@@ -91,23 +92,21 @@ public final class InfraConfigValueSearcher {
 
   @Nullable
   public String findValueText() {
-    Ref valueText = Ref.create();
-    Processor<ConfigurationValueResult> findValueTextProcessor = new Processor<>() {
-      public boolean process(ConfigurationValueResult result) {
-        String text = result.getValueText();
-        if (text != null) {
-          valueText.set(text);
-          return false;
-        }
-        return true;
+    Ref<String> valueText = Ref.create();
+    Processor<ConfigurationValueResult> findValueTextProcessor = result -> {
+      String text = result.getValueText();
+      if (text != null) {
+        valueText.set(text);
+        return false;
       }
+      return true;
     };
     process(findValueTextProcessor);
-    return (String) valueText.get();
+    return valueText.get();
   }
 
   public boolean process(Processor<ConfigurationValueResult> processor) {
-    MetaConfigKey metaConfigKey = InfraApplicationMetaConfigKeyManager.getInstance().findApplicationMetaConfigKey(this.myModule, this.myConfigKey);
+    MetaConfigKey metaConfigKey = InfraApplicationMetaConfigKeyManager.of().findApplicationMetaConfigKey(module, configKey);
     if (metaConfigKey == null) {
       return true;
     }
@@ -115,23 +114,20 @@ public final class InfraConfigValueSearcher {
     if (deprecation.getLevel() == MetaConfigKey.Deprecation.DeprecationLevel.ERROR) {
       return true;
     }
-    PsiManager psiManager = PsiManager.getInstance(this.myModule.getProject());
-    Set activeProfiles = clearDefaultTestProfile(this.myActiveProfiles);
-    ConfigurationValueSearchParams params = new ConfigurationValueSearchParams(this.myModule, this.myCheckRelaxedNames, activeProfiles,
-            metaConfigKey, this.myKeyIndex, this.myKeyProperty, false, null, 192, null);
+    PsiManager psiManager = PsiManager.getInstance(module.getProject());
+    Set<String> activeProfiles = clearDefaultTestProfile(this.activeProfiles);
+    var params = new ConfigurationValueSearchParams(module, checkRelaxedNames,
+            activeProfiles, metaConfigKey, keyIndex, keyProperty, false, null);
 
-    for (VirtualFile configFile : InfraConfigurationFileService.of().findConfigFiles(this.myModule, this.myIncludeTests)) {
-      InfraModelConfigFileContributor contributor = InfraModelConfigFileContributor.getContributor(configFile);
+    for (VirtualFile configFile : InfraConfigurationFileService.of().findConfigFiles(module, includeTests)) {
+      var contributor = InfraModelConfigFileContributor.getContributor(configFile);
       if (contributor != null) {
         PsiFile configPsiFile = psiManager.findFile(configFile);
         if (configPsiFile != null) {
-          List result = contributor.findConfigurationValues(configPsiFile, params);
+          var result = contributor.findConfigurationValues(configPsiFile, params);
           if (!ContainerUtil.process(result, processor)) {
             return false;
           }
-        }
-        else {
-          continue;
         }
       }
     }

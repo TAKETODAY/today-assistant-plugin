@@ -44,6 +44,7 @@ import cn.taketoday.assistant.context.model.graph.LocalModelDependency;
 import cn.taketoday.assistant.context.model.graph.LocalModelDependencyType;
 import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.facet.beans.CustomSetting;
+import cn.taketoday.assistant.model.InfraProfile;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionalOnEvaluationContext;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionalOnEvaluationContextBase;
 import cn.taketoday.assistant.util.InfraUtils;
@@ -94,7 +95,7 @@ public abstract class AbstractAutoConfigDependentModelsProvider extends LocalAnn
   }
 
   static NotNullLazyValue<List<VirtualFile>> createConfigFilesCache(Module module, Set<String> activeProfiles) {
-    boolean includeTestScope = activeProfiles != null && activeProfiles.contains("_DEFAULT_TEST_PROFILE_NAME_");
+    boolean includeTestScope = activeProfiles != null && activeProfiles.contains(InfraProfile.DEFAULT_TEST_PROFILE_NAME);
     return NotNullLazyValue.lazy(() -> {
       return InfraConfigurationFileService.of().findConfigFiles(module, includeTestScope);
     });

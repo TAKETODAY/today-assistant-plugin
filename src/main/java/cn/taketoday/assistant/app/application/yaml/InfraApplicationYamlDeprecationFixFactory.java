@@ -61,7 +61,7 @@ final class InfraApplicationYamlDeprecationFixFactory {
   }
 
   private static boolean replacementKeyExists(PsiElement keyElement, String replacement) {
-    ConfigYamlAccessor accessor = new ConfigYamlAccessor(keyElement, InfraApplicationMetaConfigKeyManager.getInstance());
+    ConfigYamlAccessor accessor = new ConfigYamlAccessor(keyElement, InfraApplicationMetaConfigKeyManager.of());
     YAMLKeyValue existingReplacement = accessor.findExistingKey(replacement);
     return existingReplacement != null;
   }
@@ -91,7 +91,7 @@ final class InfraApplicationYamlDeprecationFixFactory {
       }
       String existingKeyName = ConfigYamlUtils.getQualifiedConfigKeyName(existingKey);
       Module module = ModuleUtilCore.findModuleForPsiElement(startElement);
-      InfraApplicationMetaConfigKeyManager metaConfigKeyManager = InfraApplicationMetaConfigKeyManager.getInstance();
+      InfraApplicationMetaConfigKeyManager metaConfigKeyManager = InfraApplicationMetaConfigKeyManager.of();
       MetaConfigKeyManager.ConfigKeyNameBinder binder = metaConfigKeyManager.getConfigKeyNameBinder(module);
       if (!binder.bindsTo(this.myConfigKey, existingKeyName)) {
         return;

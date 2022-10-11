@@ -29,41 +29,45 @@ import cn.taketoday.lang.Nullable;
 
 @Presentation(typeName = InfraConfigKeyDeclarationPsiElement.CONFIGURATION_KEY)
 public final class InfraConfigKeyDeclarationPsiElement extends ConfigKeyDeclarationPsiElement {
-  public static final String CONFIGURATION_KEY = "Infra Configuration Key";
-  private final PsiElement myNavigationParent;
-  private final String myLibraryName;
-  private final PsiElement myNavigationTarget;
-  private final String myConfigKeyName;
-  private final String mySourceTypeText;
 
-  InfraConfigKeyDeclarationPsiElement(String libraryName, PsiElement navigationParent, PsiElement navigationTarget, String configKeyName, String sourceTypeText,
-          @Nullable PsiType type) {
+  public static final String CONFIGURATION_KEY = "Infra Configuration Key";
+
+  private final String libraryName;
+  private final String configKeyName;
+  private final String sourceTypeText;
+
+  private final PsiElement navigationParent;
+  private final PsiElement navigationTarget;
+
+  InfraConfigKeyDeclarationPsiElement(String libraryName,
+          PsiElement navigationParent, PsiElement navigationTarget,
+          String configKeyName, String sourceTypeText, @Nullable PsiType type) {
     super(type);
-    this.myNavigationParent = navigationParent;
-    this.myLibraryName = libraryName;
-    this.myNavigationTarget = navigationTarget;
-    this.myConfigKeyName = configKeyName;
-    this.mySourceTypeText = sourceTypeText;
+    this.navigationParent = navigationParent;
+    this.libraryName = libraryName;
+    this.navigationTarget = navigationTarget;
+    this.configKeyName = configKeyName;
+    this.sourceTypeText = sourceTypeText;
   }
 
   public PsiElement getParent() {
-    return this.myNavigationParent;
+    return this.navigationParent;
   }
 
   public PsiElement getNavigationElement() {
-    return this.myNavigationTarget;
+    return this.navigationTarget;
   }
 
   public String getPresentableText() {
-    return this.mySourceTypeText;
+    return this.sourceTypeText;
   }
 
   public String getName() {
-    return this.myConfigKeyName;
+    return this.configKeyName;
   }
 
   @Nullable
   public String getLocationString() {
-    return this.myLibraryName;
+    return this.libraryName;
   }
 }

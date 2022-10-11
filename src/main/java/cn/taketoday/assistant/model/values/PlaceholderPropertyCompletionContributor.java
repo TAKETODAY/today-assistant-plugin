@@ -108,8 +108,8 @@ public class PlaceholderPropertyCompletionContributor extends CompletionContribu
     PlaceholderPropertyReference.processCommonModel(propertyReference.getElement().getProject(), processor, springModel);
     LookupElement[] lookupElements = PropertiesCompletionContributor.getVariants(variants);
     SmartList<LookupElement> smartList = new SmartList<>();
-    for (InfraPlaceholderReferenceResolver placeholderReferenceResolver : InfraPlaceholderReferenceResolver.EP_NAME.getExtensionList()) {
-      smartList.addAll(placeholderReferenceResolver.getVariants(propertyReference));
+    for (InfraPlaceholderReferenceResolver resolver : InfraPlaceholderReferenceResolver.array()) {
+      smartList.addAll(resolver.getVariants(propertyReference));
     }
     Set<PsiElement> overrideVariants = ContainerUtil.map2Set(smartList, LookupElement::getPsiElement);
     List<LookupElement> filteredElements = ContainerUtil.filter(lookupElements, element -> {

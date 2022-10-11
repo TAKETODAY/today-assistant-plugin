@@ -23,7 +23,7 @@ package cn.taketoday.assistant.app.run.lifecycle.beans;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.CodeAnalyzerLivePropertyListener;
 import cn.taketoday.assistant.app.run.lifecycle.Endpoint;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
@@ -47,8 +47,7 @@ public final class BeansEndpoint extends Endpoint<LiveBeansModel> {
   }
 
   @Override
-
-  public EndpointTab<LiveBeansModel> createEndpointTab(InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+  public EndpointTab<LiveBeansModel> createEndpointTab(InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     return new LiveBeansTab(this, runConfiguration, processHandler);
   }
 
@@ -57,7 +56,7 @@ public final class BeansEndpoint extends Endpoint<LiveBeansModel> {
     info.getEndpointData(this).addPropertyListener(new CodeAnalyzerLivePropertyListener(project));
   }
 
-  public static Endpoint<LiveBeansModel> getInstance() {
+  public static Endpoint<LiveBeansModel> of() {
     return Endpoint.EP_NAME.findExtension(BeansEndpoint.class);
   }
 }

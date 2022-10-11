@@ -33,15 +33,22 @@ import cn.taketoday.assistant.app.run.lifecycle.beans.model.LiveBeansModel;
 import cn.taketoday.lang.Nullable;
 
 import static cn.taketoday.assistant.app.run.InfraRunBundle.message;
+import static cn.taketoday.assistant.app.run.lifecycle.InfraApplicationConnector.ENDPOINTS_ENABLED_PROPERTY;
+import static cn.taketoday.assistant.app.run.lifecycle.InfraApplicationConnector.ENDPOINTS_ID_ENABLED_PROPERTY;
+import static cn.taketoday.assistant.app.run.lifecycle.InfraApplicationConnector.ENDPOINTS_JMX_DOMAIN_PROPERTY;
+import static cn.taketoday.assistant.app.run.lifecycle.InfraApplicationConnector.ENDPOINTS_JMX_EXPOSURE_EXCLUDE_PROPERTY_2X;
+import static cn.taketoday.assistant.app.run.lifecycle.InfraApplicationConnector.ENDPOINTS_JMX_EXPOSURE_INCLUDE_PROPERTY_2X;
+import static cn.taketoday.assistant.app.run.lifecycle.InfraApplicationConnector.JMX_DEFAULT_DOMAIN_PROPERTY;
 
-class EndpointLiveProperty<T> extends AsyncApplicationLiveProperty<T> {
+class EndpointProperty<T> extends AsyncApplicationProperty<T> {
   private static final String ENDPOINT_WILDCARD = "*";
   private final Endpoint<T> endpoint;
-  private final LiveProperty<? extends LiveBeansModel> liveBeansModel;
+  private final Property<? extends LiveBeansModel> liveBeansModel;
 
-  EndpointLiveProperty(
-          Endpoint<T> endpoint, LiveProperty<InfraModuleDescriptor> moduleDescriptor,
-          LiveProperty<String> serviceUrl, LifecycleErrorHandler errorHandler, Disposable parent, LiveProperty<? extends LiveBeansModel> liveBeansModel) {
+  EndpointProperty(
+          Endpoint<T> endpoint, Property<InfraModuleDescriptor> moduleDescriptor,
+          Property<String> serviceUrl, LifecycleErrorHandler errorHandler,
+          Disposable parent, Property<? extends LiveBeansModel> liveBeansModel) {
     super(moduleDescriptor, serviceUrl, errorHandler, parent);
     this.endpoint = endpoint;
     this.liveBeansModel = liveBeansModel;
@@ -50,42 +57,46 @@ class EndpointLiveProperty<T> extends AsyncApplicationLiveProperty<T> {
   @Override
   public T doCompute() throws LifecycleException {
     InfraModuleDescriptor moduleDescriptor = getModuleDescriptor();
-    if (!moduleDescriptor.isActuatorsEnabled() || !moduleDescriptor.isEndpointAvailable(this.endpoint)) {
+    if (!moduleDescriptor.isActuatorsEnabled() || !moduleDescriptor.isEndpointAvailable(endpoint)) {
       return null;
     }
-    String endpointDomain = "cn.taketoday";
+    String endpointDomain = InfraActuatorConnector.DEFAULT_DOMAIN;
     String endpointDisabledMessage = null;
     try {
       InfraApplicationConnector connector = getApplicationConnector();
       boolean endpointsJmxEnabled = true;
-      Set<String> exposed = parseEndpointsList(connector.getProperty("management.endpoints.jmx.exposure.include"));
-      if (exposed.isEmpty() || exposed.contains(ENDPOINT_WILDCARD) || exposed.contains(this.endpoint.getId())) {
-        Set<String> excluded = parseEndpointsList(connector.getProperty("management.endpoints.jmx.exposure.exclude"));
-        if (!excluded.isEmpty() && (excluded.contains(ENDPOINT_WILDCARD) || excluded.contains(this.endpoint.getId()))) {
+
+      Set<String> exposed = parseEndpointsList(connector.getProperty(ENDPOINTS_JMX_EXPOSURE_INCLUDE_PROPERTY_2X));
+      if (exposed.isEmpty() || exposed.contains(ENDPOINT_WILDCARD) || exposed.contains(endpoint.getId())) {
+        Set<String> excluded = parseEndpointsList(connector.getProperty(ENDPOINTS_JMX_EXPOSURE_EXCLUDE_PROPERTY_2X));
+        if (!excluded.isEmpty() && (excluded.contains(ENDPOINT_WILDCARD) || excluded.contains(endpoint.getId()))) {
           endpointsJmxEnabled = false;
-          endpointDisabledMessage = message("infra.application.endpoints.error.excluded", "management.endpoints.jmx.exposure.exclude");
+          endpointDisabledMessage = message(
+                  "infra.application.endpoints.error.excluded", ENDPOINTS_JMX_EXPOSURE_EXCLUDE_PROPERTY_2X);
         }
       }
       else {
         endpointsJmxEnabled = false;
-        endpointDisabledMessage = message("infra.application.endpoints.error.not.exposed", "management.endpoints.jmx.exposure.include");
+        endpointDisabledMessage = message(
+                "infra.application.endpoints.error.not.exposed", ENDPOINTS_JMX_EXPOSURE_INCLUDE_PROPERTY_2X);
       }
       if (endpointsJmxEnabled) {
-        String endpointsEnabledByDefaultProperty = InfraApplicationConnector.ENDPOINTS_ENABLED_PROPERTY.getKey();
+        String endpointsEnabledByDefaultProperty = ENDPOINTS_ENABLED_PROPERTY.getKey();
         boolean endpointsEnabledByDefault = connector.getBooleanProperty(endpointsEnabledByDefaultProperty, true);
-        String endpointEnabledProperty = String.format(InfraApplicationConnector.ENDPOINTS_ID_ENABLED_PROPERTY.getKey(), this.endpoint.getId());
+        String endpointEnabledProperty = String.format(ENDPOINTS_ID_ENABLED_PROPERTY.getKey(), endpoint.getId());
         boolean endpointEnabled = connector.getBooleanProperty(endpointEnabledProperty, endpointsEnabledByDefault);
         if (!endpointEnabled) {
           String propertyName = endpointsEnabledByDefault ? endpointEnabledProperty : endpointsEnabledByDefaultProperty;
-          endpointDisabledMessage = message("infra.application.endpoints.error.property.is.set.to.false", propertyName);
+          endpointDisabledMessage = message(
+                  "infra.application.endpoints.error.property.is.set.to.false", propertyName);
         }
         else {
-          Object o = connector.getProperty(InfraApplicationConnector.ENDPOINTS_JMX_DOMAIN_PROPERTY);
+          Object o = connector.getProperty(ENDPOINTS_JMX_DOMAIN_PROPERTY);
           if (o instanceof String) {
             endpointDomain = (String) o;
           }
           else {
-            Object o2 = connector.getProperty("jmx.default-domain");
+            Object o2 = connector.getProperty(JMX_DEFAULT_DOMAIN_PROPERTY);
             if (o2 instanceof String) {
               endpointDomain = (String) o2;
             }
@@ -96,21 +107,20 @@ class EndpointLiveProperty<T> extends AsyncApplicationLiveProperty<T> {
         connector.close();
       }
       if (endpointDisabledMessage == null) {
-        LiveBeansModel model = this.liveBeansModel != null ? this.liveBeansModel.getValue() : null;
+        LiveBeansModel model = liveBeansModel != null ? liveBeansModel.getValue() : null;
         if (model != null) {
           List<LiveBean> beans = model.getBeans();
-          if (beans.stream().noneMatch(bean -> {
-            return this.endpoint.getBeanName().equals(bean.getId());
-          })) {
-            endpointDisabledMessage = message("infra.application.endpoints.error.bean.not.initialized", this.endpoint.getBeanName());
+          if (beans.stream().noneMatch(bean -> endpoint.getBeanName().equals(bean.getId()))) {
+            endpointDisabledMessage = message(
+                    "infra.application.endpoints.error.bean.not.initialized", endpoint.getBeanName());
           }
         }
       }
-      String mbeanName = StringUtil.capitalize(this.endpoint.getId());
+      String mbeanName = StringUtil.capitalize(endpoint.getId());
       InfraActuatorConnector actuatorConnector = new InfraActuatorConnector(getServiceUrl(), endpointDomain, mbeanName);
       try {
         try {
-          T parseData = this.endpoint.parseData(actuatorConnector.getData(this.endpoint.getOperationName()));
+          T parseData = endpoint.parseData(actuatorConnector.getData(endpoint.getOperationName()));
           actuatorConnector.close();
           return parseData;
         }
@@ -119,7 +129,7 @@ class EndpointLiveProperty<T> extends AsyncApplicationLiveProperty<T> {
             throw new LifecycleException(null, new InfraApplicationConfigurationException(endpointDisabledMessage));
           }
           throw new LifecycleException(
-                  message("infra.application.endpoints.error.failed.to.retrieve.endpoint.data", this.endpoint.getId(), e.getLocalizedMessage()), e);
+                  message("infra.application.endpoints.error.failed.to.retrieve.endpoint.data", endpoint.getId(), e.getLocalizedMessage()), e);
         }
       }
       catch (Throwable th) {
@@ -133,7 +143,9 @@ class EndpointLiveProperty<T> extends AsyncApplicationLiveProperty<T> {
       }
     }
     catch (Exception e2) {
-      throw new LifecycleException(message("infra.application.endpoints.error.failed.to.retrieve.endpoint.data", this.endpoint.getId(), e2.getLocalizedMessage()), e2);
+      throw new LifecycleException(message(
+              "infra.application.endpoints.error.failed.to.retrieve.endpoint.data",
+              endpoint.getId(), e2.getLocalizedMessage()), e2);
     }
   }
 

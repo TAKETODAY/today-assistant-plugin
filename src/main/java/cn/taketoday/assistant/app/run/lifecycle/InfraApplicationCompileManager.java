@@ -43,6 +43,7 @@ import cn.taketoday.assistant.app.run.update.InfraApplicationUpdatePolicy;
 final class InfraApplicationCompileManager {
 
   InfraApplicationCompileManager(Project project, Disposable parentDisposable) {
+
     ApplicationManager.getApplication().getMessageBus().connect(parentDisposable).subscribe(FrameStateListener.TOPIC, new FrameStateListener() {
       public void onFrameDeactivated() {
         if (!project.isDisposed() && project.isInitialized()

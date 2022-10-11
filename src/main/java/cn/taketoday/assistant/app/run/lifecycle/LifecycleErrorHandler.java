@@ -21,5 +21,6 @@
 package cn.taketoday.assistant.app.run.lifecycle;
 
 interface LifecycleErrorHandler {
-  void handleLifecycleError(String str);
+
+  void handleLifecycleError(String message);
 }

@@ -97,10 +97,10 @@ import cn.taketoday.assistant.app.mvc.lifecycle.mappings.gutter.LiveRequestMappi
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveHandlerMethod;
 import cn.taketoday.assistant.app.mvc.lifecycle.mappings.model.LiveRequestMapping;
 import cn.taketoday.assistant.app.mvc.statistics.InfraMvcUsageTriggerCollector;
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManager;
-import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationServerConfiguration;
+import cn.taketoday.assistant.app.run.lifecycle.InfraWebServerConfig;
 import cn.taketoday.assistant.model.BeanPointer;
 import cn.taketoday.assistant.model.utils.InfraModelSearchers;
 import cn.taketoday.assistant.util.InfraUtils;
@@ -112,27 +112,29 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
   private static final String STORAGE_PREFIX = "RequestMappingsPanel";
   private static final String NOTIFICATION_DISPLAY_ID = "Infra Application Request Mappings";
   private static final Pattern MAPPINGS_DETAILS_START_2_1_1 = Pattern.compile(", [a-z]");
-  private final Project myProject;
-  private final InfraApplicationRunConfigurationBase myRunConfiguration;
-  private final ProcessHandler myProcessHandler;
-  private final NullableFactory<CommonInfraModel> myModelFactory;
-  private final TableView<LiveRequestMappingItem> myTableView;
-  private final ListTableModel<LiveRequestMappingItem> myModel;
-  private String myDefaultPath;
-  private final MergingUpdateQueue myMergingUpdateQueue;
 
-  RequestMappingsPanel(Project project, InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler, List<AnAction> customActions) {
+  private final Project project;
+  private final ProcessHandler processHandler;
+  private final InfraApplicationRunConfig runConfiguration;
+  private final TableView<LiveRequestMappingItem> tableView;
+  private final ListTableModel<LiveRequestMappingItem> model;
+  private final NullableFactory<CommonInfraModel> modelFactory;
+
+  private String defaultPath;
+  private final MergingUpdateQueue mergingUpdateQueue;
+
+  RequestMappingsPanel(Project project, InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler, List<AnAction> customActions) {
     super(new BorderLayout());
-    this.myMergingUpdateQueue = new MergingUpdateQueue("RequestMappingsTableView", 100, true, this, this);
-    this.myProject = project;
-    this.myRunConfiguration = runConfiguration;
-    this.myProcessHandler = processHandler;
-    this.myModelFactory = () -> {
-      Module module = this.myRunConfiguration.getModule();
+    this.mergingUpdateQueue = new MergingUpdateQueue("RequestMappingsTableView", 100, true, this, this);
+    this.project = project;
+    this.runConfiguration = runConfiguration;
+    this.processHandler = processHandler;
+    this.modelFactory = () -> {
+      Module module = this.runConfiguration.getModule();
       if (module == null) {
         return null;
       }
-      return InfraManager.from(this.myProject).getCombinedModel(module);
+      return InfraManager.from(this.project).getCombinedModel(module);
     };
     List<ColumnInfo> columns = new ArrayList<>();
     columns.add(new RequestMappingsColumnInfo<LiveRequestMapping>(message("infra.application.endpoints.mappings.path")) {
@@ -151,10 +153,11 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
             tooltip = tooltip.substring(0, matcher.start()) + "<br>" + tooltip.substring(matcher.end() - 1);
           }
         }
-        if (canNavigate(mapping) && (info = InfraApplicationLifecycleManager.from(myProject)
-                .getInfraApplicationInfo(myProcessHandler)) != null && (applicationUrl = info.getApplicationUrl().getValue()) != null) {
-          InfraApplicationServerConfiguration applicationServerConfiguration = info.getServerConfiguration().getValue();
-          String servletPath = applicationServerConfiguration == null ? null : applicationServerConfiguration.getServletPath();
+        if (canNavigate(mapping)
+                && (info = InfraApplicationLifecycleManager.from(RequestMappingsPanel.this.project)
+                .getInfraApplicationInfo(RequestMappingsPanel.this.processHandler)) != null && (applicationUrl = info.getApplicationUrl().getValue()) != null) {
+          InfraWebServerConfig applicationServerConfiguration = info.getServerConfig().getValue();
+          String servletPath = applicationServerConfiguration == null ? null : applicationServerConfiguration.servletPath();
           String mappingUrl = LiveRequestMappingsNavigationHandler.getMappingUrl(applicationUrl, servletPath, mapping);
           tooltip = mappingUrl + "<br>" + tooltip;
         }
@@ -198,39 +201,39 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
       });
     }
 
-    this.myModel = new ListTableModel<>(columns.toArray(ColumnInfo.EMPTY_ARRAY));
-    this.myTableView = new TableView<>(this.myModel);
-    this.myTableView.getSelectionModel().setSelectionMode(0);
+    this.model = new ListTableModel<>(columns.toArray(ColumnInfo.EMPTY_ARRAY));
+    this.tableView = new TableView<>(this.model);
+    this.tableView.getSelectionModel().setSelectionMode(0);
     RequestMappingLinkMouseListener linkMouseListener = new RequestMappingLinkMouseListener();
-    linkMouseListener.installOn(this.myTableView);
-    new TableSpeedSearch(this.myTableView);
-    JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(this.myTableView, 20, 31);
+    linkMouseListener.installOn(this.tableView);
+    new TableSpeedSearch(this.tableView);
+    JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(this.tableView, 20, 31);
     add(scrollPane, "Center");
     installTableActions(customActions, isSB20.get());
     installDoubleClickListener();
-    BaseTableView.restore(PropertiesComponent.getInstance(project), STORAGE_PREFIX, this.myTableView);
+    BaseTableView.restore(PropertiesComponent.getInstance(project), STORAGE_PREFIX, this.tableView);
   }
 
   public void dispose() {
-    this.myMergingUpdateQueue.cancelAllUpdates();
-    BaseTableView.store(PropertiesComponent.getInstance(this.myProject), STORAGE_PREFIX, this.myTableView);
+    this.mergingUpdateQueue.cancelAllUpdates();
+    BaseTableView.store(PropertiesComponent.getInstance(this.project), STORAGE_PREFIX, this.tableView);
   }
 
   void setItems(List<LiveRequestMapping> mappings) {
-    myTableView.setPaintBusy(true);
-    RequestMappingsEndpointTabSettings settings = RequestMappingsEndpointTabSettings.getInstance(this.myProject);
+    tableView.setPaintBusy(true);
+    RequestMappingsEndpointTabSettings settings = RequestMappingsEndpointTabSettings.getInstance(this.project);
     boolean showLibraryMappings = settings.isShowLibraryMappings();
     Set<String> filteredRequestMethods = settings.getFilteredRequestMethods().stream().map(Enum::name).collect(Collectors.toSet());
 
-    myMergingUpdateQueue.queue(new Update("update") {
+    mergingUpdateQueue.queue(new Update("update") {
       @Override
       public void run() {
-        int oldIndex = myTableView.getSelectedRow();
+        int oldIndex = tableView.getSelectedRow();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
-          DumbService.getInstance(myProject).runReadActionInSmartMode(() -> {
+          DumbService.getInstance(project).runReadActionInSmartMode(() -> {
             try {
-              GlobalSearchScope searchScope = myRunConfiguration.getSearchScope();
+              GlobalSearchScope searchScope = runConfiguration.getSearchScope();
               List<RequestMappingsPanel.LiveRequestMappingItem> items = mappings.stream().map((mapping) -> {
                 LiveHandlerMethod mappingMethod = mapping.getMethod();
                 VirtualFile file = mappingMethod == null ? null : getContainingFile(mappingMethod, searchScope);
@@ -243,19 +246,19 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
                 else {
                   return showLibraryMappings
                           || item.getContainingFile() == null
-                          || myRunConfiguration.getModule().getModuleWithDependenciesScope().contains(item.getContainingFile());
+                          || runConfiguration.getModule().getModuleWithDependenciesScope().contains(item.getContainingFile());
                 }
               }).collect(Collectors.toList());
 
-              AppUIUtil.invokeLaterIfProjectAlive(myProject, () -> {
-                myModel.setItems(items);
-                if (oldIndex >= 0 && oldIndex < myTableView.getRowCount()) {
-                  myTableView.setRowSelectionInterval(oldIndex, oldIndex);
+              AppUIUtil.invokeLaterIfProjectAlive(project, () -> {
+                model.setItems(items);
+                if (oldIndex >= 0 && oldIndex < tableView.getRowCount()) {
+                  tableView.setRowSelectionInterval(oldIndex, oldIndex);
                 }
               });
             }
             finally {
-              myTableView.setPaintBusy(false);
+              tableView.setPaintBusy(false);
             }
           });
         });
@@ -264,14 +267,14 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
   }
 
   void setDefaultPath(String defaultPath) {
-    this.myDefaultPath = defaultPath;
-    this.myTableView.revalidate();
-    this.myTableView.repaint();
+    this.defaultPath = defaultPath;
+    this.tableView.revalidate();
+    this.tableView.repaint();
   }
 
   @Nullable
   LiveRequestMapping getSelectedMapping() {
-    LiveRequestMappingItem item = this.myTableView.getSelectedObject();
+    LiveRequestMappingItem item = this.tableView.getSelectedObject();
     if (item == null) {
       return null;
     }
@@ -292,7 +295,7 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
         performEditAction(e.getDataContext());
       }
     };
-    editAction.registerCustomShortcutSet(CommonShortcuts.ENTER, this.myTableView);
+    editAction.registerCustomShortcutSet(CommonShortcuts.ENTER, this.tableView);
     contextActionGroup.add(editAction);
     if (!isSB20) {
       contextActionGroup.addSeparator();
@@ -301,49 +304,49 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
         public void update(AnActionEvent e) {
           LiveRequestMapping mapping = getSelectedMapping();
           String beanName = mapping != null ? mapping.getBean() : null;
-          e.getPresentation().setEnabled(beanName != null && InfraUtils.hasFacet(myRunConfiguration.getModule()));
+          e.getPresentation().setEnabled(beanName != null && InfraUtils.hasFacet(runConfiguration.getModule()));
         }
 
         public void actionPerformed(AnActionEvent e) {
           performNavigateToBeanAction(e.getDataContext());
         }
       };
-      beanAction.registerCustomShortcutSet(ActionManager.getInstance().getAction("EditSource").getShortcutSet(), this.myTableView);
+      beanAction.registerCustomShortcutSet(ActionManager.getInstance().getAction("EditSource").getShortcutSet(), this.tableView);
       contextActionGroup.add(beanAction);
     }
     contextActionGroup.addSeparator();
     contextActionGroup.addAll(customActions);
-    PopupHandler.installPopupMenu(this.myTableView, contextActionGroup, "WebMvcRequestMappingPopup");
+    PopupHandler.installPopupMenu(this.tableView, contextActionGroup, "WebMvcRequestMappingPopup");
   }
 
   private void installDoubleClickListener() {
     new DoubleClickListener() {
 
       protected boolean onDoubleClick(MouseEvent event) {
-        performEditAction(DataManager.getInstance().getDataContext(myTableView));
+        performEditAction(DataManager.getInstance().getDataContext(tableView));
         return true;
       }
-    }.installOn(this.myTableView);
+    }.installOn(this.tableView);
   }
 
   private void performEditAction(DataContext dataContext) {
-    if (DumbService.isDumb(this.myProject)) {
+    if (DumbService.isDumb(this.project)) {
       return;
     }
-    LiveRequestMappingItem item = this.myTableView.getSelectedObject();
+    LiveRequestMappingItem item = this.tableView.getSelectedObject();
     LiveHandlerMethod mappingMethod = item != null ? item.getMapping().getMethod() : null;
     if (mappingMethod == null) {
       return;
     }
-    InfraMvcUsageTriggerCollector.trigger(this.myProject, "EditLiveRequestMapping", "ToolwindowContent");
-    GlobalSearchScope searchScope = this.myRunConfiguration.getSearchScope();
+    InfraMvcUsageTriggerCollector.trigger(this.project, "EditLiveRequestMapping", "ToolwindowContent");
+    GlobalSearchScope searchScope = this.runConfiguration.getSearchScope();
     VirtualFile file = getContainingFile(mappingMethod, searchScope);
     if (!Comparing.equal(file, item.getContainingFile())) {
       item.setContainingFile(file);
-      this.myTableView.revalidate();
-      this.myTableView.repaint();
+      this.tableView.revalidate();
+      this.tableView.repaint();
     }
-    PsiMethod method = mappingMethod.findMethod(this.myProject, searchScope);
+    PsiMethod method = mappingMethod.findMethod(this.project, searchScope);
     if (method != null && method.canNavigate()) {
       method.navigate(true);
     }
@@ -354,7 +357,7 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
 
   private void performNavigateToBeanAction(DataContext dataContext) {
     BeanPointer<?> pointer;
-    if (DumbService.isDumb(this.myProject)) {
+    if (DumbService.isDumb(this.project)) {
       return;
     }
     LiveRequestMapping mapping = getSelectedMapping();
@@ -362,7 +365,7 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
     if (beanName == null) {
       return;
     }
-    CommonInfraModel model = this.myModelFactory.create();
+    CommonInfraModel model = this.modelFactory.create();
     if (model != null && (pointer = InfraModelSearchers.findBean(model, beanName)) != null && pointer.isValid()) {
       PsiElement psiElement = pointer.getPsiElement();
       if (psiElement instanceof Navigatable navigatable) {
@@ -379,12 +382,12 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
     ToolWindow toolWindow = dataContext.getData(PlatformDataKeys.TOOL_WINDOW);
     NotificationGroup.toolWindowGroup(NOTIFICATION_DISPLAY_ID, toolWindow.getId(), false)
             .createNotification(message, MessageType.WARNING)
-            .notify(this.myProject);
+            .notify(this.project);
   }
 
   @Nullable
   private VirtualFile getContainingFile(LiveHandlerMethod method, GlobalSearchScope searchScope) {
-    PsiClass psiClass = method.findContainingClass(this.myProject, searchScope);
+    PsiClass psiClass = method.findContainingClass(this.project, searchScope);
     if (psiClass != null && psiClass.getContainingFile() != null) {
       return psiClass.getContainingFile().getVirtualFile();
     }
@@ -409,13 +412,13 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
 
     RequestMappingsColumnInfo(@NlsContexts.ColumnName String name) {
       super(name);
-      this.myRenderer = new RequestMappingsTableCellRenderer(myProject, myProcessHandler);
+      this.myRenderer = new RequestMappingsTableCellRenderer(project, processHandler);
     }
 
     @Nullable
     public TableCellRenderer getRenderer(LiveRequestMappingItem item) {
       this.myRenderer.setToolTipText(getItemTooltipText(item.getMapping()));
-      this.myRenderer.setDefault(item.getMapping().getPath().equals(myDefaultPath));
+      this.myRenderer.setDefault(item.getMapping().getPath().equals(defaultPath));
       this.myRenderer.setFile(item.getContainingFile());
       return this.myRenderer;
     }
@@ -464,8 +467,8 @@ final class RequestMappingsPanel extends JPanel implements Disposable {
         PathLinkListener linkListener = null;
         if (canNavigate(mapping) && (info = InfraApplicationLifecycleManager.from(this.myProject)
                 .getInfraApplicationInfo(this.myProcessHandler)) != null && (applicationUrl = info.getApplicationUrl().getValue()) != null) {
-          InfraApplicationServerConfiguration applicationServerConfiguration = info.getServerConfiguration().getValue();
-          String servletPath = applicationServerConfiguration == null ? null : applicationServerConfiguration.getServletPath();
+          InfraWebServerConfig applicationServerConfiguration = info.getServerConfig().getValue();
+          String servletPath = applicationServerConfiguration == null ? null : applicationServerConfiguration.servletPath();
           NavigatorHttpRequest request = LiveRequestMappingsNavigationHandler.createRequest(applicationUrl, servletPath, mapping);
           List<RequestNavigator> navigators = RequestNavigator.getRequestNavigators(request);
           if (!navigators.isEmpty()) {

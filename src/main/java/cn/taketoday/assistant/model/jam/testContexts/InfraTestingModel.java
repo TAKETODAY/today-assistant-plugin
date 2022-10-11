@@ -42,38 +42,30 @@ import cn.taketoday.assistant.model.custom.CustomModuleComponentsDiscoverer;
 import cn.taketoday.assistant.model.jam.testContexts.profiles.InfraActiveProfile;
 
 class InfraTestingModel extends InfraModel {
-  private Set<String> myActiveProfiles;
-  private final PsiClass myTestClass;
+
+  private final PsiClass testClass;
+  private Set<String> activeProfiles;
 
   public InfraTestingModel(PsiClass testClass, Module module) {
     super(module);
-    this.myTestClass = testClass;
+    this.testClass = testClass;
   }
 
   @Override
-
-  public Module getModule() {
-    Module module = super.getModule();
-    return module;
-  }
-
-  @Override
-
   public Set<String> getActiveProfiles() {
-    if (this.myActiveProfiles == null) {
-      this.myActiveProfiles = discoverTestContextActiveProfiles();
+    if (this.activeProfiles == null) {
+      this.activeProfiles = discoverTestContextActiveProfiles();
     }
-    return this.myActiveProfiles;
+    return this.activeProfiles;
   }
 
   @Override
-
   public Set<CommonInfraModel> getRelatedModels(boolean checkActiveProfiles) {
     Set<ContextConfiguration> testConfigurations = new LinkedHashSet<>();
     Set<XmlFile> appContexts = new LinkedHashSet<>();
     Set<PsiClass> configurationContexts = new LinkedHashSet<>();
     InfraTestContextUtil testContextUtil = InfraTestContextUtil.of();
-    InheritanceUtil.processSupers(this.myTestClass, true, psiClass -> {
+    InheritanceUtil.processSupers(this.testClass, true, psiClass -> {
       ProgressManager.checkCanceled();
       if ("java.lang.Object".equals(psiClass.getQualifiedName())) {
         return true;
@@ -82,7 +74,7 @@ class InfraTestingModel extends InfraModel {
       return true;
     });
     for (ContextConfiguration contextConfiguration : testConfigurations) {
-      testContextUtil.discoverConfigFiles(contextConfiguration, appContexts, configurationContexts, contextConfiguration.getPsiElement(), this.myTestClass);
+      testContextUtil.discoverConfigFiles(contextConfiguration, appContexts, configurationContexts, contextConfiguration.getPsiElement(), this.testClass);
     }
     Set<String> activeProfiles = getActiveProfiles();
     Set<CommonInfraModel> models = new LinkedHashSet<>();
@@ -110,17 +102,17 @@ class InfraTestingModel extends InfraModel {
   private static Set<ContextConfiguration> getConfigurations(PsiClass psiClass) {
     Set<ContextConfiguration> configurations = new LinkedHashSet<>(2);
     configurations.addAll(SemService.getSemService(psiClass.getProject()).getSemElements(ContextConfiguration.CONTEXT_CONFIGURATION_JAM_KEY, psiClass));
-    InfraContextHierarchy hierarchyConfiguration = JamService.getJamService(psiClass.getProject())
-            .getJamElement(psiClass, InfraContextHierarchy.META);
-    if (hierarchyConfiguration != null) {
-      configurations.addAll(hierarchyConfiguration.getContextConfigurations());
+    var hierarchy = JamService.getJamService(psiClass.getProject()).getJamElement(
+            psiClass, InfraContextHierarchy.META);
+    if (hierarchy != null) {
+      configurations.addAll(hierarchy.getContextConfigurations());
     }
     return configurations;
   }
 
   private Set<String> discoverTestContextActiveProfiles() {
     Set<String> activeProfiles = new LinkedHashSet<>();
-    InheritanceUtil.processSupers(this.myTestClass, true, psiClass -> {
+    InheritanceUtil.processSupers(this.testClass, true, psiClass -> {
       InfraActiveProfile profiles;
       if (!"java.lang.Object".equals(psiClass.getQualifiedName()) && (profiles = InfraContextConfiguration.getActiveProfiles(psiClass)) != null) {
         activeProfiles.addAll(profiles.getActiveProfiles());

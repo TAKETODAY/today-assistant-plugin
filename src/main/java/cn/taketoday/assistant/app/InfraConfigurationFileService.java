@@ -61,8 +61,8 @@ import cn.taketoday.assistant.app.application.metadata.InfraApplicationMetaConfi
 import cn.taketoday.assistant.facet.InfraFacet;
 import cn.taketoday.assistant.model.config.ConfigurationValueResult;
 import cn.taketoday.assistant.model.config.ConfigurationValueSearchParams;
-import cn.taketoday.assistant.model.config.InfraConfigFileModificationTracker;
 import cn.taketoday.assistant.model.config.InfraConfigFileDetector;
+import cn.taketoday.assistant.model.config.InfraConfigFileModificationTracker;
 import cn.taketoday.assistant.util.InfraUtils;
 import cn.taketoday.lang.Nullable;
 
@@ -120,15 +120,13 @@ public class InfraConfigurationFileService {
   }
 
   public List<VirtualFile> findConfigFiles(Module module, boolean includeTestScope) {
-    return this.findConfigFiles(module, includeTestScope, (contributor) -> {
-      return contributor.accept(module);
-    });
+    return findConfigFiles(module, includeTestScope, contributor -> contributor.accept(module));
   }
 
   public List<VirtualFile> findConfigFiles(Module module, boolean includeTestScope, Condition<? super InfraModelConfigFileNameContributor> filter) {
 
     SmartList<VirtualFile> result = new SmartList<>();
-    InfraModelConfigFileNameContributor[] extensions = InfraModelConfigFileNameContributor.EP_NAME.getExtensions();
+    var extensions = InfraModelConfigFileNameContributor.EP_NAME.getExtensions();
     for (InfraModelConfigFileNameContributor fileNameContributor : extensions) {
       if (filter.value(fileNameContributor)) {
         result.addAll(findConfigFiles(module, includeTestScope, fileNameContributor));
@@ -144,13 +142,13 @@ public class InfraConfigurationFileService {
     return importedFiles.isEmpty() ? configFiles : ContainerUtil.concat(configFiles, importedFiles);
   }
 
-  private static List<VirtualFile> findConfigFiles(Module module, boolean includeTestScope, InfraModelConfigFileNameContributor fileNameContributor) {
+  private static List<VirtualFile> findConfigFiles(
+          Module module, boolean includeTestScope, InfraModelConfigFileNameContributor contributor) {
     return CachedValuesManager.getManager(module.getProject()).getCachedValue(module, () -> {
-      Map<Pair<InfraModelConfigFileNameContributor, Boolean>, List<VirtualFile>> map = FactoryMap.create((key) -> {
-        return doFindConfigFile(module, key.second, key.first);
-      });
+      Map<Pair<InfraModelConfigFileNameContributor, Boolean>, List<VirtualFile>> map =
+              FactoryMap.create(key -> doFindConfigFile(module, key.second, key.first));
       return Result.create(map, getConfigFilesDependencies(module));
-    }).get(Pair.create(fileNameContributor, includeTestScope));
+    }).get(Pair.create(contributor, includeTestScope));
   }
 
   private static List<Object> getConfigFilesDependencies(Module module) {
@@ -168,17 +166,17 @@ public class InfraConfigurationFileService {
   }
 
   private static List<VirtualFile> doFindConfigFile(Module module, boolean includeTestScope, InfraModelConfigFileNameContributor fileNameContributor) {
-
-    List<VirtualFile> result = new SmartList<>();
-    List<FileType> fileTypes = ContainerUtil.map(InfraModelConfigFileContributor.array(), InfraModelConfigFileContributor::getFileType);
+    var result = new SmartList<VirtualFile>();
+    List<FileType> fileTypes = ContainerUtil.map(
+            InfraModelConfigFileContributor.array(), InfraModelConfigFileContributor::getFileType);
     String configName = fileNameContributor.getInfraConfigName(module);
-    List<VirtualFile> profileConfigFiles = new SmartList<>();
-    List<VirtualFile> baseNameConfigFiles = new SmartList<>();
-    List<VirtualFile> directories = InfraModelConfigFileContributor.getConfigFileDirectories(module, includeTestScope);
-
+    var profileConfigFiles = new SmartList<VirtualFile>();
+    var baseNameConfigFiles = new SmartList<VirtualFile>();
+    var directories = InfraModelConfigFileContributor.getConfigFileDirectories(module, includeTestScope);
     for (VirtualFile directory : directories) {
       for (FileType fileType : fileTypes) {
-        Pair<List<VirtualFile>, List<VirtualFile>> allConfigs = InfraModelConfigFileContributor.findConfigFiles(module, directory, fileType, configName);
+        var allConfigs = InfraModelConfigFileContributor.findConfigFiles(
+                module, directory, fileType, configName);
         profileConfigFiles.addAll(allConfigs.first);
         baseNameConfigFiles.addAll(allConfigs.second);
       }
@@ -336,7 +334,7 @@ public class InfraConfigurationFileService {
 
   @Nullable
   private static MetaConfigKey getInfraConfigImportKey(Module module) {
-    return InfraApplicationMetaConfigKeyManager.getInstance()
+    return InfraApplicationMetaConfigKeyManager.of()
             .findCanonicalApplicationMetaConfigKey(module, INFRA_CONFIG_IMPORT_KEY);
   }
 

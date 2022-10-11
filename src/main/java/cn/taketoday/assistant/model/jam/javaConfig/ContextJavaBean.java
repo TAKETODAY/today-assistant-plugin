@@ -54,9 +54,9 @@ import cn.taketoday.assistant.model.jam.JamPsiMemberInfraBean;
 import cn.taketoday.lang.Nullable;
 
 public class ContextJavaBean extends InfraJavaBean {
+
   public static final SemKey<JamAnnotationMeta> BEAN_ANNOTATION_KEY = JamService.ANNO_META_KEY.subKey("ContextJavaBean");
-  public static final SemKey<ContextJavaBean> BEAN_JAM_KEY =
-          JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("ContextJavaBean");
+  public static final SemKey<ContextJavaBean> BEAN_JAM_KEY = JamPsiMemberInfraBean.PSI_MEMBERINFRA_BEAN_JAM_KEY.subKey("ContextJavaBean");
   public static final JamMethodMeta<ContextJavaBean> METHOD_META = new JamMethodMeta<>(null, ContextJavaBean.class, BEAN_JAM_KEY);
 
   // @Bean annotation meta

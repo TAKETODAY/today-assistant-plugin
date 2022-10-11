@@ -43,12 +43,13 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import cn.taketoday.assistant.InfraLibraryUtil;
-import cn.taketoday.assistant.InfraLibraryUtil.TodayVersion;
+import cn.taketoday.assistant.InfraVersion;
 import cn.taketoday.assistant.app.application.metadata.InfraMetadataConstant;
 import cn.taketoday.assistant.app.application.metadata.InfraValueProvider;
 import cn.taketoday.lang.Nullable;
 
 class InfraAdditionalConfigPropertyNameReference extends PsiReferenceBase<PsiElement> {
+
   private static final TailType CLOSE_PROPERTY_NAME_TAIL = new TailType() {
     public int processTail(Editor editor, int tailOffset) {
       return insertChar(editor, insertChar(editor, insertChar(editor, tailOffset, '\"'), ':'), ' ', false);
@@ -80,7 +81,7 @@ class InfraAdditionalConfigPropertyNameReference extends PsiReferenceBase<PsiEle
       case DEFAULT -> TailTypeDecorator.withTail(builder, CLOSE_PROPERTY_NAME_TAIL);
     };
   };
-  private final GroupContext myGroupContext;
+  private final GroupContext groupContext;
 
   private enum VariantType {
     DEFAULT,
@@ -91,7 +92,7 @@ class InfraAdditionalConfigPropertyNameReference extends PsiReferenceBase<PsiEle
 
   InfraAdditionalConfigPropertyNameReference(PsiElement element, GroupContext groupContext) {
     super(element);
-    this.myGroupContext = groupContext;
+    this.groupContext = groupContext;
   }
 
   @Nullable
@@ -100,9 +101,8 @@ class InfraAdditionalConfigPropertyNameReference extends PsiReferenceBase<PsiEle
   }
 
   public Object[] getVariants() {
-    InfraValueProvider.Parameter[] parameters;
     Module module = ModuleUtilCore.findModuleForPsiElement(getElement());
-    switch (this.myGroupContext) {
+    switch (groupContext) {
       case FAKE_TOP_LEVEL:
         return createVariants(EnumSet.of(Variant.TOP_LEVEL_GROUPS, Variant.TOP_LEVEL_PROPERTIES, Variant.TOP_LEVEL_HINTS));
       case GROUPS:
@@ -131,7 +131,7 @@ class InfraAdditionalConfigPropertyNameReference extends PsiReferenceBase<PsiEle
         }
         return createVariants(myVariantsFromParameters);
       default:
-        throw new IllegalStateException(this.myGroupContext.name());
+        throw new IllegalStateException(this.groupContext.name());
     }
   }
 
@@ -169,6 +169,7 @@ class InfraAdditionalConfigPropertyNameReference extends PsiReferenceBase<PsiEle
   }
 
   private enum Variant {
+
     TOP_LEVEL_GROUPS(InfraMetadataConstant.GROUPS, VariantType.ARRAY),
     TOP_LEVEL_PROPERTIES(InfraMetadataConstant.PROPERTIES, VariantType.ARRAY),
     TOP_LEVEL_HINTS(InfraMetadataConstant.HINTS, VariantType.ARRAY),
@@ -201,7 +202,6 @@ class InfraAdditionalConfigPropertyNameReference extends PsiReferenceBase<PsiEle
 
     @Nullable
     static Variant findByName(String name) {
-      Variant[] values;
       for (Variant variant : values()) {
         if (variant.name.equals(name)) {
           return variant;
@@ -212,24 +212,24 @@ class InfraAdditionalConfigPropertyNameReference extends PsiReferenceBase<PsiEle
   }
 
   enum GroupContext {
-    FAKE_TOP_LEVEL("topLevel", TodayVersion.V_4_0),
-    GROUPS(InfraMetadataConstant.GROUPS, TodayVersion.V_4_0),
-    PROPERTIES(InfraMetadataConstant.PROPERTIES, TodayVersion.V_4_0),
-    DEPRECATION(InfraMetadataConstant.DEPRECATION, TodayVersion.V_4_0),
-    HINTS(InfraMetadataConstant.HINTS, TodayVersion.V_4_0),
-    HINTS_VALUES(InfraMetadataConstant.VALUES, TodayVersion.V_4_0),
-    HINTS_PROVIDERS(InfraMetadataConstant.PROVIDERS, TodayVersion.V_4_0),
-    HINTS_PARAMETERS(InfraMetadataConstant.PARAMETERS, TodayVersion.V_4_0);
+    FAKE_TOP_LEVEL("topLevel", InfraVersion.V_4_0),
+    GROUPS(InfraMetadataConstant.GROUPS, InfraVersion.V_4_0),
+    PROPERTIES(InfraMetadataConstant.PROPERTIES, InfraVersion.V_4_0),
+    DEPRECATION(InfraMetadataConstant.DEPRECATION, InfraVersion.V_4_0),
+    HINTS(InfraMetadataConstant.HINTS, InfraVersion.V_4_0),
+    HINTS_VALUES(InfraMetadataConstant.VALUES, InfraVersion.V_4_0),
+    HINTS_PROVIDERS(InfraMetadataConstant.PROVIDERS, InfraVersion.V_4_0),
+    HINTS_PARAMETERS(InfraMetadataConstant.PARAMETERS, InfraVersion.V_4_0);
 
     private final String myPropertyName;
-    private final TodayVersion myMinimumVersion;
+    private final InfraVersion myMinimumVersion;
 
-    GroupContext(String propertyName, TodayVersion minimumVersion) {
+    GroupContext(String propertyName, InfraVersion minimumVersion) {
       this.myPropertyName = propertyName;
       this.myMinimumVersion = minimumVersion;
     }
 
-    TodayVersion getMinimumVersion() {
+    InfraVersion getMinimumVersion() {
       return this.myMinimumVersion;
     }
 

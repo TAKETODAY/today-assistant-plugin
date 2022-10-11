@@ -26,15 +26,15 @@ import cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionOut
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.ConditionalOnEvaluationContext;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnJamElement;
 
-abstract class AutoConfigConditionEvaluatorBase {
-  private final boolean myNonStrictEvaluation;
-  private final ConditionalOnEvaluationContext myConditionalOnEvaluationContext;
+abstract class AbstractAutoConfigConditionEvaluator {
+  private final boolean nonStrictEvaluation;
+  private final ConditionalOnEvaluationContext conditionalOnEvaluationContext;
 
   protected abstract ConditionalCollector getConditionalCollector();
 
-  AutoConfigConditionEvaluatorBase(boolean nonStrictEvaluation, ConditionalOnEvaluationContext conditionalOnEvaluationContext) {
-    this.myNonStrictEvaluation = nonStrictEvaluation;
-    this.myConditionalOnEvaluationContext = conditionalOnEvaluationContext;
+  AbstractAutoConfigConditionEvaluator(boolean nonStrictEvaluation, ConditionalOnEvaluationContext conditionalOnEvaluationContext) {
+    this.nonStrictEvaluation = nonStrictEvaluation;
+    this.conditionalOnEvaluationContext = conditionalOnEvaluationContext;
   }
 
   boolean isActive() {
@@ -43,8 +43,8 @@ abstract class AutoConfigConditionEvaluatorBase {
       return true;
     }
     for (ConditionalOnJamElement condition : allConditions) {
-      if (!this.myNonStrictEvaluation || !(condition instanceof ConditionalOnJamElement.NonStrict)) {
-        ConditionOutcome outcome = condition.matches(this.myConditionalOnEvaluationContext);
+      if (!this.nonStrictEvaluation || !(condition instanceof ConditionalOnJamElement.NonStrict)) {
+        ConditionOutcome outcome = condition.matches(this.conditionalOnEvaluationContext);
         if (!outcome.isMatch()) {
           return false;
         }

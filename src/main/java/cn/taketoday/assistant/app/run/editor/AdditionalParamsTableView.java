@@ -369,7 +369,7 @@ class AdditionalParamsTableView extends TableView<InfraAdditionalParameter> {
     if (this.myModule == null || DumbService.isDumb(this.myModule.getProject())) {
       return null;
     }
-    return InfraApplicationMetaConfigKeyManager.getInstance().findApplicationMetaConfigKey(this.myModule, parameter.getName());
+    return InfraApplicationMetaConfigKeyManager.of().findApplicationMetaConfigKey(this.myModule, parameter.getName());
   }
 
   private static PsiElement createDummyKeyNode(Module module, String prefix) {
@@ -401,7 +401,7 @@ class AdditionalParamsTableView extends TableView<InfraAdditionalParameter> {
   }
 
   private static void showHint(Module module, String configKey) {
-    MetaConfigKey key = InfraApplicationMetaConfigKeyManager.getInstance().findApplicationMetaConfigKey(module, configKey);
+    MetaConfigKey key = InfraApplicationMetaConfigKeyManager.of().findApplicationMetaConfigKey(module, configKey);
     DocumentationManager documentationManager = DocumentationManager.getInstance(module.getProject());
     documentationManager.restorePopupBehavior();
     if (key == null) {
@@ -418,7 +418,7 @@ class AdditionalParamsTableView extends TableView<InfraAdditionalParameter> {
     private final TextFieldWithAutoCompletion<Object> myTextField;
 
     MyInfraNameTableCellEditor(Module module) {
-      List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.getInstance().getAllMetaConfigKeys(module);
+      List<? extends MetaConfigKey> allKeys = InfraApplicationMetaConfigKeyManager.of().getAllMetaConfigKeys(module);
       List<Object> variants2 = new ArrayList<>(allKeys);
       for (MetaConfigKey key : allKeys) {
         if (key.isAccessType(MetaConfigKey.AccessType.MAP_GROUP)) {

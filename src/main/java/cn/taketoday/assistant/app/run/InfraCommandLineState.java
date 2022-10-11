@@ -87,9 +87,9 @@ class InfraCommandLineState extends ApplicationCommandLineState<InfraApplication
   static final String TRIGGER_FILE_PARAMETER = "-Ddevtools.restart.trigger-file";
   static final String OUTPUT_ANSI_ENABLED_PARAMETER = "-Doutput.ansi.enabled=always";
   static final String JMX_REMOTE_PARAMETER = "-Dcom.sun.management.jmxremote";
-  static final String JMX_PARAMETER = "-Djmx.enabled=true";
+  static final String JMX_PARAMETER = "-Dinfra.jmx.enabled=true";
   static final String LIVE_BEAN_PARAMETER = "-DliveBeansView.mbeanDomain";
-  static final String LIFECYCLE_PARAMETER = "-Dapplication.admin.enabled=true";
+  static final String LIFECYCLE_PARAMETER = "-Dapp.admin.enabled=true";
   private static final int DEFAULT_SERVER_PORT = 8080;
   private static final String SERVER_PORT_PROPERTY = "server.port";
   private final AtomicBoolean myTargetParametersPrepared;

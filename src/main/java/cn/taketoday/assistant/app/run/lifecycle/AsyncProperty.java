@@ -26,20 +26,23 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.Disposer;
 
-abstract class AsyncLiveProperty<T> extends AbstractLiveProperty<T> {
-  protected static final Logger LOG = Logger.getInstance(AsyncLiveProperty.class);
-  private final LifecycleErrorHandler myErrorHandler;
-  private volatile boolean myDisposed;
+import java.util.function.Consumer;
+
+abstract class AsyncProperty<T> extends AbstractProperty<T> {
+  protected static final Logger LOG = Logger.getInstance(AsyncProperty.class);
+
+  private final LifecycleErrorHandler errorHandler;
+  private volatile boolean disposed;
 
   protected abstract T doCompute() throws LifecycleException;
 
-  protected AsyncLiveProperty(LifecycleErrorHandler errorHandler, Disposable parent) {
+  protected AsyncProperty(LifecycleErrorHandler errorHandler, Disposable parent) {
     this(errorHandler, parent, null);
   }
 
-  protected AsyncLiveProperty(LifecycleErrorHandler errorHandler, Disposable parent, T defaultValue) {
+  protected AsyncProperty(LifecycleErrorHandler errorHandler, Disposable parent, T defaultValue) {
     super(defaultValue);
-    this.myErrorHandler = errorHandler;
+    this.errorHandler = errorHandler;
     if (parent != null) {
       Disposer.register(parent, this);
     }
@@ -47,11 +50,11 @@ abstract class AsyncLiveProperty<T> extends AbstractLiveProperty<T> {
 
   @Override
   public void compute() {
-    if (this.myDisposed) {
+    if (this.disposed) {
       return;
     }
     ApplicationManager.getApplication().executeOnPooledThread(() -> {
-      if (this.myDisposed) {
+      if (this.disposed) {
         return;
       }
       try {
@@ -59,40 +62,42 @@ abstract class AsyncLiveProperty<T> extends AbstractLiveProperty<T> {
           T value = doCompute();
           T oldValue = setValue(value);
           if (!Comparing.equal(oldValue, value)) {
-            getListeners().forEach(LivePropertyListener::propertyChanged);
+            dispatchPropertyChanged();
           }
-          getListeners().forEach(LivePropertyListener::computationFinished);
+          dispatchComputationFinished();
         }
         catch (LifecycleException e) {
           LOG.debug(e.getCause());
           if (e.getMessage() != null) {
-            this.myErrorHandler.handleLifecycleError(e.getMessage());
+            errorHandler.handleLifecycleError(e.getMessage());
           }
           setValue(null);
           Throwable cause = e.getCause();
           if (cause == null) {
-            getListeners().forEach(LivePropertyListener::computationFinished);
+            dispatchComputationFinished();
             return;
           }
-          Exception toNotify = cause instanceof Exception ? (Exception) cause : new LifecycleException(cause.getMessage(), cause);
-          getListeners().forEach(listener3 -> {
-            listener3.computationFailed(toNotify);
-          });
-          getListeners().forEach(LivePropertyListener::computationFinished);
+
+          Exception toNotify = cause instanceof Exception
+                               ? (Exception) cause
+                               : new LifecycleException(cause.getMessage(), cause);
+          dispatchComputationFailed(toNotify);
+          dispatchComputationFinished();
         }
       }
       catch (Throwable th) {
-        getListeners().forEach(LivePropertyListener::computationFinished);
+        dispatchComputationFinished();
         throw th;
       }
     });
   }
 
+  @Override
   public void dispose() {
-    this.myDisposed = true;
+    this.disposed = true;
   }
 
   protected boolean isDisposed() {
-    return this.myDisposed;
+    return this.disposed;
   }
 }

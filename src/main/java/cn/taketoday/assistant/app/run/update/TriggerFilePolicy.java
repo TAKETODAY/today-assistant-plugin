@@ -41,7 +41,8 @@ public interface TriggerFilePolicy {
       application.runWriteAction(() -> {
         for (Module module : modules) {
           if (!module.isDisposed()) {
-            VirtualFile[] roots = OrderEnumerator.orderEntries(module).runtimeOnly().productionOnly().withoutLibraries().withoutSdk().getClassesRoots();
+            VirtualFile[] roots = OrderEnumerator.orderEntries(module)
+                    .runtimeOnly().productionOnly().withoutLibraries().withoutSdk().getClassesRoots();
             if (roots.length == 0) {
               LOG.debug("Failed to update trigger file: class roots not found");
             }

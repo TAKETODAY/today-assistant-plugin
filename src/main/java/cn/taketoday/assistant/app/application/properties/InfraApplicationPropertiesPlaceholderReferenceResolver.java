@@ -62,6 +62,7 @@ import cn.taketoday.assistant.model.values.InfraPlaceholderReferenceResolver;
 import cn.taketoday.lang.Nullable;
 
 public class InfraApplicationPropertiesPlaceholderReferenceResolver implements InfraPlaceholderReferenceResolver {
+
   public static final LookupElementRenderer<LookupElement> LOOKUP_ELEMENT_RENDERER = new LookupElementRenderer<LookupElement>() {
     public void renderElement(LookupElement element, LookupElementPresentation presentation) {
       IProperty property = (IProperty) element.getObject();

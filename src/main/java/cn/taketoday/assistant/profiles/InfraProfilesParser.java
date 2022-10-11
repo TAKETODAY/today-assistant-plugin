@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
 
+import cn.taketoday.assistant.model.InfraProfile;
+
 import static cn.taketoday.assistant.InfraBundle.message;
 
 final class InfraProfilesParser {
@@ -37,7 +39,7 @@ final class InfraProfilesParser {
 
   static Predicate<Set<String>> parse(Collection<String> expressions) {
     String expression = ContainerUtil.getOnlyItem(expressions);
-    if ("_DEFAULT_PROFILE_NAME_".equals(expression)) {
+    if (InfraProfile.DEFAULT_PROFILE_NAME.equals(expression)) {
       return DEFAULT;
     }
     else {
@@ -141,9 +143,7 @@ final class InfraProfilesParser {
   }
 
   private static Predicate<Set<String>> equals(String profile) {
-    return (activeProfiles) -> {
-      return activeProfiles.contains(profile);
-    };
+    return activeProfiles -> activeProfiles.contains(profile);
   }
 
   private enum Context {

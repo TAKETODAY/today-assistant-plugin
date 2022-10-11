@@ -122,7 +122,7 @@ public abstract class InfraJmxSetup {
         }
         try {
           int samePort = Integer.parseInt(samePortForAll);
-          TargetEnvironment.TargetPortBinding it = new TargetEnvironment.TargetPortBinding(Integer.valueOf(samePort), samePort);
+          var it = new TargetEnvironment.TargetPortBinding(Integer.valueOf(samePort), samePort);
           targetRequest.getTargetPortBindings().add(it);
           this.myJmxPortBinding = it;
         }
@@ -166,7 +166,7 @@ public abstract class InfraJmxSetup {
         emptyMap = MapsKt.emptyMap();
       }
       Map resolvedPorts = emptyMap;
-      TargetEnvironment.TargetPortBinding it = this.myJmxPortBinding;
+      var it = this.myJmxPortBinding;
       if (it != null && (num = (Integer) resolvedPorts.get(it)) != null) {
         int port = num;
         processHandler.putUserData(InfraApplicationLifecycleManager.JMX_PORT, port);

@@ -26,6 +26,7 @@ import com.intellij.lang.properties.psi.PropertiesFile;
 import com.intellij.lang.properties.psi.impl.PropertyImpl;
 import com.intellij.lang.properties.psi.impl.PropertyKeyImpl;
 import com.intellij.microservices.jvm.config.MetaConfigKey;
+import com.intellij.microservices.jvm.config.MetaConfigKey.AccessType;
 import com.intellij.microservices.jvm.config.MetaConfigKeyManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressManager;
@@ -56,7 +57,6 @@ public class InfraModelApplicationPropertiesConfigFileContributor extends InfraM
   }
 
   @Override
-
   public List<ConfigurationValueResult> findConfigurationValues(PsiFile configFile, ConfigurationValueSearchParams params) {
     VirtualFile virtualFile = configFile.getVirtualFile();
     params.getProcessedFiles().add(virtualFile);
@@ -69,21 +69,21 @@ public class InfraModelApplicationPropertiesConfigFileContributor extends InfraM
     if (!isProfileRelevant(params, profileSuffix)) {
       return Collections.emptyList();
     }
-    SmartList smartList = new SmartList();
+    var valueResults = new SmartList<ConfigurationValueResult>();
     List<List<IProperty>> documents = getDocuments(propertiesFile, params.getModule());
     if (!documents.isEmpty()) {
       boolean processAllDocuments = params.isProcessAllProfiles();
       for (int i = documents.size() - 1; i >= 0; i--) {
         List<IProperty> document = documents.get(i);
         if (processAllDocuments || isProfileRelevantDocument(document, params, profileSuffix)) {
-          processImports(params, virtualFile, smartList, i);
-          if (!processDocument(document, i, params, smartList) && !processAllDocuments) {
+          processImports(params, virtualFile, valueResults, i);
+          if (!processDocument(document, i, params, valueResults) && !processAllDocuments) {
             break;
           }
         }
       }
     }
-    return smartList;
+    return valueResults;
   }
 
   private static List<List<IProperty>> getDocuments(PropertiesFile propertiesFile, Module module) {
@@ -93,11 +93,12 @@ public class InfraModelApplicationPropertiesConfigFileContributor extends InfraM
     return new SmartList(propertiesFile.getProperties());
   }
 
-  private static boolean processDocument(List<IProperty> document, int documentId, ConfigurationValueSearchParams params, List<ConfigurationValueResult> results) {
+  private static boolean processDocument(List<IProperty> document,
+          int documentId, ConfigurationValueSearchParams params, List<ConfigurationValueResult> results) {
     MetaConfigKey configKey = params.getConfigKey();
     String keyName = configKey.getName();
     List<IProperty> reversed = ContainerUtil.reverse(document);
-    if (configKey.isAccessType(MetaConfigKey.AccessType.NORMAL, MetaConfigKey.AccessType.INDEXED)) {
+    if (configKey.isAccessType(AccessType.NORMAL, AccessType.INDEXED)) {
       IProperty byExactName = null;
 
       for (IProperty property : reversed) {
@@ -111,52 +112,51 @@ public class InfraModelApplicationPropertiesConfigFileContributor extends InfraM
         results.add(createResult(params, byExactName, null, documentId));
         return false;
       }
-      else if (!params.getCheckRelaxedNames() && configKey.isAccessType(MetaConfigKey.AccessType.NORMAL)) {
+      else if (!params.getCheckRelaxedNames() && configKey.isAccessType(AccessType.NORMAL)) {
         return true;
       }
     }
-    MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.getInstance().getConfigKeyNameBinder(params.getModule());
-    boolean multipleOccurrencesPossible = configKey.isAccessType(MetaConfigKey.AccessType.ENUM_MAP, MetaConfigKey.AccessType.MAP, MetaConfigKey.AccessType.INDEXED);
+    var binder = InfraApplicationMetaConfigKeyManager.of().getConfigKeyNameBinder(params.getModule());
+    boolean multipleOccurrencesPossible = configKey.isAccessType(AccessType.ENUM_MAP, AccessType.MAP, AccessType.INDEXED);
     boolean processParts = multipleOccurrencesPossible && !(params.getKeyIndex() == null && params.getKeyProperty() == null);
     boolean found = false;
-    for (IProperty property2 : reversed) {
+    for (IProperty property : reversed) {
       ProgressManager.checkCanceled();
-      String propertyName = property2.getName();
+      String propertyName = property.getName();
       if (propertyName != null && (params.getCheckRelaxedNames() || propertyName.startsWith(keyName))) {
         if (processParts) {
           String keyIndexText = binder.bindsToKeyProperty(configKey, params.getKeyProperty(), propertyName);
           if (keyIndexText != null && (params.getKeyIndex() == null || keyIndexText.equals(params.getKeyIndex()))) {
-            results.add(createResult(params, property2, keyIndexText, documentId));
+            results.add(createResult(params, property, keyIndexText, documentId));
             found = true;
           }
         }
         else if (binder.bindsTo(configKey, propertyName)) {
-          results.add(createResult(params, property2, null, documentId));
+          results.add(createResult(params, property, null, documentId));
           if (!multipleOccurrencesPossible) {
             return false;
           }
           found = true;
-        }
-        else {
-          continue;
         }
       }
     }
     return !found;
   }
 
-  private static ConfigurationValueResult createResult(ConfigurationValueSearchParams params, IProperty property, @Nullable String keyIndexText, int documentId) {
+  private static ConfigurationValueResult createResult(ConfigurationValueSearchParams params,
+          IProperty property, @Nullable String keyIndexText, int documentId) {
     PropertyImpl propertyImpl = (PropertyImpl) property.getPsiElement();
     PropertyKeyImpl key = InfraApplicationPropertiesUtil.getPropertyKey(propertyImpl);
     return new ConfigurationValueResult(key, keyIndexText, InfraApplicationPropertiesUtil.getPropertyValue(propertyImpl), propertyImpl.getValue(), documentId, params);
   }
 
-  private static boolean isProfileRelevantDocument(List<IProperty> document, ConfigurationValueSearchParams params, String fileProfile) {
+  private static boolean isProfileRelevantDocument(List<IProperty> document,
+          ConfigurationValueSearchParams params, String fileProfile) {
     Set<String> activeProfiles = params.getActiveProfiles();
     if (ContainerUtil.isEmpty(activeProfiles)) {
       return true;
     }
-    MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.getInstance().getConfigKeyNameBinder(params.getModule());
+    MetaConfigKeyManager.ConfigKeyNameBinder binder = InfraApplicationMetaConfigKeyManager.of().getConfigKeyNameBinder(params.getModule());
     String profileText = getProfileByKey(InfraMetadataConstant.INFRA_PROFILES_KEY, document, null, binder);
     if (profileText == null) {
       profileText = getProfileByKey(InfraMetadataConstant.INFRA_CONFIG_ACTIVE_ON_PROFILE_KEY, document, fileProfile, binder);
@@ -165,7 +165,8 @@ public class InfraModelApplicationPropertiesConfigFileContributor extends InfraM
       return true;
     }
     try {
-      Predicate<Set<String>> profiles = InfraProfilesFactory.of().parseProfileExpressions(StringUtil.split(profileText, ","));
+      Predicate<Set<String>> profiles = InfraProfilesFactory.of()
+              .parseProfileExpressions(StringUtil.split(profileText, ","));
       return profiles.test(activeProfiles);
     }
     catch (InfraProfilesFactory.MalformedProfileExpressionException e) {
@@ -173,7 +174,8 @@ public class InfraModelApplicationPropertiesConfigFileContributor extends InfraM
     }
   }
 
-  private static String getProfileByKey(String key, List<IProperty> document, String fileProfile, MetaConfigKeyManager.ConfigKeyNameBinder binder) {
+  private static String getProfileByKey(String key, List<IProperty> document,
+          String fileProfile, MetaConfigKeyManager.ConfigKeyNameBinder binder) {
     for (IProperty property : ContainerUtil.reverse(document)) {
       String propertyKey = property.getKey();
       if (propertyKey != null && binder.matchesPart(key, propertyKey)) {

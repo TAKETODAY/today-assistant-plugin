@@ -40,7 +40,7 @@ import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 
-import cn.taketoday.assistant.app.run.InfraApplicationRunConfigurationBase;
+import cn.taketoday.assistant.app.run.InfraApplicationRunConfig;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationInfo;
 import cn.taketoday.assistant.app.run.lifecycle.InfraApplicationLifecycleManager;
 import cn.taketoday.assistant.app.run.lifecycle.beans.BeansEndpoint;
@@ -49,19 +49,19 @@ import cn.taketoday.lang.Nullable;
 
 abstract class LifecycleFinderRecursivePanel<T> extends FinderRecursivePanel<T> {
 
-  private final InfraApplicationRunConfigurationBase myRunConfiguration;
+  private final InfraApplicationRunConfig myRunConfiguration;
 
   private final ProcessHandler myProcessHandler;
   private JBList<T> myList;
 
   protected LifecycleFinderRecursivePanel(Project project, @Nullable FinderRecursivePanel parent, @Nullable String groupId,
-          InfraApplicationRunConfigurationBase runConfiguration, ProcessHandler processHandler) {
+          InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     super(project, parent, groupId);
     this.myRunConfiguration = runConfiguration;
     this.myProcessHandler = processHandler;
   }
 
-  protected final InfraApplicationRunConfigurationBase getRunConfiguration() {
+  protected final InfraApplicationRunConfig getRunConfiguration() {
     return this.myRunConfiguration;
   }
 
@@ -99,7 +99,7 @@ abstract class LifecycleFinderRecursivePanel<T> extends FinderRecursivePanel<T> 
   protected final LiveBeansModel getModel() {
     InfraApplicationInfo info = InfraApplicationLifecycleManager.from(getProject()).getInfraApplicationInfo(myProcessHandler);
     if (info != null) {
-      return info.getEndpointData(BeansEndpoint.getInstance()).getValue();
+      return info.getEndpointData(BeansEndpoint.of()).getValue();
     }
     return null;
   }

@@ -37,12 +37,12 @@ import cn.taketoday.lang.Nullable;
 
 import static cn.taketoday.assistant.app.run.InfraRunBundle.message;
 
-class JmxServiceUrlLiveProperty extends AsyncLiveProperty<String> {
+class JmxServiceUrlProperty extends AsyncProperty<String> {
   private static final String JMX_CONNECTION_ADDRESS_PROPERTY = "com.sun.management.jmxremote.localConnectorAddress";
   private static final String LOCAL_JMX_CONNECTOR_URL = "service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi";
   private final ProcessHandler myProcessHandler;
 
-  JmxServiceUrlLiveProperty(LifecycleErrorHandler errorHandler, Disposable parent, ProcessHandler processHandler) {
+  JmxServiceUrlProperty(LifecycleErrorHandler errorHandler, Disposable parent, ProcessHandler processHandler) {
     super(errorHandler, parent, "");
     this.myProcessHandler = processHandler;
   }
