@@ -27,6 +27,7 @@ import com.intellij.microservices.jvm.config.ConfigKeyPathBeanPropertyResolver;
 import com.intellij.microservices.jvm.config.MetaConfigKey;
 import com.intellij.microservices.jvm.config.RelaxedNames;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -59,7 +60,7 @@ public class InfraConfigKetPathBeanPropertyResolver implements ConfigKeyPathBean
     if (psiClass == null) {
       return null;
     }
-    PsiMethod constructor = getBindingConstructor(psiClass, this.myModule, configKey);
+    PsiMethod constructor = getBindingConstructor(psiClass, this.myModule);
     if (constructor == null) {
       return DEFAULT_RESOLVER.resolveProperty(configKey, psiType, propertyName);
     }
@@ -77,7 +78,7 @@ public class InfraConfigKetPathBeanPropertyResolver implements ConfigKeyPathBean
     if (psiClass == null || ConfigKeyPathBeanPropertyReference.stopResolvingProperty(psiClass)) {
       return Collections.emptyList();
     }
-    PsiMethod constructor = getBindingConstructor(psiClass, this.myModule, configKey);
+    PsiMethod constructor = getBindingConstructor(psiClass, this.myModule);
     if (constructor == null) {
       return DEFAULT_RESOLVER.getAllBeanProperties(configKey, psiType);
     }
@@ -86,34 +87,19 @@ public class InfraConfigKetPathBeanPropertyResolver implements ConfigKeyPathBean
   }
 
   @Nullable
-  public static PsiMethod getBindingConstructor(PsiClass psiClass, @Nullable Module module, @Nullable MetaConfigKey configKey) {
-    boolean version3 = true;
-    if (!version3) {
-      if (configKey != null) {
-        hasConfigurationPropertiesConstructorBinding(configKey);
-      }
-    }
-    Supplier<List<String>> excludedAnnotations = () -> ContainerUtil.mapNotNull(
-            MetaAnnotationUtil.getAnnotationTypesWithChildren(module, AnnotationConstant.AUTOWIRED, false),
-            PsiClass::getQualifiedName
-    );
+  public static PsiMethod getBindingConstructor(PsiClass psiClass, @Nullable Module module) {
+    Supplier<List<String>> excludedAnnotations =
+            module != null ? () -> ContainerUtil.mapNotNull(
+                    MetaAnnotationUtil.getAnnotationTypesWithChildren(module, AnnotationConstant.AUTOWIRED, false),
+                    PsiClass::getQualifiedName
+            ) : null;
+
     return getBindingConstructor(psiClass, true, excludedAnnotations);
   }
 
-  private static boolean hasConfigurationPropertiesConstructorBinding(MetaConfigKey configKey) {
-    if (configKey.getDeclarationResolveResult() != MetaConfigKey.DeclarationResolveResult.PROPERTY) {
-      return false;
-    }
-    PsiElement declaration = configKey.getDeclaration();
-    if (!(declaration instanceof InfraConfigKeyDeclarationPsiElement)) {
-      return false;
-    }
-    PsiElement parent = declaration.getParent();
-    return (parent instanceof PsiClass psiClass) && getBindingConstructor(psiClass, false, null) != null;
-  }
-
   @Nullable
-  private static PsiMethod getBindingConstructor(PsiClass psiClass, boolean keyBinding, Supplier<List<String>> excludedAnnotations) {
+  private static PsiMethod getBindingConstructor(
+          PsiClass psiClass, boolean keyBinding, Supplier<List<String>> excludedAnnotations) {
     if (!keyBinding && !psiClass.isRecord() && getClassBinding(psiClass) == null) {
       return getBindingConstructor(getConstructorsWithParameters(psiClass));
     }

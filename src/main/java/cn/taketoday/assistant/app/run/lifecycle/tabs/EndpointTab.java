@@ -85,8 +85,7 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
     this.endpoint = endpoint;
     this.runConfiguration = runConfiguration;
     this.processHandler = processHandler;
-
-    endpointListener = new Property.PropertyListener() {
+    this.endpointListener = new Property.PropertyListener() {
       @Override
       public void propertyChanged() {
         AppUIUtil.invokeLaterIfProjectAlive(getProject(), () -> {
@@ -123,15 +122,15 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
       }
     };
 
-    rootPanelLayout = new CardLayout();
-    rootPanel = new JPanel(rootPanelLayout);
+    this.rootPanelLayout = new CardLayout();
+    this.rootPanel = new JPanel(rootPanelLayout);
 
-    messagePanel = new JBLoadingPanel(new GridBagLayout(), this);
-    String name = StringUtil.shortenTextWithEllipsis(this.runConfiguration.getName(), 30, 3);
+    this.messagePanel = new JBLoadingPanel(new GridBagLayout(), this);
+    String name = StringUtil.shortenTextWithEllipsis(runConfiguration.getName(), 30, 3);
     messagePanel.setLoadingText(InfraAppBundle.message("infra.app.endpoints.application.is.starting", name));
     messagePanel.startLoading();
 
-    messageLabel = new JBLabel();
+    this.messageLabel = new JBLabel();
     messageLabel.setForeground(JBColor.GRAY);
 
     GridBagConstraints gbc = new GridBagConstraints();
@@ -147,7 +146,8 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
 
     rootPanel.add(MESSAGE_CARD, ScrollPaneFactory.createScrollPane(messagePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED)
+    );
   }
 
   public String getId() {
@@ -227,7 +227,8 @@ public abstract class EndpointTab<T> implements Disposable, DataProvider {
   public void checkAvailability() {
     actuatorsEnabled = InfraLibraryUtil.hasActuators(runConfiguration.getModule());
     if (!actuatorsEnabled) {
-      showMessage(InfraAppBundle.message("infra.app.endpoints.error.actuator.starter.disabled"));
+//      showMessage(InfraAppBundle.message("infra.app.endpoints.error.actuator.starter.disabled"));
+      showMessage(InfraAppBundle.message("infra.app.endpoints.error.actuator.not-supported"));
     }
   }
 

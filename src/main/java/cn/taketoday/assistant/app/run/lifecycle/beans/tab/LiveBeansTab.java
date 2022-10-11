@@ -60,43 +60,38 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
   private static final String BEANS_FULL = "BEANS_FULL";
   private static final String BEANS_UPDATE_DETAILS = "BEANS_UPDATE_DETAILS";
   private static final String BEANS_CONTENT = "BEANS_CONTENT";
-  private final JComponent myWrapper;
-  private final SimpleToolWindowPanel myMainPanel;
-  private LifecycleFinderRecursivePanel myBeansPanel;
-  private JComponent myDiagramPanel;
-  private final DefaultActionGroup myDiagramActionGroup;
-  private final UserDataHolder myDiagramDataHolder;
-  private volatile boolean myNeedUpdateAfterRefresh;
-  private final BeansEndpointTabSettings mySettings;
+
+  private JComponent diagramPanel;
+  private final JComponent wrapper;
+  private final SimpleToolWindowPanel mainPanel;
+  private final UserDataHolder diagramDataHolder;
+  private volatile boolean needUpdateAfterRefresh;
+  private final BeansEndpointTabSettings settings;
+  private LifecycleFinderRecursivePanel beansPanel;
+  private final DefaultActionGroup diagramActionGroup;
 
   public LiveBeansTab(Endpoint<LiveBeansModel> endpoint, InfraApplicationRunConfig runConfiguration, ProcessHandler processHandler) {
     super(endpoint, runConfiguration, processHandler);
-    this.myMainPanel = new SimpleToolWindowPanel(false, true);
-    this.myDiagramDataHolder = new UserDataHolderBase();
-    this.mySettings = BeansEndpointTabSettings.getInstance(getProject());
-    this.myDiagramActionGroup = new DefaultActionGroup() {
+    this.mainPanel = new SimpleToolWindowPanel(false, true);
+    this.diagramDataHolder = new UserDataHolderBase();
+    this.settings = BeansEndpointTabSettings.getInstance(getProject());
+    this.diagramActionGroup = new DefaultActionGroup() {
 
       public void update(AnActionEvent e) {
         e.getPresentation().setVisible(isDiagramMode() && !DumbService.isDumb(getProject()));
       }
     };
     refreshContentPanel();
-    this.myWrapper = DumbService.getInstance(getProject()).wrapGently(this.myMainPanel, this);
+    this.wrapper = DumbService.getInstance(getProject()).wrapGently(this.mainPanel, this);
     getProject().getMessageBus().connect(this).subscribe(InfraEndpointsTabSettings.TOPIC, new InfraEndpointsTabSettings.Listener() {
 
       @Override
       public void settingsChanged(String changeType) {
-        if (changeType.equals(BEANS_MODE)) {
-          performModeUpdate();
-        }
-        else if (changeType.equals(BEANS_FULL)) {
-          performFullUpdate();
-        }
-        else if (changeType.equals(BEANS_UPDATE_DETAILS)) {
-          performDetailsUpdate();
-        }
-        else if (changeType.equals(BEANS_CONTENT)) {
-          updateContent();
+        switch (changeType) {
+          case BEANS_MODE -> performModeUpdate();
+          case BEANS_FULL -> performFullUpdate();
+          case BEANS_CONTENT -> updateContent();
+          case BEANS_UPDATE_DETAILS -> performDetailsUpdate();
         }
       }
     });
@@ -108,64 +103,66 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
   }
 
   @Override
-
   public Icon getIcon() {
-    Icon icon = cn.taketoday.assistant.Icons.SpringBean;
-    return icon;
+    return Icons.SpringBean;
   }
 
   @Override
-
   protected List<AnAction> getToolbarActions() {
-    List<AnAction> actions = new ArrayList<>();
+    ArrayList<AnAction> actions = new ArrayList<>();
     if (LiveBeansPanelContent.EP_NAME.getExtensions().length != 0) {
       actions.add(new EndpointToggleAction(InfraRunBundle.message("infra.application.endpoints.diagram.mode.action.name"), null,
               new LayeredIcon(AllIcons.FileTypes.Diagram, Icons.TodayOverlay)) {
-
+        @Override
         public boolean isSelected(AnActionEvent e) {
-          return mySettings.isDiagramMode();
+          return settings.isDiagramMode();
         }
 
+        @Override
         public void setSelected(AnActionEvent e, boolean state) {
-          mySettings.setDiagramMode(state);
+          settings.setDiagramMode(state);
           InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_MODE);
         }
       });
       actions.add(Separator.getInstance());
-      actions.add(this.myDiagramActionGroup);
+      actions.add(this.diagramActionGroup);
       actions.add(Separator.getInstance());
     }
     actions.add(new LiveBeansPanelToggleAction(InfraBundle.message("beans.view.show.library.beans.title"), null, AllIcons.Nodes.PpLib) {
 
+      @Override
       public boolean isSelected(AnActionEvent e) {
-        return mySettings.isShowLibraryBeans();
+        return settings.isShowLibraryBeans();
       }
 
+      @Override
       public void setSelected(AnActionEvent e, boolean state) {
-        mySettings.setShowLibraryBeans(state);
+        settings.setShowLibraryBeans(state);
         InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_CONTENT);
       }
     });
     actions.add(Separator.getInstance());
     actions.add(new LiveBeansPanelToggleAction(InfraRunBundle.message("infra.application.endpoints.show.context.action.name"), null, cn.taketoday.assistant.Icons.FileSet) {
-
+      @Override
       public boolean isSelected(AnActionEvent e) {
-        return mySettings.isShowContexts();
+        return settings.isShowContexts();
       }
 
+      @Override
       public void setSelected(AnActionEvent e, boolean state) {
-        mySettings.setShowContexts(state);
+        settings.setShowContexts(state);
         InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_FULL);
       }
     });
     actions.add(new LiveBeansPanelToggleAction(InfraBundle.message("beans.view.show.configuration.files"), null, cn.taketoday.assistant.Icons.SpringConfig) {
-
+      @Override
       public boolean isSelected(AnActionEvent e) {
-        return mySettings.isShowFiles();
+        return settings.isShowFiles();
       }
 
+      @Override
       public void setSelected(AnActionEvent e, boolean state) {
-        mySettings.setShowFiles(state);
+        settings.setShowFiles(state);
         InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_FULL);
       }
     });
@@ -173,11 +170,11 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
     actions.add(new LiveBeansPanelToggleAction(InfraBundle.message("beans.view.show.bean.documentation.title"), null, AllIcons.Toolwindows.Documentation) {
 
       public boolean isSelected(AnActionEvent e) {
-        return mySettings.isShowDoc();
+        return settings.isShowDoc();
       }
 
       public void setSelected(AnActionEvent e, boolean state) {
-        mySettings.setShowDoc(state);
+        settings.setShowDoc(state);
         InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_UPDATE_DETAILS);
       }
     });
@@ -185,11 +182,11 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
       actions.add(new LiveBeansPanelToggleAction(InfraBundle.message("beans.view.show.bean.graph.title"), null, AllIcons.FileTypes.Diagram) {
 
         public boolean isSelected(AnActionEvent e) {
-          return mySettings.isShowLiveBeansGraph();
+          return settings.isShowLiveBeansGraph();
         }
 
         public void setSelected(AnActionEvent e, boolean state) {
-          mySettings.setShowLiveBeansGraph(state);
+          settings.setShowLiveBeansGraph(state);
           InfraEndpointsTabSettings.from(getProject()).fireSettingsChanged(BEANS_UPDATE_DETAILS);
         }
       });
@@ -198,38 +195,33 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
   }
 
   @Override
-
   protected JComponent getEndpointComponent() {
-    JComponent jComponent = this.myWrapper;
-    return jComponent;
+    return this.wrapper;
   }
 
   @Override
   public void doUpdateComponent(LiveBeansModel value) {
     updateContent();
-    this.myNeedUpdateAfterRefresh = true;
+    this.needUpdateAfterRefresh = true;
   }
 
   private void updateContent() {
     if (isDiagramMode()) {
-      if (this.myDiagramPanel != null) {
+      if (this.diagramPanel != null) {
         for (LiveBeansPanelContent content : LiveBeansPanelContent.EP_NAME.getExtensions()) {
-          content.update(this.myDiagramDataHolder);
+          content.update(this.diagramDataHolder);
         }
       }
     }
-    else if (this.myBeansPanel != null) {
-      this.myBeansPanel.updateComponent();
+    else if (this.beansPanel != null) {
+      this.beansPanel.updateComponent();
     }
   }
 
   @Override
   protected String getErrorMessage(String cause) {
-    return InfraRunBundle.message("infra.application.endpoints.error.failed.to.retrieve.application.beans.snapshot", cause);
-  }
-
-  @Override
-  public void checkAvailability() {
+    return InfraRunBundle.message(
+            "infra.application.endpoints.error.failed.to.retrieve.application.beans.snapshot", cause);
   }
 
   @Override
@@ -241,9 +233,12 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
   @Nullable
   public Object getData(String dataId) {
     InfraApplicationInfo info;
-    if (isDiagramMode() && (info = getInfo()) != null && Boolean.TRUE.equals(info.getReadyState().getValue()) && getLiveProperty(info).getValue() != null && !isTabLoading()) {
+    if (isDiagramMode()
+            && (info = getInfo()) != null
+            && Boolean.TRUE.equals(info.getReadyState().getValue())
+            && getLiveProperty(info).getValue() != null && !isTabLoading()) {
       for (LiveBeansPanelContent content : LiveBeansPanelContent.EP_NAME.getExtensions()) {
-        Object data = content.getData(this.myDiagramDataHolder, dataId);
+        Object data = content.getData(diagramDataHolder, dataId);
         if (data != null) {
           return data;
         }
@@ -253,15 +248,15 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
   }
 
   private boolean isDiagramMode() {
-    return LiveBeansPanelContent.EP_NAME.getExtensions().length != 0 && this.mySettings.isDiagramMode();
+    return LiveBeansPanelContent.EP_NAME.getExtensions().length != 0 && this.settings.isDiagramMode();
   }
 
   private void refreshContentPanel() {
-    LifecycleFinderRecursivePanel lifecycleFinderRecursivePanel;
+    JComponent lifecycleFinderRecursivePanel;
     if (isDiagramMode()) {
-      if (this.myDiagramPanel == null) {
+      if (this.diagramPanel == null) {
         for (LiveBeansPanelContent content : LiveBeansPanelContent.EP_NAME.getExtensions()) {
-          this.myDiagramPanel = content.createComponent(getProject(), this.myDiagramDataHolder, this, () -> {
+          this.diagramPanel = content.createComponent(getProject(), this.diagramDataHolder, this, () -> {
             LiveBeansModel liveBeansModel;
             InfraApplicationInfo info = getInfo();
             if (info != null && (liveBeansModel = getLiveProperty(info).getValue()) != null) {
@@ -269,32 +264,32 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
             }
             return Collections.emptyList();
           }, getRunConfiguration(), false);
-          this.myDiagramActionGroup.removeAll();
-          this.myDiagramActionGroup.add(content.createToolbarActions(this.myDiagramDataHolder));
+          this.diagramActionGroup.removeAll();
+          this.diagramActionGroup.add(content.createToolbarActions(this.diagramDataHolder));
         }
       }
-      lifecycleFinderRecursivePanel = (LifecycleFinderRecursivePanel) this.myDiagramPanel;
+      lifecycleFinderRecursivePanel = this.diagramPanel;
     }
     else {
-      if (this.myBeansPanel == null) {
-        this.myBeansPanel = createRootBeansPanel();
-        this.myBeansPanel.initPanel();
-        Disposer.register(this, this.myBeansPanel);
+      if (this.beansPanel == null) {
+        this.beansPanel = createRootBeansPanel();
+        this.beansPanel.initPanel();
+        Disposer.register(this, this.beansPanel);
       }
-      lifecycleFinderRecursivePanel = this.myBeansPanel;
+      lifecycleFinderRecursivePanel = this.beansPanel;
     }
-    this.myMainPanel.setContent(lifecycleFinderRecursivePanel);
-    if (this.myNeedUpdateAfterRefresh) {
+    this.mainPanel.setContent(lifecycleFinderRecursivePanel);
+    if (this.needUpdateAfterRefresh) {
       updateContent();
-      this.myNeedUpdateAfterRefresh = false;
+      this.needUpdateAfterRefresh = false;
     }
   }
 
   private LifecycleFinderRecursivePanel createRootBeansPanel() {
-    if (this.mySettings.isShowContexts()) {
+    if (this.settings.isShowContexts()) {
       return new LiveContextsPanel(getProject(), getRunConfiguration(), getProcessHandler());
     }
-    if (this.mySettings.isShowFiles()) {
+    if (this.settings.isShowFiles()) {
       return new LiveResourcesPanel(getProject(), getRunConfiguration(), getProcessHandler());
     }
     return new LiveBeansPanel(getProject(), getRunConfiguration(), getProcessHandler());
@@ -308,21 +303,20 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
 
   private void performFullUpdate() {
     ApplicationManager.getApplication().invokeLater(() -> {
-      if (this.myBeansPanel == null) {
+      if (this.beansPanel == null) {
         return;
       }
-      FinderRecursivePanel oldPanel = this.myBeansPanel;
-      Disposer.dispose(oldPanel);
-      this.myBeansPanel = null;
+      Disposer.dispose(beansPanel);
+      this.beansPanel = null;
       refreshContentPanel();
     }, ModalityState.NON_MODAL, o -> Disposer.isDisposed(this));
   }
 
   private void performDetailsUpdate() {
-    if (this.myBeansPanel == null) {
+    if (this.beansPanel == null) {
       return;
     }
-    FinderRecursivePanel finderRecursivePanel = this.myBeansPanel;
+    FinderRecursivePanel finderRecursivePanel = this.beansPanel;
     while (true) {
       FinderRecursivePanel panel = finderRecursivePanel;
       if (!(panel.getSecondComponent() instanceof FinderRecursivePanel)) {
@@ -335,7 +329,7 @@ public class LiveBeansTab extends EndpointTab<LiveBeansModel> {
 
   private abstract class LiveBeansPanelToggleAction extends EndpointTab<LiveBeansModel>.EndpointToggleAction {
 
-    LiveBeansPanelToggleAction(@NlsActions.ActionText @Nullable String text, @NlsActions.ActionDescription @Nullable String description, @Nullable Icon icon) {
+    LiveBeansPanelToggleAction(@Nullable String text, @NlsActions.ActionDescription @Nullable String description, @Nullable Icon icon) {
       super(text, description, icon);
     }
 

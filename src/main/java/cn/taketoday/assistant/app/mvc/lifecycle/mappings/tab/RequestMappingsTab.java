@@ -136,8 +136,7 @@ public class RequestMappingsTab extends EndpointTab<LiveRequestMappingsModel> {
 
   @Override
   protected JComponent getEndpointComponent() {
-    JComponent jComponent = this.wrapper;
-    return jComponent;
+    return this.wrapper;
   }
 
   @Override

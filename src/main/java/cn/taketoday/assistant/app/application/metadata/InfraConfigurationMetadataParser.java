@@ -324,7 +324,7 @@ final class InfraConfigurationMetadataParser {
 
   private static PsiElement findPropertyNavigationTarget(PsiClass sourceTypeClass, String configKeyName, Module module) {
     String propertyName = RelaxedNames.dashedPropertyNameToCamelCase(configKeyName);
-    PsiMethod constructor = InfraConfigKetPathBeanPropertyResolver.getBindingConstructor(sourceTypeClass, module, null);
+    PsiMethod constructor = InfraConfigKetPathBeanPropertyResolver.getBindingConstructor(sourceTypeClass, module);
     if (constructor != null) {
       for (PsiParameter parameter : constructor.getParameterList().getParameters()) {
         if (propertyName.equals(parameter.getName())) {

@@ -86,9 +86,7 @@ public final class RequestMappingsEndpoint extends Endpoint<LiveRequestMappingsM
     info.getApplicationUrl().addPropertyListener(analyzerRestarter);
     RequestMappingLinkListener linkListener = new RequestMappingLinkListener(project, processHandler, info);
     endpointData.addPropertyListener(linkListener);
-    Disposer.register(info, () -> {
-      AppUIUtil.invokeOnEdt(linkListener::clearLinks);
-    });
+    Disposer.register(info, () -> AppUIUtil.invokeOnEdt(linkListener::clearLinks));
   }
 
   @Override

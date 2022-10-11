@@ -276,6 +276,7 @@
     <!-- "Health" endpoint -->
     <app.run.endpoint implementation="cn.taketoday.assistant.app.run.lifecycle.health.HealthEndpoint"
         id="health" order="after beans" />
+
     <app.run.endpointTabConfigurable
         implementation="cn.taketoday.assistant.app.run.lifecycle.health.tab.HealthEndpointTabConfigurable" />
 

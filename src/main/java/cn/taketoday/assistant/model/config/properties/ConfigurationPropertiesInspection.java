@@ -183,7 +183,7 @@ public final class ConfigurationPropertiesInspection extends AbstractInfraLocalI
 
       PsiClass containingClass = containingUClass.getJavaPsi();
       if (InfraUtils.isStereotypeComponentOrMeta(containingClass)) {
-        PsiMethod bindingConstructor = InfraConfigKetPathBeanPropertyResolver.getBindingConstructor(containingClass, module, null);
+        PsiMethod bindingConstructor = InfraConfigKetPathBeanPropertyResolver.getBindingConstructor(containingClass, module);
         if (bindingConstructor != null) {
           UElement uastAnchor = containingUClass.getUastAnchor();
           if (uastAnchor == null || (identifier = uastAnchor.getSourcePsi()) == null) {

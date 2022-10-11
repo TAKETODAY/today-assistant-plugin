@@ -148,7 +148,7 @@ public class InfraConfigurationPropertyReferenceSearcher extends QueryExecutorBa
         return null;
       }
       Module currentModule = ModuleUtilCore.findModuleForPsiElement(psiMethod);
-      PsiMethod bindingConstructor = InfraConfigKetPathBeanPropertyResolver.getBindingConstructor(containingClass, currentModule, null);
+      PsiMethod bindingConstructor = InfraConfigKetPathBeanPropertyResolver.getBindingConstructor(containingClass, currentModule);
       if (isConstructor) {
         if (!psiMethod.getManager().areElementsEquivalent(bindingConstructor, psiMethod)) {
           return null;
