@@ -112,7 +112,7 @@ public class InfraModelServiceImpl extends InfraModelService {
       return testingModel;
     }
     else if (InfraUtils.isConfigurationOrMeta(psiClass)) {
-      return getAnnoConfigurationSpringModel(psiClass);
+      return getAnnoConfigurationInfraModel(psiClass);
     }
     else {
       VirtualFile virtualFile = psiClass.getContainingFile().getOriginalFile().getVirtualFile();
@@ -146,7 +146,7 @@ public class InfraModelServiceImpl extends InfraModelService {
     return null;
   }
 
-  private CommonInfraModel getAnnoConfigurationSpringModel(PsiClass psiClass) {
+  private CommonInfraModel getAnnoConfigurationInfraModel(PsiClass psiClass) {
     CommonInfraModel infraModel = getModuleCombinedModel(psiClass);
     ModelSearchParameters.BeanClass params = ModelSearchParameters.byClass(psiClass);
     if (InfraModelSearchers.doesBeanExist(infraModel, params)) {

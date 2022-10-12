@@ -69,7 +69,7 @@ public class WebMvcServiceImpl extends WebMvcService {
       Set<BeanPointer<?>> pointers = new HashSet<>();
       PsiClass servletMvcController = InfraUtils.findLibraryClass(module, InfraMvcConstant.SERVLET_MVC_CONTROLLER);
       if (servletMvcController != null) {
-        for (InfraModel model : getSpringModels(module)) {
+        for (InfraModel model : getInfraModels(module)) {
           pointers.addAll(InfraModelSearchers.findBeans(model, ModelSearchParameters.byClass(servletMvcController).withInheritors()));
         }
       }
@@ -87,7 +87,7 @@ public class WebMvcServiceImpl extends WebMvcService {
       PsiClass servletMvcController = InfraUtils.findLibraryClass(module, InfraMvcConstant.SERVLET_MVC_CONTROLLER);
       if (servletMvcController != null) {
         ModelSearchParameters.BeanClass searchParameters = ModelSearchParameters.byClass(servletMvcController).withInheritors();
-        for (InfraModel model : getSpringModels(module)) {
+        for (InfraModel model : getInfraModels(module)) {
           pointers.addAll(InfraModelSearchers.findBeans(model, searchParameters));
         }
       }
@@ -135,7 +135,7 @@ public class WebMvcServiceImpl extends WebMvcService {
     });
   }
 
-  private static Set<InfraModel> getSpringModels(Module module) {
+  private static Set<InfraModel> getInfraModels(Module module) {
     Set<InfraModel> allModels = InfraManager.from(module.getProject()).getAllModels(module);
     Set<InfraModel> servletModels = allModels.stream().filter(model -> {
       return model.getFileSet() instanceof ServletFileSet;

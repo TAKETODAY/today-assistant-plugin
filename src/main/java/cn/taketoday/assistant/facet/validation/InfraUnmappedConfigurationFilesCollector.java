@@ -146,9 +146,9 @@ public class InfraUnmappedConfigurationFilesCollector {
       }
     }
     LOG.debug("=== collected not configured");
-    Collection<?> filesUsedInSpringModels = getFilesUsedImplicitlyInSpringModels(indicator, this.myNotConfiguredStorage);
+    Collection<?> filesUsedInInfraModels = getFilesUsedImplicitlyInInfraModels(indicator, this.myNotConfiguredStorage);
     for (Map.Entry<Module, Collection<PsiFile>> entry : this.myNotConfiguredStorage.entrySet()) {
-      entry.getValue().removeAll(filesUsedInSpringModels);
+      entry.getValue().removeAll(filesUsedInInfraModels);
     }
     LOG.debug("=== processed implicit infra model");
     Collection<?> filesUsedImplicitlyAsStereotype = getFilesUsedImplicitlyAsStereotype(indicator, this.myNotConfiguredStorage);
@@ -193,7 +193,7 @@ public class InfraUnmappedConfigurationFilesCollector {
     return true;
   }
 
-  private Set<PsiFile> getFilesUsedImplicitlyInSpringModels(ProgressIndicator indicator, MultiMap<Module, PsiFile> notConfigured) {
+  private Set<PsiFile> getFilesUsedImplicitlyInInfraModels(ProgressIndicator indicator, MultiMap<Module, PsiFile> notConfigured) {
     Collection<?> allNotConfiguredFiles = notConfigured.values();
     if (allNotConfiguredFiles.isEmpty()) {
       return Collections.emptySet();

@@ -44,7 +44,6 @@ import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.Conditio
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnMissingClass;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnNotWebApplication;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnProperty;
-import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnRepositoryType;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnResource;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnSingleCandidate;
 import cn.taketoday.assistant.model.config.autoconfigure.conditions.jam.ConditionalOnWebApplication;
@@ -71,13 +70,11 @@ import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConst
 import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_MISSING_CLASS;
 import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_NOT_WEB_APPLICATION;
 import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_PROPERTY;
-import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_REPOSITORY_TYPE;
 import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_RESOURCE;
 import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_SINGLE_CANDIDATE;
 import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.CONDITIONAL_ON_WEB_APPLICATION;
 import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.ENABLE_AUTO_CONFIGURATION;
 import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.IMPORT_AUTO_CONFIGURATION;
-import static cn.taketoday.assistant.model.config.autoconfigure.InfraConfigConstant.INFRA_APPLICATION;
 
 final class InfraAutoconfigureSemContributor extends SemContributor {
 
@@ -115,7 +112,6 @@ final class InfraAutoconfigureSemContributor extends SemContributor {
     registerConditionalOn(registrar, CONDITIONAL_ON_WEB_APPLICATION, ConditionalOnWebApplication.CLASS_META, ConditionalOnWebApplication.METHOD_META);
     registerConditionalOn(registrar, CONDITIONAL_ON_NOT_WEB_APPLICATION, ConditionalOnNotWebApplication.CLASS_META, ConditionalOnNotWebApplication.METHOD_META);
     registerConditionalOn(registrar, CONDITIONAL_ON_ENABLED_RESOURCE_CHAIN, ConditionalOnEnabledResourceChain.CLASS_META, ConditionalOnEnabledResourceChain.METHOD_META);
-    registerConditionalOn(registrar, CONDITIONAL_ON_REPOSITORY_TYPE, ConditionalOnRepositoryType.CLASS_META, ConditionalOnRepositoryType.METHOD_META);
     registerConditionalOn(registrar, CONDITIONAL_ON_ENABLED_HEALTH_INDICATOR, ConditionalOnEnabledHealthIndicator.CLASS_META,
             ConditionalOnEnabledHealthIndicator.METHOD_META);
     registerConditionalOn(registrar, CONDITIONAL_ON_ENABLED_HEALTH_INDICATOR_SB2, ConditionalOnEnabledHealthIndicator.CLASS_META,

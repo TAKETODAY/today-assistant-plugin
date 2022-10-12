@@ -72,7 +72,7 @@ public class InfraModelTreeElement implements StructureViewTreeElement, ItemPres
   }
 
   public TreeElement[] getChildren() {
-    LocalXmlModel infraModel = getSpringModel();
+    LocalXmlModel infraModel = getInfraModel();
     if (infraModel == null) {
       return EMPTY_ARRAY;
     }
@@ -96,7 +96,7 @@ public class InfraModelTreeElement implements StructureViewTreeElement, ItemPres
   }
 
   @Nullable
-  private LocalXmlModel getSpringModel() {
+  private LocalXmlModel getInfraModel() {
     Module module = ModuleUtilCore.findModuleForFile(this.myXmlFile);
     if (module == null) {
       return null;

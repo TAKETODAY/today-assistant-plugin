@@ -68,9 +68,6 @@ public interface InfraConfigConstant {
   String CONDITIONAL_ON_ENABLED_RESOURCE_CHAIN =
           "cn.taketoday.context.annotation.config.web.ConditionalOnEnabledResourceChain";
 
-  String CONDITIONAL_ON_REPOSITORY_TYPE =
-          "cn.taketoday.context.annotation.config.data.ConditionalOnRepositoryType";
-
   String CONDITIONAL_ON_ENABLED_HEALTH_INDICATOR =
           "cn.taketoday.boot.actuate.autoconfigure.ConditionalOnEnabledHealthIndicator";
 

@@ -53,8 +53,8 @@ public class GenerateBeanDependenciesActionHandler implements CodeInsightActionH
     PsiElement element = file.findElementAt(offset);
     if (element != null) {
       PsiClass psiClass = PsiTreeUtil.getParentOfType(element, PsiClass.class);
-      CommonInfraModel psiClassSpringModel = InfraModelService.of().getPsiClassModel(psiClass);
-      List<Pair<InfraInjection, InfraGenerateTemplatesHolder>> list = GenerateBeanDependenciesUtil.generateDependenciesFor(psiClassSpringModel, psiClass, this.mySetterDependency);
+      CommonInfraModel psiClassInfraModel = InfraModelService.of().getPsiClassModel(psiClass);
+      List<Pair<InfraInjection, InfraGenerateTemplatesHolder>> list = GenerateBeanDependenciesUtil.generateDependenciesFor(psiClassInfraModel, psiClass, this.mySetterDependency);
       for (Pair<InfraInjection, InfraGenerateTemplatesHolder> pair : list) {
         pair.getSecond().runTemplates();
       }

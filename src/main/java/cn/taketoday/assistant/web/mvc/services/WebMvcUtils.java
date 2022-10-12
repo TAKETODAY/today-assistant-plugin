@@ -157,7 +157,7 @@ public final class WebMvcUtils {
     return new ArrayList<>(processor.getResults());
   }
 
-  public static Iterable<UrlMappingElement> getUrlMappingsWithoutSpringModel(Module module, BiConsumer<? super Long, ? super Integer> listener) {
+  public static Iterable<UrlMappingElement> getUrlMappingsWithoutInfraModel(Module module, BiConsumer<? super Long, ? super Integer> listener) {
     PerformanceTracker tracker = new PerformanceTracker(listener, 2);
     CachedValue<List<UrlMappingElement>> annotationListMapping = getAnnotatedMappingsCacheValue(module);
     return PerformanceTracker.weakTrack(tracker, List::size, annotationListMapping);

@@ -65,7 +65,7 @@ public class InfraBeanReferenceJamConverter extends JamSimpleReferenceConverter<
       return null;
     }
 
-    CommonInfraModel model = getSpringModel(context.getPsiElement());
+    CommonInfraModel model = getInfraModel(context.getPsiElement());
     return InfraModelSearchers.findBean(model, s);
   }
 
@@ -76,7 +76,7 @@ public class InfraBeanReferenceJamConverter extends JamSimpleReferenceConverter<
       return Collections.emptyList();
 
     if (myBaseClass == null) {
-      CommonInfraModel model = getSpringModel(psiElement);
+      CommonInfraModel model = getInfraModel(psiElement);
       return model.getAllCommonBeans();
     }
 
@@ -85,7 +85,7 @@ public class InfraBeanReferenceJamConverter extends JamSimpleReferenceConverter<
     if (psiClass == null)
       return Collections.emptyList();
 
-    CommonInfraModel model = getSpringModel(psiElement);
+    CommonInfraModel model = getInfraModel(psiElement);
     ModelSearchParameters.BeanClass searchParameters =
             ModelSearchParameters.byClass(psiClass).withInheritors().effectiveBeanTypes();
     return InfraModelSearchers.findBeans(model, searchParameters);
@@ -109,7 +109,7 @@ public class InfraBeanReferenceJamConverter extends JamSimpleReferenceConverter<
    * @return Spring Model for resolving/completion.
    */
 
-  protected CommonInfraModel getSpringModel(PsiElement psiElement) {
+  protected CommonInfraModel getInfraModel(PsiElement psiElement) {
     return InfraModelService.of().getModel(psiElement);
   }
 }
