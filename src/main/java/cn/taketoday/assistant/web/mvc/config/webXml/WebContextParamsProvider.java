@@ -66,7 +66,7 @@ public class WebContextParamsProvider extends ContextParamsProvider {
     }
 
     @Nullable
-    protected CommonInfraModel getSpringModel(ConvertContext context) {
+    protected CommonInfraModel getInfraModel(ConvertContext context) {
       Module module = context.getModule();
       if (module == null) {
         return null;

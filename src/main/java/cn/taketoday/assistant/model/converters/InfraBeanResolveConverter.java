@@ -66,7 +66,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
   }
 
   @Nullable
-  protected CommonInfraModel getSpringModel(ConvertContext context) {
+  protected CommonInfraModel getInfraModel(ConvertContext context) {
     return InfraManager.from(context.getFile().getProject()).getInfraModelByFile(context.getFile());
   }
 
@@ -87,7 +87,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
     if (s == null)
       return null;
 
-    CommonInfraModel infraModel = getSpringModel(context);
+    CommonInfraModel infraModel = getInfraModel(context);
     if (infraModel == null)
       return null;
 
@@ -141,7 +141,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
       return Collections.emptySet();
     }
 
-    return getVariants(context, false, false, getRequiredClasses(context), getSpringModel(context));
+    return getVariants(context, false, false, getRequiredClasses(context), getInfraModel(context));
   }
 
   protected static boolean isPlaceholder(ConvertContext context) {
@@ -221,7 +221,7 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
 
     @Override
     public Collection<BeanPointer<?>> getVariants(ConvertContext context) {
-      return getVariants(context, false, true, getRequiredClasses(context), getSpringModel(context));
+      return getVariants(context, false, true, getRequiredClasses(context), getInfraModel(context));
     }
   }
 }

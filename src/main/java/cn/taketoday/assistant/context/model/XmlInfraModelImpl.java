@@ -50,13 +50,13 @@ public class XmlInfraModelImpl extends XmlInfraModel {
 
   public Set<CommonInfraModel> getRelatedModels(boolean checkActiveProfiles) {
     Set<CommonInfraModel> models = new LinkedHashSet<>();
-    models.addAll(getLocalSpringModels());
+    models.addAll(getLocalInfraModels());
     models.addAll(getDependencies());
     return models;
   }
 
   @Override
-  public Set<LocalXmlModel> getLocalSpringModels() {
+  public Set<LocalXmlModel> getLocalInfraModels() {
     InfraFileSet fileSet = getFileSet();
     Set<String> activeProfiles = fileSet == null ? getActiveProfiles() : fileSet.getActiveProfiles();
     return new LinkedHashSet<>(ContainerUtil.mapNotNull(myConfigFiles, xmlFile -> {
@@ -75,7 +75,7 @@ public class XmlInfraModelImpl extends XmlInfraModel {
         return (model instanceof cn.taketoday.assistant.context.model.LocalXmlModel) && ((LocalXmlModel) model).getConfig().equals(file);
       }
     };
-    for (cn.taketoday.assistant.context.model.LocalXmlModel model : getLocalSpringModels()) {
+    for (cn.taketoday.assistant.context.model.LocalXmlModel model : getLocalInfraModels()) {
       if (!InfraModelVisitors.visitRecursionAwareRelatedModels(
               model, InfraModelVisitorContext.context(findProcessor, (m, p) -> p.process(m)))) {
         return true;
@@ -86,7 +86,7 @@ public class XmlInfraModelImpl extends XmlInfraModel {
 
   @Override
   public Set<DomFileElement<Beans>> getLocalModelsRoots() {
-    Set<LocalXmlModel> localModels = getLocalSpringModels();
+    Set<LocalXmlModel> localModels = getLocalInfraModels();
     Set<DomFileElement<Beans>> set = new LinkedHashSet<>(localModels.size());
     for (LocalXmlModel localXmlModel : localModels) {
       DomFileElement<Beans> root = localXmlModel.getRoot();

@@ -30,7 +30,8 @@ import cn.taketoday.assistant.facet.InfraFileSet;
 import cn.taketoday.assistant.model.xml.beans.Beans;
 
 public abstract class XmlInfraModel extends InfraModel {
-  public abstract Set<LocalXmlModel> getLocalSpringModels();
+
+  public abstract Set<LocalXmlModel> getLocalInfraModels();
 
   public abstract Set<XmlFile> getXmlConfigFiles();
 

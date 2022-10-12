@@ -37,7 +37,7 @@ public class ParentRefConverterImpl extends ParentRefConverter {
     if (s == null) {
       return null;
     }
-    CommonInfraModel model = getSpringModel(context);
+    CommonInfraModel model = getInfraModel(context);
     if (!(model instanceof XmlInfraModel)) {
       return null;
     }
@@ -52,6 +52,6 @@ public class ParentRefConverterImpl extends ParentRefConverter {
 
   @Override
   public Collection<BeanPointer<?>> getVariants(ConvertContext context) {
-    return getVariants(context, true, false, getRequiredClasses(context), getSpringModel(context));
+    return getVariants(context, true, false, getRequiredClasses(context), getInfraModel(context));
   }
 }

@@ -76,6 +76,6 @@ public class CombinedInfraModelImpl extends InfraModel implements CombinedInfraM
 
   @Override
   public String toString() {
-    return "CombinedSpringModel[" + getModule().getName() + ", #" + this.myModels.size() + "]";
+    return "CombinedInfraModel[" + getModule().getName() + ", #" + this.myModels.size() + "]";
   }
 }

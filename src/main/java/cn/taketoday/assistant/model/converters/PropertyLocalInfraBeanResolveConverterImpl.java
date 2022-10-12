@@ -36,7 +36,7 @@ public class PropertyLocalInfraBeanResolveConverterImpl extends PropertyLocalInf
 
   @Override
   @Nullable
-  public CommonInfraModel getSpringModel(ConvertContext context) {
+  public CommonInfraModel getInfraModel(ConvertContext context) {
     if (context.getModule() == null) {
       return null;
     }
