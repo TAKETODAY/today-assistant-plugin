@@ -296,7 +296,7 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
   }
 
   private static Set<BeanPointer<?>> getPlaceholderConfigurerBeans(DomElement domElement) {
-    InfraModel model = InfraConverterUtil.getSpringModel(domElement);
+    InfraModel model = InfraConverterUtil.getInfraModel(domElement);
     return model == null ? Collections.emptySet() : InfraModelVisitorUtils.getPlaceholderConfigurers(model);
   }
 }

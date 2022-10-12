@@ -93,7 +93,7 @@ public class BeanPropertyConverterImpl extends BeanPropertyConverter {
   public boolean isAbstractBeanTemplate(CommonInfraBean infraBean, @Nullable PsiClass beanClass, ConvertContext context) {
     InfraModel model;
     boolean isAbstractBeanWithNoClass = beanClass == null && (infraBean instanceof InfraBean) && ((InfraBean) infraBean).isAbstract();
-    return isAbstractBeanWithNoClass && (model = InfraConverterUtil.getSpringModel(context)) != null && InfraModelVisitorUtils.getDescendants(model,
+    return isAbstractBeanWithNoClass && (model = InfraConverterUtil.getInfraModel(context)) != null && InfraModelVisitorUtils.getDescendants(model,
             InfraBeanService.of().createBeanPointer(infraBean)).size() == 1;
   }
 }

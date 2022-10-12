@@ -73,12 +73,12 @@ public final class InfraConverterUtil {
   }
 
   @Nullable
-  public static InfraModel getSpringModel(ConvertContext context) {
-    return getSpringModel(context.getInvocationElement());
+  public static InfraModel getInfraModel(ConvertContext context) {
+    return getInfraModel(context.getInvocationElement());
   }
 
   @Nullable
-  public static InfraModel getSpringModel(DomElement element) {
+  public static InfraModel getInfraModel(DomElement element) {
     XmlFile xmlFile = (XmlFile) DomUtil.getFile(element).getOriginalFile();
     return InfraManager.from(xmlFile.getProject()).getInfraModelByFile(xmlFile);
   }

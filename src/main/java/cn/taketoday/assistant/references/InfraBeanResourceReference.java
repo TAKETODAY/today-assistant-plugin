@@ -53,11 +53,11 @@ public class InfraBeanResourceReference extends InfraBeanReference {
   public PsiElement resolve() {
     String beanName = getValue();
 
-    CommonInfraModel springModel = getInfraModel();
+    CommonInfraModel infraModel = getInfraModel();
 
-    BeanPointer<?> pointer = InfraModelSearchers.findBean(springModel, beanName);
+    BeanPointer<?> pointer = InfraModelSearchers.findBean(infraModel, beanName);
     return pointer == null || !pointer.isValid() || isDefinedAsCollectionElement(pointer) ?
-           resolveResourceByFqn(beanName, springModel, getElement().getProject()) : pointer.getPsiElement();
+           resolveResourceByFqn(beanName, infraModel, getElement().getProject()) : pointer.getPsiElement();
   }
 
   @Override

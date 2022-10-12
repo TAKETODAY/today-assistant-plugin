@@ -143,7 +143,7 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
 
   public ResolveResult[] multiResolve(boolean incompleteCode) {
     if (isFirst()) {
-      InfraModel model = InfraConverterUtil.getSpringModel(this.myReferenceSet.getContext());
+      InfraModel model = InfraConverterUtil.getInfraModel(this.myReferenceSet.getContext());
       if (model == null) {
         return ResolveResult.EMPTY_ARRAY;
       }
@@ -187,7 +187,7 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
 
   public Object[] getVariants() {
     Map<String, PsiMethod> properties;
-    InfraModel model = InfraConverterUtil.getSpringModel(this.myReferenceSet.getContext());
+    InfraModel model = InfraConverterUtil.getInfraModel(this.myReferenceSet.getContext());
     if (model == null) {
       return EMPTY_ARRAY;
     }

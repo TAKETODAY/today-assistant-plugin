@@ -38,11 +38,11 @@ public class RequestMappingsUrlPathProviderFactory implements InfraApplicationUr
   @Override
   public TextFieldWithAutoCompletionListProvider<?> createCompletionProvider(InfraApplicationInfo info) {
     LiveRequestMappingsModel mappingsModel = info.getEndpointData(RequestMappingsEndpoint.getInstance()).getValue();
-    Collection<String> mappings = mappingsModel == null ? Collections.emptySet() : mappingsModel.getRequestMappings().stream().filter((v0) -> {
-      return v0.canNavigate();
-    }).map((v0) -> {
-      return v0.getPath();
-    }).collect(Collectors.toSet());
+    Collection<String> mappings =
+            mappingsModel == null ? Collections.emptySet() : mappingsModel.getRequestMappings().stream()
+                    .filter(LiveRequestMapping::canNavigate)
+                    .map(LiveRequestMapping::getPath)
+                    .collect(Collectors.toSet());
     return new TextFieldWithAutoCompletionListProvider<>(mappings) {
 
       public String getLookupString(String item) {

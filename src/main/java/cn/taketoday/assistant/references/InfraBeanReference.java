@@ -52,8 +52,8 @@ import cn.taketoday.lang.Nullable;
 public class InfraBeanReference extends PsiReferenceBase<PsiElement> implements EmptyResolveMessageProvider {
 
   @Nullable
-  private final PsiClass myRequiredClass;
-  private final boolean myFactoryBeanRef;
+  private final PsiClass requiredClass;
+  private final boolean factoryBeanRef;
 
   public InfraBeanReference(PsiElement element) {
     this(element, ElementManipulators.getValueTextRange(element));
@@ -68,12 +68,12 @@ public class InfraBeanReference extends PsiReferenceBase<PsiElement> implements 
           @Nullable PsiClass requiredClass,
           boolean isFactoryBeanRef) {
     super(element, range);
-    myRequiredClass = requiredClass;
-    myFactoryBeanRef = isFactoryBeanRef;
+    this.requiredClass = requiredClass;
+    this.factoryBeanRef = isFactoryBeanRef;
   }
 
   public boolean isFactoryBeanRef() {
-    return myFactoryBeanRef;
+    return factoryBeanRef;
   }
 
   protected CommonInfraModel getInfraModel() {
@@ -102,7 +102,7 @@ public class InfraBeanReference extends PsiReferenceBase<PsiElement> implements 
     Collection<BeanPointer<?>> beans = getBeanPointers(model);
 
     List<LookupElement> lookups = new ArrayList<>(beans.size());
-    for (BeanPointer bean : beans) {
+    for (BeanPointer<?> bean : beans) {
       ContainerUtil.addIfNotNull(lookups, InfraConverterUtil.createCompletionVariant(bean));
     }
     return ArrayUtil.toObjectArray(lookups);
@@ -110,9 +110,9 @@ public class InfraBeanReference extends PsiReferenceBase<PsiElement> implements 
 
   protected Collection<BeanPointer<?>> getBeanPointers(CommonInfraModel model) {
     Collection<BeanPointer<?>> beans;
-    if (myRequiredClass != null && !CommonClassNames.JAVA_LANG_OBJECT.equals(myRequiredClass.getQualifiedName())) {
+    if (requiredClass != null && !CommonClassNames.JAVA_LANG_OBJECT.equals(requiredClass.getQualifiedName())) {
       ModelSearchParameters.BeanClass searchParameters =
-              ModelSearchParameters.byClass(myRequiredClass).withInheritors().effectiveBeanTypes();
+              ModelSearchParameters.byClass(requiredClass).withInheritors().effectiveBeanTypes();
       beans = InfraModelSearchers.findBeans(model, searchParameters);
     }
     else {

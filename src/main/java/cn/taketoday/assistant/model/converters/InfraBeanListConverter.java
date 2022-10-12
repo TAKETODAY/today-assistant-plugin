@@ -70,7 +70,7 @@ public class InfraBeanListConverter extends DelimitedListConverter<BeanPointer<?
     if (s == null)
       return null;
 
-    CommonInfraModel model = InfraConverterUtil.getSpringModel(context);
+    CommonInfraModel model = InfraConverterUtil.getInfraModel(context);
     if (model == null)
       return null;
 
@@ -98,7 +98,7 @@ public class InfraBeanListConverter extends DelimitedListConverter<BeanPointer<?
   @Override
   protected Object[] getReferenceVariants(ConvertContext context,
           GenericDomValue<? extends List<BeanPointer<?>>> genericDomValue) {
-    CommonInfraModel model = InfraConverterUtil.getSpringModel(context);
+    CommonInfraModel model = InfraConverterUtil.getInfraModel(context);
     if (model == null)
       return EMPTY_ARRAY;
 
