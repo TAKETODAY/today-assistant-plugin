@@ -154,8 +154,8 @@ public class PlaceholderPropertyReference extends PropertyReferenceBase implemen
       return true;
     };
     Set<DomElement> configurerProperties = new HashSet<>();
-    CommonInfraModel springModel = InfraModelService.of().getModel(this.myElement);
-    List<BeanPointer<?>> placeholders = getPlaceholders(springModel);
+    CommonInfraModel infraModel = InfraModelService.of().getModel(this.myElement);
+    List<BeanPointer<?>> placeholders = getPlaceholders(infraModel);
     if (placeholders.size() > 0) {
       configurerProperties.addAll(getPlaceholderConfigurerProperties(this.myKey, placeholders));
       processXmlProperties(processor, placeholders);
@@ -167,7 +167,7 @@ public class PlaceholderPropertyReference extends PropertyReferenceBase implemen
       additionalProperties.addAll(resolveResult.first);
       processedFiles.addAll(resolveResult.second);
     }
-    for (PropertiesFile propertiesFile2 : getPropertiesFiles(springModel)) {
+    for (PropertiesFile propertiesFile2 : getPropertiesFiles(infraModel)) {
       if (!processedFiles.contains(propertiesFile2.getVirtualFile())) {
         processor.process(propertiesFile2);
       }
@@ -197,16 +197,16 @@ public class PlaceholderPropertyReference extends PropertyReferenceBase implemen
     return result;
   }
 
-  public Collection<PropertiesFile> getPropertiesFiles(CommonInfraModel springModel) {
-    return springModel instanceof UserDataHolder ? getCachedPropertiesFiles(springModel) : getFiles(springModel);
+  public Collection<PropertiesFile> getPropertiesFiles(CommonInfraModel infraModel) {
+    return infraModel instanceof UserDataHolder ? getCachedPropertiesFiles(infraModel) : getFiles(infraModel);
   }
 
-  private static Collection<PropertiesFile> getCachedPropertiesFiles(CommonInfraModel springModel) {
+  private static Collection<PropertiesFile> getCachedPropertiesFiles(CommonInfraModel infraModel) {
     Collection<PropertiesFile> emptyList;
-    Module module = springModel.getModule();
-    if (module != null && (springModel instanceof UserDataHolder)) {
-      emptyList = CachedValuesManager.getManager(module.getProject()).getCachedValue((UserDataHolder) springModel, () -> {
-        return CachedValueProvider.Result.create(getFiles(springModel), InfraModificationTrackersManager.from(springModel.getModule().getProject()).getOuterModelsDependencies());
+    Module module = infraModel.getModule();
+    if (module != null && (infraModel instanceof UserDataHolder)) {
+      emptyList = CachedValuesManager.getManager(module.getProject()).getCachedValue((UserDataHolder) infraModel, () -> {
+        return CachedValueProvider.Result.create(getFiles(infraModel), InfraModificationTrackersManager.from(infraModel.getModule().getProject()).getOuterModelsDependencies());
       });
     }
     else {
@@ -215,18 +215,18 @@ public class PlaceholderPropertyReference extends PropertyReferenceBase implemen
     return emptyList;
   }
 
-  private static Collection<PropertiesFile> getFiles(CommonInfraModel springModel) {
+  private static Collection<PropertiesFile> getFiles(CommonInfraModel infraModel) {
     CommonProcessors.CollectProcessor<PropertiesFile> processor = new CommonProcessors.CollectProcessor<>();
-    processEmbeddedPropertySources(processor, springModel);
-    Module module = springModel.getModule();
+    processEmbeddedPropertySources(processor, infraModel);
+    Module module = infraModel.getModule();
     if (module != null) {
-      processCommonModel(module.getProject(), processor, springModel);
+      processCommonModel(module.getProject(), processor, infraModel);
     }
     return processor.getResults();
   }
 
-  public static void processCommonModel(Project project, Processor<? super PropertiesFile> processor, CommonInfraModel springModel) {
-    InfraModelVisitors.visitRelatedModels(springModel, InfraModelVisitorContext.context(processor, (model, params) -> {
+  public static void processCommonModel(Project project, Processor<? super PropertiesFile> processor, CommonInfraModel infraModel) {
+    InfraModelVisitors.visitRelatedModels(infraModel, InfraModelVisitorContext.context(processor, (model, params) -> {
       if (model instanceof InfraModel) {
         return processFilesetCustomPropertiesFiles(processor, ((InfraModel) model).getFileSet(), project);
       }

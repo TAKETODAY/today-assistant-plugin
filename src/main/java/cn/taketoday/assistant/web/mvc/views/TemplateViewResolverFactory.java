@@ -106,8 +106,8 @@ public class TemplateViewResolverFactory extends ViewResolverFactory {
     return "";
   }
 
-  private Set<ViewResolver> getViewResolverRegistryViewResolvers(UCallExpression expression, CommonInfraModel springModel) {
-    Module module = springModel.getModule();
+  private Set<ViewResolver> getViewResolverRegistryViewResolvers(UCallExpression expression, CommonInfraModel infraModel) {
+    Module module = infraModel.getModule();
     if (module == null) {
       return Collections.emptySet();
     }
@@ -116,7 +116,7 @@ public class TemplateViewResolverFactory extends ViewResolverFactory {
       return Collections.emptySet();
     }
     ModelSearchParameters.BeanClass searchParameters = ModelSearchParameters.byClass(configurerClass).withInheritors().effectiveBeanTypes();
-    List<BeanPointer<?>> configurers = InfraModelSearchers.findBeans(springModel, searchParameters);
+    List<BeanPointer<?>> configurers = InfraModelSearchers.findBeans(infraModel, searchParameters);
     if (configurers.size() != 1) {
       return Collections.emptySet();
     }

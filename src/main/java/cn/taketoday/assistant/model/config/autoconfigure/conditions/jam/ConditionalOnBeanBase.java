@@ -136,7 +136,7 @@ abstract class ConditionalOnBeanBase extends JamBaseElement<PsiModifierListOwner
     });
   }
 
-  protected void matchBeansByType(CommonInfraModel springModel, Collection<PsiType> types, Collection<PsiClass> containers, List<CommonInfraBean> ignoredBeans,
+  protected void matchBeansByType(CommonInfraModel infraModel, Collection<PsiType> types, Collection<PsiClass> containers, List<CommonInfraBean> ignoredBeans,
           Processor<? super Boolean> matchingProcessor) {
     Iterator var6 = types.iterator();
 
@@ -146,7 +146,7 @@ abstract class ConditionalOnBeanBase extends JamBaseElement<PsiModifierListOwner
         PsiType psiType = (PsiType) var6.next();
         if (psiType != null) {
           List<CommonInfraBean> beansByType = ContainerUtil.map(
-                  ConditionalOnBeanUtils.findBeansByType(springModel, psiType), BeanPointer.TO_BEAN);
+                  ConditionalOnBeanUtils.findBeansByType(infraModel, psiType), BeanPointer.TO_BEAN);
           beansByType.removeAll(ignoredBeans);
           if (!beansByType.isEmpty()) {
             continue label44;
@@ -157,7 +157,7 @@ abstract class ConditionalOnBeanBase extends JamBaseElement<PsiModifierListOwner
           for (PsiClass container : containers) {
             PsiClassType containerType = ConditionalOnBeanUtils.getContainerType(container, psiType);
             beansByType = ContainerUtil.map(
-                    ConditionalOnBeanUtils.findBeansByType(springModel, containerType),
+                    ConditionalOnBeanUtils.findBeansByType(infraModel, containerType),
                     BeanPointer.TO_BEAN);
             beansByType.removeAll(ignoredBeans);
             if (!beansByType.isEmpty()) {
@@ -202,12 +202,12 @@ abstract class ConditionalOnBeanBase extends JamBaseElement<PsiModifierListOwner
     });
   }
 
-  protected void matchBeansByAnnotation(CommonInfraModel springModel, List<CommonInfraBean> ignoredBeans, Processor<? super Boolean> matchingProcessor) {
+  protected void matchBeansByAnnotation(CommonInfraModel infraModel, List<CommonInfraBean> ignoredBeans, Processor<? super Boolean> matchingProcessor) {
     Collection<PsiClass> annotations = getAnnotation();
     if (annotations.isEmpty()) {
       return;
     }
-    Module module = springModel.getModule();
+    Module module = infraModel.getModule();
     if (module == null) {
       matchingProcessor.process(false);
       return;
@@ -217,7 +217,7 @@ abstract class ConditionalOnBeanBase extends JamBaseElement<PsiModifierListOwner
     for (PsiClass annotationClass : annotations) {
       if (annotationClass != null && annotationClass.isAnnotationType()) {
         Query<PsiMethod> psiMethods = AnnotatedElementsSearch.searchPsiMethods(annotationClass, scope);
-        boolean matched = matchAnnotatedBean(springModel, ignoredBeans, psiMethods, psiElement -> {
+        boolean matched = matchAnnotatedBean(infraModel, ignoredBeans, psiMethods, psiElement -> {
           PsiMethod psiMethod = (PsiMethod) psiElement;
           if (psiMethod.isConstructor() || psiMethod.hasModifier(JvmModifier.STATIC) || psiMethod.hasModifier(JvmModifier.PRIVATE)) {
             return null;
@@ -231,7 +231,7 @@ abstract class ConditionalOnBeanBase extends JamBaseElement<PsiModifierListOwner
         }
         else {
           Query<PsiClass> psiClasses = AnnotatedElementsSearch.searchPsiClasses(annotationClass, scope);
-          boolean matched2 = matchAnnotatedBean(springModel, ignoredBeans, psiClasses, psiElement2 -> {
+          boolean matched2 = matchAnnotatedBean(infraModel, ignoredBeans, psiClasses, psiElement2 -> {
             if (!InfraUtils.isBeanCandidateClass((PsiClass) psiElement2)) {
               return null;
             }
@@ -250,14 +250,14 @@ abstract class ConditionalOnBeanBase extends JamBaseElement<PsiModifierListOwner
     }
   }
 
-  private static boolean matchAnnotatedBean(CommonInfraModel springModel, List<CommonInfraBean> ignoredBeans, Query<? extends PsiElement> query, Function<PsiElement, CommonInfraBean> mapper) {
+  private static boolean matchAnnotatedBean(CommonInfraModel infraModel, List<CommonInfraBean> ignoredBeans, Query<? extends PsiElement> query, Function<PsiElement, CommonInfraBean> mapper) {
     return query.anyMatch(psiElement -> {
       PsiType psiType;
       CommonInfraBean bean = mapper.apply(psiElement);
       if (bean == null || ignoredBeans.contains(bean) || (psiType = bean.getBeanType()) == null) {
         return false;
       }
-      List<BeanPointer<?>> pointers = InfraModelSearchers.findBeans(springModel, ModelSearchParameters.byType(psiType));
+      List<BeanPointer<?>> pointers = InfraModelSearchers.findBeans(infraModel, ModelSearchParameters.byType(psiType));
       for (BeanPointer<?> pointer : pointers) {
         if (pointer.isValid() && bean.equals(pointer.getBean())) {
           return true;
@@ -267,14 +267,14 @@ abstract class ConditionalOnBeanBase extends JamBaseElement<PsiModifierListOwner
     });
   }
 
-  protected void matchBeansByName(CommonInfraModel springModel, List<CommonInfraBean> ignoredBeans, Processor<? super Boolean> matchingProcessor) {
+  protected void matchBeansByName(CommonInfraModel infraModel, List<CommonInfraBean> ignoredBeans, Processor<? super Boolean> matchingProcessor) {
     Collection<String> names = getName();
     if (names.isEmpty()) {
       return;
     }
     List<String> ignoredNames = ContainerUtil.mapNotNull(ignoredBeans, CommonInfraBean::getBeanName);
     for (String name : names) {
-      boolean matched = !ignoredNames.contains(name) && !InfraModelSearchers.findBeans(springModel, name).isEmpty();
+      boolean matched = !ignoredNames.contains(name) && !InfraModelSearchers.findBeans(infraModel, name).isEmpty();
       if (!matchingProcessor.process(matched)) {
         return;
       }

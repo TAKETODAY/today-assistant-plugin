@@ -53,7 +53,7 @@ public final class BeanInstantiationInspection extends InfraBeanInspectionBase {
 
   @Override
   protected void checkBean(InfraBean infraBean, Beans beans,
-          DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+          DomElementAnnotationHolder holder, @Nullable CommonInfraModel infraModel) {
 
     PsiClass psiClass = infraBean.getClazz().getValue();
     if (psiClass != null && !infraBean.isAbstract() && psiClass.hasModifierProperty("abstract")) {

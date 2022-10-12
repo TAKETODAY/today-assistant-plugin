@@ -71,7 +71,7 @@ import cn.taketoday.lang.Nullable;
 public final class InfraConstructorArgInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel infraModel) {
     PsiClass beanClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType());
     if (beanClass != null) {
       checkConstructorArgType(infraBean, holder);

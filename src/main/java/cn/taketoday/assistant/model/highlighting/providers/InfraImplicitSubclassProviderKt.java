@@ -48,12 +48,12 @@ import kotlin.jvm.functions.Function1;
 public final class InfraImplicitSubclassProviderKt {
   public static final String ADVISE_MODE_ASPECTJ = "cn.taketoday.context.annotation.AdviceMode.ASPECTJ";
 
-  public static boolean hasAspectJTransactionMode(CommonInfraModel springModel) {
-    if (springModel instanceof LocalAnnotationModel config) {
+  public static boolean hasAspectJTransactionMode(CommonInfraModel infraModel) {
+    if (infraModel instanceof LocalAnnotationModel config) {
       PsiClass getConfig = config.getConfig();
       return isAspectJAdviceMode(getConfig);
     }
-    else if (springModel instanceof LocalXmlModel model) {
+    else if (infraModel instanceof LocalXmlModel model) {
       var findFirstProcessor = findFirstProcessor(new Function1<CommonInfraBean, Boolean>() {
         @Override
         public Boolean invoke(CommonInfraBean it) {
@@ -68,7 +68,7 @@ public final class InfraImplicitSubclassProviderKt {
       }
       return findFirstProcessor.isFound();
     }
-    else if (springModel instanceof InfraModel) {
+    else if (infraModel instanceof InfraModel) {
       var processor = findFirstProcessor(new Function1<CommonInfraModel, Boolean>() {
         @Override
         public Boolean invoke(CommonInfraModel it) {
@@ -78,7 +78,7 @@ public final class InfraImplicitSubclassProviderKt {
           return false;
         }
       });
-      InfraModelVisitors.visitRelatedModels(springModel, InfraModelVisitorContext.context(
+      InfraModelVisitors.visitRelatedModels(infraModel, InfraModelVisitorContext.context(
               processor, new InfraModelVisitorContext.Exec<>() {
                 @Override
                 public boolean run(CommonInfraModel m, Processor<? super CommonInfraModel> processor) {

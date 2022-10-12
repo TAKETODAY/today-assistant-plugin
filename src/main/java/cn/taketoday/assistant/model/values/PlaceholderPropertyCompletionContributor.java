@@ -96,16 +96,16 @@ public class PlaceholderPropertyCompletionContributor extends CompletionContribu
       PropertiesPsiCompletionUtil.addVariantsFromFile(propertyReference, propertiesFile, variants);
       return true;
     };
-    CommonInfraModel springModel = InfraModelService.of().getModel(propertyReference.getElement());
-    List<BeanPointer<?>> placeholders = propertyReference.getPlaceholders(springModel);
+    CommonInfraModel infraModel = InfraModelService.of().getModel(propertyReference.getElement());
+    List<BeanPointer<?>> placeholders = propertyReference.getPlaceholders(infraModel);
     PlaceholderPropertyReference.processXmlProperties(processor, placeholders);
-    PlaceholderPropertyReference.processEmbeddedPropertySources(processor, springModel);
+    PlaceholderPropertyReference.processEmbeddedPropertySources(processor, infraModel);
     for (String key : PlaceholderPropertyReference.getAllPlaceholderConfigurerProperties(placeholders).keySet()) {
       if (!StringUtil.isEmptyOrSpaces(key)) {
         variants.add(key);
       }
     }
-    PlaceholderPropertyReference.processCommonModel(propertyReference.getElement().getProject(), processor, springModel);
+    PlaceholderPropertyReference.processCommonModel(propertyReference.getElement().getProject(), processor, infraModel);
     LookupElement[] lookupElements = PropertiesCompletionContributor.getVariants(variants);
     SmartList<LookupElement> smartList = new SmartList<>();
     for (InfraPlaceholderReferenceResolver resolver : InfraPlaceholderReferenceResolver.array()) {

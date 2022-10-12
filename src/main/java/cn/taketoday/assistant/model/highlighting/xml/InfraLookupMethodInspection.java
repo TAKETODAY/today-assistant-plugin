@@ -86,7 +86,7 @@ public final class InfraLookupMethodInspection extends InfraBeanInspectionBase {
   }
 
   @Override
-  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel infraModel) {
     for (LookupMethod lookupMethod : infraBean.getLookupMethods()) {
       PsiMethod method = lookupMethod.getName().getValue();
       if (method != null) {

@@ -147,10 +147,10 @@ public class InfraModelServiceImpl extends InfraModelService {
   }
 
   private CommonInfraModel getAnnoConfigurationSpringModel(PsiClass psiClass) {
-    CommonInfraModel springModel = getModuleCombinedModel(psiClass);
+    CommonInfraModel infraModel = getModuleCombinedModel(psiClass);
     ModelSearchParameters.BeanClass params = ModelSearchParameters.byClass(psiClass);
-    if (InfraModelSearchers.doesBeanExist(springModel, params)) {
-      return springModel;
+    if (InfraModelSearchers.doesBeanExist(infraModel, params)) {
+      return infraModel;
     }
     Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
     if (module == null) {

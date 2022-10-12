@@ -226,7 +226,7 @@ final class LiveBeanImpl implements LiveBean {
   }
 
   @Override
-  public PsiElementPointer findBeanPointer(@Nullable PsiClass beanClass, @Nullable PsiElement resourceElement, @Nullable CommonInfraModel springModel) {
+  public PsiElementPointer findBeanPointer(@Nullable PsiClass beanClass, @Nullable PsiElement resourceElement, @Nullable CommonInfraModel infraModel) {
     InfraModel localModel;
     BeanPointer<?> pointer = SoftReference.dereference(this.myBeanPointerRef);
     if (pointer != null && pointer.isValid() && getName().equals(pointer.getBean().getBeanName())) {
@@ -256,8 +256,8 @@ final class LiveBeanImpl implements LiveBean {
       localModel.processByName(ModelSearchParameters.byName(getName()), findProcessor);
       psiElementPointer = findProcessor.getFoundValue();
     }
-    if (psiElementPointer == null && springModel != null) {
-      springModel.processByName(ModelSearchParameters.byName(getName()), findProcessor);
+    if (psiElementPointer == null && infraModel != null) {
+      infraModel.processByName(ModelSearchParameters.byName(getName()), findProcessor);
       psiElementPointer = findProcessor.getFoundValue();
     }
     this.myBeanPointerRef = new WeakReference<>(pointer);

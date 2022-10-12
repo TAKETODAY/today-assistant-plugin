@@ -120,8 +120,8 @@ public class InfraBeanUtilsImpl extends InfraBeanUtils {
       return Collections.emptySet();
     }
     else if (bean instanceof InfraBean) {
-      CommonInfraModel springModel = InfraModelService.of().getModelByBean(bean);
-      return InfraModelVisitorUtils.getAllBeanNames(springModel, InfraBeanService.of().createBeanPointer(bean));
+      CommonInfraModel infraModel = InfraModelService.of().getModelByBean(bean);
+      return InfraModelVisitorUtils.getAllBeanNames(infraModel, InfraBeanService.of().createBeanPointer(bean));
     }
     else {
       Set<String> names = new HashSet<>();

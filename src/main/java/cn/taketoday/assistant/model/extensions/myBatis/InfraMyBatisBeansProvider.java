@@ -58,21 +58,21 @@ public class InfraMyBatisBeansProvider extends CustomLocalComponentsDiscoverer {
   private static final String MAPPER_SCANNER_CONFIGURER = "org.mybatis.spring.mapper.MapperScannerConfigurer";
 
   @Override
-  public Collection<CommonInfraBean> getCustomComponents(LocalModel springModel) {
-    Module module = springModel.getModule();
-    if (module == null || !(springModel instanceof LocalXmlModel) || DumbService.isDumb(module.getProject())) {
+  public Collection<CommonInfraBean> getCustomComponents(LocalModel infraModel) {
+    Module module = infraModel.getModule();
+    if (module == null || !(infraModel instanceof LocalXmlModel) || DumbService.isDumb(module.getProject())) {
       return Collections.emptyList();
     }
     Collection<CommonInfraBean> myBatisMappers = new HashSet<>();
-    collectMappers((LocalXmlModel) springModel, module, myBatisMappers, MAPPER_FACTORY_BEAN);
-    collectMappers((LocalXmlModel) springModel, module, myBatisMappers, MAPPER_SCANNER_CONFIGURER);
+    collectMappers((LocalXmlModel) infraModel, module, myBatisMappers, MAPPER_FACTORY_BEAN);
+    collectMappers((LocalXmlModel) infraModel, module, myBatisMappers, MAPPER_SCANNER_CONFIGURER);
     return myBatisMappers;
   }
 
-  public void collectMappers(LocalXmlModel springModel, Module module, Collection<CommonInfraBean> myBatisMappers, String className) {
+  public void collectMappers(LocalXmlModel infraModel, Module module, Collection<CommonInfraBean> myBatisMappers, String className) {
     VirtualFile configFile;
     PsiClass mapperFactoryBeanClass = InfraUtils.findLibraryClass(module, className);
-    if (mapperFactoryBeanClass == null || (configFile = springModel.getConfig().getVirtualFile()) == null) {
+    if (mapperFactoryBeanClass == null || (configFile = infraModel.getConfig().getVirtualFile()) == null) {
       return;
     }
     Project project = module.getProject();

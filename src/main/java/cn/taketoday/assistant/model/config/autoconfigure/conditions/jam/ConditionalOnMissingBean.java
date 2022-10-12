@@ -118,45 +118,45 @@ public class ConditionalOnMissingBean extends ConditionalOnBeanBase implements C
 
   @Override
   public ConditionOutcome matches(ConditionalOnEvaluationContext context) {
-    CommonInfraModel springModel = context.getUserData(ConditionalOnEvaluationContext.MODEL_KEY);
-    if (springModel == null) {
+    CommonInfraModel infraModel = context.getUserData(ConditionalOnEvaluationContext.MODEL_KEY);
+    if (infraModel == null) {
       return ConditionalOnBeanUtils.getMissingModelOutcome();
     }
     Collection<PsiClass> containers = getValidParametrizedContainers();
-    List<CommonInfraBean> ignoredBeans = findIgnoredBeans(springModel, containers);
+    List<CommonInfraBean> ignoredBeans = findIgnoredBeans(infraModel, containers);
     ContainerUtil.addIfNotNull(ignoredBeans, ConditionalOnBeanUtils.getSpringBean(getPsiElement()));
     MatchAnyProcessor processor = new MatchAnyProcessor();
     Collection<PsiType> types = getTypesToMatch();
     if (types.isEmpty() && getName().isEmpty() && getAnnotation().isEmpty()) {
       return ConditionOutcome.noMatch("Bean is not specified using type, name or annotation");
     }
-    matchBeansByType(springModel, types, containers, ignoredBeans, processor);
+    matchBeansByType(infraModel, types, containers, ignoredBeans, processor);
     if (processor.isMatched()) {
       return ConditionOutcome.noMatch(ConditionMessage.found("bean"));
     }
     MatchAnyProcessor processor2 = new MatchAnyProcessor();
-    matchBeansByAnnotation(springModel, ignoredBeans, processor2);
+    matchBeansByAnnotation(infraModel, ignoredBeans, processor2);
     if (processor2.isMatched()) {
       return ConditionOutcome.noMatch(ConditionMessage.found("bean"));
     }
     MatchAnyProcessor processor3 = new MatchAnyProcessor();
-    matchBeansByName(springModel, ignoredBeans, processor3);
+    matchBeansByName(infraModel, ignoredBeans, processor3);
     if (processor3.isMatched()) {
       return ConditionOutcome.noMatch(ConditionMessage.found("bean"));
     }
     return ConditionOutcome.match(ConditionMessage.didNotFind("bean"));
   }
 
-  private List<CommonInfraBean> findIgnoredBeans(CommonInfraModel springModel, Collection<PsiClass> containers) {
+  private List<CommonInfraBean> findIgnoredBeans(CommonInfraModel infraModel, Collection<PsiClass> containers) {
     SmartList smartList = new SmartList();
     Iterable<PsiClass> ignored = ContainerUtil.concat(getIgnored(), getIgnoredType());
     for (PsiClass psiClass : ignored) {
       if (psiClass != null) {
         PsiClassType classType = PsiTypesUtil.getClassType(psiClass);
-        smartList.addAll(ConditionalOnBeanUtils.findBeansByType(springModel, classType));
+        smartList.addAll(ConditionalOnBeanUtils.findBeansByType(infraModel, classType));
         for (PsiClass container : containers) {
           PsiClassType containerType = ConditionalOnBeanUtils.getContainerType(container, classType);
-          smartList.addAll(ConditionalOnBeanUtils.findBeansByType(springModel, containerType));
+          smartList.addAll(ConditionalOnBeanUtils.findBeansByType(infraModel, containerType));
         }
       }
     }

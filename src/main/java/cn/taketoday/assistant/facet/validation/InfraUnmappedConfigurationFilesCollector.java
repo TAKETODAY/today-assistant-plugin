@@ -279,10 +279,10 @@ public class InfraUnmappedConfigurationFilesCollector {
                 if (!it.hasNext()) {
                   break;
                 }
-                CommonInfraModel springModel = it.next();
-                LOG.debug("  in " + springModel);
+                CommonInfraModel infraModel = it.next();
+                LOG.debug("  in " + infraModel);
                 indicator.checkCanceled();
-                if (InfraModelSearchers.doesBeanExist(springModel, params)) {
+                if (InfraModelSearchers.doesBeanExist(infraModel, params)) {
                   foundStereoTypeConfigFiles.add(psiClassOwner);
                   break;
                 }

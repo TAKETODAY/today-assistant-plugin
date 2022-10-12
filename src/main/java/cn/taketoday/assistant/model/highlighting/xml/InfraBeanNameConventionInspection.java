@@ -39,7 +39,7 @@ import static cn.taketoday.assistant.InfraBundle.message;
 public final class InfraBeanNameConventionInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel infraModel) {
     GenericAttributeValue<String> springBeanId = infraBean.getId();
     if (!DomUtil.hasXml(springBeanId)) {
       return;

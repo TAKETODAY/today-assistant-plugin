@@ -87,11 +87,11 @@ public class InfraBeanResolveConverter extends ResolvingConverter<BeanPointer<?>
     if (s == null)
       return null;
 
-    CommonInfraModel springModel = getSpringModel(context);
-    if (springModel == null)
+    CommonInfraModel infraModel = getSpringModel(context);
+    if (infraModel == null)
       return null;
 
-    return InfraBeanUtils.of().findBean(springModel, s);
+    return InfraBeanUtils.of().findBean(infraModel, s);
   }
 
   @Override

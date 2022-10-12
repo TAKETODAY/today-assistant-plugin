@@ -53,9 +53,9 @@ import cn.taketoday.lang.Nullable;
 public final class RequiredPropertyInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel infraModel) {
     PsiClass psiClass;
-    if (infraBean.isAbstract() || springModel == null || (psiClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType())) == null) {
+    if (infraBean.isAbstract() || infraModel == null || (psiClass = PsiTypesUtil.getPsiClass(infraBean.getBeanType())) == null) {
       return;
     }
     Map<String, PsiMethod> properties = PropertyUtilBase.getAllProperties(psiClass, true, false);
@@ -64,7 +64,7 @@ public final class RequiredPropertyInspection extends InfraBeanInspectionBase {
     SmartList smartList2 = new SmartList();
     for (Map.Entry<String, PsiMethod> entry : properties.entrySet()) {
       if (AnnotationUtil.isAnnotated(entry.getValue(), AnnotationConstant.REQUIRED, 0) && !isDefined(definedProperties,
-              entry.getKey()) && !AutowireUtil.isAutowired(infraBean, springModel, entry.getValue())) {
+              entry.getKey()) && !AutowireUtil.isAutowired(infraBean, infraModel, entry.getValue())) {
         smartList.add(entry.getKey());
         smartList2.add(entry.getValue());
       }

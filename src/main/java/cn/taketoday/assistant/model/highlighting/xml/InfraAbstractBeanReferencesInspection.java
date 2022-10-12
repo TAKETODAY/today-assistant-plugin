@@ -47,7 +47,7 @@ import cn.taketoday.lang.Nullable;
 public final class InfraAbstractBeanReferencesInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel infraModel) {
     for (InfraValueHolderDefinition property : InfraPropertyUtils.getValueHolders(infraBean)) {
       checkAbstractBeanReferences(property, holder);
     }

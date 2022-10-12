@@ -88,8 +88,8 @@ public class ConditionalOnBean extends ConditionalOnBeanBase implements Conditio
 
   @Override
   public ConditionOutcome matches(ConditionalOnEvaluationContext context) {
-    CommonInfraModel springModel = context.getUserData(ConditionalOnEvaluationContext.MODEL_KEY);
-    if (springModel == null) {
+    CommonInfraModel infraModel = context.getUserData(ConditionalOnEvaluationContext.MODEL_KEY);
+    if (infraModel == null) {
       return ConditionalOnBeanUtils.getMissingModelOutcome();
     }
     Collection<PsiClass> containers = getValidParametrizedContainers();
@@ -100,17 +100,17 @@ public class ConditionalOnBean extends ConditionalOnBeanBase implements Conditio
     if (types.isEmpty() && getName().isEmpty() && getAnnotation().isEmpty()) {
       return ConditionOutcome.noMatch("Bean is not specified using type, name or annotation");
     }
-    matchBeansByType(springModel, types, containers, ignoredBeans, processor);
+    matchBeansByType(infraModel, types, containers, ignoredBeans, processor);
     if (!processor.isMatched()) {
       return ConditionOutcome.noMatch(ConditionMessage.didNotFind("bean"));
     }
     MatchAllProcessor processor2 = new MatchAllProcessor();
-    matchBeansByAnnotation(springModel, ignoredBeans, processor2);
+    matchBeansByAnnotation(infraModel, ignoredBeans, processor2);
     if (!processor2.isMatched()) {
       return ConditionOutcome.noMatch(ConditionMessage.didNotFind("bean"));
     }
     MatchAllProcessor processor3 = new MatchAllProcessor();
-    matchBeansByName(springModel, ignoredBeans, processor3);
+    matchBeansByName(infraModel, ignoredBeans, processor3);
     if (!processor3.isMatched()) {
       return ConditionOutcome.noMatch(ConditionMessage.didNotFind("bean"));
     }

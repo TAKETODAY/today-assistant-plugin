@@ -50,9 +50,9 @@ final class ConditionalOnBeanUtils {
     return facade.getElementFactory().createType(container, substitutor, PsiUtil.getLanguageLevel(container));
   }
 
-  static List<BeanPointer<?>> findBeansByType(CommonInfraModel springModel, PsiType psiType) {
+  static List<BeanPointer<?>> findBeansByType(CommonInfraModel infraModel, PsiType psiType) {
     ModelSearchParameters.BeanClass searchParameters = ModelSearchParameters.byType(psiType).withInheritors().effectiveBeanTypes();
-    return InfraModelSearchers.findBeans(springModel, searchParameters);
+    return InfraModelSearchers.findBeans(infraModel, searchParameters);
   }
 
   @Nullable

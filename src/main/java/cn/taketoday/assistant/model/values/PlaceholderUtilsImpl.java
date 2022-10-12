@@ -683,12 +683,12 @@ public class PlaceholderUtilsImpl extends PlaceholderUtils {
       return var10000;
     }
     else {
-      LocalXmlModel springModel = LocalModelFactory.of().getOrCreateLocalXmlModel(configFile, module, Collections.emptySet());
-      if (springModel == null) {
+      LocalXmlModel infraModel = LocalModelFactory.of().getOrCreateLocalXmlModel(configFile, module, Collections.emptySet());
+      if (infraModel == null) {
         return Collections.emptySet();
       }
       else {
-        List<BeanPointer<?>> configurers = springModel.getPlaceholderConfigurerBeans();
+        List<BeanPointer<?>> configurers = infraModel.getPlaceholderConfigurerBeans();
         if (configurers.isEmpty()) {
 
           return Collections.singleton(DEFAULT_PLACEHOLDER_PAIR);

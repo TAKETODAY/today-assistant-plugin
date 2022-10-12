@@ -72,16 +72,16 @@ public class InfraModelTreeElement implements StructureViewTreeElement, ItemPres
   }
 
   public TreeElement[] getChildren() {
-    LocalXmlModel springModel = getSpringModel();
-    if (springModel == null) {
+    LocalXmlModel infraModel = getSpringModel();
+    if (infraModel == null) {
       return EMPTY_ARRAY;
     }
-    DomFileElement<Beans> fileElement = springModel.getRoot();
+    DomFileElement<Beans> fileElement = infraModel.getRoot();
     if (fileElement == null) {
       return EMPTY_ARRAY;
     }
     List<StructureViewTreeElement> treeElements = new ArrayList<>();
-    for (BeanPointer pointer : InfraModelVisitorUtils.getAllDomBeans(springModel)) {
+    for (BeanPointer pointer : InfraModelVisitorUtils.getAllDomBeans(infraModel)) {
       CommonInfraBean infraBean = pointer.getBean();
       if (pointer.isValid() && infraBean.isValid() && (infraBean instanceof DomInfraBean)) {
         if (infraBean instanceof CustomBeanWrapper customBeanWrapper) {

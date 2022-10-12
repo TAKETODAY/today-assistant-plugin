@@ -34,7 +34,7 @@ import cn.taketoday.lang.Nullable;
 public final class BeanAttributesInspection extends InfraBeanInspectionBase {
 
   @Override
-  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel springModel) {
+  protected void checkBean(InfraBean infraBean, Beans beans, DomElementAnnotationHolder holder, @Nullable CommonInfraModel infraModel) {
     InfraDomInspectionUtils utils = new InfraDomInspectionUtils(holder);
     if (!utils.onlyOneOf(infraBean, infraBean.getClazz(), infraBean.getFactoryBean())) {
       utils.ifExistsOtherRequired(infraBean, infraBean.getFactoryBean(), infraBean.getFactoryMethod());

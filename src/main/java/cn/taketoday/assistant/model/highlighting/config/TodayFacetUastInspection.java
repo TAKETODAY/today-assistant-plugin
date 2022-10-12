@@ -82,8 +82,8 @@ public final class TodayFacetUastInspection extends AbstractInfraLocalInspection
       return ProblemDescriptor.EMPTY_ARRAY;
     }
     ModelSearchParameters.BeanClass params = ModelSearchParameters.byClass(psiClass);
-    for (CommonInfraModel springModel : InfraManager.from(psiClass.getProject()).getAllModels(module)) {
-      if (InfraModelSearchers.doesBeanExist(springModel, params)) {
+    for (CommonInfraModel infraModel : InfraManager.from(psiClass.getProject()).getAllModels(module)) {
+      if (InfraModelSearchers.doesBeanExist(infraModel, params)) {
         return ProblemDescriptor.EMPTY_ARRAY;
       }
     }

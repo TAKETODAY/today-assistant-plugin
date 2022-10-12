@@ -158,7 +158,7 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     boolean constructorAutowire = AutowireUtil.isConstructorAutowire(bean);
     ConstructorArgumentValues values = new ConstructorArgumentValues();
     int minNrOfArgs = values.init(bean);
-    NotNullLazyValue<CommonInfraModel> springModel = NotNullLazyValue.lazy(() -> InfraModelService.of().getModelByBean(bean));
+    NotNullLazyValue<CommonInfraModel> infraModel = NotNullLazyValue.lazy(() -> InfraModelService.of().getModelByBean(bean));
     methods.sort(CTOR_COMPARATOR);
     for (PsiMethod method : methods) {
       PsiParameter[] params = method.getParameterList().getParameters();
@@ -205,11 +205,11 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
         }
         else if (arg2 == null && isAutowired) {
           PsiType paramType = param.getType();
-          Collection<BeanPointer<?>> beans = AutowireUtil.autowireByType(springModel.getValue(), paramType, null, false);
+          Collection<BeanPointer<?>> beans = AutowireUtil.autowireByType(infraModel.getValue(), paramType, null, false);
           if (beans.isEmpty()) {
             PsiType effectiveBeanType = AutowireUtil.getAutowiredEffectiveBeanTypes(paramType);
             if (!effectiveBeanType.equals(paramType)) {
-              beans = AutowireUtil.autowireByType(springModel.getValue(), effectiveBeanType, null, false);
+              beans = AutowireUtil.autowireByType(infraModel.getValue(), effectiveBeanType, null, false);
             }
           }
           if (!beans.isEmpty() || AutowireUtil.isAutowiredByDefault(paramType)) {

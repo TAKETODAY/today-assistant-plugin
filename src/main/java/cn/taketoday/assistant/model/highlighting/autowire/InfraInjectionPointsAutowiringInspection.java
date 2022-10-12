@@ -208,7 +208,7 @@ public final class InfraInjectionPointsAutowiringInspection extends AbstractInfr
     return null;
   }
 
-  private static void checkAutowiredMethodInjections(UMethod psiMethod, ProblemsHolder holder, CommonInfraModel springModel, boolean requiredForMethod) {
+  private static void checkAutowiredMethodInjections(UMethod psiMethod, ProblemsHolder holder, CommonInfraModel infraModel, boolean requiredForMethod) {
     if (isBeanFactoryInitializationCandidate(psiMethod)) {
       return;
     }
@@ -216,7 +216,7 @@ public final class InfraInjectionPointsAutowiringInspection extends AbstractInfr
       PsiElement param = parameter.getSourcePsi();
       if (param instanceof PsiParameter psiParameter
               && !AutowireUtil.isValueAnnoInjection(psiParameter)) {
-        checkInjectionPoint(parameter, parameter.getType(), holder, springModel, requiredForMethod
+        checkInjectionPoint(parameter, parameter.getType(), holder, infraModel, requiredForMethod
                 && AutowireUtil.isRequired(psiParameter) && !isNullableParameter(psiParameter));
       }
     }
@@ -261,27 +261,27 @@ public final class InfraInjectionPointsAutowiringInspection extends AbstractInfr
     return AnnotationUtil.isAnnotated(psi, AnnotationConstant.NULLABLE, 0);
   }
 
-  private static void checkResourceMethod(UMethod psiMethod, ProblemsHolder holder, CommonInfraModel springModel, boolean required) {
+  private static void checkResourceMethod(UMethod psiMethod, ProblemsHolder holder, CommonInfraModel infraModel, boolean required) {
     PsiType type = PropertyUtilBase.getPropertyType(psiMethod.getJavaPsi());
     if (type != null) {
-      checkInjectionPoint(psiMethod, type, holder, springModel, required);
+      checkInjectionPoint(psiMethod, type, holder, infraModel, required);
     }
   }
 
-  public static void checkInjectionPoint(UDeclaration uDeclaration, PsiType psiType, ProblemsHolder holder, CommonInfraModel springModel, boolean required) {
+  public static void checkInjectionPoint(UDeclaration uDeclaration, PsiType psiType, ProblemsHolder holder, CommonInfraModel infraModel, boolean required) {
     PsiModifierListOwner psiModifierListOwner;
     if (psiType.isValid() && (psiModifierListOwner = UElementKt.getAsJavaPsiElement(uDeclaration, PsiModifierListOwner.class)) != null) {
       PsiAnnotation resourceAnnotation = AutowireUtil.getResourceAnnotation(psiModifierListOwner);
       if (resourceAnnotation != null && (psiModifierListOwner instanceof PsiMember)) {
-        checkResourceInjectionPoint(psiType, holder, springModel, resourceAnnotation);
+        checkResourceInjectionPoint(psiType, holder, infraModel, resourceAnnotation);
         return;
       }
       UAnnotation annotation = getEffectiveQualifiedUAnnotation(uDeclaration);
       if (annotation != null) {
-        checkQualifiedAutowiring(psiType, annotation, holder, springModel, required);
+        checkQualifiedAutowiring(psiType, annotation, holder, infraModel, required);
       }
       else {
-        checkByTypeAutowire(uDeclaration, psiType, holder, springModel, required);
+        checkByTypeAutowire(uDeclaration, psiType, holder, infraModel, required);
       }
     }
   }
@@ -309,10 +309,10 @@ public final class InfraInjectionPointsAutowiringInspection extends AbstractInfr
     return qualifiedAnnotation;
   }
 
-  private static void checkResourceInjectionPoint(PsiType psiType, ProblemsHolder holder, CommonInfraModel springModel, PsiAnnotation resourceAnnotation) {
+  private static void checkResourceInjectionPoint(PsiType psiType, ProblemsHolder holder, CommonInfraModel infraModel, PsiAnnotation resourceAnnotation) {
     PsiAnnotationMemberValue attributeValue = resourceAnnotation.findDeclaredAttributeValue("name");
     if (attributeValue != null) {
-      checkByNameAutowiring(attributeValue, holder, springModel, psiType);
+      checkByNameAutowiring(attributeValue, holder, infraModel, psiType);
     }
   }
 

@@ -47,25 +47,25 @@ import cn.taketoday.assistant.util.InfraUtils;
 public class InfraValidationCustomComponentsDiscoverer extends CustomLocalComponentsDiscoverer {
 
   @Override
-  public Collection<CommonInfraBean> getCustomComponents(LocalModel springModel) {
-    Module module = springModel.getModule();
+  public Collection<CommonInfraBean> getCustomComponents(LocalModel infraModel) {
+    Module module = infraModel.getModule();
     if (module == null || DumbService.isDumb(module.getProject())) {
       return Collections.emptyList();
     }
     Collection<CommonInfraBean> myValidators = new HashSet<>();
-    myValidators.addAll(getConstraintValidatorBeans(springModel, module, JavaeeConstant.JAVAX_CONSTRAINT_VALIDATOR, JavaeeConstant.JAVAX_VALIDATOR_FACTORY));
-    myValidators.addAll(getConstraintValidatorBeans(springModel, module, JavaeeConstant.JAKARTA_CONSTRAINT_VALIDATOR, JavaeeConstant.JAKARTA_VALIDATOR_FACTORY));
+    myValidators.addAll(getConstraintValidatorBeans(infraModel, module, JavaeeConstant.JAVAX_CONSTRAINT_VALIDATOR, JavaeeConstant.JAVAX_VALIDATOR_FACTORY));
+    myValidators.addAll(getConstraintValidatorBeans(infraModel, module, JavaeeConstant.JAKARTA_CONSTRAINT_VALIDATOR, JavaeeConstant.JAKARTA_VALIDATOR_FACTORY));
     return myValidators;
   }
 
-  private static Collection<CommonInfraBean> getConstraintValidatorBeans(LocalModel<?> springModel, Module module, String validatorClass, String factoryClass) {
+  private static Collection<CommonInfraBean> getConstraintValidatorBeans(LocalModel<?> infraModel, Module module, String validatorClass, String factoryClass) {
     PsiModifierList modifierList;
     PsiClass constraintValidator = InfraUtils.findLibraryClass(module, validatorClass);
     if (constraintValidator == null) {
       return Collections.emptyList();
     }
     PsiClass validatorFactory = InfraUtils.findLibraryClass(module, factoryClass);
-    if (validatorFactory == null || !doesBeanExist(springModel, validatorFactory)) {
+    if (validatorFactory == null || !doesBeanExist(infraModel, validatorFactory)) {
       return Collections.emptyList();
     }
     Collection<CommonInfraBean> validators = new HashSet<>();
@@ -78,16 +78,16 @@ public class InfraValidationCustomComponentsDiscoverer extends CustomLocalCompon
     return validators;
   }
 
-  public static boolean doesBeanExist(LocalModel springModel, PsiClass validatorFactory) {
+  public static boolean doesBeanExist(LocalModel infraModel, PsiClass validatorFactory) {
     CommonProcessors.FindFirstProcessor<BeanPointer<?>> findFirstProcessor = new CommonProcessors.FindFirstProcessor<>();
     ModelSearchParameters.BeanClass params = ModelSearchParameters.byClass(validatorFactory);
-    RecursionManager.doPreventingRecursion(springModel, false, () -> {
-      if (springModel instanceof LocalXmlModelImpl) {
-        ((LocalXmlModelImpl) springModel).processLocalBeansByClass(params, findFirstProcessor, true);
+    RecursionManager.doPreventingRecursion(infraModel, false, () -> {
+      if (infraModel instanceof LocalXmlModelImpl) {
+        ((LocalXmlModelImpl) infraModel).processLocalBeansByClass(params, findFirstProcessor, true);
         return null;
       }
-      else if (springModel instanceof CacheableCommonInfraModel) {
-        ((CacheableCommonInfraModel) springModel).processLocalBeansByClass(params, findFirstProcessor);
+      else if (infraModel instanceof CacheableCommonInfraModel) {
+        ((CacheableCommonInfraModel) infraModel).processLocalBeansByClass(params, findFirstProcessor);
         return null;
       }
       else {

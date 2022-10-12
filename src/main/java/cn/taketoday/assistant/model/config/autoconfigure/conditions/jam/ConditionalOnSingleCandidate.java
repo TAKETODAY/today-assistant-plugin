@@ -90,8 +90,8 @@ public class ConditionalOnSingleCandidate extends JamBaseElement<PsiModifierList
 
   @Override
   public ConditionOutcome matches(ConditionalOnEvaluationContext context) {
-    CommonInfraModel springModel = context.getUserData(ConditionalOnEvaluationContext.MODEL_KEY);
-    if (springModel == null) {
+    CommonInfraModel infraModel = context.getUserData(ConditionalOnEvaluationContext.MODEL_KEY);
+    if (infraModel == null) {
       return ConditionalOnBeanUtils.getMissingModelOutcome();
     }
     List<PsiType> psiTypes = getTypesToMatch();
@@ -100,7 +100,7 @@ public class ConditionalOnSingleCandidate extends JamBaseElement<PsiModifierList
     }
     PsiType psiType = psiTypes.get(0);
     ModelSearchParameters.BeanClass searchParameters = ModelSearchParameters.byType(psiType).withInheritors().effectiveBeanTypes();
-    List<CommonInfraBean> beans = ContainerUtil.map(InfraModelSearchers.findBeans(springModel, searchParameters), BeanPointer.TO_BEAN);
+    List<CommonInfraBean> beans = ContainerUtil.map(InfraModelSearchers.findBeans(infraModel, searchParameters), BeanPointer.TO_BEAN);
     CommonInfraBean selfBean = ConditionalOnBeanUtils.getSpringBean(getPsiElement());
     if (selfBean != null) {
       beans.remove(selfBean);
